@@ -28,6 +28,22 @@
 		sourceDirectories = (
 		);
 		variableFormatDictionary = {
+			$cs = 1;
+			$ds = 1;
+			$eax = 1;
+			$ebp = 1;
+			$ebx = 1;
+			$ecx = 1;
+			$edi = 1;
+			$edx = 1;
+			$eflags = 1;
+			$eip = 1;
+			$es = 1;
+			$esi = 1;
+			$esp = 1;
+			$fs = 1;
+			$gs = 1;
+			$ss = 1;
 		};
 	};
 	03846D45145FEECF002BB72D /* Source Control */ = {
@@ -56,7 +72,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 18";
 		rLen = 0;
-		rLoc = 2783;
+		rLoc = 3638;
 		rType = 0;
 		vrLen = 1089;
 		vrLoc = 0;
@@ -116,7 +132,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 61";
 		rLen = 0;
-		rLoc = 3165;
+		rLoc = 4020;
 		rType = 0;
 		vrLen = 938;
 		vrLoc = 19;
@@ -126,7 +142,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 21";
 		rLen = 0;
-		rLoc = 2684;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 835;
 		vrLoc = 454;
@@ -136,7 +152,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 21";
 		rLen = 0;
-		rLoc = 2684;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 837;
 		vrLoc = 452;
@@ -146,7 +162,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 21";
 		rLen = 0;
-		rLoc = 2684;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 837;
 		vrLoc = 452;
@@ -156,7 +172,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 35";
 		rLen = 0;
-		rLoc = 814;
+		rLoc = 1026;
 		rType = 0;
 		vrLen = 985;
 		vrLoc = 0;
@@ -166,7 +182,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 51";
 		rLen = 0;
-		rLoc = 2684;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 798;
 		vrLoc = 745;
@@ -176,7 +192,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 62";
 		rLen = 0;
-		rLoc = 2620;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 679;
 		vrLoc = 1100;
@@ -186,7 +202,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 115";
 		rLen = 0;
-		rLoc = 2768;
+		rLoc = 3623;
 		rType = 0;
 		vrLen = 1218;
 		vrLoc = 1856;
@@ -196,7 +212,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 59";
 		rLen = 0;
-		rLoc = 1336;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 1274;
 		vrLoc = 699;
@@ -206,7 +222,7 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 60";
 		rLen = 0;
-		rLoc = 1353;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 1259;
 		vrLoc = 716;
@@ -216,10 +232,30 @@
 		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
 		name = "main.c: 91";
 		rLen = 0;
-		rLoc = 2240;
+		rLoc = 1292;
 		rType = 0;
 		vrLen = 1290;
 		vrLoc = 1614;
+	};
+	03846DEE14602787002BB72D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
+		name = "main.c: 104";
+		rLen = 0;
+		rLoc = 2341;
+		rType = 0;
+		vrLen = 1379;
+		vrLoc = 1895;
+	};
+	03846DF814602AD3002BB72D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08FB7796FE84155DC02AAC07 /* main.c */;
+		name = "main.c: 122";
+		rLen = 0;
+		rLoc = 2960;
+		rType = 0;
+		vrLen = 1156;
+		vrLoc = 2082;
 	};
 	08FB7793FE84155DC02AAC07 /* Project object */ = {
 		activeBuildConfigurationName = Debug;
@@ -276,6 +312,8 @@
 			03846DB514601C35002BB72D /* PBXTextBookmark */ = 03846DB514601C35002BB72D /* PBXTextBookmark */;
 			03846DBA14601D5A002BB72D /* PBXTextBookmark */ = 03846DBA14601D5A002BB72D /* PBXTextBookmark */;
 			03846DCA14602051002BB72D /* PBXTextBookmark */ = 03846DCA14602051002BB72D /* PBXTextBookmark */;
+			03846DEE14602787002BB72D /* PBXTextBookmark */ = 03846DEE14602787002BB72D /* PBXTextBookmark */;
+			03846DF814602AD3002BB72D /* PBXTextBookmark */ = 03846DF814602AD3002BB72D /* PBXTextBookmark */;
 		};
 		sourceControlManager = 03846D45145FEECF002BB72D /* Source Control */;
 		userBuildSettings = {
@@ -283,9 +321,9 @@
 	};
 	08FB7796FE84155DC02AAC07 /* main.c */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1113, 1988}}";
-			sepNavSelRange = "{2240, 0}";
-			sepNavVisRange = "{1614, 1290}";
+			sepNavIntBoundsRect = "{{0, 0}, {1113, 2618}}";
+			sepNavSelRange = "{2298, 0}";
+			sepNavVisRange = "{2082, 1343}";
 		};
 	};
 	8DD76FA90486AB0100D96B5E /* multi_fasta_to_vcf */ = {

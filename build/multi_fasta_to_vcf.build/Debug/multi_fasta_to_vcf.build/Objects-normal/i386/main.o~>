@@ -1,7 +1,0 @@
-/Users/ap13/multi_fasta_to_vcf/main.c: In function 'genome_length':
-/Users/ap13/multi_fasta_to_vcf/main.c:41: warning: implicit declaration of function 'advance_to_sequence'
-/Users/ap13/multi_fasta_to_vcf/main.c: At top level:
-/Users/ap13/multi_fasta_to_vcf/main.c:80: warning: conflicting types for 'advance_to_sequence'
-/Users/ap13/multi_fasta_to_vcf/main.c:41: warning: previous implicit declaration of 'advance_to_sequence' was here
-/Users/ap13/multi_fasta_to_vcf/main.c: In function 'main':
-/Users/ap13/multi_fasta_to_vcf/main.c:139: warning: passing argument 1 of 'generate_snp_sites' discards qualifiers from pointer target type

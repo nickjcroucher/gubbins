@@ -37,6 +37,13 @@ void advance_to_sequence(FILE * alignment_file_pointer)
 	line_length(alignment_file_pointer);
 }
 
+void advance_to_sequence_name(FILE * alignment_file_pointer)
+{
+	// Skip sequence line, TODO make this work properly
+	line_length(alignment_file_pointer);
+}
+
+
 
 int validate_alignment_file(FILE * alignment_file_pointer)
 {
@@ -75,6 +82,21 @@ int read_line(char sequence[], FILE * pFilePtr)
     return 1;
 }
 
+int count_lines_in_file(FILE * alignment_file_pointer)
+{
+	rewind(alignment_file_pointer);
+	int i = 0;
+	int length_of_line =0;
+	
+	do{
+		length_of_line = line_length(alignment_file_pointer);
+		i++;
+	}while(length_of_line != 0);
+	
+	return i;	
+}
+
+
 int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer)
 {
 	int i;
@@ -93,14 +115,13 @@ int build_reference_sequence(char reference_sequence[], FILE * alignment_file_po
 }
 
 
-void detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int length_of_genome)
+int detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int length_of_genome)
 {
 	char * comparison_sequence;
 	int i;
-	int s;
+	int number_of_snps = 0;
 	
 	do{
-		s = 0;
 		comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
 		advance_to_sequence(alignment_file_pointer);
 		read_line(comparison_sequence, alignment_file_pointer);
@@ -116,18 +137,85 @@ void detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int l
 			if(reference_sequence[i] != '*' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
 			{
 				reference_sequence[i] = '*';
-			}
-			if(reference_sequence[i] == '*')
-			{
-				s++;	
+				number_of_snps++;
 			}
 		}
-		printf("Snps: %d", s);
 	}while(comparison_sequence[0] != '\0');
-	printf("Snps: %d", s);
+
+	free(comparison_sequence);
+	return number_of_snps;
+}
+
+void build_snp_locations(int snp_locations[], char reference_sequence[])
+{
+	int i;
+	int snp_counter = 0;
 	
+	for(i = 0; reference_sequence[i]; i++)
+    {
+		if(reference_sequence[i] == '*')
+		{
+			snp_locations[snp_counter] = i;
+			snp_counter++;
+		}
+	}
+}
+
+void output_vcf_header( FILE * vcf_file_pointer)
+{
+	fprintf( vcf_file_pointer, "##fileformat=VCFv4.1\n" );	
+	fprintf( vcf_file_pointer, "##INFO=<ID=AB,Number=1,Type=String,Description=\"Alt Base\">\n" );
+	fprintf( vcf_file_pointer, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT\n" );
+}
+
+
+void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], char bases_for_snps[][], int length_of_genome)
+{
+	int i;
+	int sequence_number = 0;
+	
+	do{
+		advance_to_sequence(alignment_file_pointer);
+		read_line(comparison_sequence, alignment_file_pointer);
+
+		*****************
+		if(comparison_sequence[0] == '\0')
+		{
+			break;
+		}
+		
+		for(i = 0; snp_locations[i]; i++)
+		{
+		  	bases_for_snps[i][sequence_number] =  comparison_sequence[i];
+		}
+		
+		sequence_number++;
+	}while(comparison_sequence[0] != '\0');
 	
 	free(comparison_sequence);
+}
+
+
+void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_locations[], int length_of_genome)
+{
+	FILE *vcf_file_pointer;
+	int number_of_samples;
+	char * bases_for_snps;
+	
+	// TODO chunk up to reduce memory usage
+	
+	vcf_file_pointer=fopen(strcat(filename,".vcf"), "w");
+	output_vcf_header(vcf_file_pointer);
+	
+	// store values for each snp location
+	rewind(alignment_file_pointer);
+	
+	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
+	bases_for_snps =(char *) malloc(number_of_samples*(sizeof(snp_locations)/sizeof(*snp_locations))*sizeof(char));
+	
+	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps,length_of_genome);
+	
+	
 }
 
 
@@ -136,6 +224,8 @@ int generate_snp_sites(char filename[])
 	FILE *alignment_file_pointer;
 	int length_of_genome;
 	char * reference_sequence;
+	int number_of_snps;
+	int * snp_locations;
 
 	alignment_file_pointer=fopen(filename, "r");
 	
@@ -148,14 +238,46 @@ int generate_snp_sites(char filename[])
 	reference_sequence = (char *) malloc(length_of_genome*sizeof(char));
 	
 	build_reference_sequence(reference_sequence,alignment_file_pointer);
-	detect_snps(reference_sequence, alignment_file_pointer, length_of_genome);
+	number_of_snps = detect_snps(reference_sequence, alignment_file_pointer, length_of_genome);
 	
-	//create_list_of_snps(reference_sequence);
-	
+	snp_locations = (int *) malloc(number_of_snps*sizeof(int));
+	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
 	
+	//printf("Number of SNPs: %d\n", number_of_snps);
+	create_vcf_file(filename, alignment_file_pointer, snp_locations,length_of_genome);
+	
+	free(snp_locations);
 	return 1;
 }
+
+
+
+void get_sample_names_for_header(FILE * alignment_file_pointer, char sequence_names[])
+{
+	rewind(alignment_file_pointer);
+	int i = 0;
+	// remove this hardcoding and figure out number of lines in the file
+	char * sequence_name;
+	
+	do{
+		sequence_name = (char *) malloc(500*sizeof(char));
+		read_line(sequence_name, alignment_file_pointer);
+		advance_to_sequence_name(alignment_file_pointer);
+		
+		if(sequence_name[0] == '\0')
+		{
+			break;
+		}
+		
+		//TODO clean up the sample name before use
+		strcpy(sequence_names[i],sequence_name);
+		i++;
+	}while(sequence_name[0] != '\0');
+	free(sequence_name);
+}
+
+
 
 
 

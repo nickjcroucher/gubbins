@@ -1,0 +1,4 @@
+/Users/ap13/multi_fasta_to_vcf/snp_sites.c: In function 'build_reference_sequence':
+/Users/ap13/multi_fasta_to_vcf/snp_sites.c:25: warning: implicit declaration of function 'toupper'
+/Users/ap13/multi_fasta_to_vcf/snp_sites.c: In function 'generate_snp_sites':
+/Users/ap13/multi_fasta_to_vcf/snp_sites.c:138: error: too many arguments to function 'create_vcf_file'

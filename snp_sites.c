@@ -97,7 +97,7 @@ void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], 
 		
 		for(i = 0; snp_locations[i]; i++)
 		{
-			bases_for_snps[sequence_number][i] = ((char *) comparison_sequence)[i];
+			bases_for_snps[i][sequence_number] = toupper(((char *) comparison_sequence)[snp_locations[i]]);
 		}
 		
 		sequence_number++;
@@ -131,9 +131,9 @@ int generate_snp_sites(char filename[])
 	snp_locations = (int *) malloc(number_of_snps*sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
-	
+	 
 	//printf("Number of SNPs: %d\n", number_of_snps);
-	create_vcf_file(filename, alignment_file_pointer, snp_locations,length_of_genome);
+	create_vcf_file(filename, alignment_file_pointer, snp_locations,length_of_genome, number_of_snps);
 	
 	free(snp_locations);
 	return 1;

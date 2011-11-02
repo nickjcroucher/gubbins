@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03846E1D146141DF002BB72D /* vcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1C146141DF002BB72D /* vcf.c */; };
+		03846E2014614224002BB72D /* alignment_file.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1F14614224002BB72D /* alignment_file.c */; };
+		03846E23146142FF002BB72D /* snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E22146142FF002BB72D /* snp_sites.c */; };
 		8DD76FAC0486AB0100D96B5E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.c */; settings = {ATTRIBUTES = (); }; };
 		8DD76FB00486AB0100D96B5E /* multi_fasta_to_vcf.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* multi_fasta_to_vcf.1 */; };
 /* End PBXBuildFile section */
@@ -25,6 +28,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		03846E1B146141A1002BB72D /* vcf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vcf.h; sourceTree = "<group>"; };
+		03846E1C146141DF002BB72D /* vcf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vcf.c; sourceTree = "<group>"; };
+		03846E1E14614224002BB72D /* alignment_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignment_file.h; sourceTree = "<group>"; };
+		03846E1F14614224002BB72D /* alignment_file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alignment_file.c; sourceTree = "<group>"; };
+		03846E21146142FF002BB72D /* snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = snp_sites.h; sourceTree = "<group>"; };
+		03846E22146142FF002BB72D /* snp_sites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snp_sites.c; sourceTree = "<group>"; };
 		08FB7796FE84155DC02AAC07 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* multi_fasta_to_vcf */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = multi_fasta_to_vcf; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A0FF2C0290799A04C91782 /* multi_fasta_to_vcf.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = multi_fasta_to_vcf.1; sourceTree = "<group>"; };
@@ -55,6 +64,12 @@
 			isa = PBXGroup;
 			children = (
 				08FB7796FE84155DC02AAC07 /* main.c */,
+				03846E21146142FF002BB72D /* snp_sites.h */,
+				03846E22146142FF002BB72D /* snp_sites.c */,
+				03846E1E14614224002BB72D /* alignment_file.h */,
+				03846E1F14614224002BB72D /* alignment_file.c */,
+				03846E1B146141A1002BB72D /* vcf.h */,
+				03846E1C146141DF002BB72D /* vcf.c */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -119,6 +134,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DD76FAC0486AB0100D96B5E /* main.c in Sources */,
+				03846E1D146141DF002BB72D /* vcf.c in Sources */,
+				03846E2014614224002BB72D /* alignment_file.c in Sources */,
+				03846E23146142FF002BB72D /* snp_sites.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

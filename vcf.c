@@ -15,13 +15,14 @@ void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_lo
 {
 	FILE *vcf_file_pointer;
 	int number_of_samples;
+	int i;
 	
 	rewind(alignment_file_pointer);
 	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
 	
 	char* sequence_names[number_of_samples];
 	sequence_names[number_of_samples-1] = '\0';
-	for(int i = 0; i < number_of_samples; i++)
+	for(i = 0; i < number_of_samples; i++)
 	{
 		sequence_names[i] = malloc(21*sizeof(char));
 		strcpy(sequence_names[i],"");
@@ -134,7 +135,8 @@ void alternative_bases(char reference_base, char * bases_for_snp, char alt_bases
 
 int check_if_char_in_string(char search_string[], char target_char, int search_string_length)
 {
-	for(int i=0; i < search_string_length ; i++ )
+	int i;
+	for(i=0; i < search_string_length ; i++ )
 	{
 		if(search_string[i] == target_char)
 		{

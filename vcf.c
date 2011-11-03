@@ -35,7 +35,7 @@ void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_lo
 	
 	char* bases_for_snps[number_of_snps];
 	
-	for(int i = 0; i < number_of_snps; i++)
+	for(i = 0; i < number_of_snps; i++)
 	{
 		bases_for_snps[i] = malloc(number_of_samples*sizeof(char));
 	}

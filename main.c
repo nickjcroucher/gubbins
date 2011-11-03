@@ -12,10 +12,11 @@ static void print_usage()
 	puts("Usage:");
 	puts("./multi_fasta_to_vcf file.aln ");
 	puts("");
-	puts("\tfile.aln\t\t\t: file containting a multi fasta alignment");
+	puts("Input:");
+	puts("\tfile.aln\t:file containting a multi fasta alignment");
 	puts("");
 	puts("Output:");
-	puts("\tfile.aln.vcf\t\t:VCF file containing all SNP sites");
+	puts("\tfile.aln.vcf\t:VCF file containing all SNP sites");
 }
 
 

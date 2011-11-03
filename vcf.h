@@ -1,7 +1,7 @@
 #ifndef _VCF_H_
 #define _VCF_H_
 
-void output_vcf_header( FILE * vcf_file_pointer);
+void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names);
 void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_locations[], int length_of_genome, int number_of_snps);
 void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int snp_locations[]);
 void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location);

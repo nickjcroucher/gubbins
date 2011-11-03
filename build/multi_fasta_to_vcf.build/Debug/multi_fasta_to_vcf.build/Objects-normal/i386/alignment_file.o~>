@@ -1,0 +1,2 @@
+/Users/ap13/multi_fasta_to_vcf/alignment_file.c:99: error: conflicting types for 'get_sample_names_for_header'
+/Users/ap13/multi_fasta_to_vcf/alignment_file.h:11: error: previous declaration of 'get_sample_names_for_header' was here

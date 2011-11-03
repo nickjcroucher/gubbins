@@ -95,12 +95,14 @@ int count_lines_in_file(FILE * alignment_file_pointer)
 }
 
 
-void get_sample_names_for_header(FILE * alignment_file_pointer, char sequence_names[])
+void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names)
 {
 	rewind(alignment_file_pointer);
 	int i = 0;
 	// remove this hardcoding and figure out number of lines in the file
 	char * sequence_name;
+	char filtered_sequence_name[10];
+	int name_counter;
 	
 	do{
 		sequence_name = (char *) malloc(500*sizeof(char));
@@ -112,8 +114,19 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char sequence_na
 			break;
 		}
 		
+		for(name_counter=0; sequence_name[name_counter]; name_counter++)
+		{
+			if((sequence_name[name_counter] == '\0') || (sequence_name[name_counter] == '\n') || (name_counter >= 10))
+			{
+				filtered_sequence_name[name_counter]  = '\0';
+				break;
+			}
+			filtered_sequence_name[name_counter] = sequence_name[name_counter+1];
+		}
+		
+		
 		//TODO clean up the sample name before use
-		strcpy(sequence_names[i],sequence_name);
+		strcpy(sequence_names[i],filtered_sequence_name);
 		i++;
 	}while(sequence_name[0] != '\0');
 	free(sequence_name);

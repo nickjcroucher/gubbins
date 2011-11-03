@@ -11,24 +11,25 @@
 #include "snp_sites.h"
 
 
-
-
-
-
 void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_locations[], int length_of_genome, int number_of_snps)
 {
 	FILE *vcf_file_pointer;
 	int number_of_samples;
 	
-	// TODO chunk up to reduce memory usage
+	rewind(alignment_file_pointer);
+	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
+	
+	char* sequence_names[number_of_samples];
+	for(int i = 0; i < number_of_samples; ++i)
+	{
+		sequence_names[i] = malloc(500*sizeof(char));
+	}
+	
+	get_sample_names_for_header(alignment_file_pointer, sequence_names);
 	
 	vcf_file_pointer=fopen(strcat(filename,".vcf"), "w");
-	output_vcf_header(vcf_file_pointer);
+	output_vcf_header(vcf_file_pointer,sequence_names);
 	
-	// store values for each snp location
-	rewind(alignment_file_pointer);
-	
-	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
 	char* bases_for_snps[number_of_snps];
 	
 	for(int i = 0; i < number_of_snps; ++i)
@@ -50,12 +51,18 @@ void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_
 	}
 }
 
-void output_vcf_header( FILE * vcf_file_pointer)
+void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names)
 {
-	// populate the sample names
+	int i;
 	fprintf( vcf_file_pointer, "##fileformat=VCFv4.1\n" );	
 	fprintf( vcf_file_pointer, "##INFO=<ID=AB,Number=1,Type=String,Description=\"Alt Base\">\n" );
-	fprintf( vcf_file_pointer, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\n" );
+	fprintf( vcf_file_pointer, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" );
+	
+	for(i=0; sequence_names[i]; i++)
+	{
+		fprintf( vcf_file_pointer, "%s\t",  sequence_names[i]);
+	}
+	fprintf( vcf_file_pointer, "\n");
 }
 
 void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location)

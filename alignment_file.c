@@ -95,17 +95,17 @@ int count_lines_in_file(FILE * alignment_file_pointer)
 }
 
 
-void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names)
+void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples)
 {
 	rewind(alignment_file_pointer);
 	int i = 0;
 	// remove this hardcoding and figure out number of lines in the file
 	char * sequence_name;
-	char filtered_sequence_name[10];
+	char filtered_sequence_name[20];
 	int name_counter;
 	
 	do{
-		sequence_name = (char *) malloc(500*sizeof(char));
+		sequence_name = (char *) malloc(1000*sizeof(char));
 		read_line(sequence_name, alignment_file_pointer);
 		advance_to_sequence_name(alignment_file_pointer);
 		
@@ -114,19 +114,26 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence
 			break;
 		}
 		
-		for(name_counter=0; sequence_name[name_counter]; name_counter++)
+		for(name_counter=0; name_counter < number_of_samples; name_counter++)
 		{
-			if((sequence_name[name_counter] == '\0') || (sequence_name[name_counter] == '\n') || (name_counter >= 10))
+			if((sequence_name[name_counter+1] == '\0') || (sequence_name[name_counter+1] == '\n') || (sequence_name[name_counter+1] == '\r') || (name_counter >= 20))
 			{
 				filtered_sequence_name[name_counter]  = '\0';
 				break;
 			}
-			filtered_sequence_name[name_counter] = sequence_name[name_counter+1];
+			
+			if((sequence_name[name_counter+1] == '\t') || (sequence_name[name_counter+1] == ' ') || sequence_name[name_counter+1] == '>' )
+			{
+				filtered_sequence_name[name_counter] = '_';
+			}
+			else
+			{
+				filtered_sequence_name[name_counter] = sequence_name[name_counter+1];
+			}
 		}
-		
-		
 		//TODO clean up the sample name before use
-		strcpy(sequence_names[i],filtered_sequence_name);
+		strcpy(sequence_names[i], filtered_sequence_name);
+		
 		i++;
 	}while(sequence_name[0] != '\0');
 	free(sequence_name);

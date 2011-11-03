@@ -19,11 +19,9 @@ static void print_usage()
 }
 
 
-// first pass read in first genome and store in array
-// read in subsequent lines, if base difference mark the coord
-// no need to check already marked base
-// could speed up by comparing x strings at a time
-// or by having very large input read buffer
+// Assumptions:
+// The sequences in the multi fasta alignment file are the same length
+// Your only interested in SNPs, INDELS are ignored
 
 
 int main (int argc, const char * argv[]) {

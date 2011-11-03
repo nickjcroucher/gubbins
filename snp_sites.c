@@ -20,7 +20,7 @@ int build_reference_sequence(char reference_sequence[], FILE * alignment_file_po
 	
     read_line(reference_sequence, alignment_file_pointer);
 	
-	for(i = 0; reference_sequence[ i ]; i++)
+	for(i = 0; reference_sequence[i]; i++)
 	{
 		reference_sequence[i] = toupper(reference_sequence[i]);
 	}
@@ -77,12 +77,19 @@ void build_snp_locations(int snp_locations[], char reference_sequence[])
 }
 
 
-void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], char ** bases_for_snps, int length_of_genome)
+void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps)
 {
 	int i;
 	int sequence_number = 0;
 	char * comparison_sequence;
 	rewind(alignment_file_pointer);
+	
+	// initialise the strings in the array
+	for(i = 0; i < number_of_snps; i++)
+	{
+		strcpy(bases_for_snps[i], "");
+	}
+
 	
 	do{
 		comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
@@ -95,7 +102,7 @@ void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], 
 			break;
 		}
 		
-		for(i = 0; snp_locations[i]; i++)
+		for(i = 0; i< number_of_snps; i++)
 		{
 			bases_for_snps[i][sequence_number] = toupper(((char *) comparison_sequence)[snp_locations[i]]);
 		}

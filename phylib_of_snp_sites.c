@@ -24,8 +24,7 @@ void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bas
 		// sequence_name can be more than 10 (relaxed phylib format) and contain [\w\s]
 		//TODO check for illegal characters [^\w\s]
 		fprintf( fasta_file_pointer, "%s\t", sequence_names[sample_counter]);
-			
-		fprintf( fasta_file_pointer, "%s\t", sequence_names[sample_counter]);
+		
 		for(snp_counter=0; snp_counter< number_of_snps; snp_counter++)
 		{
 			fprintf( fasta_file_pointer, "%c", bases_for_snps[snp_counter][sample_counter]);

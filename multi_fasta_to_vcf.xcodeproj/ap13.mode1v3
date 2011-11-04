@@ -334,21 +334,21 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>034AE72114644AE20025A88E</string>
+										<string>034AE7271464518E0025A88E</string>
 										<key>history</key>
 										<array>
 											<string>03846D73145FFFE6002BB72D</string>
 											<string>038471191462D746002BB72D</string>
 											<string>0384711A1462D746002BB72D</string>
 											<string>034AE67B146430FF0025A88E</string>
-											<string>034AE702146448ED0025A88E</string>
 											<string>034AE703146448ED0025A88E</string>
 											<string>034AE704146448ED0025A88E</string>
 											<string>034AE705146448ED0025A88E</string>
 											<string>034AE706146448ED0025A88E</string>
 											<string>034AE707146448ED0025A88E</string>
 											<string>034AE71C14644A620025A88E</string>
-											<string>034AE71D14644A620025A88E</string>
+											<string>034AE7231464518E0025A88E</string>
+											<string>034AE7241464518E0025A88E</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -511,6 +511,8 @@
 											<string>034AE717146448ED0025A88E</string>
 											<string>034AE718146448ED0025A88E</string>
 											<string>034AE71E14644A620025A88E</string>
+											<string>034AE7251464518E0025A88E</string>
+											<string>034AE7261464518E0025A88E</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -707,8 +709,8 @@
 		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>03846D7E145FFFE6002BB72D</string>
 		<string>1CD10A99069EF8BA00B06720</string>
-		<string>/Users/ap13/multi_fasta_to_vcf/multi_fasta_to_vcf.xcodeproj</string>
 		<string>1C78EAAD065D492600B07095</string>
+		<string>/Users/ap13/multi_fasta_to_vcf/multi_fasta_to_vcf.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>277 60 1461 1115 0 0 1920 1178 </string>

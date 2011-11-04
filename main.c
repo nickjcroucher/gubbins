@@ -23,6 +23,8 @@ static void print_usage()
 // Assumptions:
 // The sequences in the multi fasta alignment file are the same length
 // Your only interested in SNPs, INDELS are ignored
+// The first sequence is chosen as the reference sequence
+// If there is an indel in the reference sequence, the first normal base found in another strain is used.
 
 
 int main (int argc, const char * argv[]) {

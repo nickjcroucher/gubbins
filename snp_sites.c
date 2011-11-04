@@ -48,7 +48,13 @@ int detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int le
 		// Set the reference base to * if 
 		for(i = 0; reference_sequence[ i ]; i++)
 		{
-			if(reference_sequence[i] != '*' && reference_sequence[i] != '-' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
+			// If there is an indel in the reference sequence, replace with the first proper base you find
+			if(reference_sequence[i] == '-' && comparison_sequence[i] != '-' )
+			{
+				reference_sequence[i] = toupper(comparison_sequence[i]);
+			}
+			
+			if(reference_sequence[i] != '*' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
 			{
 				reference_sequence[i] = '*';
 				number_of_snps++;

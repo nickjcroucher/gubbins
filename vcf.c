@@ -41,16 +41,15 @@ void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_lo
 	}
 	
 	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
-	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations);
+	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples);
 }
 
-void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations)
+void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples)
 {
 	int i;
-	for(i=0; bases_for_snps[i]; i++)
+	for(i=0; i < number_of_snps; i++)
 	{
-
-		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i]);
+		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i], number_of_samples);
 	}
 }
 
@@ -68,10 +67,10 @@ void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int num
 	fprintf( vcf_file_pointer, "\n");
 }
 
-void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location)
+void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location, int number_of_samples)
 {
 	char reference_base =  bases_for_snp[0];
-	char alt_bases[2000];
+	char alt_bases[30];
 	if(reference_base == '\0')
 	{
 		return;	
@@ -92,7 +91,7 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	// ALT
 	// Need to look through list and find unique characters
 	
-	alternative_bases(reference_base, bases_for_snp, alt_bases);
+	alternative_bases(reference_base, bases_for_snp, alt_bases, number_of_samples);
 	fprintf( vcf_file_pointer, "%s\t", alt_bases);
 	
 	// QUAL
@@ -108,17 +107,17 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	fprintf( vcf_file_pointer, ".\t");
 	
 	// Bases for each sample
-	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp );
+	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp, number_of_samples );
 	
 	fprintf( vcf_file_pointer, "\n");	
 }
 
 
-void alternative_bases(char reference_base, char * bases_for_snp, char alt_bases[] )
+void alternative_bases(char reference_base, char * bases_for_snp, char alt_bases[], int number_of_samples)
 {
 	int i;
 	int num_alt_bases = 0;
-	for(i=0; bases_for_snp[i]; i++ )
+	for(i=0; i< number_of_samples; i++ )
 	{
 		if((bases_for_snp[i] != reference_base) && (bases_for_snp[i] != '-'))
 		{
@@ -126,11 +125,19 @@ void alternative_bases(char reference_base, char * bases_for_snp, char alt_bases
 			{
 				alt_bases[num_alt_bases] = bases_for_snp[i];
 				num_alt_bases++;
+				alt_bases[num_alt_bases] = ',';
+				num_alt_bases++;
 			}
 		}
 	}
-	
-	alt_bases[num_alt_bases] = '\0';
+	if(num_alt_bases > 0 && alt_bases[num_alt_bases-1] == ',')
+	{
+		alt_bases[num_alt_bases-1] = '\0';
+	}
+	else
+	{
+		alt_bases[num_alt_bases] = '\0';
+	}
 }
 
 int check_if_char_in_string(char search_string[], char target_char, int search_string_length)
@@ -146,11 +153,11 @@ int check_if_char_in_string(char search_string[], char target_char, int search_s
 	return 0;
 }
 
-void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char * bases_for_snp)
+void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char * bases_for_snp, int number_of_samples)
 {
 	int i;
 	
-	for(i=0; bases_for_snp[i]; i++ )
+	for(i=0; i < number_of_samples ; i++ )
 	{
 		if((bases_for_snp[i] == reference_base) || (bases_for_snp[i] == '-'))
 		{

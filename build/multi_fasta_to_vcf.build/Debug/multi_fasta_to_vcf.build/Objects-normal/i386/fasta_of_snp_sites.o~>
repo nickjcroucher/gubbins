@@ -1,0 +1,2 @@
+/Users/ap13/multi_fasta_to_vcf/fasta_of_snp_sites.c:8: error: conflicting types for 'create_fasta_of_snp_sites'
+/Users/ap13/multi_fasta_to_vcf/fasta_of_snp_sites.h:4: error: previous declaration of 'create_fasta_of_snp_sites' was here

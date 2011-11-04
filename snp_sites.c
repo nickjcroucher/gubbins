@@ -9,6 +9,7 @@
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
+#include "fasta_of_snp_sites.h"
 
 
 int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer)
@@ -46,7 +47,7 @@ int detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int le
 		}
 		
 		// Set the reference base to * if 
-		for(i = 0; reference_sequence[ i ]; i++)
+		for(i = 0; i < length_of_genome; i++)
 		{
 			// If there is an indel in the reference sequence, replace with the first proper base you find
 			if(reference_sequence[i] == '-' && comparison_sequence[i] != '-' )
@@ -127,6 +128,8 @@ int generate_snp_sites(char filename[])
 	char * reference_sequence;
 	int number_of_snps;
 	int * snp_locations;
+	int number_of_samples;
+	int i;
 	
 	alignment_file_pointer=fopen(filename, "r");
 	
@@ -145,8 +148,32 @@ int generate_snp_sites(char filename[])
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
 	 
-	//printf("Number of SNPs: %d\n", number_of_snps);
-	create_vcf_file(filename, alignment_file_pointer, snp_locations,length_of_genome, number_of_snps);
+	rewind(alignment_file_pointer);
+	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
+	
+	// Find out the names of the sequences
+	char* sequence_names[number_of_samples];
+	sequence_names[number_of_samples-1] = '\0';
+	for(i = 0; i < number_of_samples; i++)
+	{
+		sequence_names[i] = malloc(21*sizeof(char));
+		strcpy(sequence_names[i],"");
+	}
+	
+	get_sample_names_for_header(alignment_file_pointer, sequence_names, number_of_samples);
+	
+	char* bases_for_snps[number_of_snps];
+	
+	for(i = 0; i < number_of_snps; i++)
+	{
+		bases_for_snps[i] = malloc(number_of_samples*sizeof(char));
+	}
+	
+	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
+	
+	create_vcf_file(filename, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	
+	create_fasta_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	
 	free(snp_locations);
 	return 1;

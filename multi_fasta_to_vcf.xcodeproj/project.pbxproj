@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		034AE677146427CD0025A88E /* fasta_of_snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 034AE676146427CD0025A88E /* fasta_of_snp_sites.c */; };
 		03846E1D146141DF002BB72D /* vcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1C146141DF002BB72D /* vcf.c */; };
 		03846E2014614224002BB72D /* alignment_file.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1F14614224002BB72D /* alignment_file.c */; };
 		03846E23146142FF002BB72D /* snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E22146142FF002BB72D /* snp_sites.c */; };
@@ -28,6 +29,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		034AE675146427CD0025A88E /* fasta_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fasta_of_snp_sites.h; sourceTree = "<group>"; };
+		034AE676146427CD0025A88E /* fasta_of_snp_sites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fasta_of_snp_sites.c; sourceTree = "<group>"; };
 		03846E1B146141A1002BB72D /* vcf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vcf.h; sourceTree = "<group>"; };
 		03846E1C146141DF002BB72D /* vcf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vcf.c; sourceTree = "<group>"; };
 		03846E1E14614224002BB72D /* alignment_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignment_file.h; sourceTree = "<group>"; };
@@ -70,6 +73,8 @@
 				03846E1F14614224002BB72D /* alignment_file.c */,
 				03846E1B146141A1002BB72D /* vcf.h */,
 				03846E1C146141DF002BB72D /* vcf.c */,
+				034AE675146427CD0025A88E /* fasta_of_snp_sites.h */,
+				034AE676146427CD0025A88E /* fasta_of_snp_sites.c */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -137,6 +142,7 @@
 				03846E1D146141DF002BB72D /* vcf.c in Sources */,
 				03846E2014614224002BB72D /* alignment_file.c in Sources */,
 				03846E23146142FF002BB72D /* snp_sites.c in Sources */,
+				034AE677146427CD0025A88E /* fasta_of_snp_sites.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,36 +11,13 @@
 #include "snp_sites.h"
 
 
-void create_vcf_file(char filename[],  FILE * alignment_file_pointer, int snp_locations[], int length_of_genome, int number_of_snps)
+
+void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples)
 {
 	FILE *vcf_file_pointer;
-	int number_of_samples;
-	int i;
-	
-	rewind(alignment_file_pointer);
-	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
-	
-	char* sequence_names[number_of_samples];
-	sequence_names[number_of_samples-1] = '\0';
-	for(i = 0; i < number_of_samples; i++)
-	{
-		sequence_names[i] = malloc(21*sizeof(char));
-		strcpy(sequence_names[i],"");
-	}
-	
-	get_sample_names_for_header(alignment_file_pointer, sequence_names, number_of_samples);
 	
 	vcf_file_pointer=fopen(strcat(filename,".vcf"), "w");
 	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples);
-	
-	char* bases_for_snps[number_of_snps];
-	
-	for(i = 0; i < number_of_snps; i++)
-	{
-		bases_for_snps[i] = malloc(number_of_samples*sizeof(char));
-	}
-	
-	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples);
 }
 

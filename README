@@ -1,0 +1,25 @@
+This application takes in a multi fasta alignment, finds all the SNP sites, then outputs the snp sites in the following formats:
+VCF, 
+a multi fasta alignment,
+relaxed phylib format.
+
+The first sequence in the input file is taken as the reference.
+
+To use:
+
+multi_fasta_to_vcf my_file.aln
+
+
+VCF
+=====
+This contains the position of each SNP in the reference sequence, and the occurance in each other sample.
+
+Multi Fasta Alignment
+=====
+Similar to the input file but just containing the snpsites.
+
+Relaxed Phylib format
+=====
+All the snpsites in a format for RAxML
+
+

@@ -113,9 +113,9 @@
 		path = /Users/ap13/multi_fasta_to_vcf/vcf.c;
 		sourceTree = "<absolute>";
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1192, 2408}}";
-			sepNavSelRange = "{1249, 0}";
-			sepNavVisRange = "{155, 2072}";
+			sepNavIntBoundsRect = "{{0, 0}, {1192, 2506}}";
+			sepNavSelRange = "{4320, 0}";
+			sepNavVisRange = "{3040, 1325}";
 		};
 	};
 	034AE62F1463FFB30025A88E /* PBXTextBookmark */ = {
@@ -274,6 +274,16 @@
 		rType = 0;
 		vrLen = 2072;
 		vrLoc = 155;
+	};
+	034AE63F146402D90025A88E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 034AE62D1463FF990025A88E /* vcf.c */;
+		name = "vcf.c: 172";
+		rLen = 0;
+		rLoc = 4320;
+		rType = 0;
+		vrLen = 1325;
+		vrLoc = 3040;
 	};
 	03846D41145FEEAF002BB72D /* multi_fasta_to_vcf */ = {
 		isa = PBXExecutable;
@@ -3549,6 +3559,7 @@
 			034AE63C1463FFB30025A88E /* PBXTextBookmark */ = 034AE63C1463FFB30025A88E /* PBXTextBookmark */;
 			034AE63D1463FFB30025A88E /* PBXTextBookmark */ = 034AE63D1463FFB30025A88E /* PBXTextBookmark */;
 			034AE63E1463FFB30025A88E /* PBXTextBookmark */ = 034AE63E1463FFB30025A88E /* PBXTextBookmark */;
+			034AE63F146402D90025A88E /* PBXTextBookmark */ = 034AE63F146402D90025A88E /* PBXTextBookmark */;
 			03846D73145FFFE6002BB72D = 03846D73145FFFE6002BB72D /* PBXTextBookmark */;
 			03846D75145FFFE6002BB72D = 03846D75145FFFE6002BB72D /* PBXTextBookmark */;
 			03846D76145FFFE6002BB72D = 03846D76145FFFE6002BB72D /* PBXTextBookmark */;

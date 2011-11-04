@@ -322,7 +322,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>fasta_of_snp_sites.c</string>
+								<string>phylib_of_snp_sites.c</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -330,23 +330,25 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>fasta_of_snp_sites.c</string>
+										<string>phylib_of_snp_sites.c</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>034AE6A1146430FF0025A88E</string>
+										<string>034AE72114644AE20025A88E</string>
 										<key>history</key>
 										<array>
 											<string>03846D73145FFFE6002BB72D</string>
 											<string>038471191462D746002BB72D</string>
 											<string>0384711A1462D746002BB72D</string>
-											<string>034AE657146427190025A88E</string>
-											<string>034AE679146430FF0025A88E</string>
-											<string>034AE67A146430FF0025A88E</string>
 											<string>034AE67B146430FF0025A88E</string>
-											<string>034AE67C146430FF0025A88E</string>
-											<string>034AE67D146430FF0025A88E</string>
-											<string>034AE67E146430FF0025A88E</string>
+											<string>034AE702146448ED0025A88E</string>
+											<string>034AE703146448ED0025A88E</string>
+											<string>034AE704146448ED0025A88E</string>
+											<string>034AE705146448ED0025A88E</string>
+											<string>034AE706146448ED0025A88E</string>
+											<string>034AE707146448ED0025A88E</string>
+											<string>034AE71C14644A620025A88E</string>
+											<string>034AE71D14644A620025A88E</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -431,6 +433,84 @@
 											<string>034AE69E146430FF0025A88E</string>
 											<string>034AE69F146430FF0025A88E</string>
 											<string>034AE6A0146430FF0025A88E</string>
+											<string>034AE6BA146447570025A88E</string>
+											<string>034AE6BB146447570025A88E</string>
+											<string>034AE6BC146447570025A88E</string>
+											<string>034AE6BD146447570025A88E</string>
+											<string>034AE6BE146447570025A88E</string>
+											<string>034AE6BF146447570025A88E</string>
+											<string>034AE6C0146447570025A88E</string>
+											<string>034AE6C1146447570025A88E</string>
+											<string>034AE6C2146447570025A88E</string>
+											<string>034AE6C3146447570025A88E</string>
+											<string>034AE6C4146447570025A88E</string>
+											<string>034AE6C5146447570025A88E</string>
+											<string>034AE6C6146447570025A88E</string>
+											<string>034AE6C7146447570025A88E</string>
+											<string>034AE6C8146447570025A88E</string>
+											<string>034AE6C9146447570025A88E</string>
+											<string>034AE6CA146447570025A88E</string>
+											<string>034AE6CB146447570025A88E</string>
+											<string>034AE6CC146447570025A88E</string>
+											<string>034AE6CD146447570025A88E</string>
+											<string>034AE6CE146447570025A88E</string>
+											<string>034AE6CF146447570025A88E</string>
+											<string>034AE6D0146447570025A88E</string>
+											<string>034AE6D1146447570025A88E</string>
+											<string>034AE6D2146447570025A88E</string>
+											<string>034AE6D3146447570025A88E</string>
+											<string>034AE6D4146447570025A88E</string>
+											<string>034AE6D5146447570025A88E</string>
+											<string>034AE6D6146447570025A88E</string>
+											<string>034AE6D7146447570025A88E</string>
+											<string>034AE6D8146447570025A88E</string>
+											<string>034AE6D9146447570025A88E</string>
+											<string>034AE6DA146447570025A88E</string>
+											<string>034AE6DB146447570025A88E</string>
+											<string>034AE6DC146447570025A88E</string>
+											<string>034AE6DD146447570025A88E</string>
+											<string>034AE6DE146447570025A88E</string>
+											<string>034AE6DF146447570025A88E</string>
+											<string>034AE6E0146447570025A88E</string>
+											<string>034AE6E1146447570025A88E</string>
+											<string>034AE6E2146447570025A88E</string>
+											<string>034AE6E3146447570025A88E</string>
+											<string>034AE6E4146447570025A88E</string>
+											<string>034AE6E5146447570025A88E</string>
+											<string>034AE6E6146447570025A88E</string>
+											<string>034AE6E7146447570025A88E</string>
+											<string>034AE6E8146447570025A88E</string>
+											<string>034AE6E9146447570025A88E</string>
+											<string>034AE6EA146447570025A88E</string>
+											<string>034AE6EB146447570025A88E</string>
+											<string>034AE6EC146447570025A88E</string>
+											<string>034AE6ED146447570025A88E</string>
+											<string>034AE6EE146447570025A88E</string>
+											<string>034AE6EF146447570025A88E</string>
+											<string>034AE6F0146447570025A88E</string>
+											<string>034AE6F1146447570025A88E</string>
+											<string>034AE6F2146447570025A88E</string>
+											<string>034AE6F3146447570025A88E</string>
+											<string>034AE6F4146447570025A88E</string>
+											<string>034AE6F5146447570025A88E</string>
+											<string>034AE6F6146447570025A88E</string>
+											<string>034AE6F7146447570025A88E</string>
+											<string>034AE70A146448ED0025A88E</string>
+											<string>034AE70B146448ED0025A88E</string>
+											<string>034AE70C146448ED0025A88E</string>
+											<string>034AE70D146448ED0025A88E</string>
+											<string>034AE70E146448ED0025A88E</string>
+											<string>034AE70F146448ED0025A88E</string>
+											<string>034AE710146448ED0025A88E</string>
+											<string>034AE711146448ED0025A88E</string>
+											<string>034AE712146448ED0025A88E</string>
+											<string>034AE713146448ED0025A88E</string>
+											<string>034AE714146448ED0025A88E</string>
+											<string>034AE715146448ED0025A88E</string>
+											<string>034AE716146448ED0025A88E</string>
+											<string>034AE717146448ED0025A88E</string>
+											<string>034AE718146448ED0025A88E</string>
+											<string>034AE71E14644A620025A88E</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

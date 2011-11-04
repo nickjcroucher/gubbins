@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <regex.h>
-#include "vcf.h"
-#include "alignment_file.h"
 #include "snp_sites.h"
 
 

@@ -10,6 +10,7 @@
 #include "alignment_file.h"
 #include "snp_sites.h"
 #include "fasta_of_snp_sites.h"
+#include "phylib_of_snp_sites.h"
 
 
 int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer)
@@ -131,6 +132,7 @@ int generate_snp_sites(char filename[])
 	int number_of_samples;
 	int i;
 	
+	
 	alignment_file_pointer=fopen(filename, "r");
 	
 	if(validate_alignment_file(alignment_file_pointer) == 0)
@@ -174,6 +176,9 @@ int generate_snp_sites(char filename[])
 	create_vcf_file(filename, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	
 	create_fasta_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	
+	create_phylib_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	
 	
 	free(snp_locations);
 	return 1;

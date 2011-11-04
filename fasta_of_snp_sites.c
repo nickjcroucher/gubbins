@@ -9,8 +9,12 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 	FILE *fasta_file_pointer;
 	int sample_counter;
 	int snp_counter; 
+	char * base_filename;
 	
-	fasta_file_pointer = fopen(strcat(filename,".snps.aln"), "w");
+	base_filename = (char *) malloc(256*sizeof(char));
+	strcpy(base_filename, filename);
+	
+	fasta_file_pointer = fopen(strcat(base_filename,".snps.aln"), "w");
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{

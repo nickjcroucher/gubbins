@@ -275,9 +275,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>14</integer>
-									<integer>1</integer>
-									<integer>0</integer>
+									<integer>24</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -300,7 +298,7 @@
 							<real>186</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>538 59 1299 1119 0 0 1920 1178 </string>
+						<string>253 59 1667 1119 0 0 1920 1178 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -330,14 +328,13 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>0345A5A7146BE60A009B681F</string>
+										<string>0345A5B3146BF1B1009B681F</string>
 										<key>history</key>
 										<array>
 											<string>0345A451146AD643009B681F</string>
 											<string>0345A452146AD643009B681F</string>
 											<string>0345A453146AD643009B681F</string>
 											<string>0345A454146AD643009B681F</string>
-											<string>0345A456146AD643009B681F</string>
 											<string>0345A457146AD643009B681F</string>
 											<string>0345A4F2146BCD9B009B681F</string>
 											<string>0345A4F3146BCD9B009B681F</string>
@@ -346,7 +343,8 @@
 											<string>0345A599146BE60A009B681F</string>
 											<string>0345A59A146BE60A009B681F</string>
 											<string>0345A59B146BE60A009B681F</string>
-											<string>0345A59C146BE60A009B681F</string>
+											<string>0345A5AA146BED4B009B681F</string>
+											<string>0345A5AB146BED4B009B681F</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -545,6 +543,8 @@
 											<string>0345A5A4146BE60A009B681F</string>
 											<string>0345A5A5146BE60A009B681F</string>
 											<string>0345A5A6146BE60A009B681F</string>
+											<string>0345A5AC146BED4B009B681F</string>
+											<string>0345A5AD146BED4B009B681F</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -556,9 +556,9 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {1091, 757}}</string>
+								<string>{{0, 0}, {1459, 757}}</string>
 								<key>RubberWindowFrame</key>
-								<string>538 59 1299 1119 0 0 1920 1178 </string>
+								<string>253 59 1667 1119 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -576,9 +576,9 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 762}, {1091, 316}}</string>
+								<string>{{0, 762}, {1459, 316}}</string>
 								<key>RubberWindowFrame</key>
-								<string>538 59 1299 1119 0 0 1920 1178 </string>
+								<string>253 59 1667 1119 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -587,7 +587,7 @@
 						</dict>
 					</array>
 					<key>Proportion</key>
-					<string>1091pt</string>
+					<string>1459pt</string>
 				</dict>
 			</array>
 			<key>Name</key>
@@ -748,7 +748,7 @@
 		<string>/Users/ap13/multi_fasta_to_vcf/multi_fasta_to_vcf.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>538 59 1299 1119 0 0 1920 1178 </string>
+	<string>253 59 1667 1119 0 0 1920 1178 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -1086,7 +1086,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {603, 507}}</string>
 								<key>RubberWindowFrame</key>
-								<string>3 630 603 548 0 0 1920 1178 </string>
+								<string>1 630 603 548 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXDebugCLIModule</string>
@@ -1115,7 +1115,7 @@
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.consoleV3</string>
 			<key>WindowString</key>
-			<string>3 630 603 548 0 0 1920 1178 </string>
+			<string>1 630 603 548 0 0 1920 1178 </string>
 			<key>WindowToolGUID</key>
 			<string>1C78EAAD065D492600B07095</string>
 			<key>WindowToolIsVisible</key>

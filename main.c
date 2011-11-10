@@ -3,12 +3,15 @@
 #include <string.h>
 #include <regex.h>
 #include "snp_sites.h"
+#include "gubbins.h"
 
 
 static void print_usage()
 {
-	puts("Usage:");
-	puts("./multi_fasta_to_vcf file.aln ");
+	puts("Find SNP sites");
+	puts("./multi_fasta_to_vcf -s file.aln ");
+	puts("Run Gubbins");
+	puts("./multi_fasta_to_vcf -r file.aln.vcf file.aln.vcf.tre ");
 	puts("");
 	puts("Input:");
 	puts("\tfile.aln\t:file containting a multi fasta alignment");
@@ -31,8 +34,17 @@ int main (int argc, const char * argv[]) {
 		print_usage();
 		return 0;
     }
+	else if(strcmp(argv[1], "-s") == 0)
+    {
+		generate_snp_sites(argv[2]);
+		return 0;
+    }
+	else if(strcmp(argv[1], "-r") == 0)
+    {
+        run_gubbins(argv[2],argv[3]);
+		return 0;
+    }
 	
-	generate_snp_sites(argv[1]);
 	
 	
 	return 0;

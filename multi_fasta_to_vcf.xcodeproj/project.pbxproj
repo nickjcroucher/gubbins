@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0345A41A146AAF07009B681F /* gubbins.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345A419146AAF07009B681F /* gubbins.c */; };
+		0345A41E146ABD71009B681F /* parse_vcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345A41D146ABD71009B681F /* parse_vcf.c */; };
 		034AE677146427CD0025A88E /* fasta_of_snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 034AE676146427CD0025A88E /* fasta_of_snp_sites.c */; };
 		034AE6B0146446090025A88E /* phylib_of_snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 034AE6AF146446090025A88E /* phylib_of_snp_sites.c */; };
 		03846E1D146141DF002BB72D /* vcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1C146141DF002BB72D /* vcf.c */; };
@@ -30,6 +32,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0345A418146AAF07009B681F /* gubbins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gubbins.h; sourceTree = "<group>"; };
+		0345A419146AAF07009B681F /* gubbins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gubbins.c; sourceTree = "<group>"; };
+		0345A41C146ABD71009B681F /* parse_vcf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parse_vcf.h; sourceTree = "<group>"; };
+		0345A41D146ABD71009B681F /* parse_vcf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parse_vcf.c; sourceTree = "<group>"; };
 		034AE675146427CD0025A88E /* fasta_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fasta_of_snp_sites.h; sourceTree = "<group>"; };
 		034AE676146427CD0025A88E /* fasta_of_snp_sites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fasta_of_snp_sites.c; sourceTree = "<group>"; };
 		034AE6AE146446090025A88E /* phylib_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = phylib_of_snp_sites.h; sourceTree = "<group>"; };
@@ -76,8 +82,12 @@
 				03846E1F14614224002BB72D /* alignment_file.c */,
 				03846E1B146141A1002BB72D /* vcf.h */,
 				03846E1C146141DF002BB72D /* vcf.c */,
+				0345A41C146ABD71009B681F /* parse_vcf.h */,
+				0345A41D146ABD71009B681F /* parse_vcf.c */,
 				034AE675146427CD0025A88E /* fasta_of_snp_sites.h */,
 				034AE676146427CD0025A88E /* fasta_of_snp_sites.c */,
+				0345A418146AAF07009B681F /* gubbins.h */,
+				0345A419146AAF07009B681F /* gubbins.c */,
 				034AE6AE146446090025A88E /* phylib_of_snp_sites.h */,
 				034AE6AF146446090025A88E /* phylib_of_snp_sites.c */,
 			);
@@ -149,6 +159,8 @@
 				03846E23146142FF002BB72D /* snp_sites.c in Sources */,
 				034AE677146427CD0025A88E /* fasta_of_snp_sites.c in Sources */,
 				034AE6B0146446090025A88E /* phylib_of_snp_sites.c in Sources */,
+				0345A41A146AAF07009B681F /* gubbins.c in Sources */,
+				0345A41E146ABD71009B681F /* parse_vcf.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

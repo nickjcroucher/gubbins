@@ -156,3 +156,4 @@ void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, 
 
 
 
+

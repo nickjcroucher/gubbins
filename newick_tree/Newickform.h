@@ -1,6 +1,9 @@
+#ifndef __NEWICKFORM_H__
+#define __NEWICKFORM_H__
+
 /*
- *  Wellcome Trust Sanger Institute
- *  Copyright (C) 2011  Wellcome Trust Sanger Institute
+ *  Yu-Wei Wu  http://yuweibioinfo.blogspot.com/2008/10/newick-tree-parser-in-c-make-use-of.html
+ *  Copyright (C) 2011  Yu-Wei Wu
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,20 +20,36 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _GUBBINS_H_
-#define _GUBBINS_H_
 
-#include "seqUtil.h"
-#include "Newickform.h"
+typedef struct newick_child
+{
+	struct newick_node *node;
+	struct newick_child *next;
+} newick_child;
 
-void run_gubbins(char vcf_filename[], char tree_filename[]);
-void extract_sequences(char vcf_filename[]);
-void calculate_ancestor_sequence(char * ancestor_sequence, char * reference_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
+typedef struct newick_node
+{
+	char *taxon;
+	char *seq;
+	float dist;
+	int childNum;
+	struct newick_child *child;
+	struct newick_node *parent;
+} newick_node;
 
+short sDEBUG;
 
-#define MAX_EDGES_IN_TREE 10000
+#ifdef __NEWICKFORM_C__
+newick_node* parseTree(char *str);
+void build_newick_tree(char * filename);
+void printTree(newick_node *root);
+
+#else
+extern newick_node* parseTree(char *str);
+extern void build_newick_tree(char * filename);
+extern void printTree(newick_node *root);
 
 #endif
 
-
+#endif
 

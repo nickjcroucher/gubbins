@@ -1,14 +1,49 @@
+/*
+ *  Wellcome Trust Sanger Institute
+ *  Copyright (C) 2011  Wellcome Trust Sanger Institute
+ *  
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gubbins.h"
 #include "parse_vcf.h"
 
+#include "seqUtil.h"
+#include "Newickform.h"
+
+
+
 // get reference sequence from VCF, and store snp locations
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
 void run_gubbins(char vcf_filename[], char tree_filename[])
+{
+	//extract_sequences(vcf_filename);
+	build_newick_tree(tree_filename);
+
+	
+
+}
+
+
+void extract_sequences(char vcf_filename[])
 {
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
@@ -35,9 +70,6 @@ void run_gubbins(char vcf_filename[], char tree_filename[])
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, reference_bases, number_of_snps, reference_column_number);
 	
-	// take in multiple columns
-	// get sequences for each
-	// take in multiple sequences (and reference seq) to generate ancestor sequence
 	
 	char * seq1;
 	char * seq2;
@@ -56,7 +88,6 @@ void run_gubbins(char vcf_filename[], char tree_filename[])
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq3, number_of_snps,  column_number_for_column_name(column_names, "4882_8_11", number_of_columns));
 	
 	calculate_ancestor_sequence(ancestor_sequence, reference_bases,child_sequences, number_of_snps, 3);
-	printf("%s\n",ancestor_sequence);
 }
 
 // If there are snps between the child sequences, fill in with the reference sequence
@@ -96,6 +127,7 @@ void calculate_ancestor_sequence(char * ancestor_sequence, char * reference_sequ
 		
 	}
 }
+
 
 
 

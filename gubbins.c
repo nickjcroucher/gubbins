@@ -46,7 +46,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	vcf_file_pointer=fopen(vcf_filename, "r");
 	
 	char * reference_bases;
-	int * snp_locations;
+	
 	int number_of_snps;
 	int number_of_columns;
 	int i;
@@ -61,11 +61,17 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
 	number_of_snps  = get_number_of_snps(vcf_file_pointer);
-	snp_locations   = (int *)  malloc(number_of_snps*sizeof(int));
 	reference_bases = (char *) malloc(number_of_snps*sizeof(char));
+	
+	int snp_locations[number_of_snps];
+	
+	get_integers_from_column_in_vcf(vcf_file_pointer, snp_locations, number_of_snps, column_number_for_column_name(column_names, "POS", number_of_columns));
+	
 	// get reference sequence from VCF
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
-	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, reference_bases, number_of_snps, reference_column_number);
+	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
+	
+	
 	
 	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases);
 	

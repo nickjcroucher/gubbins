@@ -1,0 +1,2 @@
+/Users/ap13/multi_fasta_to_vcf/newick_tree/Newickform.c: In function 'build_newick_tree':
+/Users/ap13/multi_fasta_to_vcf/newick_tree/Newickform.c:72: error: void value not ignored as it ought to be

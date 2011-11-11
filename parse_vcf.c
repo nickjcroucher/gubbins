@@ -51,6 +51,8 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, int snp_locations[
 		}
 		
 	}while(szBuffer[0] != '\0');
+	
+	sequence_bases[reference_index] = '\0';
 }
 
 char *split_string_and_return_specific_index(char * result, char * input_string, int token_index)

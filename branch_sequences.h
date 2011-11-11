@@ -17,20 +17,10 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _GUBBINS_H_
-#define _GUBBINS_H_
+#ifndef _BRANCH_SEQUENCES_H_
+#define _BRANCH_SEQUENCES_H_
 
-#include "seqUtil.h"
-#include "Newickform.h"
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence);
 
-void run_gubbins(char vcf_filename[], char tree_filename[]);
-void extract_sequences(char vcf_filename[], char tree_filename[]);
-char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
-
-
-#define MAX_EDGES_IN_TREE 10000
 
 #endif
-
-
-

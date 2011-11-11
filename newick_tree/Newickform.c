@@ -21,11 +21,12 @@
 
 #include "seqUtil.h"
 #include "Newickform.h"
+#include "branch_sequences.h"
 
 
 #define STR_OUT	"out"
 
-void build_newick_tree(char * filename)
+void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases)
 {
 	int iLen, iMaxLen;
 	char *pcTreeStr;
@@ -66,8 +67,10 @@ void build_newick_tree(char * filename)
 	
 	// Parse tree string
 	root = parseTree(pcTreeStr);
-	printTree(root);
 	
+	char * root_sequence;
+	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence);
+	printf("\n\n\n\n%s\n\n\n\n", root_sequence);
 	// Free occupied memory
 	//seqFree(pcOutputFile);
 	//seqFree(pcTreeStr);
@@ -269,35 +272,3 @@ newick_node* parseTree(char *str)
 	return node;
 }
 
-void printTree(newick_node *root)
-{
-	newick_child *child;
-	if (root->childNum == 0)
-	{
-		// leaf node
-		printf("%s", root->taxon);
-	}
-	else
-	{
-		child = root->child;
-		printf("(");
-		while (child != NULL)
-		{
-			// recursion
-			printTree(child->node);
-			if (child->next != NULL)
-			{
-				printf(",");
-			}
-			child = child->next;
-		}
-		if (root->taxon != NULL)
-		{
-			printf(")%s", root->taxon);
-		}
-		else
-		{
-			printf(")", root->dist);
-		}
-	}
-}

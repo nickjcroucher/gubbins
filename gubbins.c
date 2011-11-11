@@ -35,15 +35,12 @@
 
 void run_gubbins(char vcf_filename[], char tree_filename[])
 {
-	//extract_sequences(vcf_filename);
-	build_newick_tree(tree_filename);
-
-	
+	extract_sequences(vcf_filename, tree_filename);
 
 }
 
 
-void extract_sequences(char vcf_filename[])
+void extract_sequences(char vcf_filename[], char tree_filename[])
 {
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
@@ -70,7 +67,10 @@ void extract_sequences(char vcf_filename[])
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, reference_bases, number_of_snps, reference_column_number);
 	
+	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases);
 	
+	
+	/*
 	char * seq1;
 	char * seq2;
 	char * seq3;
@@ -86,60 +86,57 @@ void extract_sequences(char vcf_filename[])
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq1, number_of_snps,  column_number_for_column_name(column_names, "4232_3_2", number_of_columns));
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq2, number_of_snps,  column_number_for_column_name(column_names, "4882_8_8", number_of_columns));
 	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq3, number_of_snps,  column_number_for_column_name(column_names, "4882_8_11", number_of_columns));
-	
+
 	calculate_ancestor_sequence(ancestor_sequence, reference_bases,child_sequences, number_of_snps, 3);
+	 */
 }
 
 // If there are snps between the child sequences, fill in with the reference sequence
-void calculate_ancestor_sequence(char * ancestor_sequence, char * reference_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences)
+char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences)
 {
 	int base_position;
 	int sequence_number;
 	int found_snp;
-	
+	strcpy(ancestor_sequence,"");
+		   
+		   
 	for(base_position = 0; base_position < sequence_length; base_position++)
 	{
-		found_snp = 0; 
-		if(child_sequences[0][base_position] != '.')
+		if(child_sequences[0][base_position] == '\0')
 		{
+			ancestor_sequence[base_position] == '\0';
+			break;
+		}
 		
-			for(sequence_number = 1; sequence_number < number_of_child_sequences; sequence_number++)	
+		found_snp = 0;
+		
+		for(sequence_number = 1; sequence_number < number_of_child_sequences; sequence_number++)	
+		{
+			if(child_sequences[0][base_position] != child_sequences[sequence_number][base_position])
 			{
-				if(child_sequences[0][base_position] != child_sequences[sequence_number][base_position])
-				{
-					found_snp = 1;
-					break;
-				}
+				found_snp = 1;
+				break;
 			}
-			if(found_snp == 1)
-			{
-				ancestor_sequence[base_position] = reference_sequence[base_position];
-			}
-			else
-			{
-				ancestor_sequence[base_position] = child_sequences[0][base_position];
-			}
+		}
+		if(found_snp == 1)
+		{
+			ancestor_sequence[base_position] = '.';
 		}
 		else
 		{
-			ancestor_sequence[base_position] = reference_sequence[base_position];
+			ancestor_sequence[base_position] = child_sequences[0][base_position];
 		}
 		
 	}
+	
+	if(ancestor_sequence[sequence_length] != '\0')
+	{
+		ancestor_sequence[sequence_length] = '\0';
+	}
+	
+	
+	return ancestor_sequence;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

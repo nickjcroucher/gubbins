@@ -11,21 +11,20 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 {
 	newick_child *child;
 	int child_counter = 0;
-	int number_of_children = root->childNum;
-	int i;
+	int current_branch =0;
 	int j;
 	
-	if (number_of_children == 0)
+	
+	if (root->childNum == 0)
 	{
 		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
 		get_sequence_from_column_in_vcf(vcf_file_pointer,  leaf_sequence, number_of_snps,  column_number_for_column_name(column_names, root->taxon, number_of_columns));
-		
 		return leaf_sequence;
 	}
 	else
 	{
 		child = root->child;
-		char * child_sequences[number_of_children];
+		char * child_sequences[root->childNum];
 
 		// generate pointers for each child seuqn
 		
@@ -47,24 +46,26 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		else
 		{
 			// All child sequneces should be available use them to find the ancestor sequence
-			leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, number_of_children);
+			leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
 		}
 		
-		int * branches_snp_sites[number_of_children];
+		int * branches_snp_sites[root->childNum];
 		
-		for(i = 0 ; i< number_of_children; i++)
+		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
 			int number_of_branch_snps=0;
-			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[i], snp_locations,number_of_snps, branches_snp_sites[i]);
+			branches_snp_sites[current_branch] = (int *) malloc(number_of_snps*sizeof(int));
+			
+			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[current_branch], snp_locations,number_of_snps, branches_snp_sites[current_branch]);
+
 			for(j = 0; j < number_of_branch_snps; j++)
 			{
-				printf("%d\t",branches_snp_sites[i][j]);
+				printf("%d\t",branches_snp_sites[current_branch][j]);
 			}
 			printf("\n");
 		}
 		
 		return leaf_sequence;
-		//free(child_sequences);
 	}
 }
 
@@ -72,20 +73,23 @@ int find_branch_snp_sites(char * ancestor_sequence, char * child_sequence, int *
 {
 	int i ;
 	int number_of_branch_snp_sites = 0;
-	branch_snp_sites[number_of_snps];
 	
 	for(i = 0; i< number_of_snps; i++)
 	{
+		branch_snp_sites[i] = 0;
+		
 		if(ancestor_sequence[i] == '\0' || child_sequence[i] == '\0')
 		{
 			break;
 		}
 		if(ancestor_sequence[i] != child_sequence[i])
 		{
+			
 			branch_snp_sites[number_of_branch_snp_sites] = snp_locations[i];
 			number_of_branch_snp_sites++;
 		}
 	}
+	realloc(branch_snp_sites,number_of_branch_snp_sites*sizeof(int));
 	
 	return number_of_branch_snp_sites;
 }

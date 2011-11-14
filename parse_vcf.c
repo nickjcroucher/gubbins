@@ -89,7 +89,7 @@ char *split_string_and_return_specific_index(char * result, char * input_string,
 {
 	char delims[] = "\t";
     int i = 0;	
-	char tokenised_string[100000] = {0}; 
+	char tokenised_string[10000] = {0}; 
 	strcpy(tokenised_string,input_string);
 	
 	// split the line and go through the tokens to find the reference char

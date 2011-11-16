@@ -24,6 +24,8 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer);
 int get_number_of_samples_from_phylip(char * phylip_string);
 int get_number_of_snps_from_phylip(char * phylip_string);
 void load_sequences_from_phylib_file(char phylip_filename[]);
+void get_sequence_for_sample_name(char * sequence_bases, char * sample_name);
+int find_sequence_index_from_sample_name( char * sample_name);
 
 #define MAX_READ_BUFFER 1048576
 #define MAX_SAMPLE_NAME_SIZE 1024

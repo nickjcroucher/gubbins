@@ -32,14 +32,16 @@ int line_length(FILE * alignment_file_pointer)
 	char szBuffer[MAX_READ_BUFFER] = {0};  
 	char *pcRes         = NULL; 
 	int  length_of_line    = 0;    
+	int total_length_of_line = 0;
 	
 	while((pcRes = fgets(szBuffer, sizeof(szBuffer), alignment_file_pointer))  != NULL){
 		length_of_line = strlen(szBuffer) - 1;
+		total_length_of_line = total_length_of_line + length_of_line;
 		if((szBuffer)[length_of_line] == '\n'){
 			break;
 		}
 	}
-	return length_of_line;
+	return total_length_of_line;
 }
 
 void advance_to_sequence(FILE * alignment_file_pointer)
@@ -80,13 +82,12 @@ int read_line(char sequence[], FILE * pFilePtr)
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
         //append string to line buffer
-		
         strcat(sequence, current_line_buffer);
         strcpy(current_line_buffer, "");
         lineLength = strlen(sequence) - 1;
         //if end of line character is found then exit from loop
 		
-        if((sequence)[lineLength] == '\n'){
+        if((sequence)[lineLength] == '\n' || (sequence)[lineLength] == '\0'){
             break;
         }
     }
@@ -114,13 +115,12 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence
 {
 	rewind(alignment_file_pointer);
 	int i = 0;
-	// remove this hardcoding and figure out number of lines in the file
 	char * sequence_name;
-	char filtered_sequence_name[20];
+	char filtered_sequence_name[MAX_SAMPLE_NAME_SIZE];
 	int name_counter;
 	
 	do{
-		sequence_name = (char *) malloc(1000*sizeof(char));
+		sequence_name = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 		read_line(sequence_name, alignment_file_pointer);
 		advance_to_sequence_name(alignment_file_pointer);
 		
@@ -129,21 +129,22 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence
 			break;
 		}
 		
+		int filtered_name_counter = 0 ;
 		for(name_counter=0; name_counter < number_of_samples; name_counter++)
 		{
-			if((sequence_name[name_counter+1] == '\0') || (sequence_name[name_counter+1] == '\n') || (sequence_name[name_counter+1] == '\r') || (name_counter >= 20))
+			if((sequence_name[name_counter] == '\0') || (sequence_name[name_counter] == '\n') || (sequence_name[name_counter] == '\r') || (name_counter >= MAX_SAMPLE_NAME_SIZE))
 			{
-				filtered_sequence_name[name_counter]  = '\0';
+				filtered_sequence_name[filtered_name_counter]  = '\0';
 				break;
 			}
 			
-			if((sequence_name[name_counter+1] == '\t') || (sequence_name[name_counter+1] == ' ') || sequence_name[name_counter+1] == '>' )
+			if((sequence_name[name_counter] == '\t') || (sequence_name[name_counter] == ' ') || sequence_name[name_counter] == '>' )
 			{
-				filtered_sequence_name[name_counter] = '_';
 			}
 			else
 			{
-				filtered_sequence_name[name_counter] = sequence_name[name_counter+1];
+				filtered_sequence_name[filtered_name_counter] = sequence_name[name_counter];
+				filtered_name_counter++;
 			}
 		}
 		//TODO clean up the sample name before use

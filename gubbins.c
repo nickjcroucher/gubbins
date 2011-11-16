@@ -36,10 +36,8 @@
 
 void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[])
 {
-	//extract_sequences(vcf_filename, tree_filename);
-	
 	load_sequences_from_phylib_file(phylip_filename);
-
+	extract_sequences(vcf_filename, tree_filename);
 }
 
 
@@ -74,8 +72,6 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	// get reference sequence from VCF
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
-	
-	
 	
 	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases);
 }

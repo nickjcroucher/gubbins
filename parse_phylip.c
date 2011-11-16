@@ -27,7 +27,29 @@
 int num_samples;
 int num_snps;
 char ** sequences;
-char ** sample_names;
+char ** phylip_sample_names;
+
+
+void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
+{
+	int sequence_index;
+	sequence_index = find_sequence_index_from_sample_name( sample_name);
+	strcpy(sequence_bases, sequences[sequence_index]);
+}
+
+int find_sequence_index_from_sample_name( char * sample_name)
+{
+	int i;
+	
+	for(i =0; i< num_samples; i++)
+	{
+		if(strcmp(sample_name,phylip_sample_names[i]) == 0)	
+		{
+			return i;
+		}
+	}
+	return -1;
+}
 
 
 void load_sequences_from_phylib_file(char phylip_filename[])
@@ -51,12 +73,13 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 	num_snps = get_number_of_snps_from_phylip(line_buffer);
 	
 
-	sequences    = (char **) malloc(num_samples*sizeof(char));
-	sample_names = (char **) malloc(num_samples*sizeof(char));
+	sequences = (char **) malloc(num_samples*sizeof(char *));
+	phylip_sample_names = (char **) malloc(num_samples*sizeof(char *));
+	
 	for(i = 0; i < num_samples; i++)
 	{
 		sequences[i] = (char *) malloc(num_snps*sizeof(char));
-		sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		phylip_sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 	}
 	
 	int sample_counter = 0;
@@ -91,20 +114,18 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 				{
 					found_sequence = 1;
 					sequence_offset = i+1;
-					sample_names[sample_counter][i] = '\0';
+					phylip_sample_names[sample_counter][i] = '\0';
 				}
 				else
 				{
-					sample_names[sample_counter][i] = line_buffer[i];
+					phylip_sample_names[sample_counter][i] = line_buffer[i];
 				}
 			}
 		}
-		printf("%s\n",sample_names[sample_counter]);
-		
 		sample_counter++;
-		
-	}while(line_buffer[0] != '\0');
 
+	}while(line_buffer[0] != '\0');
+	
 }
 
 int get_number_of_samples_from_phylip(char * phylip_string)

@@ -6,6 +6,7 @@
 #include "branch_sequences.h"
 #include "gubbins.h"
 #include "parse_vcf.h"
+#include "parse_phylip.h"
 
 char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence)
 {
@@ -17,7 +18,9 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	if (root->childNum == 0)
 	{
 		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
-		get_sequence_from_column_in_vcf(vcf_file_pointer,  leaf_sequence, number_of_snps,  column_number_for_column_name(column_names, root->taxon, number_of_columns));
+		printf("-%s-\n", root->taxon);
+		get_sequence_for_sample_name(leaf_sequence, root->taxon);
+		
 		return leaf_sequence;
 	}
 	else
@@ -40,7 +43,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		if (root->taxon != NULL)
 		{
 			// this non leaf node has its own sequence
-			get_sequence_from_column_in_vcf(vcf_file_pointer, leaf_sequence, number_of_snps,  column_number_for_column_name(column_names, root->taxon, number_of_columns));
+			get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		}
 		else
 		{
@@ -57,8 +60,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			
 			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[current_branch], snp_locations,number_of_snps, branches_snp_sites[current_branch]);
 
-
 			identify_recombinations(number_of_branch_snps, branches_snp_sites[current_branch]);
+			printf(".\n");
 		}
 		
 		return leaf_sequence;
@@ -103,11 +106,7 @@ void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites
 	{
 		double density;
 		density = calculate_snp_density(branches_snp_sites, number_of_branch_snps, i);
-
-		printf("%f\t", density);
 	}
-	printf("\n\n");
-
 }
 
 // Assume that the branches_snps_sites array is sorted from smallest to largest

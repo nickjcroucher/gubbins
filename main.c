@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
 #include "snp_sites.h"
 #include "gubbins.h"
 
@@ -52,6 +51,7 @@ int main (int argc, const char * argv[]) {
 	char vcf_filename[MAX_FILENAME_SIZE];
 	char tree_filename[MAX_FILENAME_SIZE];
 	char phylip_filename[MAX_FILENAME_SIZE];
+
 	
 	if(strcmp(argv[1], "--help") == 0)
     {
@@ -71,11 +71,8 @@ int main (int argc, const char * argv[]) {
 		strcpy(phylip_filename,argv[4]);
 		
         run_gubbins(vcf_filename,tree_filename,phylip_filename);
-		
 		return 0;
     }
-	
-	
 	
 	return 0;
 }

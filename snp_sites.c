@@ -157,7 +157,7 @@ int generate_snp_sites(char filename[])
 	}
 	
 	length_of_genome = genome_length(alignment_file_pointer);
-	reference_sequence = (char *) malloc(4000000*sizeof(char));
+	reference_sequence = (char *) malloc(length_of_genome*sizeof(char));
 	
 	build_reference_sequence(reference_sequence,alignment_file_pointer);
 	number_of_snps = detect_snps(reference_sequence, alignment_file_pointer, length_of_genome);

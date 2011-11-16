@@ -18,7 +18,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	if (root->childNum == 0)
 	{
 		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
-		printf("-%s-\n", root->taxon);
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		return leaf_sequence;
@@ -61,7 +60,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[current_branch], snp_locations,number_of_snps, branches_snp_sites[current_branch]);
 
 			identify_recombinations(number_of_branch_snps, branches_snp_sites[current_branch]);
-			printf(".\n");
 		}
 		
 		return leaf_sequence;

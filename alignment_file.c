@@ -22,9 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <regex.h>
+#include <sys/types.h>
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
+
 
 // Given a file handle, return the length of the current line
 int line_length(FILE * alignment_file_pointer)
@@ -143,8 +145,11 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence
 			}
 			else
 			{
-				filtered_sequence_name[filtered_name_counter] = sequence_name[name_counter];
-				filtered_name_counter++;
+				if(filter_invalid_characters(sequence_name[name_counter]) == sequence_name[name_counter])
+				{
+					filtered_sequence_name[filtered_name_counter] = sequence_name[name_counter];
+					filtered_name_counter++;
+				}
 			}
 		}
 		//TODO clean up the sample name before use
@@ -155,5 +160,29 @@ void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence
 	free(sequence_name);
 }
 
+
+char filter_invalid_characters(char input_char)
+{
+	regex_t regex;
+	int reti;
+	char  input_chars[10];
+	input_chars[0] =input_char;
+	input_chars[1] = '\0';
+	
+	/* Compile regular expression */
+	reti = regcomp(&regex, "^[[:alnum:]_.]", 0);
+
+	/* Execute regular expression */
+	reti = regexec(&regex, input_chars, 0, NULL, 0);
+	if( !reti ){
+		return input_char;
+	}
+	else if( reti == REG_NOMATCH ){
+		return '\0';
+	}
+	return '\0';
+
+	regfree(&regex);
+}
 
 

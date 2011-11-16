@@ -28,8 +28,9 @@ int genome_length(FILE * alignment_file_pointer);
 int read_line(char sequence[], FILE * pFilePtr);
 int count_lines_in_file(FILE * alignment_file_pointer);
 void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples);
+char filter_invalid_characters(char input_char);
 
-#define MAX_READ_BUFFER 524288
+#define MAX_READ_BUFFER 1048576
 #define MAX_SAMPLE_NAME_SIZE 1024
 
 #endif

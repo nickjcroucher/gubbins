@@ -24,7 +24,7 @@
 #include "snp_sites.h"
 #include "gubbins.h"
 
-
+#define MAX_FILENAME_SIZE 200
 
 static void print_usage()
 {
@@ -49,6 +49,10 @@ static void print_usage()
 
 
 int main (int argc, const char * argv[]) {
+	char vcf_filename[MAX_FILENAME_SIZE];
+	char tree_filename[MAX_FILENAME_SIZE];
+	char phylip_filename[MAX_FILENAME_SIZE];
+	
 	if(strcmp(argv[1], "--help") == 0)
     {
 		print_usage();
@@ -56,12 +60,17 @@ int main (int argc, const char * argv[]) {
     }
 	else if(strcmp(argv[1], "-s") == 0)
     {
-		generate_snp_sites(argv[2]);
+		strcpy(vcf_filename,argv[2]);
+		generate_snp_sites(vcf_filename);
 		return 0;
     }
 	else if(strcmp(argv[1], "-r") == 0)
     {
-        run_gubbins(argv[2],argv[3]);
+		strcpy(vcf_filename,argv[2]);
+		strcpy(tree_filename,argv[3]);
+		strcpy(phylip_filename,argv[4]);
+		
+        run_gubbins(vcf_filename,tree_filename,phylip_filename);
 		
 		return 0;
     }

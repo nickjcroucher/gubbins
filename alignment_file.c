@@ -29,7 +29,7 @@
 // Given a file handle, return the length of the current line
 int line_length(FILE * alignment_file_pointer)
 {
-	char szBuffer[4194304] = {0};  
+	char szBuffer[MAX_READ_BUFFER] = {0};  
 	char *pcRes         = NULL; 
 	int  length_of_line    = 0;    
 	
@@ -54,15 +54,10 @@ void advance_to_sequence_name(FILE * alignment_file_pointer)
 	line_length(alignment_file_pointer);
 }
 
-
-
 int validate_alignment_file(FILE * alignment_file_pointer)
 {
 	return 1;
 }
-
-
-
 
 int genome_length(FILE * alignment_file_pointer)
 {
@@ -77,15 +72,17 @@ int genome_length(FILE * alignment_file_pointer)
 
 int read_line(char sequence[], FILE * pFilePtr)
 {
-    char szBuffer[4194304] = {0};   
+    
     char *pcRes         = NULL;  
     int   lineLength    = 0; 
+	char current_line_buffer[MAX_READ_BUFFER] = {0};
 	
-    while((pcRes = fgets(szBuffer, sizeof(szBuffer), pFilePtr))  != NULL){
+	
+    while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
         //append string to line buffer
 		
-        strcat(sequence, szBuffer);
-        strcpy(szBuffer, "");
+        strcat(sequence, current_line_buffer);
+        strcpy(current_line_buffer, "");
         lineLength = strlen(sequence) - 1;
         //if end of line character is found then exit from loop
 		
@@ -93,6 +90,8 @@ int read_line(char sequence[], FILE * pFilePtr)
             break;
         }
     }
+	 
+	 
     return 1;
 }
 

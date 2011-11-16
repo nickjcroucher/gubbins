@@ -12,7 +12,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	newick_child *child;
 	int child_counter = 0;
 	int current_branch =0;
-	int j;
 	
 	
 	if (root->childNum == 0)
@@ -58,11 +57,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			
 			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[current_branch], snp_locations,number_of_snps, branches_snp_sites[current_branch]);
 
-			for(j = 0; j < number_of_branch_snps; j++)
-			{
-				printf("%d\t",branches_snp_sites[current_branch][j]);
-			}
-			printf("\n");
+
+			identify_recombinations(number_of_branch_snps, branches_snp_sites[current_branch]);
 		}
 		
 		return leaf_sequence;
@@ -95,7 +91,52 @@ int find_branch_snp_sites(char * ancestor_sequence, char * child_sequence, int *
 }
 
 
+void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites)
+{
+	int i;
+	if(number_of_branch_snps < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+	{
+		return;	
+	}
+	
+	for(i=0; i< number_of_branch_snps; i++)
+	{
+		double density;
+		density = calculate_snp_density(branches_snp_sites, number_of_branch_snps, i);
 
+		printf("%f\t", density);
+	}
+	printf("\n\n");
+
+}
+
+// Assume that the branches_snps_sites array is sorted from smallest to largest
+double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index)
+{
+	int starting_index = index;
+	int ending_index = index;
+	if( index > 0)
+	{
+		starting_index = index-1;
+	}
+	if(index<(number_of_branch_snps - 1) )
+	{
+		ending_index = index+1;
+	}
+	
+	if(ending_index == starting_index)
+	{
+		return DEFAULT_SNP_DENSITY;	
+	}
+	int index_interval = ending_index - starting_index;
+	int coordinate_interval = branches_snp_sites[ending_index] - branches_snp_sites[starting_index];
+	if(coordinate_interval > MAX_WINDOW)
+	{
+		return DEFAULT_SNP_DENSITY;
+	}
+		
+	return ((index_interval)*1.0)/((coordinate_interval)*1.0);
+}
 
 
 

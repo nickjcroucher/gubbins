@@ -21,9 +21,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <regex.h>
 #include "vcf.h"
 #include "parse_vcf.h"
 #include "alignment_file.h"
+
+int * column_data;
 
 void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_values, int number_of_snps, int column_number)
 {
@@ -44,15 +48,17 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 		
 		if(szBuffer[0] != '#')
 		{
-			char * returned_result ;
-			returned_result  = split_string_and_return_specific_index(result, szBuffer, column_number);
-			integer_values[reference_index] = atoi(returned_result);
+			split_string_and_return_specific_index(result, szBuffer, column_number,100000);
+			integer_values[reference_index] = atoi(result);
 			reference_index++;
 		}
 		
 	}while(szBuffer[0] != '\0');
 	
 }
+
+
+
 
 
 void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_bases, int number_of_snps, int column_number)
@@ -74,9 +80,8 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_ba
 		
 		if(szBuffer[0] != '#')
 		{
-			char * returned_result ;
-			returned_result  = split_string_and_return_specific_index(result, szBuffer, column_number);
-			sequence_bases[reference_index] = returned_result[0];
+			split_string_and_return_specific_index(result, szBuffer, column_number, 100000);
+			sequence_bases[reference_index] = result[0];
 			reference_index++;
 		}
 		
@@ -85,30 +90,36 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_ba
 	sequence_bases[reference_index] = '\0';
 }
 
-char *split_string_and_return_specific_index(char * result, char * input_string, int token_index)
+void split_string_and_return_specific_index(char * result, char * input_string, int token_index, int input_string_length)
 {
-	char delims[] = "\t";
-    int i = 0;	
-	char tokenised_string[10000] = {0}; 
-	strcpy(tokenised_string,input_string);
+	int i;
+	int tab_counter = 0;
+	int result_counter = 0; 
+	result[0] = '\0';
 	
-	// split the line and go through the tokens to find the reference char
-	result = strtok( tokenised_string, delims );
-	if(token_index ==0)
+	for(i = 0 ; i< input_string_length; i++)
 	{
-		return result;	
-	}
-	
-	while( result != NULL ) {
-		result = strtok( NULL, delims );
-		if(i == token_index -1)
+		if(input_string[i] == '\0' || input_string[i] == '\n')
 		{
-			return result;	
+			result[result_counter] = '\0';
+			break;	
 		}
 		
-		i++;
+		if(input_string[i] == '\t')
+		{
+			tab_counter++;
+		}
+		else if(tab_counter == token_index)
+		{
+			result[result_counter] = input_string[i];
+			result_counter++;
+		}
+		else if(tab_counter > token_index)
+		{
+			result[result_counter] = '\0';
+			break;	
+		}
 	}
-	return "";
 }
 
 
@@ -138,20 +149,19 @@ int get_number_of_snps(FILE * vcf_file_pointer)
 int get_number_of_columns(char * column_header)
 {
 	int number_of_columns = 0;
-	char result[100] = {0}; 
-	char * returned_result;
+	char result[100] = {0};
 	
 	do
 	{
-		returned_result = split_string_and_return_specific_index( result, column_header, number_of_columns);
-		if(returned_result == NULL ||  returned_result[0] == '\n')
+		split_string_and_return_specific_index( result, column_header, number_of_columns,100000);
+		if(result == NULL ||  result[0] == '\n')
 		{
 			break;	
 		}
 		
 		number_of_columns++;
 	}
-	while( ! (strcmp(returned_result,"") == 0) );
+	while( ! (strcmp(result,"") == 0) );
 	
 	return number_of_columns;
 }
@@ -162,7 +172,6 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 	rewind(vcf_file_pointer);
 	char szBuffer[100000] = {0};
 	char result[100] = {0};
-	char * returned_result;
 	
 	do{
 		strcpy(szBuffer,""); 
@@ -175,12 +184,10 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 		}
 		
 		//#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  _S_pneumoniae_Spanis    _3948_7_10
-		returned_result = split_string_and_return_specific_index( result, szBuffer, 0);
-
-		if(strcmp(returned_result, "#CHROM")==0)
+		split_string_and_return_specific_index( result, szBuffer, 0,100000);
+		if(strcmp(result, "#CHROM")==0)
 		{
 			return get_number_of_columns(szBuffer);
-			
 		}
 		
 	}while(szBuffer[0] != '\0');
@@ -194,7 +201,6 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 	char szBuffer[100000] = {0};
 	char result[100] = {0};  
 	int i;
-	char * returned_result;
 	
 	do{
 		strcpy(szBuffer,""); 
@@ -207,13 +213,13 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 		}
 		
 		//#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  _S_pneumoniae_Spanis    _3948_7_10
-		returned_result = split_string_and_return_specific_index( result, szBuffer, 0);
-		if(strcmp(returned_result, "#CHROM")==0)
+		split_string_and_return_specific_index( result, szBuffer, 0,100000);
+		if(strcmp(result, "#CHROM")==0)
 		{
 			for(i = 0; i< number_of_columns; i++)
 			{
-				returned_result = split_string_and_return_specific_index( result, szBuffer, i);
-				strcpy(column_names[i], returned_result);
+				split_string_and_return_specific_index( result, szBuffer, i,100000);
+				strcpy(column_names[i], result);
 			}
 		}
 		
@@ -234,10 +240,6 @@ int column_number_for_column_name(char ** column_names, char * column_name, int 
 	
 	return -1;
 }
-
-
-
-
 
 
 

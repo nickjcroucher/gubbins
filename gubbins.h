@@ -23,7 +23,7 @@
 #include "seqUtil.h"
 #include "Newickform.h"
 
-void run_gubbins(char vcf_filename[], char tree_filename[]);
+void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[]);
 void extract_sequences(char vcf_filename[], char tree_filename[]);
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
 

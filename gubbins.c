@@ -23,6 +23,7 @@
 #include <string.h>
 #include "gubbins.h"
 #include "parse_vcf.h"
+#include "parse_phylip.h"
 
 #include "seqUtil.h"
 #include "Newickform.h"
@@ -33,11 +34,14 @@
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
-void run_gubbins(char vcf_filename[], char tree_filename[])
+void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[])
 {
-	extract_sequences(vcf_filename, tree_filename);
+	//extract_sequences(vcf_filename, tree_filename);
+	
+	load_sequences_from_phylib_file(phylip_filename);
 
 }
+
 
 
 void extract_sequences(char vcf_filename[], char tree_filename[])
@@ -74,27 +78,6 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	
 	
 	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases);
-	
-	
-	/*
-	char * seq1;
-	char * seq2;
-	char * seq3;
-	char * ancestor_sequence;
-	seq1= (char *) malloc(number_of_snps*sizeof(char));
-	seq2= (char *) malloc(number_of_snps*sizeof(char));
-	seq3= (char *) malloc(number_of_snps*sizeof(char));
-	ancestor_sequence = (char *) malloc(number_of_snps*sizeof(char));
-	char * child_sequences[3];
-	child_sequences[0] = seq1;
-	child_sequences[1] = seq2;
-	child_sequences[2] = seq3;
-	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq1, number_of_snps,  column_number_for_column_name(column_names, "4232_3_2", number_of_columns));
-	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq2, number_of_snps,  column_number_for_column_name(column_names, "4882_8_8", number_of_columns));
-	get_sequence_from_column_in_vcf(vcf_file_pointer, snp_locations, seq3, number_of_snps,  column_number_for_column_name(column_names, "4882_8_11", number_of_columns));
-
-	calculate_ancestor_sequence(ancestor_sequence, reference_bases,child_sequences, number_of_snps, 3);
-	 */
 }
 
 // If there are snps between the child sequences, fill in with the reference sequence

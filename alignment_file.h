@@ -29,4 +29,6 @@ int read_line(char sequence[], FILE * pFilePtr);
 int count_lines_in_file(FILE * alignment_file_pointer);
 void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples);
 
+#define MAX_READ_BUFFER 1048576
+
 #endif

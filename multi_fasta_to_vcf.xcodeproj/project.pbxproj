@@ -12,6 +12,7 @@
 		0345A6DD146C3045009B681F /* Newickform.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345A6C2146C2F90009B681F /* Newickform.c */; };
 		0345A6DF146C3051009B681F /* seqUtil.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345A6BF146C2F90009B681F /* seqUtil.c */; };
 		0345A7A7146D3B0C009B681F /* branch_sequences.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345A7A6146D3B0C009B681F /* branch_sequences.c */; };
+		0345AA2D1472C47F009B681F /* parse_phylip.c in Sources */ = {isa = PBXBuildFile; fileRef = 0345AA2C1472C47F009B681F /* parse_phylip.c */; };
 		034AE677146427CD0025A88E /* fasta_of_snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 034AE676146427CD0025A88E /* fasta_of_snp_sites.c */; };
 		034AE6B0146446090025A88E /* phylib_of_snp_sites.c in Sources */ = {isa = PBXBuildFile; fileRef = 034AE6AF146446090025A88E /* phylib_of_snp_sites.c */; };
 		03846E1D146141DF002BB72D /* vcf.c in Sources */ = {isa = PBXBuildFile; fileRef = 03846E1C146141DF002BB72D /* vcf.c */; };
@@ -45,6 +46,8 @@
 		0345A6C2146C2F90009B681F /* Newickform.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Newickform.c; path = newick_tree/Newickform.c; sourceTree = "<group>"; };
 		0345A7A5146D3B0C009B681F /* branch_sequences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = branch_sequences.h; sourceTree = "<group>"; };
 		0345A7A6146D3B0C009B681F /* branch_sequences.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = branch_sequences.c; sourceTree = "<group>"; };
+		0345AA2B1472C47F009B681F /* parse_phylip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parse_phylip.h; sourceTree = "<group>"; };
+		0345AA2C1472C47F009B681F /* parse_phylip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parse_phylip.c; sourceTree = "<group>"; };
 		034AE675146427CD0025A88E /* fasta_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fasta_of_snp_sites.h; sourceTree = "<group>"; };
 		034AE676146427CD0025A88E /* fasta_of_snp_sites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fasta_of_snp_sites.c; sourceTree = "<group>"; };
 		034AE6AE146446090025A88E /* phylib_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = phylib_of_snp_sites.h; sourceTree = "<group>"; };
@@ -97,6 +100,8 @@
 				03846E1C146141DF002BB72D /* vcf.c */,
 				0345A41C146ABD71009B681F /* parse_vcf.h */,
 				0345A41D146ABD71009B681F /* parse_vcf.c */,
+				0345AA2B1472C47F009B681F /* parse_phylip.h */,
+				0345AA2C1472C47F009B681F /* parse_phylip.c */,
 				034AE675146427CD0025A88E /* fasta_of_snp_sites.h */,
 				034AE676146427CD0025A88E /* fasta_of_snp_sites.c */,
 				0345A418146AAF07009B681F /* gubbins.h */,
@@ -179,6 +184,7 @@
 				0345A6DD146C3045009B681F /* Newickform.c in Sources */,
 				0345A6DF146C3051009B681F /* seqUtil.c in Sources */,
 				0345A7A7146D3B0C009B681F /* branch_sequences.c in Sources */,
+				0345AA2D1472C47F009B681F /* parse_phylip.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

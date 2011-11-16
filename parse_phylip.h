@@ -17,16 +17,19 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _BRANCH_SEQUENCES_H_
-#define _BRANCH_SEQUENCES_H_
+#ifndef _PARSE_PHYLIP_H_
+#define _PARSE_PHYLIP_H_
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence);
-int find_branch_snp_sites(char * ancestor_sequence, char * child_sequence, int * snp_locations, int number_of_snps, int * branch_snp_sites);
-void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites);
-double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
+void load_sequences_from_phylib(FILE * phylip_file_pointer);
+int get_number_of_samples_from_phylip(char * phylip_string);
+int get_number_of_snps_from_phylip(char * phylip_string);
+void load_sequences_from_phylib_file(char phylip_filename[]);
 
-#define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 10
-#define DEFAULT_SNP_DENSITY 0.000001
-#define MAX_WINDOW 1000
+#define MAX_READ_BUFFER 1048576
+#define MAX_SAMPLE_NAME_SIZE 1024
 
 #endif
+
+
+
+

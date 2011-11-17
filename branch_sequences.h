@@ -25,12 +25,22 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites,int length_of_original_genome);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
 int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index,int length_of_sequence,  int length_of_original_genome);
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords,int branch_genome_size, int number_of_branch_snps);
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps,int * snp_locations);
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps);
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
+int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_snps);
+int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps);
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
+double calculate_threshold(int branch_genome_size, int window_size);
+int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);
+double reduce_factorial(int l, int i);
 
-#define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 10
+#define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3
 #define DEFAULT_SNP_DENSITY 0.000001
 #define MAX_WINDOW 1000
-#define WINDOW_SIZE 10
+#define WINDOW_SNP_MODE_TARGET 10
+#define MIN_WINDOW_SIZE 100
+#define MAX_WINDOW_SIZE 100000
+#define RANDOMNESS_DAMPNER 0.05
 
 #endif

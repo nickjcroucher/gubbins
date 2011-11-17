@@ -9,6 +9,71 @@
 #include "parse_vcf.h"
 #include "parse_phylip.h"
 
+
+// Order is not preserved.
+int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array)
+{
+	int array_1_counter=0;
+	int array_2_counter=0;
+	
+	for(array_1_counter = 0; array_1_counter< array_1_size; array_1_counter++)
+	{
+		output_array[array_1_counter] = array_1[array_1_counter];
+	}
+	
+	for(array_2_counter = array_1_size; array_2_counter < array_2_size + array_1_size; array_2_counter++)
+	{
+		output_array[array_2_counter] = array_2[array_2_counter];
+	}
+	return array_1_size+array_2_size;
+}
+
+// Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
+void find_sample_recombinations(newick_node *root, int * parent_recombinations, int parent_num_recombinations)
+{
+	newick_child *child;
+	int * current_recombinations;
+	int num_current_recombinations = 0 ;
+	int i;
+	
+	current_recombinations = (int *) malloc((root->num_recombinations+parent_num_recombinations)*sizeof(int));
+	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
+	
+	
+	if (root->childNum == 0)
+	{
+		printf("%s\t",root->taxon);
+		for(i =0 ; i<num_current_recombinations; i++ )
+		{
+			printf("%d\t",current_recombinations[i]);
+		}
+		printf("\n");
+		
+	}
+	else
+	{
+		child = root->child;
+
+		while (child != NULL)
+		{
+			// recursion
+			find_sample_recombinations(child->node, current_recombinations, num_current_recombinations);
+			child = child->next;
+		}
+
+		if (root->taxon != NULL)
+		{
+			printf("%s\t",root->taxon);
+			for(i =0 ; i<num_current_recombinations; i++ )
+			{
+				printf("%d\t",current_recombinations[i]);
+			}
+			printf("\n");
+		}
+	}
+}
+
+
 char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence, int length_of_original_genome)
 {
 	newick_child *child;
@@ -65,8 +130,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
 			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch]->recombinations);
-
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch]);
 		}
 		
 		return leaf_sequence;
@@ -133,7 +197,6 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps)
 		return MIN_WINDOW_SIZE;
 	}
 	
-	// Convert a double to an int????
 	window_size = (int) ((branch_genome_size*1.0)/(number_of_branch_snps*1.0/WINDOW_SNP_MODE_TARGET));
 	
 	if(window_size < MIN_WINDOW_SIZE)
@@ -188,7 +251,7 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	return number_of_snps_in_block;
 }
 
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, int * recombinations)
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node)
 {
 	int i;
 	int window_size;
@@ -201,7 +264,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	int number_of_recombinations = 0;
 	
 	// place to store coordinates of recombinations snps
-	recombinations = (int *) malloc(length_of_sequence*sizeof(int));
+	current_node->recombinations = (int *) malloc(length_of_sequence*sizeof(int));
 	
 	if(number_of_branch_snps == 0)
 	{
@@ -228,15 +291,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			// Fix me
 			if(block_likelihood > 9000)
 			{
-				number_of_recombinations += flag_recombinations_in_window(window_start_coordinate, window_end_coordinate,length_of_sequence, snp_locations, recombinations, number_of_recombinations);
+				number_of_recombinations += flag_recombinations_in_window(window_start_coordinate, window_end_coordinate,length_of_sequence, snp_locations, current_node->recombinations, number_of_recombinations);
 			}
 			
 			//printf("cutoff: %d\tN: %d\tC: %d\twindowsize: %d\tstart %d\tn: %d\tc: %d\tLH: %f\n",cutoff,branch_genome_size,number_of_branch_snps,window_size,window_start_coordinate,block_genome_size_without_gaps,number_of_snps_in_block, block_likelihood);
 		}
 		window_start_coordinate = window_end_coordinate;
 	}
-	realloc(recombinations, number_of_recombinations*sizeof(int));
-	
+	realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
+	current_node->num_recombinations = number_of_recombinations;
 }
 
 // Inefficient

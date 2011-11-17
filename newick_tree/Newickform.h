@@ -34,6 +34,7 @@ typedef struct newick_node
 	float dist;
 	int childNum;
 	int * recombinations;
+	int num_recombinations;
 	struct newick_child *child;
 	struct newick_node *parent;
 } newick_node;

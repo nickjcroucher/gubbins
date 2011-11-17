@@ -8,7 +8,7 @@
 #include "parse_vcf.h"
 #include "parse_phylip.h"
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence)
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence, int length_of_original_genome)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -32,7 +32,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		while (child != NULL)
 		{
 			// recursion
-			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns, reference_bases, child_sequences[child_counter]);
+			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns, reference_bases, child_sequences[child_counter],length_of_original_genome);
 			
 			child = child->next;
 			child_counter++;
@@ -137,8 +137,52 @@ double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps
 
 
 
+// Get the total genome length
+// for each branch sequence, go through the snp sites. if its a - reduce the genome length, otherwise increment the snps. The final genome length = N
+// and the number of snps is = C
+
+// create sliding windows containing 10 snps (which are not gaps)
+// adjust the coordinates of the snps so that gaps are eliminated. keep a lookup table of coordinates to gapless coordinates
+// then for each window do the same to get n and c
 
 
+
+/*
+def get_block_likelihood(start, end, binsnps, N, C):
+
+
+
+n=0.0
+c=0.0
+for x in binsnps[start:end+1]:
+if x==0:
+n+=1
+elif x==1:
+c+=1
+n+=1
+
+#print start, end, c, n, C, N
+part1=math.log((c/n),10)*c
+if n-c==0:
+part2=0
+else:
+part2=math.log((((n-c)/n)),10)*(n-c)
+if C-c==0:
+part3=0
+else:
+part3=math.log((((C-c)/(N-n))),10)*(C-c)
+if ((N-n)-(C-c))==0:
+part4=0
+else:
+part4=math.log(((((N-n)-(C-c))/(N-n))),10)*((N-n)-(C-c))
+
+likelihood=(part1+part2+part3+part4)*-1
+
+#print start, end, c, n, C, N, likelihood
+
+return likelihood
+
+*/
 
 
 

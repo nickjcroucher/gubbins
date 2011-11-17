@@ -23,12 +23,14 @@
 #include "seqUtil.h"
 #include "Newickform.h"
 
-void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[]);
-void extract_sequences(char vcf_filename[], char tree_filename[]);
+void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[], char multi_fasta_filename[]);
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[]);
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
+int get_length_of_genome_from_alignment_file(char multi_fasta_filename[]);
 
 
-#define MAX_EDGES_IN_TREE 10000
+#define MAX_EDGES_IN_TREE 20000
+#define MAX_SAMPLE_NAME_SIZE 1024
 
 #endif
 

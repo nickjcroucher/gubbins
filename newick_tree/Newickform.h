@@ -41,11 +41,11 @@ short sDEBUG;
 
 #ifdef __NEWICKFORM_C__
 newick_node* parseTree(char *str);
-void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases);
+void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, int length_of_original_genome);
 
 #else
 extern newick_node* parseTree(char *str);
-extern void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases);
+extern void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, int length_of_original_genome);
 
 #endif
 

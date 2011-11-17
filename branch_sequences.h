@@ -20,7 +20,7 @@
 #ifndef _BRANCH_SEQUENCES_H_
 #define _BRANCH_SEQUENCES_H_
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence);
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence, int length_of_original_genome);
 int find_branch_snp_sites(char * ancestor_sequence, char * child_sequence, int * snp_locations, int number_of_snps, int * branch_snp_sites);
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);

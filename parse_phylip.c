@@ -43,8 +43,6 @@ int find_sequence_index_from_sample_name( char * sample_name)
 	
 	for(i =0; i< num_samples; i++)
 	{
-		printf("-%s-\t-%s-\n",sample_name,phylip_sample_names[i]);
-		
 		if(strcmp(sample_name,phylip_sample_names[i]) == 0)	
 		{
 			return i;
@@ -124,7 +122,6 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 				}
 			}
 		}
-		printf("*%s*",phylip_sample_names[sample_counter]);
 		sample_counter++;
 
 	}while(line_buffer[0] != '\0');

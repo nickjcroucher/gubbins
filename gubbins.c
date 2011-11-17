@@ -24,6 +24,7 @@
 #include "gubbins.h"
 #include "parse_vcf.h"
 #include "parse_phylip.h"
+#include "alignment_file.h"
 
 #include "seqUtil.h"
 #include "Newickform.h"
@@ -34,15 +35,21 @@
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
-void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[])
+void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[],char multi_fasta_filename[])
 {
 	load_sequences_from_phylib_file(phylip_filename);
-	extract_sequences(vcf_filename, tree_filename);
+	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename);
 }
 
 
+int get_length_of_genome_from_alignment_file(char multi_fasta_filename[])
+{
+	FILE *alignment_file_pointer;
+	alignment_file_pointer=fopen(multi_fasta_filename, "r");
+	return genome_length(alignment_file_pointer);	
+}
 
-void extract_sequences(char vcf_filename[], char tree_filename[])
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[])
 {
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
@@ -53,12 +60,14 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	int number_of_columns;
 	int i;
 	int reference_column_number;
+	int length_of_original_genome;
+	length_of_original_genome = get_length_of_genome_from_alignment_file(multi_fasta_filename);
 	
 	number_of_columns = get_number_of_columns_from_file(vcf_file_pointer);
 	char* column_names[number_of_columns];
 	for(i = 0; i < number_of_columns; i++)
 	{
-		column_names[i] = malloc(100*sizeof(char));
+		column_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 	}
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
@@ -73,7 +82,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[])
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
 	
-	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases);
+	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome);
 }
 
 // If there are snps between the child sequences, fill in with the reference sequence

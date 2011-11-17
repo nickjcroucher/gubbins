@@ -30,7 +30,7 @@ static void print_usage()
 	puts("Find SNP sites");
 	puts("./multi_fasta_to_vcf -s file.aln ");
 	puts("Run Gubbins");
-	puts("./multi_fasta_to_vcf -r file.aln.vcf file.aln.vcf.tre ");
+	puts("./multi_fasta_to_vcf -r file.aln file.aln.vcf file.aln.vcf.tre file.aln.phylip");
 	puts("");
 	puts("Input:");
 	puts("\tfile.aln\t:file containting a multi fasta alignment");
@@ -48,6 +48,7 @@ static void print_usage()
 
 
 int main (int argc, const char * argv[]) {
+	char multi_fasta_filename[MAX_FILENAME_SIZE];
 	char vcf_filename[MAX_FILENAME_SIZE];
 	char tree_filename[MAX_FILENAME_SIZE];
 	char phylip_filename[MAX_FILENAME_SIZE];
@@ -60,17 +61,18 @@ int main (int argc, const char * argv[]) {
     }
 	else if(strcmp(argv[1], "-s") == 0)
     {
-		strcpy(vcf_filename,argv[2]);
-		generate_snp_sites(vcf_filename);
+		strcpy(multi_fasta_filename,argv[2]);
+		generate_snp_sites(multi_fasta_filename);
 		return 0;
     }
 	else if(strcmp(argv[1], "-r") == 0)
     {
-		strcpy(vcf_filename,argv[2]);
-		strcpy(tree_filename,argv[3]);
-		strcpy(phylip_filename,argv[4]);
+		strcpy(multi_fasta_filename,argv[2]);
+		strcpy(vcf_filename,argv[3]);
+		strcpy(tree_filename,argv[4]);
+		strcpy(phylip_filename,argv[5]);
 		
-        run_gubbins(vcf_filename,tree_filename,phylip_filename);
+        run_gubbins(vcf_filename,tree_filename,phylip_filename,multi_fasta_filename);
 		return 0;
     }
 	

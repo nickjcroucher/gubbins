@@ -26,7 +26,7 @@
 
 #define STR_OUT	"out"
 
-void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases)
+void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, int length_of_original_genome)
 {
 	int iLen, iMaxLen;
 	char *pcTreeStr;
@@ -69,7 +69,7 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	root = parseTree(pcTreeStr);
 	
 	char * root_sequence;
-	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence);
+	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome);
 	printf("\n\n\n\n%s\n\n\n\n", root_sequence);
 	// Free occupied memory
 	//seqFree(pcOutputFile);

@@ -33,6 +33,7 @@ typedef struct newick_node
 	char *seq;
 	float dist;
 	int childNum;
+	int * recombinations;
 	struct newick_child *child;
 	struct newick_node *parent;
 } newick_node;

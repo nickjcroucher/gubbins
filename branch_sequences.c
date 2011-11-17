@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "seqUtil.h"
 #include "Newickform.h"
 #include "branch_sequences.h"
@@ -57,42 +58,49 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			int number_of_branch_snps=0;
 			branches_snp_sites[current_branch] = (int *) malloc(number_of_snps*sizeof(int));
 			
-			number_of_branch_snps = find_branch_snp_sites(leaf_sequence, child_sequences[current_branch], snp_locations,number_of_snps, branches_snp_sites[current_branch]);
+			int branch_genome_size;
+			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
+			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations);
+			
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps);
 
-			identify_recombinations(number_of_branch_snps, branches_snp_sites[current_branch]);
+		/*	
+				identify_recombinations(number_of_branch_snps, branches_snp_sites[current_branch],length_of_original_genome);
+		 */
 		}
 		
 		return leaf_sequence;
 	}
 }
 
-int find_branch_snp_sites(char * ancestor_sequence, char * child_sequence, int * snp_locations, int number_of_snps, int * branch_snp_sites)
+
+
+int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations)
 {
 	int i ;
 	int number_of_branch_snp_sites = 0;
 	
-	for(i = 0; i< number_of_snps; i++)
+	for(i = 0; i< child_sequence_size; i++)
 	{
-		branch_snp_sites[i] = 0;
-		
+		branch_snp_coords[i] = 0;
 		if(ancestor_sequence[i] == '\0' || child_sequence[i] == '\0')
 		{
 			break;
 		}
-		if(ancestor_sequence[i] != child_sequence[i])
+ 
+		// If there is a gap in the ancestor, and a base in the child, what happens?
+		if(ancestor_sequence[i] != child_sequence[i]  && child_sequence[i] != '-')
 		{
-			
-			branch_snp_sites[number_of_branch_snp_sites] = snp_locations[i];
+			branch_snp_coords[number_of_branch_snp_sites] = snp_locations[i];
 			number_of_branch_snp_sites++;
 		}
-	}
-	realloc(branch_snp_sites,number_of_branch_snp_sites*sizeof(int));
-	
+	}	
+	realloc(branch_snp_coords, number_of_branch_snp_sites*sizeof(int));
 	return number_of_branch_snp_sites;
 }
 
-
-void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites)
+/*
+void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites, int length_of_original_genome)
 {
 	int i;
 	if(number_of_branch_snps < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
@@ -106,36 +114,112 @@ void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites
 		density = calculate_snp_density(branches_snp_sites, number_of_branch_snps, i);
 	}
 }
+ */
 
-// Assume that the branches_snps_sites array is sorted from smallest to largest
-double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index)
+// take in a sequence, and calculate the size of the genome when gaps are excluded
+int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index, int length_of_sequence,  int length_of_original_genome)
 {
-	int starting_index = index;
-	int ending_index = index;
-	if( index > 0)
+	int i;
+	int total_length_of_genome = length_of_original_genome;
+	for(i = start_index; i< (start_index+length_of_sequence) && (i-start_index) < (total_length_of_genome); i++)
 	{
-		starting_index = index-1;
-	}
-	if(index<(number_of_branch_snps - 1) )
-	{
-		ending_index = index+1;
-	}
-	
-	if(ending_index == starting_index)
-	{
-		return DEFAULT_SNP_DENSITY;	
-	}
-	int index_interval = ending_index - starting_index;
-	int coordinate_interval = branches_snp_sites[ending_index] - branches_snp_sites[starting_index];
-	if(coordinate_interval > MAX_WINDOW)
-	{
-		return DEFAULT_SNP_DENSITY;
-	}
+		if(child_sequence[i] == '\0')
+		{
+			break;
+		}
 		
-	return ((index_interval)*1.0)/((coordinate_interval)*1.0);
+		if(child_sequence[i] == '-')
+		{
+			length_of_original_genome--;
+		}
+	}
+	return length_of_original_genome;
 }
 
 
+// create windows. A window needs to contain at least 10 snps?
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords,int branch_genome_size, int number_of_branch_snps)
+{
+	int i;
+	int block_number =0;
+	
+	for(block_number = 0; block_number*WINDOW_SIZE < number_of_branch_snps ; block_number++)
+	{
+		int max_block_coord = 0;
+		int min_block_coord = 0;
+		int block_genome_size_with_gaps;
+		int block_genome_size_without_gaps;
+		double block_likelihood;
+		
+		int number_of_snps_in_block = 0;
+		for(i = 0; (i< WINDOW_SIZE) && ((block_number*WINDOW_SIZE) + i < number_of_branch_snps ); i++)
+		{
+			if(i == 0)
+			{
+				min_block_coord = snp_site_coords[block_number*WINDOW_SIZE + i];
+			}
+			max_block_coord = snp_site_coords[block_number*WINDOW_SIZE + i];
+			number_of_snps_in_block++;
+		}
+		block_genome_size_with_gaps = max_block_coord - min_block_coord;
+		// this is 'n'
+		block_genome_size_without_gaps = calculate_size_of_genome_without_gaps( child_sequence, block_number*WINDOW_SIZE, number_of_snps_in_block,  block_genome_size_with_gaps);
+		
+		block_likelihood =  get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, number_of_snps_in_block);
+		printf("block %d\tN: %d\tC: %d\tn: %d\tc: %d\tLH: %f\n",block_number,branch_genome_size,number_of_branch_snps,block_genome_size_without_gaps,number_of_snps_in_block, block_likelihood);
+	}
+	
+}
+
+
+// N = branch_genome_size
+// C = number_of_branch_snps
+// n = block_genome_size_without_gaps
+// c = number_of_block_snps
+double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps)
+{
+	double part1, part2, part3, part4;
+	
+	if(block_genome_size_without_gaps == 0)
+	{
+		return 0.0;
+	}
+	if(number_of_block_snps == 0)
+	{
+		return 0.0;
+	}
+	
+	part1 = log10(number_of_block_snps*1.0/block_genome_size_without_gaps)*number_of_block_snps;
+	
+	if((block_genome_size_without_gaps-number_of_block_snps) == 0)
+	{
+		part2 = 0.0;	
+	}
+	else
+	{
+		part2 = log10( ((block_genome_size_without_gaps-number_of_block_snps)*1.0)/block_genome_size_without_gaps )*(block_genome_size_without_gaps-number_of_block_snps);
+	}
+	
+	if((number_of_branch_snps-number_of_block_snps) == 0)
+	{
+		part3 = 0.0;
+	}
+	else
+	{
+		part3 = log10((number_of_branch_snps-number_of_block_snps)*1.0/(branch_genome_size-block_genome_size_without_gaps))*(number_of_branch_snps-number_of_block_snps);
+	}
+			
+	if(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps))==0)
+	{
+	  part4 = 0.0;
+	}
+	else
+	{
+		part4=log(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps)*1.0 )/(branch_genome_size-block_genome_size_without_gaps)) * ((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps));
+	}
+	
+	return (part1+part2+part3+part4)*-1;
+}
 
 // Get the total genome length
 // for each branch sequence, go through the snp sites. if its a - reduce the genome length, otherwise increment the snps. The final genome length = N
@@ -145,44 +229,6 @@ double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps
 // adjust the coordinates of the snps so that gaps are eliminated. keep a lookup table of coordinates to gapless coordinates
 // then for each window do the same to get n and c
 
-
-
-/*
-def get_block_likelihood(start, end, binsnps, N, C):
-
-
-
-n=0.0
-c=0.0
-for x in binsnps[start:end+1]:
-if x==0:
-n+=1
-elif x==1:
-c+=1
-n+=1
-
-#print start, end, c, n, C, N
-part1=math.log((c/n),10)*c
-if n-c==0:
-part2=0
-else:
-part2=math.log((((n-c)/n)),10)*(n-c)
-if C-c==0:
-part3=0
-else:
-part3=math.log((((C-c)/(N-n))),10)*(C-c)
-if ((N-n)-(C-c))==0:
-part4=0
-else:
-part4=math.log(((((N-n)-(C-c))/(N-n))),10)*((N-n)-(C-c))
-
-likelihood=(part1+part2+part3+part4)*-1
-
-#print start, end, c, n, C, N, likelihood
-
-return likelihood
-
-*/
 
 
 

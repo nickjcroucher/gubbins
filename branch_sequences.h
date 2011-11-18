@@ -32,11 +32,14 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps);
 int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
 double calculate_threshold(int branch_genome_size, int window_size);
-int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);
+int p_value_test(int branch_genome_size, int window_size, int num_branch_snps);
 double reduce_factorial(int l, int i);
 int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int length_of_sequence, int * snp_locations, int * recombinations, int number_of_recombinations);
 void find_sample_recombinations(newick_node *root, int * parent_recombinations, int parent_num_recombinations);
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array);
+int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps);
+double snp_density(int length_of_sequence, int number_of_snps);
+int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);
 
 #define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3
 #define DEFAULT_SNP_DENSITY 0.000001

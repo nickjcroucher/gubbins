@@ -223,6 +223,23 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 }
 
 
+int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
+{
+	int i;
+	
+	for(i = 0; i < number_of_branch_snps; i++)
+	{
+		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-')
+		{
+			return snp_locations[i];
+		}
+
+	}
+	return window_start_coordinate;
+	
+}
+
+
 // inefficient
 int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
 {
@@ -252,43 +269,82 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	int number_of_snps_in_block;
 	int block_genome_size_without_gaps;
 	double block_likelihood;
-	int cutoff;
 	int number_of_recombinations = 0;
+	double branch_snp_density;
+	double block_snp_density;
 	
 	// place to store coordinates of recombinations snps
 	current_node->recombinations = (int *) malloc(length_of_sequence*sizeof(int));
 	
-	if(number_of_branch_snps == 0)
+	if(number_of_branch_snps <= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
 	{
 		return;
 	}
+	
+	branch_snp_density = snp_density(branch_genome_size, number_of_branch_snps);
 	
 	window_size = calculate_window_size(branch_genome_size, number_of_branch_snps);
 	// start at the coordinate of the first snp
 	window_start_coordinate = snp_site_coords[0];
 	
-	cutoff =  calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
-	
 	for(i = 0; i < ceil(branch_genome_size/window_size) && (window_start_coordinate < branch_genome_size); i++)
 	{
 		window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);		
-		
 		number_of_snps_in_block = find_number_of_snps_in_block(window_start_coordinate, window_end_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
-		block_genome_size_without_gaps = window_end_coordinate - window_start_coordinate;
+		// the block size = window size, except for the last window
+
+		if(window_end_coordinate - window_start_coordinate < window_size)
+		{
+			block_genome_size_without_gaps = window_end_coordinate - window_start_coordinate;
+		}
+		else
+		{
+			block_genome_size_without_gaps = window_size;
+		}
+		
+		block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
+		// region with low number of snps so skip over
+		if(block_snp_density < branch_snp_density)
+		{
+			continue;	
+		}
+		
+		// minimum number of snps to be statistically significant in block
+		if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps) > number_of_branch_snps)
+		{
+			continue;
+		}
+		
+		// Iteratively move the window inwards until the SNP density is greater than the average branch density (while greater than num of snps).
+		
 		if(number_of_snps_in_block >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
 		{
-			block_likelihood =  get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, number_of_snps_in_block);
-
-			// If you've found a recombination, extend out and mark the whole window, then feed this back
-			number_of_recombinations += flag_recombinations_in_window(window_start_coordinate, window_end_coordinate,number_of_branch_snps, snp_site_coords, current_node->recombinations, number_of_recombinations);
+			if( p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps) == 1)
+			{
+				block_likelihood =  get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, number_of_snps_in_block);
+				
+				//***************************
+				//***************************
+				//***************************
+				//***************************
+				//***************************
+				//***************************
+				//***************************
+				
+				number_of_recombinations += flag_recombinations_in_window(window_start_coordinate, window_end_coordinate,number_of_branch_snps, snp_site_coords, current_node->recombinations, number_of_recombinations);	
+			}
 			
-			printf("cutoff: %d\tN: %d\tC: %d\twindowsize: %d\tstart %d\tn: %d\tc: %d\tLH: %f\n",cutoff,branch_genome_size,number_of_branch_snps,window_size,window_start_coordinate,block_genome_size_without_gaps,number_of_snps_in_block, block_likelihood);
+			
 		}
-		window_start_coordinate = window_end_coordinate;
+		window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
 	}
 	realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 	current_node->num_recombinations = number_of_recombinations;
-	
+}
+
+double snp_density(int length_of_sequence, int number_of_snps)
+{
+	return number_of_snps*1.0/length_of_sequence;
 }
 
 // Inefficient
@@ -318,6 +374,7 @@ double calculate_threshold(int branch_genome_size, int window_size)
 	return 1-(RANDOMNESS_DAMPNER/((branch_genome_size*1.0)/((window_size*1.0)/WINDOW_SNP_MODE_TARGET)));
 }
 
+
 int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps)
 {
 	double threshold = 0.0;
@@ -336,7 +393,43 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 		cutoff++;
 	}
 	cutoff--;
+
+	
 	return cutoff;
+}
+
+int p_value_test(int branch_genome_size, int window_size, int num_branch_snps)
+{
+	double threshold = 0.0;
+	int cutoff = 0;
+	double pvalue = 0.0;
+	double part1, part2, part3 = 0.0;
+	
+	threshold = calculate_threshold(branch_genome_size, window_size);
+	
+	while( pvalue <= threshold)
+	{
+		part1 = reduce_factorial(window_size,cutoff)-reduce_factorial(cutoff,cutoff);
+		part2 = log10((num_branch_snps*1.0)/branch_genome_size)*cutoff;
+		part3 = log10(1.0-((num_branch_snps*1.0)/branch_genome_size))*(window_size-cutoff);
+		pvalue = pvalue + pow(10,(part1 + part2 + part3));
+		cutoff++;
+	}
+	cutoff--;
+	
+	// There should be rounding here to 10 decimal place
+	pvalue = 1.0-pvalue;
+	
+	//*************
+	//**************
+	// Is this correct? 
+	if(pvalue < threshold)
+	{
+		// the block could contain a recombination
+		return 1;
+	}
+	
+	return 0;
 }
 
 
@@ -403,30 +496,5 @@ double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, i
 	
 	return (part1+part2+part3+part4)*-1;
 }
-
-// Get the total genome length
-// for each branch sequence, go through the snp sites. if its a - reduce the genome length, otherwise increment the snps. The final genome length = N
-// and the number of snps is = C
-
-// create sliding windows containing 10 snps (which are not gaps)
-// adjust the coordinates of the snps so that gaps are eliminated. keep a lookup table of coordinates to gapless coordinates
-// then for each window do the same to get n and c
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

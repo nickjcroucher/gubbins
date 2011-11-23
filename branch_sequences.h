@@ -43,13 +43,17 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks);
 int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps);
 int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome);
+int get_smallest_log_likelihood(int ** candidate_blocks, int number_of_candidate_blocks);
+int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_site_coords, int number_of_branch_snps);
+int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node );
+
 
 #define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3
 #define DEFAULT_SNP_DENSITY 0.000001
 #define MAX_WINDOW 1000
 #define WINDOW_SNP_MODE_TARGET 10
 #define MIN_WINDOW_SIZE 100
-#define MAX_WINDOW_SIZE 100000
+#define MAX_WINDOW_SIZE 60000
 #define RANDOMNESS_DAMPNER 0.05
 
 #endif

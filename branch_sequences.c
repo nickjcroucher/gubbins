@@ -1,3 +1,22 @@
+/*
+ *  Wellcome Trust Sanger Institute
+ *  Copyright (C) 2011  Wellcome Trust Sanger Institute
+ *  
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +27,7 @@
 #include "gubbins.h"
 #include "parse_vcf.h"
 #include "parse_phylip.h"
+#include "snp_searching.h"
 
 
 // Order is not preserved.
@@ -126,76 +146,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 }
 
 
-
-int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations)
-{
-	int i ;
-	int number_of_branch_snp_sites = 0;
-	
-	for(i = 0; i< child_sequence_size; i++)
-	{
-		branch_snp_coords[i] = 0;
-		if(ancestor_sequence[i] == '\0' || child_sequence[i] == '\0')
-		{
-			break;
-		}
- 
-		// If there is a gap in the ancestor, and a base in the child, what happens?
-		if(ancestor_sequence[i] != child_sequence[i]  && child_sequence[i] != '-')
-		{
-			branch_snp_coords[number_of_branch_snp_sites] = snp_locations[i];
-			number_of_branch_snp_sites++;
-		}
-	}	
-	realloc(branch_snp_coords, number_of_branch_snp_sites*sizeof(int));
-	return number_of_branch_snp_sites;
-}
-
-
-// take in a sequence, and calculate the size of the genome when gaps are excluded
-int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index, int length_of_sequence,  int length_of_original_genome)
-{
-	int i;
-	int total_length_of_genome = length_of_original_genome;
-	for(i = start_index; i< (start_index+length_of_sequence) && (i-start_index) < (total_length_of_genome); i++)
-	{
-		if(child_sequence[i] == '\0')
-		{
-			break;
-		}
-		
-		if(child_sequence[i] == '-')
-		{
-			length_of_original_genome--;
-		}
-	}
-	return length_of_original_genome;
-}
-
-int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome)
-{
-	int i;
-	int block_size = ending_coordinate - starting_coordinate;
-	for(i = 0; i < length_of_original_genome ; i++)
-	{
-		if(snp_locations[i]< ending_coordinate && snp_locations[i]>= starting_coordinate)
-		{
-			if(child_sequence[i] == '-')
-			{
-				block_size--;
-			}
-		}
-		
-		if( snp_locations[i]> ending_coordinate)
-		{
-			break;	
-		}
-
-	}
-	return block_size;
-}
-
-
 // Windows need to be of a fixed size
 // calculate window size
 // starting at coord of first snp, count number of snps which fall into window
@@ -222,82 +172,6 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps)
 	return window_size;
 }
 
-
-// inefficient
-int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps)
-{
-	int i;
-	int window_end_coordinate = window_start_coordinate + window_size;
-	
-	for(i = 0; i < number_of_snps; i++)
-	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
-		{
-			if(child_sequence[i] == '-')
-			{
-				window_end_coordinate++;
-			}
-		}
-		if(snp_locations[i] > window_end_coordinate)
-		{
-			break;	
-		}
-	}
-	return window_end_coordinate;
-}
-
-
-int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
-{
-	int i;
-	
-	for(i = 0; i < number_of_branch_snps; i++)
-	{
-		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-')
-		{
-			return snp_locations[i];
-		}
-
-	}
-	return window_start_coordinate;
-	
-}
-
-int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
-{
-	int i;
-	
-	for(i = number_of_branch_snps-1; i >= 0; i--)
-	{
-		if(snp_locations[i]< window_end_coordinate && child_sequence[i] != '-')
-		{
-			return (snp_locations[i] +1);
-		}
-		
-	}
-	return window_end_coordinate;
-}
-
-
-// inefficient
-int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
-{
-	int i;
-	int number_of_snps_in_block =0;
-	
-	for(i = 0; i < number_of_snps; i++)
-	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
-		{
-				number_of_snps_in_block++;
-		}
-		if(snp_locations[i] > window_end_coordinate)
-		{
-			break;	
-		}
-	}
-	return number_of_snps_in_block;
-}
 
 void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node)
 {
@@ -366,7 +240,12 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		}
 		
 		// minimum number of snps to be statistically significant in block
-		if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_snps_in_block) > number_of_snps_in_block || number_of_snps_in_block < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+		if(number_of_snps_in_block < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+		{
+			continue;
+		}
+		
+		if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_snps_in_block) > number_of_snps_in_block)
 		{
 			continue;
 		}
@@ -413,9 +292,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, child_sequence, number_of_branch_snps);
 				block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, child_sequence, number_of_branch_snps);
 				block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
-				cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
 			}
-			loop_counter++;
 		
 			if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count) == 1)
 			{
@@ -426,8 +303,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				number_of_candidate_blocks++;
 				break;
 			}
+			// TODO need a more intelligent way to move inwards.
 			current_start++;
 			current_end--;
+			
+			if(loop_counter > 0)
+			{
+				cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+			}
+			loop_counter++;
 		}
 	
 	// calc and save likelihood

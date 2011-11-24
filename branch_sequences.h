@@ -53,7 +53,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 #define MAX_WINDOW 1000
 #define WINDOW_SNP_MODE_TARGET 10
 #define MIN_WINDOW_SIZE 100
-#define MAX_WINDOW_SIZE 60000
+#define MAX_WINDOW_SIZE 10000
 #define RANDOMNESS_DAMPNER 0.05
 
 #endif

@@ -30,12 +30,86 @@ char ** sequences;
 char ** phylip_sample_names;
 
 
+void update_sequence_base(char new_sequence_base, int sequence_index, int base_index)
+{
+	sequences[sequence_index][base_index] = new_sequence_base;	
+}
+
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 {
 	int sequence_index;
 	sequence_index = find_sequence_index_from_sample_name( sample_name);
 	strcpy(sequence_bases, sequences[sequence_index]);
 }
+
+int does_column_contain_snps(int snp_column, char reference_base)
+{
+	int i;
+	for(i = 0; i < num_samples; i++)
+	{
+		if(sequences[i][snp_column] == '\0' || sequences[i][snp_column] == '\n')
+		{
+			return 0;	
+		}
+		
+		if(sequences[i][snp_column]  != '-' && sequences[i][snp_column] != reference_base)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int number_of_samples_from_parse_phylip()
+{
+	return num_samples;
+}
+
+void get_sample_names_from_parse_phylip(char ** sample_names)
+{
+	int i;
+	for(i = 0; i< num_samples; i++)
+	{
+		sample_names[i] =  (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		strcpy(sample_names[i], phylip_sample_names[i]);
+	}
+}
+	
+
+void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_bases_for_snps, int number_of_filtered_snps)
+{
+	int i,j,reference_index;
+	
+	for(j = 0; j < number_of_filtered_snps; j++)
+	{
+		filtered_bases_for_snps[j] = (char *) malloc(num_samples*sizeof(char));
+	}
+		
+	for(i = 0; i < num_samples; i++)
+	{
+		int filtered_base_counter = 0;
+		
+		for(reference_index = 0; reference_index < num_snps; reference_index++)
+		{
+			if(reference_bases[reference_index] == '\0')
+			{
+				break;	
+			}
+			
+			if(reference_bases[reference_index] != '*' && sequences[i][reference_index] != '\0' && sequences[i][reference_index] != '\n')
+			{
+				filtered_bases_for_snps[filtered_base_counter][i] = sequences[i][reference_index];
+				filtered_base_counter++;
+			}
+		}
+	}
+	for(j = 0; j < number_of_filtered_snps; j++)
+	{
+		 filtered_bases_for_snps[j][num_samples] = '\0';	
+	}
+
+}
+
 
 int find_sequence_index_from_sample_name( char * sample_name)
 {

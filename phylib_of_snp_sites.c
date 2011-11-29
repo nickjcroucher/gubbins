@@ -51,4 +51,3 @@ void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bas
 		fprintf( fasta_file_pointer, "\n");
 	}
 }
-

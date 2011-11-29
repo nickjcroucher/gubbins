@@ -41,15 +41,15 @@ int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_
 		output_array[array_1_counter] = array_1[array_1_counter];
 	}
 	
-	for(array_2_counter = array_1_size; array_2_counter < array_2_size + array_1_size; array_2_counter++)
+	for(array_2_counter = 0; array_2_counter < array_2_size; array_2_counter++)
 	{
-		output_array[array_2_counter] = array_2[array_2_counter];
+		output_array[array_2_counter+array_1_size] = array_2[array_2_counter];
 	}
 	return array_1_size+array_2_size;
 }
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void find_sample_recombinations(newick_node *root, int * parent_recombinations, int parent_num_recombinations)
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases)
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -61,7 +61,19 @@ void find_sample_recombinations(newick_node *root, int * parent_recombinations, 
 	
 	if (root->childNum == 0)
 	{
-		printf("%s\t%d\n",root->taxon,num_current_recombinations);
+		// overwrite the bases of snps which are recombinations with the reference bases
+		int i;
+		int sequence_index;
+		sequence_index = find_sequence_index_from_sample_name(root->taxon);
+		
+		for(i = 0; i < num_current_recombinations; i++)
+		{
+			int snp_index;
+			snp_index = current_recombinations[i];
+			
+			update_sequence_base(reference_bases[snp_index], sequence_index, snp_index);
+
+		}
 	}
 	else
 	{
@@ -70,19 +82,14 @@ void find_sample_recombinations(newick_node *root, int * parent_recombinations, 
 		while (child != NULL)
 		{
 			// recursion
-			find_sample_recombinations(child->node, current_recombinations, num_current_recombinations);
+			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases);
 			child = child->next;
-		}
-
-		if (root->taxon != NULL)
-		{
-			printf("%s\t%d\n",root->taxon,num_current_recombinations);
 		}
 	}
 }
 
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char reference_bases, char * leaf_sequence, int length_of_original_genome)
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -138,7 +145,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
 			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations);
 			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch]);
-			printf("Num recombinations: %d\n", child_nodes[current_branch]->num_recombinations);
 		}
 		
 		return leaf_sequence;
@@ -452,26 +458,7 @@ double snp_density(int length_of_sequence, int number_of_snps)
 	return number_of_snps*1.0/length_of_sequence;
 }
 
-// Inefficient
-int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int number_of_snps, int * snp_locations, int * recombinations, int number_of_recombinations)
-{
-	int i;
-	int number_of_snps_in_block = 0;
-	
-	for(i = 0; i < number_of_snps; i++)
-	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
-		{
-				recombinations[number_of_recombinations+number_of_snps_in_block] = snp_locations[i];
-				number_of_snps_in_block++;
-		}
-		if(snp_locations[i] > window_end_coordinate)
-		{
-			break;	
-		}
-	}
-	return number_of_snps_in_block;
-}
+
 
 
 double calculate_threshold(int branch_genome_size, int window_size)

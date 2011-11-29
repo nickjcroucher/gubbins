@@ -27,6 +27,7 @@
 #include "snp_sites.h"
 #include "fasta_of_snp_sites.h"
 #include "phylib_of_snp_sites.h"
+#include "parse_phylip.h"
 
 
 int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer)
@@ -199,4 +200,52 @@ int generate_snp_sites(char filename[])
 	free(snp_locations);
 	return 1;
 }
+
+
+// return new number of snps
+int refilter_existing_snps(char * reference_bases, int number_of_snps, char ** column_names, int number_of_columns,int * snp_locations, int * filtered_snp_locations)
+{
+	// go through each snp column and check to see if there is still variation
+	int i;
+	int number_of_filtered_snps = number_of_snps;
+	for(i = 0; i < number_of_snps; i++)
+	{
+		if( does_column_contain_snps(i, reference_bases[i]) == 0)
+		{
+			snp_locations[i] = -1;
+			reference_bases[i] = '*';
+			
+			number_of_filtered_snps--;
+		}
+	}
+	
+	remove_filtered_snp_locations(filtered_snp_locations, snp_locations, number_of_snps);
+	return number_of_filtered_snps;
+}
+
+void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locations, int number_of_snps)
+{
+	int i;
+	int filtered_counter=0;
+	for(i = 0; i< number_of_snps; i++)
+	{
+		if(snp_locations[i] != -1)
+		{
+			filtered_snp_locations[filtered_counter] = snp_locations[i];
+			filtered_counter++;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

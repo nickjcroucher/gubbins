@@ -25,6 +25,9 @@
 #include "parse_vcf.h"
 #include "parse_phylip.h"
 #include "alignment_file.h"
+#include "snp_sites.h"
+#include "vcf.h"
+#include "phylib_of_snp_sites.h"
 
 #include "seqUtil.h"
 #include "Newickform.h"
@@ -83,7 +86,27 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
 	
 	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome);
+	// check for snps in the phylib sequence
+	// create a new vcf file, and phylib file
+	
+	int filtered_snp_locations[number_of_snps];
+	int number_of_filtered_snps;
+	
+	number_of_filtered_snps = refilter_existing_snps(reference_bases, number_of_snps, column_names, number_of_columns, snp_locations, filtered_snp_locations);
+	
+	int number_of_samples = number_of_samples_from_parse_phylip();
+	
+	char * filtered_bases_for_snps[number_of_filtered_snps];
+	char * sample_names[number_of_samples];
+	
+	filter_sequence_bases_and_rotate(reference_bases, filtered_bases_for_snps, number_of_filtered_snps);
+	get_sample_names_from_parse_phylip(sample_names);
+	create_phylib_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
+
+	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 }
+
+
 
 // If there are snps between the child sequences, fill in with the reference sequence
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences)

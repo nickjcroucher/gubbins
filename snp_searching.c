@@ -22,6 +22,7 @@
 #include <string.h>
 #include "snp_searching.h"
 
+// Most of the methods in this file look the same, so should be DRYed out.
 
 int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
 {
@@ -93,7 +94,6 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 	return window_end_coordinate;
 }
 
-// inefficient
 int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps)
 {
 	int i;
@@ -119,7 +119,6 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 
 
 
-// inefficient
 int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
 {
 	int i;
@@ -211,5 +210,25 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 }
 
 
+int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int number_of_snps, int * snp_locations, int * recombinations, int number_of_recombinations)
+{
+	int i;
+	int number_of_snps_in_block = 0;
+	int start_index = find_starting_index( window_start_coordinate, snp_locations, 0, number_of_snps);
+	
+	for(i = start_index; i < number_of_snps; i++)
+	{
+		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
+		{
+			recombinations[number_of_recombinations+number_of_snps_in_block] = i;
+			number_of_snps_in_block++;
+		}
+		if(snp_locations[i] > window_end_coordinate)
+		{
+			break;	
+		}
+	}
+	return number_of_snps_in_block;
+}
 
 

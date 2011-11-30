@@ -1,5 +1,5 @@
-gubbins: seqUtil.o Newickform.o alignment_file.o fasta_of_snp_sites.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o clean
-	gcc -o gubbins seqUtil.o Newickform.o alignment_file.o fasta_of_snp_sites.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o  -lm libm.a
+gubbins: seqUtil.o Newickform.o alignment_file.o fasta_of_snp_sites.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o
+	gcc -o gubbins seqUtil.o Newickform.o alignment_file.o fasta_of_snp_sites.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o  -lm
 
 seqUtil.o: seqUtil.c
 	gcc -c seqUtil.c

@@ -205,7 +205,7 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 			number_of_branch_snp_sites++;
 		}
 	}	
-	realloc(branch_snp_coords, number_of_branch_snp_sites*sizeof(int));
+	branch_snp_coords = realloc(branch_snp_coords, number_of_branch_snp_sites*sizeof(int));
 	return number_of_branch_snp_sites;
 }
 

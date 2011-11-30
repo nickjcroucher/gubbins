@@ -377,7 +377,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		number_of_recombinations += flag_recombinations_in_window(candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],number_of_branch_snps, snp_site_coords, recombinations, number_of_recombinations);	
 		number_of_branch_snps_excluding_block = exclude_snp_sites_in_block(candidate_blocks[0][smallest_index],candidate_blocks[1][smallest_index], snp_site_coords,number_of_branch_snps);
 		
-		//realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
+		//current_node->recombinations = realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 		current_node->num_recombinations = number_of_recombinations;
 	}
 	return number_of_branch_snps_excluding_block;

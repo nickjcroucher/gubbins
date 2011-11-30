@@ -51,6 +51,7 @@
 		0345AA2C1472C47F009B681F /* parse_phylip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parse_phylip.c; sourceTree = "<group>"; };
 		0345AFBC147E8F2E009B681F /* snp_searching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = snp_searching.h; sourceTree = "<group>"; };
 		0345AFBD147E8F2E009B681F /* snp_searching.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snp_searching.c; sourceTree = "<group>"; };
+		0345B1C8148631DD009B681F /* run_gubbins.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = run_gubbins.pl; sourceTree = "<group>"; };
 		034AE675146427CD0025A88E /* fasta_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fasta_of_snp_sites.h; sourceTree = "<group>"; };
 		034AE676146427CD0025A88E /* fasta_of_snp_sites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fasta_of_snp_sites.c; sourceTree = "<group>"; };
 		034AE6AE146446090025A88E /* phylib_of_snp_sites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = phylib_of_snp_sites.h; sourceTree = "<group>"; };
@@ -91,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				0345A6BE146C2F90009B681F /* seqUtil.h */,
+				0345B1C8148631DD009B681F /* run_gubbins.pl */,
 				0345A6BF146C2F90009B681F /* seqUtil.c */,
 				0345A6C1146C2F90009B681F /* Newickform.h */,
 				0345A6C2146C2F90009B681F /* Newickform.c */,

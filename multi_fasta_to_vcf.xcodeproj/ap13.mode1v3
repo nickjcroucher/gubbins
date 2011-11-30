@@ -274,12 +274,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>42</integer>
-									<integer>35</integer>
+									<integer>3</integer>
+									<integer>1</integer>
+									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {186, 937}}</string>
+							<string>{{0, 0}, {186, 664}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -291,14 +292,14 @@
 					<key>GeometryConfiguration</key>
 					<dict>
 						<key>Frame</key>
-						<string>{{0, 0}, {203, 955}}</string>
+						<string>{{0, 0}, {203, 682}}</string>
 						<key>GroupTreeTableConfiguration</key>
 						<array>
 							<string>MainColumn</string>
 							<real>186</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>370 146 1502 996 0 0 1920 1178 </string>
+						<string>443 455 1502 723 0 0 1920 1178 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -316,7 +317,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>parse_phylip.c</string>
+								<string>gubbins.pl</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -324,11 +325,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>parse_phylip.c</string>
+										<string>gubbins.pl</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>0345B1C514852C58009B681F</string>
+										<string>0345B1CD14863294009B681F</string>
 										<key>history</key>
 										<array>
 											<string>0345A70A146D376B009B681F</string>
@@ -356,7 +357,8 @@
 											<string>0345B1B414851FC4009B681F</string>
 											<string>0345B1B614851FC4009B681F</string>
 											<string>0345B1C114852C58009B681F</string>
-											<string>0345B1C214852C58009B681F</string>
+											<string>0345B1CA14863294009B681F</string>
+											<string>0345B1CB14863294009B681F</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -1632,6 +1634,7 @@
 											<string>0345B1BD14851FC4009B681F</string>
 											<string>0345B1BE14851FC4009B681F</string>
 											<string>0345B1C414852C58009B681F</string>
+											<string>0345B1CC14863294009B681F</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -1643,14 +1646,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {1294, 716}}</string>
+								<string>{{0, 0}, {1294, 443}}</string>
 								<key>RubberWindowFrame</key>
-								<string>370 146 1502 996 0 0 1920 1178 </string>
+								<string>443 455 1502 723 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>716pt</string>
+							<string>443pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -1663,9 +1666,9 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 721}, {1294, 234}}</string>
+								<string>{{0, 448}, {1294, 234}}</string>
 								<key>RubberWindowFrame</key>
-								<string>370 146 1502 996 0 0 1920 1178 </string>
+								<string>443 455 1502 723 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -1831,14 +1834,14 @@
 		<string>0345A4CD146AD643009B681F</string>
 		<string>0345A4CE146AD643009B681F</string>
 		<string>0345A435146AC7E6009B681F</string>
-		<string>03846D7E145FFFE6002BB72D</string>
-		<string>1CD10A99069EF8BA00B06720</string>
 		<string>1C78EAAD065D492600B07095</string>
-		<string>/Users/ap13/multi_fasta_to_vcf/multi_fasta_to_vcf.xcodeproj</string>
+		<string>03846D7E145FFFE6002BB72D</string>
 		<string>1C530D57069F1CE1000CFCEE</string>
+		<string>1CD10A99069EF8BA00B06720</string>
+		<string>/Users/ap13/multi_fasta_to_vcf/multi_fasta_to_vcf.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>370 146 1502 996 0 0 1920 1178 </string>
+	<string>443 455 1502 723 0 0 1920 1178 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -2143,7 +2146,7 @@
 			<key>WindowToolGUID</key>
 			<string>1C530D57069F1CE1000CFCEE</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>
@@ -2209,7 +2212,7 @@
 			<key>WindowToolGUID</key>
 			<string>1C78EAAD065D492600B07095</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>

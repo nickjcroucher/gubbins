@@ -27,12 +27,12 @@ my $number_of_iterations = 5;
 
 my $input_multi_fasta_alignment_file = $ARGV[0];
 
-my($filename, $directories, $suffix) = fileparse($path,  qr/\.[^.]*/);
+my($filename, $directories, $suffix) = fileparse($input_multi_fasta_alignment_file,  qr/\.[^.]*/);
 
 # Initial step to find SNPs
 system("gubbins -s $ARGV[0]");
 
-for($i = 1; $i <= $number_of_iterations; $i++)
+for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
 	my $previous_tree = '';
 	if($i > 1)

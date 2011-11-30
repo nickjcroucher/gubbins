@@ -25,7 +25,6 @@
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
-#include "fasta_of_snp_sites.h"
 #include "phylib_of_snp_sites.h"
 #include "parse_phylip.h"
 
@@ -191,9 +190,6 @@ int generate_snp_sites(char filename[])
 	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	
 	create_vcf_file(filename, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	
-	create_fasta_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	
 	create_phylib_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	
 	

@@ -32,16 +32,15 @@ my($filename, $directories, $suffix) = fileparse($input_multi_fasta_alignment_fi
 # Initial step to find SNPs
 system("gubbins -s $ARGV[0]");
 
+my $current_time = time();
+
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
 	my $previous_tree = '';
 	if($i > 1)
 	{
-		$previous_tree  = "-t RAxML_result.iteration_".($i-1);
+		$previous_tree  = "-t RAxML_result.$filename.$current_time.iteration_".($i-1);
 	}
-	system("$tree_builder_exec -s $input_multi_fasta_alignment_file.phylip -n iteration_1 $previous_tree");
-	
-	# delete old temp files
-	# run RaXML 
-	system("gubbins -r $input_multi_fasta_alignment_file $input_multi_fasta_alignment_file.vcf RAxML_result.iteration_$i  $input_multi_fasta_alignment_file.phylip");
+	system("$tree_builder_exec -s $input_multi_fasta_alignment_file.phylip -n $filename.$current_time.iteration_1 $previous_tree");
+	system("gubbins -r $input_multi_fasta_alignment_file $input_multi_fasta_alignment_file.vcf RAxML_result.$filename.$current_time.iteration_$i  $input_multi_fasta_alignment_file.phylip");
 }

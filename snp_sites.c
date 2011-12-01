@@ -189,14 +189,45 @@ int generate_snp_sites(char filename[])
 	
 	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	
-	create_vcf_file(filename, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	create_phylib_of_snp_sites(filename, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+  char filename_without_directory[MAX_FILENAME_SIZE];
+  strip_directory_from_filename(filename, filename_without_directory);
+	
+	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	create_phylib_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	
 	
 	free(snp_locations);
 	return 1;
 }
 
+// Inefficient
+void strip_directory_from_filename(char * input_filename, char * output_filename)
+{
+  int i;
+  int end_index = 0;
+  int last_forward_slash_index = 0;
+  for(i = 0; i< MAX_FILENAME_SIZE; i++)
+  {
+    if(input_filename[i] == '/')
+    {
+      last_forward_slash_index = i;
+    }
+    
+    if(input_filename[i] == '\0' || input_filename[i] == '\n')
+    {
+      end_index = i;
+      break;
+    }
+  }
+  
+  int current_index = 0;
+  for(i = last_forward_slash_index+1; i< end_index; i++)
+  {
+    output_filename[current_index] = input_filename[i];
+    current_index++;
+  }
+  output_filename[current_index] = '\0';
+}
 
 // return new number of snps
 int refilter_existing_snps(char * reference_bases, int number_of_snps, char ** column_names, int number_of_columns,int * snp_locations, int * filtered_snp_locations)

@@ -23,7 +23,7 @@
 #include "snp_sites.h"
 #include "gubbins.h"
 
-#define MAX_FILENAME_SIZE 200
+#define MAX_FILENAME_SIZE 250
 
 static void print_usage()
 {

@@ -22,7 +22,7 @@ use warnings;
 use File::Basename;
 
 my $tree_builder_exec = 'raxmlHPC -f d  -m GTRGAMMA';
-#-n parisomony.tree.phylip.ra5 -t RAxML_result.sl.FINAL.aln.phylip.ra -s parisomony.tree.phylip
+my $gubbins_exec = 'gubbins';
 my $number_of_iterations = 5;
 
 my $input_multi_fasta_alignment_file = $ARGV[0];
@@ -30,17 +30,22 @@ my $input_multi_fasta_alignment_file = $ARGV[0];
 my($filename, $directories, $suffix) = fileparse($input_multi_fasta_alignment_file,  qr/\.[^.]*/);
 
 # Initial step to find SNPs
-system("gubbins -s $ARGV[0]");
+system("$gubbins_exec -s $ARGV[0]");
 
 my $current_time = time();
 
+my $base_filename = $input_multi_fasta_alignment_file;
+
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
-	my $previous_tree = '';
-	if($i > 1)
-	{
-		$previous_tree  = "-t RAxML_result.$filename.$current_time.iteration_".($i-1);
-	}
-	system("$tree_builder_exec -s $input_multi_fasta_alignment_file.phylip -n $filename.$current_time.iteration_1 $previous_tree");
-	system("gubbins -r $input_multi_fasta_alignment_file $input_multi_fasta_alignment_file.vcf RAxML_result.$filename.$current_time.iteration_$i  $input_multi_fasta_alignment_file.phylip");
+  my $current_tree = "RAxML_result.$filename.$current_time.iteration_$i";
+  my $previous_tree = '';
+  if($i > 1)
+  {
+    $previous_tree = "-t RAxML_result.$filename.$current_time.iteration_".($i-1);
+    $base_filename = $current_tree;
+   }
+   
+  system("$tree_builder_exec -s $base_filename.phylip -n $filename.$current_time.iteration_$i $previous_tree");
+  system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $base_filename $base_filename.phylip");
 }

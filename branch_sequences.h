@@ -20,10 +20,10 @@
 #ifndef _BRANCH_SEQUENCES_H_
 #define _BRANCH_SEQUENCES_H_
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome);
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome,  FILE * block_file_pointer);
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites,int length_of_original_genome);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node *current_node);
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node *current_node, FILE * block_file_pointer);
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps);
 int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
 int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
@@ -38,7 +38,7 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks);
 int get_smallest_log_likelihood(int ** candidate_blocks, int number_of_candidate_blocks);
 int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_site_coords, int number_of_branch_snps);
-int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node );
+int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer );
 
 
 #define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3

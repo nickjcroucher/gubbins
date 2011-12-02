@@ -1,1 +1,4 @@
 *.o
+gubbins
+*.phylip
+*.vcf

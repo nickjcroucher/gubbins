@@ -34,7 +34,7 @@ system("$gubbins_exec -s $ARGV[0]");
 
 my $current_time = time();
 
-my $base_filename = $input_multi_fasta_alignment_file;
+my $base_filename = $filename.$suffix;
 
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {

@@ -20,6 +20,6 @@
 #ifndef _BLOCK_TAB_FILE_H_
 #define _BLOCK_TAB_FILE_H_
 
-void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps);
+void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, int current_node_id, int parent_node_id, char * taxon_names);
 
 #endif

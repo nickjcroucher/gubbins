@@ -30,11 +30,14 @@ typedef struct newick_child
 typedef struct newick_node
 {
 	char *taxon;
+	char *taxon_names;
 	char *seq;
+	
 	float dist;
 	int childNum;
 	int * recombinations;
 	int num_recombinations;
+  int current_node_id;
 	struct newick_child *child;
 	struct newick_node *parent;
 } newick_node;

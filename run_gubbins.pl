@@ -39,13 +39,15 @@ my $base_filename = $filename.$suffix;
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
   my $current_tree = "RAxML_result.$filename.$current_time.iteration_$i";
-  my $previous_tree = '';
+  my $previous_tree_name = $base_filename;
+  my $previous_tree = "";
   if($i > 1)
-  {
-    $previous_tree = "-t RAxML_result.$filename.$current_time.iteration_".($i-1);
+  { 
+    $previous_tree_name = "RAxML_result.$filename.$current_time.iteration_".($i-1);
+    $previous_tree = "-t $previous_tree_name";
     $base_filename = $current_tree;
    }
-   
-  system("$tree_builder_exec -s $base_filename.phylip -n $filename.$current_time.iteration_$i $previous_tree");
+  system("$tree_builder_exec -s $previous_tree_name.phylip -n $filename.$current_time.iteration_$i $previous_tree");
   system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $current_tree $base_filename.phylip");
 }
+

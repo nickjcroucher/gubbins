@@ -40,6 +40,7 @@ typedef struct newick_node
 } newick_node;
 
 short sDEBUG;
+#define MAX_FILENAME_SIZE 250
 
 #ifdef __NEWICKFORM_C__
 newick_node* parseTree(char *str);

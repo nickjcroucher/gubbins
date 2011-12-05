@@ -47,5 +47,5 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
    }
    
   system("$tree_builder_exec -s $base_filename.phylip -n $filename.$current_time.iteration_$i $previous_tree");
-  system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $base_filename $base_filename.phylip");
+  system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $current_tree $base_filename.phylip");
 }

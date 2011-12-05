@@ -69,7 +69,9 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	root = parseTree(pcTreeStr);
 	
   FILE * block_file_pointer;
-	block_file_pointer = fopen(strcat(filename,".tab"), "w");
+  char block_file_name[MAX_FILENAME_SIZE];
+  strcpy(block_file_name, filename);
+	block_file_pointer = fopen(strcat(block_file_name,".tab"), "w");
 	
 	char * root_sequence;
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer);

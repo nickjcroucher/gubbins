@@ -169,7 +169,7 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 		
 		int found_sequence = 0;
 		int sequence_offset = 0;
-		for(i = 0 ; i< num_snps; i++)
+		for(i = 0 ; i< (num_snps + MAX_SAMPLE_NAME_SIZE); i++)
 		{
 			if(line_buffer[i] == '\0' || line_buffer[i] == '\n')
 			{

@@ -45,7 +45,7 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
   { 
     $previous_tree_name = "RAxML_result.$filename.$current_time.iteration_".($i-1);
     $previous_tree = "-t $previous_tree_name";
-    $base_filename = $current_tree;
+    $base_filename = $previous_tree_name;
    }
   system("$tree_builder_exec -s $previous_tree_name.phylip -n $filename.$current_time.iteration_$i $previous_tree");
   system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $current_tree $base_filename.phylip");

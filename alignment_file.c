@@ -61,10 +61,39 @@ void advance_to_sequence_name(FILE * alignment_file_pointer)
 	line_length(alignment_file_pointer);
 }
 
-int validate_alignment_file(FILE * alignment_file_pointer)
+
+void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps)
 {
-	return 1;
+  int l;
+  int i = 0;
+  int sequence_number = 0;
+	
+	gzFile fp;
+	kseq_t *seq;
+	
+	fp = gzopen(filename, "r");
+	seq = kseq_init(fp);
+
+	// initialise the strings in the array
+	for(i = 0; i < number_of_snps; i++)
+	{
+		strcpy(bases_for_snps[i], "");
+	}
+  
+	while ((l = kseq_read(seq)) >= 0) 
+	{
+    
+    for(i = 0; i< number_of_snps; i++)
+		{
+			bases_for_snps[i][sequence_number] = toupper(((char *) seq->seq.s)[snp_locations[i]]);
+		}
+    sequence_number++;
+  }
+
+	kseq_destroy(seq);
+	gzclose(fp);
 }
+
 
 int genome_length(char filename[])
 {
@@ -105,6 +134,77 @@ int number_of_sequences_in_file(char filename[])
 }
 
 
+int build_reference_sequence(char reference_sequence[], char filename[])
+{
+	int i;
+	
+	int length_of_genome;
+
+	gzFile fp;
+	kseq_t *seq;
+	
+	fp = gzopen(filename, "r");
+	seq = kseq_init(fp);
+  kseq_read(seq);
+
+  strcpy(reference_sequence, seq->seq.s) ;
+
+	kseq_destroy(seq);
+	gzclose(fp);
+	
+	for(i = 0; i < strlen(reference_sequence); i++)
+	{
+		reference_sequence[i] = toupper(reference_sequence[i]);
+	}
+	
+	return 1;
+}
+
+int detect_snps(char reference_sequence[], char filename[], int length_of_genome)
+{
+	char * comparison_sequence;
+	int i;
+	int number_of_snps = 0;
+  int l;
+  
+  gzFile fp;
+  kseq_t *seq;
+  comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
+  
+  fp = gzopen(filename, "r");
+  seq = kseq_init(fp);
+  // First sequence is the reference sequence so skip it
+  kseq_read(seq);
+  
+  while ((l = kseq_read(seq)) >= 0) {
+    strcpy(comparison_sequence, seq->seq.s);
+    
+    for(i = 0; i < length_of_genome; i++)
+		{
+			// If there is an indel in the reference sequence, replace with the first proper base you find
+			if(reference_sequence[i] == '-' && comparison_sequence[i] != '-' )
+			{
+				reference_sequence[i] = toupper(comparison_sequence[i]);
+			}
+			
+			if(reference_sequence[i] != '*' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
+			{
+				reference_sequence[i] = '*';
+				number_of_snps++;
+			}
+		}
+    
+  }
+  kseq_destroy(seq);
+  gzclose(fp);
+
+	free(comparison_sequence);
+	return number_of_snps;
+}
+
+
+
+
 
 int read_line(char sequence[], FILE * pFilePtr)
 {
@@ -131,55 +231,25 @@ int read_line(char sequence[], FILE * pFilePtr)
 }
 
 
-
-
-void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples)
+void get_sample_names_for_header(char filename[], char ** sequence_names, int number_of_samples)
 {
-	rewind(alignment_file_pointer);
-	int i = 0;
-	char * sequence_name;
-	char filtered_sequence_name[MAX_SAMPLE_NAME_SIZE];
-	int name_counter;
+  int l;
+  int i = 0;
 	
-	do{
-		sequence_name = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		read_line(sequence_name, alignment_file_pointer);
-		advance_to_sequence_name(alignment_file_pointer);
-		
-		if(sequence_name[0] == '\0')
-		{
-			break;
-		}
-		
-		int filtered_name_counter = 0 ;
-		for(name_counter=0; name_counter < number_of_samples; name_counter++)
-		{
-			if((sequence_name[name_counter] == '\0') || (sequence_name[name_counter] == '\n') || (sequence_name[name_counter] == '\r') || (name_counter >= MAX_SAMPLE_NAME_SIZE))
-			{
-				filtered_sequence_name[filtered_name_counter]  = '\0';
-				break;
-			}
-			
-			if((sequence_name[name_counter] == '\t') || (sequence_name[name_counter] == ' ') || sequence_name[name_counter] == '>' )
-			{
-			}
-			else
-			{
-				if(filter_invalid_characters(sequence_name[name_counter]) == sequence_name[name_counter])
-				{
-					filtered_sequence_name[filtered_name_counter] = sequence_name[name_counter];
-					filtered_name_counter++;
-				}
-			}
-		}
-		//TODO clean up the sample name before use
-		strcpy(sequence_names[i], filtered_sequence_name);
-		
-		i++;
-	}while(sequence_name[0] != '\0');
-	free(sequence_name);
-}
+	gzFile fp;
+	kseq_t *seq;
+	
+	fp = gzopen(filename, "r");
+	seq = kseq_init(fp);
+  
+	while ((l = kseq_read(seq)) >= 0) {
+	  strcpy(sequence_names[i], seq->name.s);
+    i++;
+	}
+	kseq_destroy(seq);
+	gzclose(fp);
 
+}
 
 char filter_invalid_characters(char input_char)
 {

@@ -29,62 +29,6 @@
 #include "parse_phylip.h"
 
 
-int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer)
-{
-	int i;
-	
-	rewind(alignment_file_pointer);
-    advance_to_sequence(alignment_file_pointer);
-	
-    read_line(reference_sequence, alignment_file_pointer);
-	
-	for(i = 0; reference_sequence[i]; i++)
-	{
-		reference_sequence[i] = toupper(reference_sequence[i]);
-	}
-	
-	return 1;
-}
-
-
-int detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int length_of_genome)
-{
-	char * comparison_sequence;
-	int i;
-	int number_of_snps = 0;
-	
-	do{
-		comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
-		advance_to_sequence(alignment_file_pointer);
-		read_line(comparison_sequence, alignment_file_pointer);
-		
-		if(comparison_sequence[0] == '\0')
-		{
-			break;
-		}
-		
-		// Set the reference base to * if 
-		for(i = 0; i < length_of_genome; i++)
-		{
-			// If there is an indel in the reference sequence, replace with the first proper base you find
-			if(reference_sequence[i] == '-' && comparison_sequence[i] != '-' )
-			{
-				reference_sequence[i] = toupper(comparison_sequence[i]);
-			}
-			
-			if(reference_sequence[i] != '*' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
-			{
-				reference_sequence[i] = '*';
-				number_of_snps++;
-			}
-		}
-	}while(comparison_sequence[0] != '\0');
-	
-	free(comparison_sequence);
-	return number_of_snps;
-}
-
-
 void build_snp_locations(int snp_locations[], char reference_sequence[])
 {
 	int i;
@@ -100,47 +44,8 @@ void build_snp_locations(int snp_locations[], char reference_sequence[])
 	}
 }
 
-
-void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps)
-{
-	int i;
-	int sequence_number = 0;
-	char * comparison_sequence;
-	rewind(alignment_file_pointer);
-	
-	// initialise the strings in the array
-	for(i = 0; i < number_of_snps; i++)
-	{
-		strcpy(bases_for_snps[i], "");
-	}
-
-	
-	do{
-		comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
-		
-		advance_to_sequence(alignment_file_pointer);
-		read_line(comparison_sequence, alignment_file_pointer);
-		
-		if(comparison_sequence[0] == '\0')
-		{
-			break;
-		}
-		
-		for(i = 0; i< number_of_snps; i++)
-		{
-			bases_for_snps[i][sequence_number] = toupper(((char *) comparison_sequence)[snp_locations[i]]);
-		}
-		
-		sequence_number++;
-	}while(comparison_sequence[0] != '\0');
-	
-	free(comparison_sequence);
-}
-
-
 int generate_snp_sites(char filename[])
 {
-	FILE *alignment_file_pointer;
 	int length_of_genome;
 	char * reference_sequence;
 	int number_of_snps;
@@ -148,25 +53,16 @@ int generate_snp_sites(char filename[])
 	int number_of_samples;
 	int i;
 	
-	
-	alignment_file_pointer=fopen(filename, "r");
-	
-	if(validate_alignment_file(alignment_file_pointer) == 0)
-	{
-		return 0;
-	}
-	
 	length_of_genome = genome_length(filename);
 	reference_sequence = (char *) malloc(length_of_genome*sizeof(char));
 	
-	build_reference_sequence(reference_sequence,alignment_file_pointer);
-	number_of_snps = detect_snps(reference_sequence, alignment_file_pointer, length_of_genome);
+	build_reference_sequence(reference_sequence,filename);
+	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome);
 	
 	snp_locations = (int *) malloc(number_of_snps*sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
-	 
-	rewind(alignment_file_pointer);
+	
 	number_of_samples = number_of_sequences_in_file(filename);
 	
 	// Find out the names of the sequences
@@ -175,10 +71,9 @@ int generate_snp_sites(char filename[])
 	for(i = 0; i < number_of_samples; i++)
 	{
 		sequence_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		strcpy(sequence_names[i],"");
 	}
 	
-	get_sample_names_for_header(alignment_file_pointer, sequence_names, number_of_samples);
+	get_sample_names_for_header(filename, sequence_names, number_of_samples);
 	
 	char* bases_for_snps[number_of_snps];
 	
@@ -187,7 +82,7 @@ int generate_snp_sites(char filename[])
 		bases_for_snps[i] = malloc(number_of_samples*sizeof(char));
 	}
 	
-	get_bases_for_each_snp(alignment_file_pointer, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
+	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	
   char filename_without_directory[MAX_FILENAME_SIZE];
   strip_directory_from_filename(filename, filename_without_directory);

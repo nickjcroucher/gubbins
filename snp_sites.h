@@ -20,10 +20,7 @@
 #ifndef _SNP_SITES_H_
 #define _SNP_SITES_H_
 
-int build_reference_sequence(char reference_sequence[], FILE * alignment_file_pointer);
-int detect_snps(char reference_sequence[], FILE * alignment_file_pointer, int length_of_genome);
 void build_snp_locations(int snp_locations[], char reference_sequence[]);
-void get_bases_for_each_snp(FILE * alignment_file_pointer, int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps);
 int generate_snp_sites(char filename[]);
 int refilter_existing_snps(char * reference_bases, int number_of_snps, char ** column_names, int number_of_columns,int * snp_locations, int * filtered_snp_locations);
 void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locations, int number_of_snps);

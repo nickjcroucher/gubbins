@@ -1,5 +1,5 @@
-gubbins: seqUtil.o Newickform.o alignment_file.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o block_tab_file.o
-	gcc -o gubbins seqUtil.o Newickform.o alignment_file.o block_tab_file.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o  -lm
+gubbins: seqUtil.o Newickform.o alignment_file.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o block_tab_file.o fasta_of_snp_sites.o
+	gcc -o gubbins seqUtil.o Newickform.o alignment_file.o block_tab_file.o main.o parse_vcf.o snp_searching.c vcf.o branch_sequences.o gubbins.o parse_phylip.o phylib_of_snp_sites.o snp_sites.o fasta_of_snp_sites.o -lm
 
 seqUtil.o: seqUtil.c
 	gcc -c seqUtil.c
@@ -14,6 +14,9 @@ block_tab_file.o: block_tab_file.c
 
 branch_sequences.o: branch_sequences.c
 	gcc -c branch_sequences.c
+
+fasta_of_snp_sites.o: 	fasta_of_snp_sites.c
+	gcc -c fasta_of_snp_sites.c
 
 gubbins.o: gubbins.c
 	gcc -c gubbins.c
@@ -41,3 +44,4 @@ vcf.o: vcf.c
 
 clean:
 	-rm *.o
+

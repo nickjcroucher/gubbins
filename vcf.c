@@ -38,6 +38,7 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 	vcf_file_pointer=fopen(strcat(base_filename,".vcf"), "w");
 	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples);
 	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples);
+  fclose(vcf_file_pointer);
 }
 
 void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples)

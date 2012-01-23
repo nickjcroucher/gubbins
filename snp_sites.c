@@ -156,7 +156,7 @@ int generate_snp_sites(char filename[])
 		return 0;
 	}
 	
-	length_of_genome = genome_length(alignment_file_pointer);
+	length_of_genome = genome_length(filename);
 	reference_sequence = (char *) malloc(length_of_genome*sizeof(char));
 	
 	build_reference_sequence(reference_sequence,alignment_file_pointer);
@@ -167,14 +167,14 @@ int generate_snp_sites(char filename[])
 	free(reference_sequence);
 	 
 	rewind(alignment_file_pointer);
-	number_of_samples = count_lines_in_file(alignment_file_pointer)/2;
+	number_of_samples = number_of_sequences_in_file(filename);
 	
 	// Find out the names of the sequences
 	char* sequence_names[number_of_samples];
 	sequence_names[number_of_samples-1] = '\0';
 	for(i = 0; i < number_of_samples; i++)
 	{
-		sequence_names[i] = malloc(21*sizeof(char));
+		sequence_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 		strcpy(sequence_names[i],"");
 	}
 	

@@ -47,9 +47,7 @@ void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename
 
 int get_length_of_genome_from_alignment_file(char multi_fasta_filename[])
 {
-	FILE *alignment_file_pointer;
-	alignment_file_pointer=fopen(multi_fasta_filename, "r");
-	return genome_length(alignment_file_pointer);	
+	return genome_length(multi_fasta_filename);	
 }
 
 void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[])

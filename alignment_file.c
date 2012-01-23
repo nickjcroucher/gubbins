@@ -21,12 +21,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <zlib.h>
 #include <regex.h>
 #include <sys/types.h>
+#include "kseq.h"
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
 
+KSEQ_INIT(gzFile, gzread)
 
 // Given a file handle, return the length of the current line
 int line_length(FILE * alignment_file_pointer)
@@ -63,16 +66,45 @@ int validate_alignment_file(FILE * alignment_file_pointer)
 	return 1;
 }
 
-int genome_length(FILE * alignment_file_pointer)
+int genome_length(char filename[])
 {
 	int length_of_genome;
+
+	gzFile fp;
+	kseq_t *seq;
 	
-	advance_to_sequence(alignment_file_pointer);
-	
-	length_of_genome = line_length(alignment_file_pointer);
-	rewind(alignment_file_pointer);
+	fp = gzopen(filename, "r");
+	seq = kseq_init(fp);
+  kseq_read(seq);
+
+  length_of_genome = strlen(seq->seq.s) ;
+
+	kseq_destroy(seq);
+	gzclose(fp);
 	return length_of_genome;
 }
+
+
+int number_of_sequences_in_file(char filename[])
+{
+  int number_of_sequences = 0;
+  int l;
+	
+	gzFile fp;
+	kseq_t *seq;
+	
+	fp = gzopen(filename, "r");
+	seq = kseq_init(fp);
+  
+	while ((l = kseq_read(seq)) >= 0) {
+    number_of_sequences++;
+	}
+	kseq_destroy(seq);
+	gzclose(fp);
+	return number_of_sequences;
+}
+
+
 
 int read_line(char sequence[], FILE * pFilePtr)
 {
@@ -98,19 +130,7 @@ int read_line(char sequence[], FILE * pFilePtr)
     return 1;
 }
 
-int count_lines_in_file(FILE * alignment_file_pointer)
-{
-	rewind(alignment_file_pointer);
-	int i = 0;
-	int length_of_line =0;
-	
-	do{
-		length_of_line = line_length(alignment_file_pointer);
-		i++;
-	}while(length_of_line != 0);
-	
-	return i;	
-}
+
 
 
 void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples)

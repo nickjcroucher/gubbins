@@ -30,5 +30,6 @@ void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locat
 void strip_directory_from_filename(char * input_filename, char * output_filename);
 
 #define MAX_FILENAME_SIZE 250
+#define MAX_SAMPLE_NAME_SIZE 1024
 
 #endif

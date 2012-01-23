@@ -20,13 +20,15 @@
 #ifndef _ALIGNMENT_FILE_H_
 #define _ALIGNMENT_FILE_H_
 
+#include "kseq.h"
+
 int line_length(FILE * alignment_file_pointer);
 void advance_to_sequence(FILE * alignment_file_pointer);
 void advance_to_sequence_name(FILE * alignment_file_pointer);
 int validate_alignment_file(FILE * alignment_file_pointer);
-int genome_length(FILE * alignment_file_pointer);
+int genome_length(char filename[]);
 int read_line(char sequence[], FILE * pFilePtr);
-int count_lines_in_file(FILE * alignment_file_pointer);
+int number_of_sequences_in_file(char filename[]);
 void get_sample_names_for_header(FILE * alignment_file_pointer, char ** sequence_names, int number_of_samples);
 char filter_invalid_characters(char input_char);
 

@@ -45,3 +45,5 @@ vcf.o: vcf.c
 clean:
 	-rm *.o
 
+test:
+	cd tests && make

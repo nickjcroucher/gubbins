@@ -44,6 +44,7 @@ void build_snp_locations(int snp_locations[], char reference_sequence[])
 	}
 }
 
+
 int generate_snp_sites(char filename[])
 {
 	int length_of_genome;

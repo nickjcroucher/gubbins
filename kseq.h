@@ -215,7 +215,7 @@ typedef struct __kstring_t {
 	} kseq_t;
 
 #define KSEQ_INIT(type_t, __read)				\
-	KSTREAM_INIT(type_t, __read, 4096)			\
+	KSTREAM_INIT(type_t, __read, 1048576)			\
 	__KSEQ_TYPE(type_t)							\
 	__KSEQ_BASIC(type_t)						\
 	__KSEQ_READ

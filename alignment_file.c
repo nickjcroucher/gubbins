@@ -106,7 +106,7 @@ int genome_length(char filename[])
 	seq = kseq_init(fp);
   kseq_read(seq);
 
-  length_of_genome = strlen(seq->seq.s) ;
+  length_of_genome = seq->seq.l;
 
 	kseq_destroy(seq);
 	gzclose(fp);
@@ -147,29 +147,24 @@ int build_reference_sequence(char reference_sequence[], char filename[])
 	seq = kseq_init(fp);
   kseq_read(seq);
 
-  strcpy(reference_sequence, seq->seq.s) ;
-
-	kseq_destroy(seq);
-	gzclose(fp);
-	
-	for(i = 0; i < strlen(reference_sequence); i++)
+	for(i = 0; i < seq->seq.l; i++)
 	{
-		reference_sequence[i] = toupper(reference_sequence[i]);
+		reference_sequence[i] = toupper(seq->seq.s[i]);
 	}
 	
+	kseq_destroy(seq);
+	gzclose(fp);
 	return 1;
 }
 
 int detect_snps(char reference_sequence[], char filename[], int length_of_genome)
 {
-	char * comparison_sequence;
 	int i;
 	int number_of_snps = 0;
   int l;
   
   gzFile fp;
   kseq_t *seq;
-  comparison_sequence = (char *) malloc(length_of_genome*sizeof(char));
   
   fp = gzopen(filename, "r");
   seq = kseq_init(fp);
@@ -177,17 +172,15 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
   kseq_read(seq);
   
   while ((l = kseq_read(seq)) >= 0) {
-    strcpy(comparison_sequence, seq->seq.s);
-    
     for(i = 0; i < length_of_genome; i++)
 		{
 			// If there is an indel in the reference sequence, replace with the first proper base you find
-			if(reference_sequence[i] == '-' && comparison_sequence[i] != '-' )
+			if((reference_sequence[i] == '-' && seq->seq.s[i] != '-' ) || (toupper(reference_sequence[i]) == 'N' && seq->seq.s[i] != 'N' ))
 			{
-				reference_sequence[i] = toupper(comparison_sequence[i]);
+				reference_sequence[i] = toupper(seq->seq.s[i]);
 			}
 			
-			if(reference_sequence[i] != '*' && comparison_sequence[i] != '-' && reference_sequence[i] != toupper(comparison_sequence[i]))
+			if(reference_sequence[i] != '*' && seq->seq.s[i] != '-' && toupper(seq->seq.s[i]) != 'N' && reference_sequence[i] != toupper(seq->seq.s[i]))
 			{
 				reference_sequence[i] = '*';
 				number_of_snps++;
@@ -198,13 +191,8 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
   kseq_destroy(seq);
   gzclose(fp);
 
-	free(comparison_sequence);
 	return number_of_snps;
 }
-
-
-
-
 
 int read_line(char sequence[], FILE * pFilePtr)
 {

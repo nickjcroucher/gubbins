@@ -91,6 +91,7 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 		
 		for(reference_index = 0; reference_index < num_snps; reference_index++)
 		{
+
 			if(reference_bases[reference_index] == '\0')
 			{
 				break;	

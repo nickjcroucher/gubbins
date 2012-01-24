@@ -45,11 +45,6 @@ void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename
 }
 
 
-int get_length_of_genome_from_alignment_file(char multi_fasta_filename[])
-{
-	return genome_length(multi_fasta_filename);	
-}
-
 void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[])
 {
 	FILE *vcf_file_pointer;
@@ -62,7 +57,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	int i;
 	int reference_column_number;
 	int length_of_original_genome;
-	length_of_original_genome = get_length_of_genome_from_alignment_file(multi_fasta_filename);
+	length_of_original_genome = genome_length(multi_fasta_filename);	
 	
 	number_of_columns = get_number_of_columns_from_file(vcf_file_pointer);
 	char* column_names[number_of_columns];

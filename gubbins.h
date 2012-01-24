@@ -26,7 +26,6 @@
 void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[], char multi_fasta_filename[]);
 void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[]);
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
-int get_length_of_genome_from_alignment_file(char multi_fasta_filename[]);
 
 
 #define MAX_EDGES_IN_TREE 20000

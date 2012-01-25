@@ -1,2 +1,3 @@
 *.o
 gubbins
+tests/run_all_tests

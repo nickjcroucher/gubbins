@@ -86,6 +86,11 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
     for(i = 0; i< number_of_snps; i++)
 		{
 			bases_for_snps[i][sequence_number] = toupper(((char *) seq->seq.s)[snp_locations[i]]);
+			// Present gaps and unknowns in the same way to Gubbins
+			if(bases_for_snps[i][sequence_number] == 'N')
+			{
+				bases_for_snps[i][sequence_number]  = '-';
+			}
 		}
     sequence_number++;
   }

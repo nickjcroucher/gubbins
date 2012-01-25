@@ -23,6 +23,20 @@ START_TEST (valid_alignment_with_one_line_per_sequence)
 END_TEST
 
 
+	START_TEST (valid_alignment_with_n_as_gap)
+	{
+		  generate_snp_sites("data/alignment_file_with_n.aln");
+		  fail_unless( compare_files("data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_with_n.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
+		  fail_unless( compare_files("data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_with_n.aln.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
+		  fail_unless( compare_files("data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_with_n.aln.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
+		  remove("alignment_file_with_n.aln.vcf");
+		  remove("alignment_file_with_n.aln.phylip");
+		  remove("alignment_file_with_n.aln.snp_sites.aln");
+	}
+	END_TEST
+
+
+
 START_TEST (valid_alignment_with_one_line_per_sequence_gzipped)
 {
   generate_snp_sites("data/alignment_file_one_line_per_sequence.aln.gz");

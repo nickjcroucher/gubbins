@@ -5,6 +5,7 @@
 #include "check_parse_phylip.h"
 #include "check_snp_sites.h"
 #include "check_calculate_ancestor_sequence.h"
+#include "check_vcf_parsing.h"
 
 int main (void)
 {
@@ -13,6 +14,7 @@ int main (void)
   SRunner *sr = srunner_create (s);
   srunner_add_suite (sr, parse_phylip_suite());
   srunner_add_suite (sr, calculate_ancestor_sequence_suite());
+  srunner_add_suite (sr, parse_vcf_suite());
   
   srunner_run_all (sr, CK_NORMAL);
   number_failed = srunner_ntests_failed (sr);

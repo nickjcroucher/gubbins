@@ -39,6 +39,11 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 {
 	int sequence_index;
 	sequence_index = find_sequence_index_from_sample_name( sample_name);
+	if(sequence_index < 0)
+	{
+    printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
+	  exit(1);
+  }
 	strcpy(sequence_bases, sequences[sequence_index]);
 }
 

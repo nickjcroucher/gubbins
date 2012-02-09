@@ -135,7 +135,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		if (root->taxon != NULL)
 		{
 			// this non leaf node has its own sequence
-			get_sequence_for_sample_name(leaf_sequence, root->taxon);
+			//get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		}
 		else
 		{

@@ -49,8 +49,9 @@ USAGE
 
 $number_of_iterations ||= 5;
 
+
 # find SNP sites
-#system("$gubbins_exec -s $alignment_file");
+system("$gubbins_exec -s $alignment_file");
 
 my($filename, $directories, $suffix) = fileparse($alignment_file,  qr/\.[^.]*/);
 my $base_filename = $filename.$suffix;
@@ -65,9 +66,26 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
   $iteration_base_name = $base_filename.".iteration_$i";
   my $previous_iteration_base_name = $base_filename.".iteration_".($i-1)."";
 
- print "$tree_building_exec $previous_iteration_base_name.snp_sites.aln > $iteration_base_name.tre\n";
- print "$gubbins_exec -r $alignment_file $previous_iteration_base_name.vcf $iteration_base_name.tre $previous_iteration_base_name.phylip\n\n";
-#  system("$tree_building_exec $previous_iteration_base_name.phylip > $iteration_base_name.tre");
-#  system("$gubbins_exec -r $alignment_file $previous_iteration_base_name.vcf $iteration_base_name.tre $previous_iteration_base_name.phylip");
+  my $input_tree = "";
+  if(defined($starting_tree))
+	{
+	  $input_tree = " -intree $starting_tree ";
+  }
+  elsif($i > 1)
+  {
+	  $input_tree = " -intree $previous_iteration_base_name ";
+	}
+
+ my $tree_building_cmd = "$tree_building_exec $previous_iteration_base_name.phylip $input_tree  > $iteration_base_name";
+ my $gubbins_recombinations_cmd = "$gubbins_exec -r $alignment_file $previous_iteration_base_name.vcf $iteration_base_name $previous_iteration_base_name.phylip";
+
+ print "$tree_building_cmd\n";
+ system($tree_building_cmd);
+
+ print "$gubbins_recombinations_cmd\n\n";
+ system($gubbins_recombinations_cmd);
 }
+
+
+
 

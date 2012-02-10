@@ -132,16 +132,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		}
 		
 		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
-		if (root->taxon != NULL)
-		{
-			// this non leaf node has its own sequence
-			//get_sequence_for_sample_name(leaf_sequence, root->taxon);
-		}
-		else
-		{
 			// All child sequneces should be available use them to find the ancestor sequence
 			leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
-		}
 		
 		int * branches_snp_sites[root->childNum];
 		

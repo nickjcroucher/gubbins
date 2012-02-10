@@ -23,7 +23,8 @@ no warnings 'uninitialized';
 use File::Basename;
 use Getopt::Long;
 
-my $tree_building_exec = '/software/pathogen/external/apps/usr/local/fasttree/FastTree -gtr -gamma -nt ';
+my $tree_building_exec = '/software/pathogen/external/apps/usr/local/fasttree/FastTree';
+my $tree_building_params = '-gtr -gamma -nt';
 my $gubbins_exec = 'gubbins';
 
 
@@ -76,7 +77,7 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
 	  $input_tree = " -intree $previous_iteration_base_name ";
 	}
 
- my $tree_building_cmd = "$tree_building_exec $previous_iteration_base_name.phylip $input_tree  > $iteration_base_name";
+ my $tree_building_cmd = "$tree_building_exec $input_tree $tree_building_params $previous_iteration_base_name.snp_sites.aln   > $iteration_base_name";
  my $gubbins_recombinations_cmd = "$gubbins_exec -r $alignment_file $previous_iteration_base_name.vcf $iteration_base_name $previous_iteration_base_name.phylip";
 
  print "$tree_building_cmd\n";

@@ -74,8 +74,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 			int snp_index;
 			snp_index = current_recombinations[i];
 			
-			update_sequence_base(reference_bases[snp_index], sequence_index, snp_index);
-
+			update_sequence_base('?', sequence_index, snp_index);
 		}
 	}
 	else
@@ -331,7 +330,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
  
 	number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
 		//printf("number_of_branch_snps\t %d\n",number_of_branch_snps);
-		
+
 		free(candidate_blocks[0]);
 		candidate_blocks[0] = NULL;
 		free(candidate_blocks[1]);
@@ -351,7 +350,7 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 	
 	for(i = 0 ; i< number_of_branch_snps; i++)
 	{
-		if(snp_site_coords[i]>= window_start_coordinate && snp_site_coords[i] <= window_end_coordinate)
+		if(snp_site_coords[i]>= window_start_coordinate && snp_site_coords[i] < window_end_coordinate)
 		{
 			
 		}
@@ -383,6 +382,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		
 		//current_node->recombinations = realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 		current_node->num_recombinations = number_of_recombinations;
+
 		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
 	}
 	return number_of_branch_snps_excluding_block;

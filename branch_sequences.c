@@ -74,7 +74,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 			int snp_index;
 			snp_index = current_recombinations[i];
 			
-			update_sequence_base('?', sequence_index, snp_index);
+			update_sequence_base('N', sequence_index, snp_index);
 		}
 	}
 	else

@@ -126,7 +126,7 @@ void strip_directory_from_filename(char * input_filename, char * output_filename
 }
 
 // return new number of snps
-int refilter_existing_snps(char * reference_bases, int number_of_snps, char ** column_names, int number_of_columns,int * snp_locations, int * filtered_snp_locations)
+int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations)
 {
 	// go through each snp column and check to see if there is still variation
 	int i;

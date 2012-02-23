@@ -55,6 +55,7 @@ START_TEST (phylip_read_in_file_with_gaps)
   fail_unless( does_column_contain_snps(2, '-') == 0);
   fail_unless( does_column_contain_snps(3, 'T') == 0);
   fail_unless( does_column_contain_snps(4, 'G') == 1);
+  fail_unless( does_column_contain_snps(4, '-') == 1);
 	
 }
 END_TEST

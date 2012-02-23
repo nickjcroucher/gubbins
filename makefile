@@ -45,5 +45,5 @@ vcf.o: vcf.c
 clean:
 	-rm *.o
 
-test:
+test: gubbins
 	cd tests && make

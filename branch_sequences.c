@@ -221,6 +221,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	for(i = 0; i < ceil(branch_genome_size/window_size) && (window_start_coordinate < branch_genome_size); i++)
 	{
 		window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);	
+		if(window_end_coordinate < window_start_coordinate)
+		{
+			continue;
+		}
+			
 		number_of_snps_in_block = find_number_of_snps_in_block(window_start_coordinate, window_end_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
 		// the block size = window size, except for the last window
 
@@ -287,7 +292,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	
 		//printf("%d\t%d\t%d\t%d\t%d\n",current_start,current_end,block_snp_count,block_genome_size_without_gaps,cutoff_value);
 		
-		while(current_start < current_end && block_snp_count >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS && block_snp_count >= cutoff_value)
+		while(current_start < current_end && block_snp_count >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
 		{
 			
 			// move inwards until pvalue test is satisfied 
@@ -331,11 +336,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
 		//printf("number_of_branch_snps\t %d\n",number_of_branch_snps);
 
-		free(candidate_blocks[0]);
+		//free(candidate_blocks[0]);
 		candidate_blocks[0] = NULL;
-		free(candidate_blocks[1]);
+		//free(candidate_blocks[1]);
 		candidate_blocks[1] = NULL;
-		free(candidate_blocks[2]);
+		//free(candidate_blocks[2]);
 		candidate_blocks[2] = NULL;
 
 	}

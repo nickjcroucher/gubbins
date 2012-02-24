@@ -116,7 +116,7 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 	
 	for(j = 0; j < number_of_filtered_snps; j++)
 	{
-		filtered_bases_for_snps[j] = (char *) malloc(num_samples*sizeof(char));
+		filtered_bases_for_snps[j] = (char *) malloc((num_samples+1)*sizeof(char));
 	}
 		
 	for(i = 0; i < num_samples; i++)
@@ -182,12 +182,12 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 	num_snps = get_number_of_snps_from_phylip(line_buffer);
 	
 
-	sequences = (char **) malloc(num_samples*sizeof(char *));
-	phylip_sample_names = (char **) malloc(num_samples*sizeof(char *));
+	sequences = (char **) malloc((num_samples+1)*sizeof(char *));
+	phylip_sample_names = (char **) malloc((num_samples+1)*sizeof(char *));
 	
 	for(i = 0; i < num_samples; i++)
 	{
-		sequences[i] = (char *) malloc(num_snps*sizeof(char));
+		sequences[i] = (char *) malloc((num_snps+1)*sizeof(char));
 		phylip_sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 	}
 	

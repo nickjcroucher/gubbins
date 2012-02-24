@@ -68,7 +68,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
 	number_of_snps  = get_number_of_snps(vcf_file_pointer);
-	reference_bases = (char *) malloc(number_of_snps*sizeof(char));
+	reference_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 	
 	int snp_locations[number_of_snps];
 	
@@ -90,7 +90,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
   get_sample_names_from_parse_phylip(sample_names);
 
   char * reference_sequence_bases;
-  reference_sequence_bases = (char *) malloc(number_of_snps*sizeof(char));
+  reference_sequence_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 
 	get_sequence_for_sample_name(reference_sequence_bases, sample_names[0]);
 

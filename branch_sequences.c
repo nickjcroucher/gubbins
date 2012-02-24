@@ -58,7 +58,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 	int * current_recombinations;
 	int num_current_recombinations = 0 ;
 	
-	current_recombinations = (int *) malloc((root->num_recombinations+parent_num_recombinations)*sizeof(int));
+	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
 	
 	
@@ -193,7 +193,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		
 	
 	// place to store coordinates of recombinations snps
-	current_node->recombinations = (int *) malloc(length_of_sequence*sizeof(int));
+	current_node->recombinations = (int *) malloc((length_of_sequence+1)*sizeof(int));
 	
 	while(number_of_branch_snps > MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
 	{
@@ -215,8 +215,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	int * block_coordinates[2];
 	
 
-	block_coordinates[0] = (int *) malloc(number_of_windows*sizeof(int));
-	block_coordinates[1] = (int *) malloc(number_of_windows*sizeof(int));
+	block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
+	block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
 	number_of_blocks = 0;
 	for(i = 0; i < ceil(branch_genome_size/window_size) && (window_start_coordinate < branch_genome_size); i++)
 	{
@@ -270,9 +270,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	// block_coordinates will now contain merged blocks
 	number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks);
 	int * candidate_blocks[3];
-	candidate_blocks[0] = (int *) malloc(number_of_blocks*sizeof(int));
-	candidate_blocks[1] = (int *) malloc(number_of_blocks*sizeof(int));
-	candidate_blocks[2] = (int *) malloc(number_of_blocks*sizeof(int));
+	candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+	candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+	candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 
 	int number_of_candidate_blocks = 0;
 	

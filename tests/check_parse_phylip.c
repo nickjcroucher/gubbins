@@ -16,6 +16,12 @@ START_TEST (phylip_read_in_small_file)
   fail_unless( find_sequence_index_from_sample_name("2956_6_2") == 1);
   fail_unless( find_sequence_index_from_sample_name("2956_6_3") == 2);
   
+  char *sample_names[3];
+  get_sample_names_from_parse_phylip(sample_names);
+  fail_unless( strcmp(sample_names[0],"2956_6_1") == 0 );
+  fail_unless( strcmp(sample_names[1],"2956_6_2") == 0 );
+  fail_unless( strcmp(sample_names[2],"2956_6_3") == 0 );
+
   char *reference_bases = "*ACG*";
   char *filtered_bases_for_snps[3];
 
@@ -24,11 +30,7 @@ START_TEST (phylip_read_in_small_file)
   fail_unless( strcmp(filtered_bases_for_snps[1], "CGT") == 0 );
   fail_unless( strcmp(filtered_bases_for_snps[2], "GGT") == 0 );
   
-  char *sample_names[3];
-  get_sample_names_from_parse_phylip(sample_names);
-  fail_unless( strcmp(sample_names[0],"2956_6_1") == 0 );
-  fail_unless( strcmp(sample_names[1],"2956_6_2") == 0 );
-  fail_unless( strcmp(sample_names[2],"2956_6_3") == 0 );
+
   
   fail_unless( does_column_contain_snps(0, 'A') == 0);
   fail_unless( does_column_contain_snps(1, 'A') == 1);

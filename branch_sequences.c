@@ -100,7 +100,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	
 	if (root->childNum == 0)
 	{
-		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
+		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
@@ -130,7 +130,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			child_counter++;
 		}
 		
-		leaf_sequence = (char *) malloc(number_of_snps*sizeof(char));
+		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			// All child sequneces should be available use them to find the ancestor sequence
 			leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
 		
@@ -139,7 +139,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
 			int number_of_branch_snps=0;
-			branches_snp_sites[current_branch] = (int *) malloc(number_of_snps*sizeof(int));
+			branches_snp_sites[current_branch] = (int *) malloc((number_of_snps +1)*sizeof(int));
 			
 			int branch_genome_size;
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
@@ -331,7 +331,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	{
 		return;	
 	}
- 
  
 	number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
 		//printf("number_of_branch_snps\t %d\n",number_of_branch_snps);

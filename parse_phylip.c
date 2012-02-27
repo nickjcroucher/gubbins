@@ -50,6 +50,7 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 int does_column_contain_snps(int snp_column, char reference_base)
 {
 	int i;
+	reference_base = convert_reference_to_real_base_in_column( snp_column,  reference_base);
 	for(i = 0; i < num_samples; i++)
 	{
 		if(sequences[i][snp_column] == '\0' || sequences[i][snp_column] == '\n')
@@ -57,12 +58,40 @@ int does_column_contain_snps(int snp_column, char reference_base)
 			return 0;	
 		}
 		
+		if((reference_base  == '-' || reference_base  == 'N') && sequences[i][snp_column] != reference_base)
+		{
+			
+		}
+		
 		if(sequences[i][snp_column]  != '-' && toupper(sequences[i][snp_column])  != 'N' && sequences[i][snp_column] != reference_base)
 		{
 			return 1;
 		}
-	}
+	}   
 	return 0;
+}
+
+char convert_reference_to_real_base_in_column(int snp_column, char reference_base)
+{
+	int i;
+	if(!(reference_base == '-' || toupper(reference_base) == 'N'))
+	{
+		return reference_base;
+	}
+	
+	for(i = 0; i < num_samples; i++)
+	{
+		if(sequences[i][snp_column] == '\0' || sequences[i][snp_column] == '\n')
+		{
+			return reference_base;	
+		}
+		
+		if(sequences[i][snp_column]  != '-' && toupper(sequences[i][snp_column])  != 'N')
+		{
+			return sequences[i][snp_column];
+		}
+	}
+	return reference_base;
 }
 
 int number_of_samples_from_parse_phylip()
@@ -87,7 +116,7 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 	
 	for(j = 0; j < number_of_filtered_snps; j++)
 	{
-		filtered_bases_for_snps[j] = (char *) malloc(num_samples*sizeof(char));
+		filtered_bases_for_snps[j] = (char *) malloc((num_samples+1)*sizeof(char));
 	}
 		
 	for(i = 0; i < num_samples; i++)
@@ -153,12 +182,12 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 	num_snps = get_number_of_snps_from_phylip(line_buffer);
 	
 
-	sequences = (char **) malloc(num_samples*sizeof(char *));
-	phylip_sample_names = (char **) malloc(num_samples*sizeof(char *));
+	sequences = (char **) malloc((num_samples+1)*sizeof(char *));
+	phylip_sample_names = (char **) malloc((num_samples+1)*sizeof(char *));
 	
 	for(i = 0; i < num_samples; i++)
 	{
-		sequences[i] = (char *) malloc(num_snps*sizeof(char));
+		sequences[i] = (char *) malloc((num_snps+1)*sizeof(char));
 		phylip_sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
 	}
 	

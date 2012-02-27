@@ -68,7 +68,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
 	number_of_snps  = get_number_of_snps(vcf_file_pointer);
-	reference_bases = (char *) malloc(number_of_snps*sizeof(char));
+	reference_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 	
 	int snp_locations[number_of_snps];
 	
@@ -84,16 +84,20 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	
 	int filtered_snp_locations[number_of_snps];
 	int number_of_filtered_snps;
-	
-	number_of_filtered_snps = refilter_existing_snps(reference_bases, number_of_snps, column_names, number_of_columns, snp_locations, filtered_snp_locations);
-	
 	int number_of_samples = number_of_samples_from_parse_phylip();
-	
-	char * filtered_bases_for_snps[number_of_filtered_snps];
+
 	char * sample_names[number_of_samples];
-	
-	filter_sequence_bases_and_rotate(reference_bases, filtered_bases_for_snps, number_of_filtered_snps);
-	get_sample_names_from_parse_phylip(sample_names);
+  get_sample_names_from_parse_phylip(sample_names);
+
+  char * reference_sequence_bases;
+  reference_sequence_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
+
+	get_sequence_for_sample_name(reference_sequence_bases, sample_names[0]);
+
+	number_of_filtered_snps = refilter_existing_snps(reference_sequence_bases, number_of_snps, snp_locations, filtered_snp_locations);
+	char * filtered_bases_for_snps[number_of_filtered_snps];
+
+	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
 	create_phylib_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);

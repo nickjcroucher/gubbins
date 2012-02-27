@@ -16,6 +16,12 @@ START_TEST (phylip_read_in_small_file)
   fail_unless( find_sequence_index_from_sample_name("2956_6_2") == 1);
   fail_unless( find_sequence_index_from_sample_name("2956_6_3") == 2);
   
+  char *sample_names[3];
+  get_sample_names_from_parse_phylip(sample_names);
+  fail_unless( strcmp(sample_names[0],"2956_6_1") == 0 );
+  fail_unless( strcmp(sample_names[1],"2956_6_2") == 0 );
+  fail_unless( strcmp(sample_names[2],"2956_6_3") == 0 );
+
   char *reference_bases = "*ACG*";
   char *filtered_bases_for_snps[3];
 
@@ -24,11 +30,7 @@ START_TEST (phylip_read_in_small_file)
   fail_unless( strcmp(filtered_bases_for_snps[1], "CGT") == 0 );
   fail_unless( strcmp(filtered_bases_for_snps[2], "GGT") == 0 );
   
-  char *sample_names[3];
-  get_sample_names_from_parse_phylip(sample_names);
-  fail_unless( strcmp(sample_names[0],"2956_6_1") == 0 );
-  fail_unless( strcmp(sample_names[1],"2956_6_2") == 0 );
-  fail_unless( strcmp(sample_names[2],"2956_6_3") == 0 );
+
   
   fail_unless( does_column_contain_snps(0, 'A') == 0);
   fail_unless( does_column_contain_snps(1, 'A') == 1);
@@ -47,12 +49,26 @@ START_TEST (phylip_read_in_small_file)
 }
 END_TEST
 
+START_TEST (phylip_read_in_file_with_gaps)
+{
+	load_sequences_from_phylib_file("data/alignment_with_gaps.phylip");
+	fail_unless( does_column_contain_snps(0, 'A') == 0);
+  fail_unless( does_column_contain_snps(1, '-') == 0);
+  fail_unless( does_column_contain_snps(2, '-') == 0);
+  fail_unless( does_column_contain_snps(3, 'T') == 0);
+  fail_unless( does_column_contain_snps(4, 'G') == 1);
+  fail_unless( does_column_contain_snps(4, '-') == 1);
+  fail_unless( does_column_contain_snps(5, 'N') == 0);
+	
+}
+END_TEST
 
 Suite * parse_phylip_suite(void)
 {
   Suite *s = suite_create ("Parsing a phylip file");
   TCase *tc_phylip = tcase_create ("phylip_files");
   tcase_add_test (tc_phylip, phylip_read_in_small_file);
+  tcase_add_test (tc_phylip, phylip_read_in_file_with_gaps);
   suite_add_tcase (s, tc_phylip);
   return s;
 }

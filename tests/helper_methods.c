@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "helper_methods.h"
 
 
@@ -41,4 +42,15 @@ int compare_files(char expected_output_filename[],char actual_output_filename[] 
   free(actual_buffer);
   
   return 0;
+}
+
+int file_exists(char * fileName)
+{
+   struct stat buf;
+   int i = stat ( fileName, &buf );
+     if ( i == 0 )
+     {
+       return 1;
+     }
+     return 0;
 }

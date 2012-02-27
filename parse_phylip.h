@@ -31,6 +31,7 @@ int does_column_contain_snps(int snp_column, char reference_base);
 int number_of_samples_from_parse_phylip();
 void get_sample_names_from_parse_phylip(char ** sample_names);
 void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_bases_for_snps, int number_of_filtered_snps);
+char convert_reference_to_real_base_in_column(int snp_column, char reference_base);
 
 #define MAX_READ_BUFFER 1048576
 #define MAX_SAMPLE_NAME_SIZE 1024

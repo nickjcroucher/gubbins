@@ -55,12 +55,12 @@ int generate_snp_sites(char filename[])
 	int i;
 	
 	length_of_genome = genome_length(filename);
-	reference_sequence = (char *) malloc(length_of_genome*sizeof(char));
+	reference_sequence = (char *) malloc((length_of_genome+1)*sizeof(char));
 	
 	build_reference_sequence(reference_sequence,filename);
 	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome);
 	
-	snp_locations = (int *) malloc(number_of_snps*sizeof(int));
+	snp_locations = (int *) malloc((number_of_snps+1)*sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
 	
@@ -80,7 +80,7 @@ int generate_snp_sites(char filename[])
 	
 	for(i = 0; i < number_of_snps; i++)
 	{
-		bases_for_snps[i] = malloc(number_of_samples*sizeof(char));
+		bases_for_snps[i] = malloc((number_of_samples+1)*sizeof(char));
 	}
 	
 	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
@@ -126,7 +126,7 @@ void strip_directory_from_filename(char * input_filename, char * output_filename
 }
 
 // return new number of snps
-int refilter_existing_snps(char * reference_bases, int number_of_snps, char ** column_names, int number_of_columns,int * snp_locations, int * filtered_snp_locations)
+int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations)
 {
 	// go through each snp column and check to see if there is still variation
 	int i;

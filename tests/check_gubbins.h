@@ -17,11 +17,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _HELPER_METHODS_H_
-#define _HELPER_METHODS_H_
+#ifndef _CHECK_RUN_GUBBINS_H_
+#define _CHECK_RUN_GUBBINS_H_
 
-int compare_files(char expected_output_filename[],char actual_output_filename[] );
-int file_exists(char * fileName);
+ Suite * run_gubbins_suite(void);
+ 
 #endif
 
 

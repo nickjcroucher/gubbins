@@ -8,6 +8,7 @@
 #include "check_vcf_parsing.h"
 #include "check_branch_sequences.h"
 #include "check_gubbins.h"
+#include "check_snp_searching.h"
 
 int main (void)
 {
@@ -19,6 +20,7 @@ int main (void)
   srunner_add_suite (sr, parse_vcf_suite());
   srunner_add_suite (sr, check_branch_sequences_suite());
   srunner_add_suite (sr, run_gubbins_suite());
+  srunner_add_suite (sr, check_snp_searching_suite());
 
   srunner_run_all (sr, CK_NORMAL);
   number_failed = srunner_ntests_failed (sr);

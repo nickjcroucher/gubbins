@@ -85,9 +85,9 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 	
 	for(i = end_index; i >= 0; i--)
 	{
-		if(snp_locations[i]< window_end_coordinate && child_sequence[i] != '-')
+		if(snp_locations[i]<= window_end_coordinate && child_sequence[i] != '-')
 		{
-			return (snp_locations[i] +1);
+			return (snp_locations[i] );
 		}
 		
 	}

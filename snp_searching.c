@@ -129,7 +129,10 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	{
 		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
 		{
-			number_of_snps_in_block++;
+			if(child_sequence[i] != '-')
+			{
+				number_of_snps_in_block++;
+			}
 		}
 		if(snp_locations[i] > window_end_coordinate)
 		{

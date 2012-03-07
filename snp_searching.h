@@ -27,4 +27,5 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome);
 int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index, int length_of_sequence,  int length_of_original_genome);
 int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations);
+int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int length_of_sequence, int * snp_locations, int * recombinations, int number_of_recombinations);
 #endif

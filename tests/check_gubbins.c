@@ -23,12 +23,12 @@ END_TEST
 
 START_TEST (check_gubbins_no_recombinations)
 {
-	run_gubbins("data/no_recombinations.aln.vcf", "data/no_recombinations.aln.tre", "data/no_recombinations.aln.tre","data/no_recombinations.aln.snp_sites.aln");
+	run_gubbins("data/no_recombinations.aln.vcf", "data/no_recombinations.tre", "data/no_recombinations.aln.phylip","data/no_recombinations.aln.snp_sites.aln");
 	fail_unless(file_exists("data/no_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.phylip") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.snp_sites.aln") == 1);
-
+  
 	remove("data/no_recombinations.tre.tab");
 	remove("data/no_recombinations.tre.vcf");
 	remove("data/no_recombinations.tre.phylip");
@@ -38,7 +38,7 @@ END_TEST
 
 START_TEST (check_gubbins_one_recombination)
 {
-	run_gubbins("data/one_recombination.aln.vcf", "data/one_recombination.aln.tre", "data/one_recombination.aln.tre","data/one_recombination.aln.snp_sites.aln");
+	run_gubbins("data/one_recombination.aln.vcf", "data/one_recombination.tre", "data/one_recombination.aln.phylip","data/one_recombination.aln.snp_sites.aln");
 	fail_unless(file_exists("data/one_recombination.tre.tab") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.vcf") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.phylip") == 1);
@@ -53,7 +53,7 @@ END_TEST
 
 START_TEST (check_gubbins_multiple_recombinations)
 {
-	run_gubbins("data/multiple_recombinations.aln.vcf", "data/multiple_recombinations.aln.tre", "data/multiple_recombinations.aln.tre","data/multiple_recombinations.aln.snp_sites.aln");
+	run_gubbins("data/multiple_recombinations.aln.vcf", "data/multiple_recombinations.tre", "data/multiple_recombinations.aln.phylip","data/multiple_recombinations.aln.snp_sites.aln");
 	fail_unless(file_exists("data/multiple_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.phylip") == 1);

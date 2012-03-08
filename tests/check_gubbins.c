@@ -28,6 +28,8 @@ START_TEST (check_gubbins_no_recombinations)
 	fail_unless(file_exists("data/no_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.phylip") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.snp_sites.aln") == 1);
+	
+  fail_unless(number_of_recombinations_in_file("data/no_recombinations.tre.tab") == 0);
   
 	remove("data/no_recombinations.tre.tab");
 	remove("data/no_recombinations.tre.vcf");
@@ -43,6 +45,8 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(file_exists("data/one_recombination.tre.vcf") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.phylip") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.snp_sites.aln") == 1);
+	
+	fail_unless(number_of_recombinations_in_file("data/one_recombination.tre.tab") == 1);
 
 	remove("data/one_recombination.tre.tab");
 	remove("data/one_recombination.tre.vcf");
@@ -58,6 +62,9 @@ START_TEST (check_gubbins_multiple_recombinations)
 	fail_unless(file_exists("data/multiple_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.phylip") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.snp_sites.aln") == 1);
+	
+	printf("\n\n\n%d\n\n\n",number_of_recombinations_in_file("data/multiple_recombinations.tre.tab"));
+	fail_unless(number_of_recombinations_in_file("data/multiple_recombinations.tre.tab") == 9);
 
 	remove("data/multiple_recombinations.tre.tab");
 	remove("data/multiple_recombinations.tre.vcf");
@@ -77,4 +84,6 @@ Suite * run_gubbins_suite(void)
   suite_add_tcase (s, tc_gubbins);
   return s;
 }
+
+
 

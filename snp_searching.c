@@ -202,13 +202,14 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 		}
 		
 		// If there is a gap in the ancestor, and a base in the child, what happens?
-		if(ancestor_sequence[i] != child_sequence[i]  && child_sequence[i] != '-')
+		if(ancestor_sequence[i] != child_sequence[i]  && child_sequence[i] != '-' && ancestor_sequence[i] != '.' && child_sequence[i] != '.')
 		{
 			branch_snp_coords[number_of_branch_snp_sites] = snp_locations[i];
 			number_of_branch_snp_sites++;
 		}
 	}	
 	branch_snp_coords = realloc(branch_snp_coords, (number_of_branch_snp_sites+1)*sizeof(int));
+	
 	return number_of_branch_snp_sites;
 }
 

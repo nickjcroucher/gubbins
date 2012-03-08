@@ -131,8 +131,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		}
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
-			// All child sequneces should be available use them to find the ancestor sequence
-			leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
+		// All child sequneces should be available use them to find the ancestor sequence
+		leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
 		
 		int * branches_snp_sites[root->childNum];
 		
@@ -190,8 +190,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	double branch_snp_density = 0.0;
 	double block_snp_density = 0.0;
 	int number_of_blocks = 0 ;
-		
-	
+
 	// place to store coordinates of recombinations snps
 	current_node->recombinations = (int *) malloc((length_of_sequence+1)*sizeof(int));
 	

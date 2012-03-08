@@ -222,11 +222,13 @@ END_TEST
 START_TEST (check_calculate_number_of_snps_excluding_gaps)
 {
 
-	char * ancestor_sequence        = "AAAAAAAAAA";
-	char * child_sequence_no_snps   = "AAAAAAAAAA";
-	char * child_sequence_one_snp   = "AAAAACAAAA";
-  char * child_sequence_many_snps = "CAAACAAACC";
-  char * child_sequence_gaps      = "-AAAC----C";
+	char * ancestor_sequence            = "AAAAAAAAAA";
+	char * child_sequence_no_snps       = "AAAAAAAAAA";
+	char * child_sequence_one_snp       = "AAAAACAAAA";
+  char * child_sequence_many_snps     = "CAAACAAACC";
+  char * child_sequence_gaps          = "-AAAC----C";
+  char * child_ancestor_sequence      = ".AAAC....C";
+  char * ancestor_sequence_with_dots  = ".C...C...C";
 
  	int child_sequence_size = 10;
 	int * branch_snp_coords;
@@ -240,6 +242,8 @@ START_TEST (check_calculate_number_of_snps_excluding_gaps)
   fail_unless( calculate_number_of_snps_excluding_gaps(ancestor_sequence, child_sequence_many_snps, child_sequence_size, branch_snp_coords, snp_locations ) == 4 );
   branch_snp_coords = (int *) malloc((child_sequence_size+1)*sizeof(int)); 
   fail_unless( calculate_number_of_snps_excluding_gaps(ancestor_sequence, child_sequence_gaps, child_sequence_size, branch_snp_coords, snp_locations ) == 2 );
+  branch_snp_coords = (int *) malloc((child_sequence_size+1)*sizeof(int)); 
+  fail_unless( calculate_number_of_snps_excluding_gaps(ancestor_sequence_with_dots, child_ancestor_sequence, child_sequence_size, branch_snp_coords, snp_locations ) == 1);
 }
 END_TEST
 

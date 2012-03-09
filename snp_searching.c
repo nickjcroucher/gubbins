@@ -188,7 +188,7 @@ int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index
 	return length_of_original_genome;
 }
 
-int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations)
+int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations, char * reference_bases)
 {
 	int i ;
 	int number_of_branch_snp_sites = 0;
@@ -201,14 +201,20 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 			break;
 		}
 		
-		// If there is a gap in the ancestor, and a base in the child, what happens?
-		if(ancestor_sequence[i] != child_sequence[i]  && child_sequence[i] != '-' && ancestor_sequence[i] != '.' && child_sequence[i] != '.')
+		if(ancestor_sequence[i]  == '.' && child_sequence[i] != '-'  && child_sequence[i] != '.' &&  child_sequence[i] != reference_bases[i] && reference_bases[i] != '-'  &&  reference_bases[i] != 'N')
 		{
 			branch_snp_coords[number_of_branch_snp_sites] = snp_locations[i];
 			number_of_branch_snp_sites++;
 		}
 	}	
 	branch_snp_coords = realloc(branch_snp_coords, (number_of_branch_snp_sites+1)*sizeof(int));
+	
+	//int a = 0;
+	//for(a=0; a< number_of_branch_snp_sites;a++)
+	//{
+	//	printf("%d %c\t",branch_snp_coords[a],child_sequence[a]);	
+	//}
+	//printf(".");
 	
 	return number_of_branch_snp_sites;
 }

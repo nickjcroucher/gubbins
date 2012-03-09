@@ -133,7 +133,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence
 		leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
-		
 		int * branches_snp_sites[root->childNum];
 		
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
@@ -143,7 +142,13 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			
 			int branch_genome_size;
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
-			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations);
+			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations, reference_bases);
+			int b = 0;
+			//printf("num_branch_snps: %d\t%d\t%s\t%s\n",number_of_branch_snps,branch_genome_size,child_sequences[current_branch],leaf_sequence);
+			//for(b = 0; b < number_of_branch_snps; b++)
+			//{
+			//	printf("%d\t",branches_snp_sites[current_branch][b]);
+			//}
 			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root);
 		}
 		
@@ -332,7 +337,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	}
  
 	number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
-		//printf("number_of_branch_snps\t %d\n",number_of_branch_snps);
 
 		//free(candidate_blocks[0]);
 		candidate_blocks[0] = NULL;
@@ -442,7 +446,6 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 	// Reuse the input array
 	for(i=0; i < number_of_blocks; i++)
 	{
-		//printf("a\t%d\t%d\t%d\n",number_of_blocks, block_coordinates[0][i], block_coordinates[1][i]);
 		if(i < current_merged_block)
 		{
 			block_coordinates[0][i] = merged_block_coordinates[0][i];
@@ -453,8 +456,6 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 			block_coordinates[0][i] = 0;
 			block_coordinates[1][i] = 0;
 		}
-		
-		//printf("b\t%d\t%d\t%d\n",number_of_blocks, block_coordinates[0][i], block_coordinates[1][i]);
 	}
 	
 	return current_merged_block;

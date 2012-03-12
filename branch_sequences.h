@@ -44,7 +44,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 #define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3
 #define DEFAULT_SNP_DENSITY 0.000001
 #define WINDOW_SNP_MODE_TARGET 10
-#define MIN_WINDOW_SIZE 100
+#define MIN_WINDOW_SIZE 10
 #define MAX_WINDOW_SIZE 10000
 #define RANDOMNESS_DAMPNER 0.05
 #define MAX_SAMPLE_NAME_SIZE 1024

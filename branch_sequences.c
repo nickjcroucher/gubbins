@@ -198,150 +198,146 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	
 	while(number_of_branch_snps > MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
 	{
-	
-	if(number_of_branch_snps <= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
-	{
-		return;
-	}
-	
-	branch_snp_density = snp_density(branch_genome_size, number_of_branch_snps);
-	
-	window_size = calculate_window_size(branch_genome_size, number_of_branch_snps);
-	// start at the coordinate of the first snp
-	window_start_coordinate = snp_site_coords[0];
-	
-	int number_of_windows = (int) ceil(branch_genome_size/window_size);
-	// start coordinate, end coordinate, likelihood
-		
-	int * block_coordinates[2];
-	
-
-	block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
-	block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
-	number_of_blocks = 0;
-	for(i = 0; i < ceil(branch_genome_size/window_size) && (window_start_coordinate < branch_genome_size); i++)
-	{
-		window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);	
-		if(window_end_coordinate < window_start_coordinate)
+		if(number_of_branch_snps <= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
 		{
-			continue;
+			return;
 		}
+		//printf("%d\t%d\n",branch_genome_size,number_of_branch_snps);
+		branch_snp_density = snp_density(branch_genome_size, number_of_branch_snps);
+		
+		window_size = calculate_window_size(branch_genome_size, number_of_branch_snps);
+		// start at the coordinate of the first snp
+		window_start_coordinate = snp_site_coords[0];
+		
+		int number_of_windows = (int) ceil(branch_genome_size/window_size);
+		// start coordinate, end coordinate, likelihood
 			
-		number_of_snps_in_block = find_number_of_snps_in_block(window_start_coordinate, window_end_coordinate, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-		// the block size = window size, except for the last window
-
-		if(window_end_coordinate - window_start_coordinate < window_size)
-		{
-			block_genome_size_without_gaps = window_end_coordinate - window_start_coordinate;
-		}
-		else
-		{
-			block_genome_size_without_gaps = window_size;
-		}
+		int * block_coordinates[2];
 		
-		int current_window_start_coordinate = window_start_coordinate;
-		window_start_coordinate = window_end_coordinate;
-		// Move to next snp, more efficient but then the adjacent block check doesnt work.
-		//window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);s
-		
-		block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
-		// region with low number of snps so skip over
-		if(block_snp_density < branch_snp_density)
-		{
-			continue;	
-		}
-		
-		// minimum number of snps to be statistically significant in block
-		if(number_of_snps_in_block < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
-		{
-			continue;
-		}
-		
-		if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_snps_in_block) > number_of_snps_in_block)
-		{
-			continue;
-		}
-		
-		block_coordinates[0][number_of_blocks] = current_window_start_coordinate;
-		block_coordinates[1][number_of_blocks] = window_end_coordinate;
-		number_of_blocks++;
-		//printf("c\t%d\t%d\t%d\n",number_of_blocks,current_window_start_coordinate,window_end_coordinate);
-	}
 	
-	// block_coordinates will now contain merged blocks
-	number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks);
-	int * candidate_blocks[3];
-	candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-	candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-	candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-
-	int number_of_candidate_blocks = 0;
-	
-	for(i = 0 ; i < number_of_blocks; i++)
-	{
-		int current_start = block_coordinates[0][i];
-		int current_end = block_coordinates[1][i];
-		int cutoff_value = MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS;
-		int block_snp_count;
-		int loop_counter =0;
-	
-		current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-		current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-		block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-		block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
-		cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-	
-		//printf("%d\t%d\t%d\t%d\t%d\n",current_start,current_end,block_snp_count,block_genome_size_without_gaps,cutoff_value);
-		
-		while(current_start < current_end && block_snp_count >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
-		{
+		block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
+		block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
+		number_of_blocks = 0;
 			
-			// move inwards until pvalue test is satisfied 
-			// move inwards so that the boundrys of the block are snps
-			if(loop_counter > 0)
+		for(i = 0; i < ceil(branch_genome_size*1.0/window_size); i++)
+		{
+			window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);	
+			
+			if(window_end_coordinate < window_start_coordinate)
 			{
-				current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
+				continue;
+			}
+			number_of_snps_in_block = find_number_of_snps_in_block(window_start_coordinate, window_end_coordinate, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			// the block size = window size, except for the last window
+			
+			if(window_end_coordinate - window_start_coordinate <= window_size)
+			{
+				block_genome_size_without_gaps = window_end_coordinate - window_start_coordinate;
+			}
+			else
+			{
+				block_genome_size_without_gaps = window_size;
+			}
+
+			int current_window_start_coordinate = window_start_coordinate;
+			window_start_coordinate = window_end_coordinate;
+			// Move to next snp, more efficient but then the adjacent block check doesnt work.
+			//window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);s
+			
+			block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
+			// region with low number of snps so skip over
+			//printf("%lf\t%lf\t%d\t%d\t%s\n",block_snp_density,branch_snp_density,block_genome_size_without_gaps,number_of_snps_in_block,current_node->taxon_names);
+			if(block_snp_density < branch_snp_density)
+			{
+				continue;	
+			}
+
+			// minimum number of snps to be statistically significant in block
+			if(number_of_snps_in_block < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+			{
+				continue;
+			}
+			
+			if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_snps_in_block) > number_of_snps_in_block)
+			{
+
+				continue;
+			}
+			
+			block_coordinates[0][number_of_blocks] = current_window_start_coordinate;
+			block_coordinates[1][number_of_blocks] = window_end_coordinate;
+			number_of_blocks++;
+		}
+
+		// block_coordinates will now contain merged blocks
+		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks);
+		int * candidate_blocks[3];
+		candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+		candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+		candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+	
+		int number_of_candidate_blocks = 0;
+		
+		for(i = 0 ; i < number_of_blocks; i++)
+		{
+			int current_start = block_coordinates[0][i];
+			int current_end = block_coordinates[1][i];
+			int cutoff_value = MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS;
+			int block_snp_count;
+			int loop_counter =0;
+		
+			current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
+			cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+		
+			//printf("%d\t%d\t%d\t%d\t%d\n",current_start,current_end,block_snp_count,block_genome_size_without_gaps,cutoff_value);
+			
+			while(current_start < current_end && block_snp_count >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
+			{
+				// move inwards until pvalue test is satisfied 
+				// move inwards so that the boundrys of the block are snps
+				if(loop_counter > 0)
+				{
+					current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+					current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+					block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+					block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
+				}
+			
+				if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count) == 1)
+				{
+					candidate_blocks[0][number_of_candidate_blocks] = current_start;
+					candidate_blocks[1][number_of_candidate_blocks] = current_end;
+					// TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
+					candidate_blocks[2][number_of_candidate_blocks] = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+					number_of_candidate_blocks++;
+					break;
+				}
+				// TODO need a more intelligent way to move inwards.
+				current_start++;
+				current_end--;
+				
+				if(loop_counter > 0)
+				{
+					cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+				}
+				loop_counter++;
 			}
 		
-			if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count) == 1)
-			{
-				candidate_blocks[0][number_of_candidate_blocks] = current_start;
-				candidate_blocks[1][number_of_candidate_blocks] = current_end;
-				// TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
-				candidate_blocks[2][number_of_candidate_blocks] = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-				number_of_candidate_blocks++;
-				break;
-			}
-			// TODO need a more intelligent way to move inwards.
-			current_start++;
-			current_end--;
-			
-			if(loop_counter > 0)
-			{
-				cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-			}
-			loop_counter++;
+		// calc and save likelihood
 		}
+		if(number_of_candidate_blocks == 0 )
+		{
+			return;	
+		}
+		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
 	
-	// calc and save likelihood
-	}
-	if(number_of_candidate_blocks == 0 )
-	{
-		return;	
-	}
- 
-	number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
-
-		//free(candidate_blocks[0]);
-		candidate_blocks[0] = NULL;
-		//free(candidate_blocks[1]);
-		candidate_blocks[1] = NULL;
-		//free(candidate_blocks[2]);
-		candidate_blocks[2] = NULL;
-
+	  candidate_blocks[0] = NULL;
+	  candidate_blocks[1] = NULL;
+	  candidate_blocks[2] = NULL;
+	
 	}
 }
 
@@ -415,16 +411,15 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 	int i;
 	int merged_block_coordinates[2][number_of_blocks];
 	int current_merged_block = 0;
-	
+
 	if(number_of_blocks == 0)
 	{
 		return number_of_blocks;	
 	}
 	
 	merged_block_coordinates[0][current_merged_block] = block_coordinates[0][current_merged_block];
-	merged_block_coordinates[1][current_merged_block] = block_coordinates[1][current_merged_block];
-	current_merged_block++;
-	
+	merged_block_coordinates[1][current_merged_block] = block_coordinates[1][current_merged_block];	
+
 	for(i=1; i < number_of_blocks; i++)
 	{
 		if( block_coordinates[0][i] <= merged_block_coordinates[1][current_merged_block] && (block_coordinates[1][i] - merged_block_coordinates[0][current_merged_block]) < MAX_WINDOW_SIZE)
@@ -433,12 +428,14 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 		}
 		else
 		{
+			current_merged_block++;
 			merged_block_coordinates[0][current_merged_block] = block_coordinates[0][i];
 			merged_block_coordinates[1][current_merged_block] = block_coordinates[1][i];
-			current_merged_block++;
+			
 		}
 		
 	}
+	current_merged_block++;
 	
 	// Reuse the input array
 	for(i=0; i < number_of_blocks; i++)
@@ -454,7 +451,6 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 			block_coordinates[1][i] = 0;
 		}
 	}
-	
 	return current_merged_block;
 }
 

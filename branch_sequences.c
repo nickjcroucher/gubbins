@@ -422,7 +422,7 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 
 	for(i=1; i < number_of_blocks; i++)
 	{
-		if( block_coordinates[0][i] <= merged_block_coordinates[1][current_merged_block] && (block_coordinates[1][i] - merged_block_coordinates[0][current_merged_block]) < MAX_WINDOW_SIZE)
+		if( block_coordinates[0][i]-1 <= merged_block_coordinates[1][current_merged_block] && (block_coordinates[1][i] - merged_block_coordinates[0][current_merged_block]) < MAX_WINDOW_SIZE)
 		{
 			merged_block_coordinates[1][current_merged_block] = block_coordinates[1][i];
 		}

@@ -48,7 +48,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	fail_unless(file_exists("data/multiple_recombinations.tre.phylip") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
-	fail_unless(number_of_recombinations_in_file("data/multiple_recombinations.tre.tab") == 9);
+	fail_unless(number_of_recombinations_in_file("data/multiple_recombinations.tre.tab") == 4);
 
 	remove("data/multiple_recombinations.tre.tab");
 	remove("data/multiple_recombinations.tre.vcf");

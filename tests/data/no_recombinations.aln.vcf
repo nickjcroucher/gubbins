@@ -1,0 +1,9 @@
+##fileformat=VCFv4.1
+##INFO=<ID=AB,Number=1,Type=String,Description="Alt Base">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sequence_1	sequence_2	sequence_3	sequence_4	sequence_5	sequence_6	sequence_7	sequence_8	sequence_9	sequence_10	
+1	15	.	A	G	.	.	AB	.	.	.	.	.	G	G	G	G	G	G
+1	21	.	A	C	.	.	AB	.	.	C	C	C	.	.	.	.	.	.
+1	23	.	A	G	.	.	AB	.	.	.	.	.	.	.	G	G	G	.
+1	27	.	A	C	.	.	AB	.	.	.	.	.	.	C	C	C	.	.
+1	34	.	A	T	.	.	AB	.	.	.	T	T	.	.	.	.	.	.
+1	40	.	A	G	.	.	AB	.	.	.	.	G	.	.	.	.	.	.

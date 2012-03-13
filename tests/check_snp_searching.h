@@ -17,20 +17,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _GUBBINS_H_
-#define _GUBBINS_H_
+#ifndef _CHECK_SNP_SEARCHING_H_
+#define _CHECK_SNP_SEARCHING_H_
 
-#include "seqUtil.h"
-#include "Newickform.h"
-
-void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[], char multi_fasta_filename[]);
-void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[]);
-char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
-char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences);
-
-#define MAX_EDGES_IN_TREE 20000
-#define MAX_SAMPLE_NAME_SIZE 1024
-
+ Suite * check_snp_searching_suite(void);
+ 
 #endif
 
 

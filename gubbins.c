@@ -121,13 +121,16 @@ char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequen
 			ancestor_sequence[base_position] == '\0';
 			break;
 		}
-		
 		found_snp = 0;
+		
+		char sequence_for_comparison;
+		sequence_for_comparison = find_first_real_base(base_position, number_of_child_sequences, child_sequences);
 		
 		for(sequence_number = 1; sequence_number < number_of_child_sequences; sequence_number++)	
 		{
-			if(child_sequences[0][base_position] != child_sequences[sequence_number][base_position])
+			if(sequence_for_comparison != child_sequences[sequence_number][base_position] && child_sequences[sequence_number][base_position] != '.' && child_sequences[sequence_number][base_position] != '-' && child_sequences[sequence_number][base_position] != 'N')
 			{
+				
 				found_snp = 1;
 				break;
 			}
@@ -138,7 +141,7 @@ char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequen
 		}
 		else
 		{
-			ancestor_sequence[base_position] = child_sequences[0][base_position];
+			ancestor_sequence[base_position] = sequence_for_comparison;
 		}
 		
 	}
@@ -150,6 +153,19 @@ char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequen
 	
 	
 	return ancestor_sequence;
+}
+
+char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences)
+{
+	int i = 0; 
+	for(i =0; i< number_of_child_sequences; i++)
+	{
+	  if(child_sequences[i][base_position] != 'N' && child_sequences[i][base_position] != '-' && child_sequences[i][base_position] != '.')
+		{
+			return child_sequences[i][base_position];
+		}
+	}
+	return child_sequences[0][base_position];
 }
 
 

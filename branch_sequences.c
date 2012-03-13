@@ -332,7 +332,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		{
 			return;	
 		}
-		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root  );
+		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence );
 	
 	  candidate_blocks[0] = NULL;
 	  candidate_blocks[1] = NULL;
@@ -350,9 +350,8 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 	
 	for(i = 0 ; i< number_of_branch_snps; i++)
 	{
-		if(snp_site_coords[i]>= window_start_coordinate && snp_site_coords[i] < window_end_coordinate)
+		if(snp_site_coords[i]>= window_start_coordinate && snp_site_coords[i] <= window_end_coordinate)
 		{
-			
 		}
 		else
 		{
@@ -363,12 +362,14 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 	
 	for(i = 0; i < number_of_branch_snps_excluding_block; i++)
 	{
-		snp_site_coords[i] = updated_snp_site_coords[i];
+	  snp_site_coords[i] = updated_snp_site_coords[i];
 	}
+	
+	snp_site_coords = realloc(snp_site_coords, (number_of_branch_snps_excluding_block+1)*sizeof(int));
 	return number_of_branch_snps_excluding_block;
 }
 
-int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root)
+int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps)
 {
 	int number_of_branch_snps_excluding_block = number_of_branch_snps;
 	if(number_of_candidate_blocks > 0)
@@ -376,7 +377,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		int smallest_index = 0;
     int number_of_recombinations_in_window = 0;
 		smallest_index = get_smallest_log_likelihood(candidate_blocks, number_of_candidate_blocks);
-		number_of_recombinations_in_window = flag_recombinations_in_window(candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],number_of_branch_snps, snp_site_coords, recombinations, number_of_recombinations);	
+		number_of_recombinations_in_window = flag_recombinations_in_window(candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],number_of_branch_snps, snp_site_coords, recombinations, number_of_recombinations,snp_locations,total_num_snps);	
     number_of_recombinations += number_of_recombinations_in_window;
 		number_of_branch_snps_excluding_block = exclude_snp_sites_in_block(candidate_blocks[0][smallest_index],candidate_blocks[1][smallest_index], snp_site_coords,number_of_branch_snps);
 		

@@ -38,7 +38,7 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks);
 int get_smallest_log_likelihood(int ** candidate_blocks, int number_of_candidate_blocks);
 int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_site_coords, int number_of_branch_snps);
-int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root );
+int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps);
 
 
 #define MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS 3

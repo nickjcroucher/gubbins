@@ -214,25 +214,30 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 }
 
 
-int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int number_of_snps, int * snp_locations, int * recombinations, int number_of_recombinations)
+int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int number_of_snps, int * branch_snp_sites, int * recombinations, int number_of_recombinations,int * snp_locations, int total_num_snps)
 {
 	int i;
 	int number_of_snps_in_block = 0;
-	int start_index = find_starting_index( window_start_coordinate, snp_locations, 0, number_of_snps);
+	int start_index = find_starting_index( window_start_coordinate, branch_snp_sites, 0, number_of_snps);
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
+		if(branch_snp_sites[i]>= window_start_coordinate && branch_snp_sites[i] <= window_end_coordinate )
 		{
-			recombinations[number_of_recombinations+number_of_snps_in_block] = i;
+			recombinations[number_of_recombinations+number_of_snps_in_block] = find_matching_coordinate_index(branch_snp_sites[i],snp_locations, total_num_snps, i);
 			number_of_snps_in_block++;
 		}
-		if(snp_locations[i] > window_end_coordinate)
+		if(branch_snp_sites[i] > window_end_coordinate)
 		{
 			break;	
 		}
 	}
 	return number_of_snps_in_block;
+}
+
+int find_matching_coordinate_index(int window_start_coordinate, int * snp_sites, int number_of_snps, int starting_index)
+{
+	return find_starting_index( window_start_coordinate, snp_sites, starting_index, number_of_snps);
 }
 
 

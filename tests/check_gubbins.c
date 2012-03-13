@@ -32,6 +32,7 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(file_exists("data/one_recombination.tre.snp_sites.aln") == 1);
 	
 	fail_unless(number_of_recombinations_in_file("data/one_recombination.tre.tab") == 1);
+	fail_unless(compare_files("data/one_recombination.tre.vcf","data/one_recombination.expected.vcf") == 1);
 
 	remove("data/one_recombination.tre.tab");
 	remove("data/one_recombination.tre.vcf");

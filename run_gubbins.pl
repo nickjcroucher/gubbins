@@ -35,6 +35,7 @@ system("$gubbins_exec -s $ARGV[0]");
 my $current_time = time();
 
 my $base_filename = $filename.$suffix;
+my $starting_base_filename = $base_filename;
 
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
@@ -47,7 +48,7 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
     $previous_tree = "-t $previous_tree_name";
     $base_filename = $previous_tree_name;
    }
-  system("$tree_builder_exec -s $previous_tree_name.phylip -n $filename.$current_time.iteration_$i $previous_tree");
-  system("$gubbins_exec -r $input_multi_fasta_alignment_file $base_filename.vcf $current_tree $base_filename.phylip");
+  system("$tree_builder_exec -s $starting_base_filename.phylip -n $filename.$current_time.iteration_$i $previous_tree");
+  system("$gubbins_exec -r $input_multi_fasta_alignment_file $starting_base_filename.vcf $current_tree $starting_base_filename.phylip");
 }
 

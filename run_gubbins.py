@@ -23,6 +23,7 @@ subprocess.call([GUBBINS_EXEC, "-s", args.alignment_filename])
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
+starting_base_filename = base_filename
 
 current_time = int(time.time())
 
@@ -37,10 +38,9 @@ for i in range(1, args.iterations+1):
     base_filename = previous_tree_name
 
   tree_building_command = TREE_BUILDER_EXEC+ " -s "+previous_tree_name+".phylip -n "+base_filename_without_ext+"."+str(current_time)+".iteration_"+str(i)+" "+previous_tree
-  gubbins_command = GUBBINS_EXEC+" -r "+ args.alignment_filename+" "+base_filename+".vcf "+str(current_tree)+" "+base_filename+".phylip"
+  gubbins_command = GUBBINS_EXEC+" -r "+ args.alignment_filename+" "+starting_base_filename+".vcf "+str(current_tree)+" "+starting_base_filename+".phylip"
   print tree_building_command
   print gubbins_command
   
   #subprocess.call(tree_building_command)
   #subprocess.call(gubbins_command)
-  

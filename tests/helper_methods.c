@@ -44,6 +44,26 @@ int compare_files(char expected_output_filename[],char actual_output_filename[] 
   return 0;
 }
 
+int number_of_recombinations_in_file(char * fileName)
+{
+	FILE *file = fopen(fileName, "r");
+	int ch, prev = '\n', lines = 0;
+	while ( (ch = fgetc(file)) != EOF )
+	{
+		if ( ch == '\n' )
+		{
+			++lines; 
+		}
+		prev = ch; 
+	}
+	fclose(file);
+	if ( prev != '\n' ) 
+	{
+		++lines;
+	}
+  return  (int) lines/5;
+}
+
 int file_exists(char * fileName)
 {
    struct stat buf;

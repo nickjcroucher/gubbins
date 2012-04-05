@@ -61,6 +61,7 @@ my $iteration_base_name = $base_filename.".iteration_0";
 rename("$base_filename.vcf", "$iteration_base_name.vcf");
 rename("$base_filename.phylip", "$iteration_base_name.phylip");
 rename("$base_filename.snp_sites.aln", "$iteration_base_name.snp_sites.aln");
+my $starting_base_name = $iteration_base_name;
 
 for(my $i = 1; $i <= $number_of_iterations; $i++)
 {
@@ -78,7 +79,7 @@ for(my $i = 1; $i <= $number_of_iterations; $i++)
 	}
 
  my $tree_building_cmd = "$tree_building_exec $input_tree $tree_building_params $previous_iteration_base_name.snp_sites.aln   > $iteration_base_name";
- my $gubbins_recombinations_cmd = "$gubbins_exec -r $alignment_file $previous_iteration_base_name.vcf $iteration_base_name $previous_iteration_base_name.phylip";
+ my $gubbins_recombinations_cmd = "$gubbins_exec -r $alignment_file $starting_base_name.vcf $iteration_base_name $starting_base_name.phylip";
 
  print "$tree_building_cmd\n";
  system($tree_building_cmd);

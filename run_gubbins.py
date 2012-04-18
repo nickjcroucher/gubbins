@@ -6,6 +6,12 @@ import subprocess
 import os
 import time
 from Bio import Phylo
+import dendropy
+
+def robinson_foulds_distance(input_tree_name,output_tree_name):
+  input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
+  output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
+  input_tree.robinson_foulds_distance(output_tree)
 
 def reroot_tree_with_outgroup(tree_name, outgroup):
   if outgroup:
@@ -35,6 +41,8 @@ starting_base_filename = base_filename
 
 current_time = int(time.time())
 
+previous_robinson_foulds_distance = 0
+
 for i in range(1, args.iterations+1):
   current_tree = "RAxML_result."+base_filename_without_ext+"."+str(current_time) +".iteration_"+str(i)
   previous_tree_name = base_filename
@@ -54,7 +62,11 @@ for i in range(1, args.iterations+1):
   reroot_tree_with_outgroup(str(current_tree), args.outgroup)
   #subprocess.call(gubbins_command)
 
-
+  current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree):
+  if current_robinson_foulds_distance == previous_robinson_foulds_distance:
+    last
+  else
+    previous_robinson_foulds_distance = current_robinson_foulds_distance
 
   
   

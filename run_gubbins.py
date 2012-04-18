@@ -62,11 +62,9 @@ for i in range(1, args.iterations+1):
   reroot_tree_with_outgroup(str(current_tree), args.outgroup)
   #subprocess.call(gubbins_command)
 
-  current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree):
+  current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree)
   if current_robinson_foulds_distance == previous_robinson_foulds_distance:
-    last
+    break
   else
     previous_robinson_foulds_distance = current_robinson_foulds_distance
-
-  
   

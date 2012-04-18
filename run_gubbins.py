@@ -5,6 +5,14 @@ import argparse
 import subprocess
 import os
 import time
+from Bio import Phylo
+
+def reroot_tree_with_outgroup(tree_name, outgroup):
+  if outgroup:
+    tree = Phylo.read(tree_name, 'newick')
+    print tree
+    tree.root_with_outgroup({'name': outgroup})
+    Phylo.write(tree, tree_name, 'newick')
 
 # config variables
 TREE_BUILDER_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
@@ -43,4 +51,10 @@ for i in range(1, args.iterations+1):
   print gubbins_command
   
   #subprocess.call(tree_building_command)
+  reroot_tree_with_outgroup(str(current_tree), args.outgroup)
   #subprocess.call(gubbins_command)
+
+
+
+  
+  

@@ -22,6 +22,7 @@
 #include "seqUtil.h"
 #include "Newickform.h"
 #include "branch_sequences.h"
+#include "gff_file.h"
 
 
 #define STR_OUT	"out"
@@ -68,13 +69,21 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	// Parse tree string
 	root = parseTree(pcTreeStr);
 	
+	// output tab file
   FILE * block_file_pointer;
   char block_file_name[MAX_FILENAME_SIZE];
   strcpy(block_file_name, filename);
 	block_file_pointer = fopen(strcat(block_file_name,".tab"), "w");
 	
+	// output gff file
+	FILE * gff_file_pointer;
+  char gff_file_name[MAX_FILENAME_SIZE];
+  strcpy(gff_file_name, filename);
+	gff_file_pointer = fopen(strcat(gff_file_name,".gff"), "w");
+	print_gff_header(gff_file_pointer,length_of_original_genome);
+	
 	char * root_sequence;
-	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer);
+	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer);
 	//printf("\n\n\n\n%s\n\n\n\n", root_sequence);
 	int * parent_recombinations;
 	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases);
@@ -83,6 +92,8 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	//seqFree(pcTreeStr);
 	// End memory management procedure and free all allocated space
 	//seqFreeAll();
+	fclose(block_file_pointer);
+	fclose(gff_file_pointer);
 }
 
 

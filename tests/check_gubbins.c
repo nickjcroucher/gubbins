@@ -13,12 +13,16 @@ START_TEST (check_gubbins_no_recombinations)
 	fail_unless(file_exists("data/no_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.phylip") == 1);
 	fail_unless(file_exists("data/no_recombinations.tre.snp_sites.aln") == 1);
+	fail_unless(file_exists("data/no_recombinations.tre.stats") == 1);
+	fail_unless(file_exists("data/no_recombinations.tre.gff") == 1);
 	
   fail_unless(number_of_recombinations_in_file("data/no_recombinations.tre.tab") == 0);
   
 	remove("data/no_recombinations.tre.tab");
 	remove("data/no_recombinations.tre.vcf");
 	remove("data/no_recombinations.tre.phylip");
+	remove("data/no_recombinations.tre.stats");
+	remove("data/no_recombinations.tre.gff");
 	remove("data/no_recombinations.tre.snp_sites.aln");
 }
 END_TEST
@@ -29,14 +33,19 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(file_exists("data/one_recombination.tre.tab") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.vcf") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.phylip") == 1);
+	fail_unless(file_exists("data/one_recombination.tre.stats") == 1);
+	fail_unless(file_exists("data/one_recombination.tre.gff") == 1);
 	fail_unless(file_exists("data/one_recombination.tre.snp_sites.aln") == 1);
 	
 	fail_unless(number_of_recombinations_in_file("data/one_recombination.tre.tab") == 1);
 	fail_unless(compare_files("data/one_recombination.tre.vcf","data/one_recombination.expected.vcf") == 1);
+	fail_unless(compare_files("data/one_recombination.tre.stats","data/one_recombination.expected.stats") == 1);
 
 	remove("data/one_recombination.tre.tab");
 	remove("data/one_recombination.tre.vcf");
 	remove("data/one_recombination.tre.phylip");
+	remove("data/one_recombination.tre.stats");
+	remove("data/one_recombination.tre.gff");
 	remove("data/one_recombination.tre.snp_sites.aln");
 }
 END_TEST
@@ -47,6 +56,8 @@ START_TEST (check_gubbins_multiple_recombinations)
 	fail_unless(file_exists("data/multiple_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.phylip") == 1);
+	fail_unless(file_exists("data/multiple_recombinations.tre.stats") == 1);
+	fail_unless(file_exists("data/multiple_recombinations.tre.gff") == 1);
 	fail_unless(file_exists("data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
 	fail_unless(number_of_recombinations_in_file("data/multiple_recombinations.tre.tab") == 4);
@@ -54,6 +65,8 @@ START_TEST (check_gubbins_multiple_recombinations)
 	remove("data/multiple_recombinations.tre.tab");
 	remove("data/multiple_recombinations.tre.vcf");
 	remove("data/multiple_recombinations.tre.phylip");
+	remove("data/multiple_recombinations.tre.stats");
+	remove("data/multiple_recombinations.tre.gff");
 	remove("data/multiple_recombinations.tre.snp_sites.aln");
 }
 END_TEST

@@ -42,7 +42,7 @@ void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename
 {
 	load_sequences_from_phylib_file(phylip_filename);
 	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename);
-	create_tree_statistics_file(tree_filename);
+	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
 }
 
 

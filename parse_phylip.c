@@ -100,6 +100,12 @@ int number_of_samples_from_parse_phylip()
 	return num_samples;
 }
 
+sample_statistics ** get_sample_statistics()
+{
+	return statistics_for_samples;
+}
+
+
 void get_sample_names_from_parse_phylip(char ** sample_names)
 {
 	int i;
@@ -205,8 +211,10 @@ void initialise_statistics()
 	for(i=0; i< num_samples; i++)
 	{
 		sample_statistics * sample_statistics_placeholder;
-		sample_statistics_placeholder->sample_name = (char*) malloc((strlen(phylip_sample_names[i]) + 1)*sizeof(char*));
-		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], strlen(phylip_sample_names[i]));
+		sample_statistics_placeholder = (sample_statistics *) malloc(sizeof(sample_statistics));
+		
+		sample_statistics_placeholder->sample_name = (char *) malloc( MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], MAX_SAMPLE_NAME_SIZE);
 		
 		statistics_for_samples[i] = sample_statistics_placeholder;
 	}

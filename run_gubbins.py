@@ -62,9 +62,15 @@ for i in range(1, args.iterations+1):
   reroot_tree_with_outgroup(str(current_tree), args.outgroup)
   #subprocess.call(gubbins_command)
 
-  current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree)
-  if current_robinson_foulds_distance == previous_robinson_foulds_distance:
-    break
-  else
-    previous_robinson_foulds_distance = current_robinson_foulds_distance
+  # first iteration creates tree 1
+  # 2nd iteration creates tree 2, and you can calculate first RF distance
+  # 3rd iteration creates tree 3, and you can now compare RF distances with the previous iteration
+  if i> 1:
+    previous_robinson_foulds_distance = robinson_foulds_distance(previous_tree_name,current_tree)
+  else if i > 2:
+    current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree)
+    if math.ceil(current_robinson_foulds_distance) == math.ceil(previous_robinson_foulds_distance):
+      break
+    else
+      previous_robinson_foulds_distance = current_robinson_foulds_distance
   

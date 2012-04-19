@@ -69,6 +69,8 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		int sequence_index;
 		sequence_index = find_sequence_index_from_sample_name(root->taxon);
 		
+		set_number_of_recombinations_for_sample(root->taxon,num_current_recombinations);
+		
 		for(i = 0; i < num_current_recombinations; i++)
 		{
 			int snp_index;
@@ -96,6 +98,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	newick_child *child;
 	int child_counter = 0;
 	int current_branch =0;
+	int branch_genome_size = 0;
+	int number_of_branch_snps=0;
   root->current_node_id = ++node_counter;
 	
 	if (root->childNum == 0)
@@ -105,6 +109,12 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
     strcpy(root->taxon_names, root->taxon);
+
+    // Save some statistics about the sequence
+		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
+		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
+		int number_of_gaps = length_of_original_genome-branch_genome_size;
+		set_number_of_snps_for_sample(root->taxon,number_of_snps - number_of_gaps);
 		
 		return leaf_sequence;
 	}
@@ -137,12 +147,10 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
-			int number_of_branch_snps=0;
 			branches_snp_sites[current_branch] = (int *) malloc((number_of_snps +1)*sizeof(int));
 			char * branch_snp_sequence;
 			branch_snp_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			
-			int branch_genome_size;
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
 			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations, reference_bases,branch_snp_sequence);
 			

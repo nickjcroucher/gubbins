@@ -28,6 +28,7 @@ int num_samples;
 int num_snps;
 char ** sequences;
 char ** phylip_sample_names;
+sample_statistics ** statistics_for_samples;
 
 
 void update_sequence_base(char new_sequence_base, int sequence_index, int base_index)
@@ -146,6 +147,43 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 }
 
 
+void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations)
+{
+	int sample_index ;
+	sample_index = find_sequence_index_from_sample_name( sample_name);
+  if( sample_index == -1)
+  {
+		return;
+	}
+	((sample_statistics *) statistics_for_samples[sample_index])->number_of_recombinations = number_of_recombinations;
+}
+
+
+void set_number_of_snps_for_sample(char * sample_name, int number_of_snps)
+{
+	int sample_index ;
+	sample_index = find_sequence_index_from_sample_name( sample_name);
+  if( sample_index == -1)
+  {
+		return;
+	}
+	
+	((sample_statistics *) statistics_for_samples[sample_index])->number_of_snps = number_of_snps;
+}
+
+void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps)
+{
+	int sample_index ;
+	sample_index = find_sequence_index_from_sample_name( sample_name);
+  if( sample_index == -1)
+  {
+		return;
+	}
+	
+	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_without_gaps = genome_length_without_gaps;
+}
+
+
 int find_sequence_index_from_sample_name( char * sample_name)
 {
 	int i;
@@ -158,6 +196,20 @@ int find_sequence_index_from_sample_name( char * sample_name)
 		}
 	}
 	return -1;
+}
+
+void initialise_statistics()
+{
+	int i=0;
+	statistics_for_samples = (sample_statistics **) malloc((num_samples+1)*sizeof(sample_statistics *));
+	for(i=0; i< num_samples; i++)
+	{
+		sample_statistics * sample_statistics_placeholder;
+		sample_statistics_placeholder->sample_name = (char*) malloc((strlen(phylip_sample_names[i]) + 1)*sizeof(char*));
+		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], strlen(phylip_sample_names[i]));
+		
+		statistics_for_samples[i] = sample_statistics_placeholder;
+	}
 }
 
 
@@ -235,6 +287,7 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 
 	}while(line_buffer[0] != '\0');
 	
+	initialise_statistics();
 }
 
 int get_number_of_samples_from_phylip(char * phylip_string)

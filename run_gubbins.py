@@ -25,7 +25,6 @@ def robinson_foulds_distance(input_tree_name,output_tree_name):
 def reroot_tree_with_outgroup(tree_name, outgroup):
   if outgroup:
     tree = Phylo.read(tree_name, 'newick')
-    print tree
     tree.root_with_outgroup({'name': outgroup})
     Phylo.write(tree, tree_name, 'newick')
     

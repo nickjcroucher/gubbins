@@ -14,7 +14,7 @@ from array import *
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
-GUBBINS_EXEC = './gubbins'
+GUBBINS_EXEC = 'gubbins'
 
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')

@@ -7,6 +7,7 @@ import os
 import time
 from Bio import Phylo
 import dendropy
+import math
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'

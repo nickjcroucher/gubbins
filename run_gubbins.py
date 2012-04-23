@@ -7,6 +7,7 @@ import os
 import time
 from Bio import Phylo
 import dendropy
+from array import *
 
 
 # config variables
@@ -101,7 +102,7 @@ starting_base_filename = base_filename
 
 current_time = int(time.time())
 
-previous_robinson_foulds_distance = 0
+previous_robinson_foulds_distances = array('d',[])
 
 tree_building_command = ""
 gubbins_command       = ""
@@ -158,14 +159,16 @@ for i in range(1, args.iterations+1):
   # 2nd iteration creates tree 2, and you can calculate first RF distance
   # 3rd iteration creates tree 3, and you can now compare RF distances with the previous iteration
   if i == 2:
-    previous_robinson_foulds_distance = robinson_foulds_distance(previous_tree_name,current_tree_name)
+    previous_robinson_foulds_distances.append(robinson_foulds_distance(previous_tree_name,current_tree_name))
   elif i > 2:
     current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)
     if args.verbose > 0:
-      print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distance) +", "+ str(current_robinson_foulds_distance)
-    if current_robinson_foulds_distance == previous_robinson_foulds_distance:
+      print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distances) +", "+ str(current_robinson_foulds_distance)
+      
+    try:
+      previous_robinson_foulds_distances.index(current_robinson_foulds_distance)
       break
-    else:
-      previous_robinson_foulds_distance = current_robinson_foulds_distance
-  
+    except ValueError:
+      previous_robinson_foulds_distances.append(current_robinson_foulds_distance)
+
   

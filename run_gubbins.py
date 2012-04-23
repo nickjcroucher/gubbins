@@ -86,7 +86,7 @@ parser = argparse.ArgumentParser(description='Iteratively detect recombinations'
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
-parser.add_argument('--verbose',          '-v', help='Debugging output')
+parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging')
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree), default is to use RAxML for 1st iteration and FastTree for rest', default = "hybrid")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', default = 5)
 args = parser.parse_args()
@@ -139,12 +139,14 @@ for i in range(1, args.iterations+1):
     tree_building_command = fasttree_tree_building_command(i, args.starting_tree, previous_tree_name,current_tree_name )
     gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename)
   
-  print tree_building_command  if args.verbose
+  if args.verbose > 0:
+    print tree_building_command
   subprocess.call(tree_building_command, shell=True)
   
   reroot_tree_with_outgroup(str(current_tree), args.outgroup)
   
-  print gubbins_command if args.verbose
+  if args.verbose > 0:
+    print gubbins_command
   subprocess.call(gubbins_command, shell=True)
   
   # first iteration creates tree 1

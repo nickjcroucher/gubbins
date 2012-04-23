@@ -10,7 +10,7 @@ import dendropy
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
-FASTTREE_EXEC = '/software/pathogen/external/apps/usr/local/fasttree/FastTree'
+FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = './gubbins'
 

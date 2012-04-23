@@ -17,7 +17,7 @@ GUBBINS_EXEC = './gubbins'
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
   output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-  input_tree.robinson_foulds_distance(output_tree)
+  return input_tree.robinson_foulds_distance(output_tree)
 
 
 def reroot_tree_with_outgroup(tree_name, outgroup):
@@ -28,7 +28,7 @@ def reroot_tree_with_outgroup(tree_name, outgroup):
     Phylo.write(tree, tree_name, 'newick')
     
 def raxml_current_tree_name(base_filename_without_ext,current_time, i):
-  "RAxML_result."+base_filename_without_ext+"."+str(current_time) +".iteration_"+str(i)
+  return "RAxML_result."+base_filename_without_ext+"."+str(current_time) +".iteration_"+str(i)
     
     
 def raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i):

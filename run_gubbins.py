@@ -64,9 +64,8 @@ def fasttree_current_tree_name(base_filename, i):
 def fasttree_previous_tree_name(base_filename, i):
   return base_filename+".iteration_"+str(i-1)
 
-def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_base_filename ):
+def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_base_filename, previous_tree_name ):
   current_tree_name = fasttree_current_tree_name(base_filename, i)
-  previous_tree_name = fasttree_previous_tree_name(base_filename, i)
   
   input_tree = ""
   if starting_tree is not None:
@@ -119,12 +118,12 @@ for i in range(1, args.iterations+1):
     elif i == 2:
       previous_tree_name    = current_tree_name
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
-      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename )
+      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename,previous_tree_name )
       gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename)
     else:
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
-      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename )
+      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename,previous_tree_name )
       gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename)
   
   elif args.tree_builder == "raxml":
@@ -141,7 +140,7 @@ for i in range(1, args.iterations+1):
       os.rename(base_filename+".vcf",           previous_tree_name+".vcf")
       os.rename(base_filename+".phylip",        previous_tree_name+".phylip")
       os.rename(base_filename+".snp_sites.aln", previous_tree_name+".snp_sites.aln")
-    tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename )
+    tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,args.alignment_filename,previous_tree_name )
     gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename)
   
   if args.verbose > 0:

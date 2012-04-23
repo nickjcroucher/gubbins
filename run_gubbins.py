@@ -162,7 +162,7 @@ for i in range(1, args.iterations+1):
   elif i > 2:
     current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)
     if args.verbose > 0:
-      print "RF Distance (previous, current): "+ previous_robinson_foulds_distance +", "+ current_robinson_foulds_distance
+      print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distance) +", "+ str(current_robinson_foulds_distance)
     if math.ceil(current_robinson_foulds_distance) == math.ceil(previous_robinson_foulds_distance):
       break
     else:

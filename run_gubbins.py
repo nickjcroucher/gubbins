@@ -7,7 +7,7 @@ import os
 import time
 from Bio import Phylo
 import dendropy
-import math
+
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
@@ -163,7 +163,7 @@ for i in range(1, args.iterations+1):
     current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)
     if args.verbose > 0:
       print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distance) +", "+ str(current_robinson_foulds_distance)
-    if math.ceil(current_robinson_foulds_distance) == math.ceil(previous_robinson_foulds_distance):
+    if current_robinson_foulds_distance == previous_robinson_foulds_distance:
       break
     else:
       previous_robinson_foulds_distance = current_robinson_foulds_distance

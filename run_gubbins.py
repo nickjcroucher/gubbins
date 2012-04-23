@@ -156,7 +156,7 @@ for i in range(1, args.iterations+1):
   # first iteration creates tree 1
   # 2nd iteration creates tree 2, and you can calculate first RF distance
   # 3rd iteration creates tree 3, and you can now compare RF distances with the previous iteration
-  if i> 1:
+  if i == 2:
     previous_robinson_foulds_distance = robinson_foulds_distance(previous_tree_name,current_tree_name)
   elif i > 2:
     current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)

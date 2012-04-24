@@ -3,5 +3,5 @@ gubbins
 tests/run_all_tests
 .DS_Store
 Makefile
-Makefile.in
 src/.deps
+autom4te.cache/*

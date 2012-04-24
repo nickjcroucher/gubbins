@@ -147,7 +147,7 @@ sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
-SUBDIRS = src
+SUBDIRS = src . tests
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

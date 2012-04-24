@@ -4,6 +4,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
 
+/* Define to 1 if you have the <math.h> header file. */
+/* #undef HAVE_MATH_H */
+
 /* Define to 1 if you have the <memory.h> header file. */
 /* #undef HAVE_MEMORY_H */
 
@@ -27,6 +30,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
+
+/* Define to 1 if you have the <zlib.h> header file. */
+/* #undef HAVE_ZLIB_H */
 
 /* Name of package */
 #define PACKAGE "gubbins"

@@ -1,88 +1,3 @@
-m4trace:/usr/share/aclocal/pkg.m4:26: -1- AC_DEFUN([PKG_PROG_PKG_CONFIG], [m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
-AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])dnl
-if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
-	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
-fi
-if test -n "$PKG_CONFIG"; then
-	_pkg_min_version=m4_default([$1], [0.9.0])
-	AC_MSG_CHECKING([pkg-config is at least version $_pkg_min_version])
-	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
-		AC_MSG_RESULT([yes])
-	else
-		AC_MSG_RESULT([no])
-		PKG_CONFIG=""
-	fi
-		
-fi[]dnl
-])
-m4trace:/usr/share/aclocal/pkg.m4:56: -1- AC_DEFUN([PKG_CHECK_EXISTS], [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
-if test -n "$PKG_CONFIG" && \
-    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
-  m4_ifval([$2], [$2], [:])
-m4_ifvaln([$3], [else
-  $3])dnl
-fi])
-m4trace:/usr/share/aclocal/pkg.m4:84: -1- AC_DEFUN([_PKG_SHORT_ERRORS_SUPPORTED], [AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi[]dnl
-])
-m4trace:/usr/share/aclocal/pkg.m4:104: -1- AC_DEFUN([PKG_CHECK_MODULES], [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
-AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
-AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
-
-pkg_failed=no
-AC_MSG_CHECKING([for $1])
-
-_PKG_CONFIG([$1][_CFLAGS], [cflags], [$2])
-_PKG_CONFIG([$1][_LIBS], [libs], [$2])
-
-m4_define([_PKG_TEXT], [Alternatively, you may set the environment variables $1[]_CFLAGS
-and $1[]_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.])
-
-if test $pkg_failed = yes; then
-        _PKG_SHORT_ERRORS_SUPPORTED
-        if test $_pkg_short_errors_supported = yes; then
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$2"`
-        else 
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
-
-	ifelse([$4], , [AC_MSG_ERROR(dnl
-[Package requirements ($2) were not met:
-
-$$1_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-_PKG_TEXT
-])],
-		[AC_MSG_RESULT([no])
-                $4])
-elif test $pkg_failed = untried; then
-	ifelse([$4], , [AC_MSG_FAILURE(dnl
-[The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-_PKG_TEXT
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])],
-		[$4])
-else
-	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
-	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
-        AC_MSG_RESULT([yes])
-	ifelse([$3], , :, [$3])
-fi[]dnl
-])
 m4trace:/usr/share/aclocal-1.9/amversion.m4:13: -1- AC_DEFUN([AM_AUTOMAKE_VERSION], [am__api_version="1.9"])
 m4trace:/usr/share/aclocal-1.9/amversion.m4:19: -1- AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION], [AM_AUTOMAKE_VERSION([1.9.6])])
 m4trace:/usr/share/aclocal-1.9/auxdir.m4:47: -1- AC_DEFUN([AM_AUX_DIR_EXPAND], [dnl Rely on autoconf to set up CDPATH properly.
@@ -715,14 +630,11 @@ m4trace:configure.ac:8: -1- m4_pattern_allow([^LIB@&t@OBJS$])
 m4trace:configure.ac:8: -1- m4_pattern_allow([^LTLIBOBJS$])
 m4trace:configure.ac:8: -1- _AC_AM_CONFIG_HEADER_HOOK([$ac_file])
 m4trace:configure.ac:8: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
-m4trace:configure.ac:10: -1- PKG_CHECK_MODULES([zlib], [zlib.h])
-m4trace:configure.ac:10: -1- PKG_PROG_PKG_CONFIG
-m4trace:configure.ac:10: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4trace:configure.ac:10: -1- m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
-m4trace:configure.ac:10: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:10: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:10: -1- m4_pattern_allow([^zlib_CFLAGS$])
-m4trace:configure.ac:10: -1- m4_pattern_allow([^zlib_LIBS$])
-m4trace:configure.ac:10: -1- PKG_CHECK_EXISTS([zlib.h], [pkg_cv_[]zlib_CFLAGS=`$PKG_CONFIG --[]cflags "zlib.h" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.ac:10: -1- PKG_CHECK_EXISTS([zlib.h], [pkg_cv_[]zlib_LIBS=`$PKG_CONFIG --[]libs "zlib.h" 2>/dev/null`], [pkg_failed=yes])
-m4trace:configure.ac:10: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:10: -1- m4_pattern_allow([^CPP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^CPPFLAGS$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^CPP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^GREP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^GREP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^EGREP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^EGREP$])
+m4trace:configure.ac:10: -1- m4_pattern_allow([^STDC_HEADERS$])

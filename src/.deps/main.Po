@@ -1,71 +1,82 @@
-main.o main.o: main.c /usr/include/stdio.h /usr/include/_types.h \
-  /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
-  /usr/include/machine/_types.h /usr/include/i386/_types.h \
-  /usr/include/stdlib.h /usr/include/available.h /usr/include/sys/wait.h \
-  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
-  /usr/include/machine/signal.h /usr/include/i386/signal.h \
-  /usr/include/i386/_structs.h /usr/include/sys/_structs.h \
-  /usr/include/machine/_structs.h /usr/include/mach/i386/_structs.h \
-  /usr/include/sys/resource.h /usr/include/machine/endian.h \
-  /usr/include/i386/endian.h /usr/include/sys/_endian.h \
-  /usr/include/libkern/_OSByteOrder.h \
-  /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
-  /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/string.h snp_sites.h gubbins.h seqUtil.h Newickform.h
+main.o: main.c /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+  /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+  /usr/lib/gcc/x86_64-linux-gnu/4.3.2/include/stddef.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+  /usr/lib/gcc/x86_64-linux-gnu/4.3.2/include/stdarg.h \
+  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/stdlib.h \
+  /usr/include/sys/types.h /usr/include/time.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/sys/select.h \
+  /usr/include/bits/select.h /usr/include/bits/sigset.h \
+  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+  /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
+  /usr/include/string.h /usr/include/bits/string.h \
+  /usr/include/bits/string2.h snp_sites.h gubbins.h seqUtil.h \
+  Newickform.h
 
 /usr/include/stdio.h:
 
-/usr/include/_types.h:
-
-/usr/include/sys/_types.h:
+/usr/include/features.h:
 
 /usr/include/sys/cdefs.h:
 
-/usr/include/machine/_types.h:
+/usr/include/bits/wordsize.h:
 
-/usr/include/i386/_types.h:
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.3.2/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.3.2/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
 
 /usr/include/stdlib.h:
 
-/usr/include/available.h:
+/usr/include/sys/types.h:
 
-/usr/include/sys/wait.h:
+/usr/include/time.h:
 
-/usr/include/sys/signal.h:
+/usr/include/endian.h:
 
-/usr/include/sys/appleapiopts.h:
+/usr/include/bits/endian.h:
 
-/usr/include/machine/signal.h:
+/usr/include/sys/select.h:
 
-/usr/include/i386/signal.h:
+/usr/include/bits/select.h:
 
-/usr/include/i386/_structs.h:
+/usr/include/bits/sigset.h:
 
-/usr/include/sys/_structs.h:
+/usr/include/bits/time.h:
 
-/usr/include/machine/_structs.h:
+/usr/include/sys/sysmacros.h:
 
-/usr/include/mach/i386/_structs.h:
-
-/usr/include/sys/resource.h:
-
-/usr/include/machine/endian.h:
-
-/usr/include/i386/endian.h:
-
-/usr/include/sys/_endian.h:
-
-/usr/include/libkern/_OSByteOrder.h:
-
-/usr/include/libkern/i386/_OSByteOrder.h:
+/usr/include/bits/pthreadtypes.h:
 
 /usr/include/alloca.h:
 
-/usr/include/machine/types.h:
-
-/usr/include/i386/types.h:
-
 /usr/include/string.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
 
 snp_sites.h:
 

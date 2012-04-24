@@ -1,0 +1,14 @@
+./configure
+make
+make install
+
+The main executable should be in ./src/gubbins
+
+
+These applications must be in your PATH:
+FastTree http://www.microbesonline.org/fasttree/
+RAxML (the full version) http://sco.h-its.org/exelixis/software.html
+
+These Python packages must be in your PYTHONPATH:
+Biopython (>=1.59)
+DendroPy (>=3.11.1)

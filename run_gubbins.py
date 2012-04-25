@@ -55,7 +55,7 @@ def raxml_tree_building_command(i,base_filename_without_ext,base_filename,curren
 
 def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec):
   current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-  return gubbins_exec+" -r "+ alignment_filename+" "+starting_base_filename+".vcf "+str(current_tree_name)+" "+starting_base_filename+".phylip"
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip "+ alignment_filename
   
 def fasttree_current_tree_name(base_filename, i):
   return base_filename+".iteration_"+str(i)
@@ -76,7 +76,7 @@ def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_
 
 def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec):
   current_tree_name = fasttree_current_tree_name(base_filename, i)
-  return gubbins_exec+" -r "+ alignment_filename+" "+starting_base_filename+".vcf "+str(current_tree_name)+" "+starting_base_filename+".phylip"
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip "+ alignment_filename
  
 
 
@@ -90,7 +90,7 @@ parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations,
 args = parser.parse_args()
 
 # find all snp sites
-subprocess.call([GUBBINS_EXEC, "-s", args.alignment_filename])
+subprocess.call([GUBBINS_EXEC, args.alignment_filename])
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)

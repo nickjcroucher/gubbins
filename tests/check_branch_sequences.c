@@ -6,7 +6,7 @@
 #include "check_branch_sequences.h"
 #include "helper_methods.h"
 
-#include "../branch_sequences.h"
+#include "branch_sequences.h"
 
 //merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 START_TEST (check_merge_adjacent_blocks_not_adjacent)

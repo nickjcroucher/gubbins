@@ -1,3 +1,7 @@
 *.o
 gubbins
 tests/run_all_tests
+.DS_Store
+Makefile
+src/.deps
+autom4te.cache/*

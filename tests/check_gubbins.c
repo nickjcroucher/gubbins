@@ -4,7 +4,7 @@
 #include <check.h>
 #include "check_parse_phylip.h"
 #include "helper_methods.h"
-#include "../gubbins.h"
+#include "gubbins.h"
 
 START_TEST (check_gubbins_no_recombinations)
 {

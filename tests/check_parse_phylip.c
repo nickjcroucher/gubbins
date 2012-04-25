@@ -4,7 +4,7 @@
 #include <check.h>
 #include "check_parse_phylip.h"
 #include "helper_methods.h"
-#include "../parse_phylip.h"
+#include "parse_phylip.h"
 
 
 START_TEST (phylip_read_in_small_file)

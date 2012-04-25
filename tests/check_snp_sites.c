@@ -6,8 +6,8 @@
 #include "check_snp_sites.h"
 #include "helper_methods.h"
 
-#include "../snp_sites.h"
-#include "../alignment_file.h"
+#include "snp_sites.h"
+#include "alignment_file.h"
 	
 
 START_TEST (valid_alignment_with_one_line_per_sequence)

@@ -37,10 +37,6 @@
 /* Define to 1 if you have the <zlib.h> header file. */
 /* #undef HAVE_ZLIB_H */
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
-#define LT_OBJDIR ".libs/"
-
 /* Name of package */
 #define PACKAGE "gubbins"
 
@@ -55,9 +51,6 @@
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gubbins"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.1"

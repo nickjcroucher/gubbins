@@ -8,9 +8,15 @@ gubbins_SOURCES = main.c
 gubbins_LDADD=-lz -lm libgubbins.la
 
 # libgubbins.so is our library
-lib_LTLIBRARIES = libgubbins.la
+lib_LTLIBRARIES = libgubbins.la libPyGubbins.la
 libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c vcf.c
 libgubbins_la_LDFLAGS= -version-info 0:1
+
+libPyGubbins_la_SOURCES = PyGubbins.cpp
+libPyGubbins_la_LDFLAGS = -version-info 0:1
+libPyGubbins_la_CPPFLAGS = -I/usr/include/python2.7 # yeah, there are better ways to check (and to particularly not hardcode the py version)
+libPyGubbins_la_LIBADD = -lpython2.7 -lboost_python -lz -lm libgubbins.la
+
 
 # "make check" target
 TESTS = $(check_PROGRAMS)

@@ -42,7 +42,8 @@ subdir = src
 DIST_COMMON = $(dist_data_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_python_devel.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -73,7 +74,8 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(datadir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libPyGubbins_la_DEPENDENCIES = libgubbins.la
+am__DEPENDENCIES_1 =
+libPyGubbins_la_DEPENDENCIES = $(am__DEPENDENCIES_1) libgubbins.la
 am_libPyGubbins_la_OBJECTS = libPyGubbins_la-PyGubbins.lo
 libPyGubbins_la_OBJECTS = $(am_libPyGubbins_la_OBJECTS)
 libPyGubbins_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -199,6 +201,13 @@ PACKAGE_TARNAME = gubbins
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
+PYTHON = /usr/bin/python
+PYTHON_CPPFLAGS = -I/usr/include/python2.7
+PYTHON_EXTRA_LDFLAGS = -Xlinker -export-dynamic
+PYTHON_EXTRA_LIBS =  -lpthread -ldl  -lutil
+PYTHON_LDFLAGS = -L/usr/lib64 -lpython2.7
+PYTHON_SITE_PKG = /usr/lib/python2.7/site-packages
+PYTHON_VERSION = 
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -270,8 +279,8 @@ libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_se
 libgubbins_la_LDFLAGS = -version-info 0:1
 libPyGubbins_la_SOURCES = PyGubbins.cpp
 libPyGubbins_la_LDFLAGS = -version-info 0:1
-libPyGubbins_la_CPPFLAGS = -I/usr/include/python2.7 # yeah, there are better ways to check (and to particularly not hardcode the py version)
-libPyGubbins_la_LIBADD = -lpython2.7 -lboost_python -lz -lm libgubbins.la
+libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
+libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lz -lm libgubbins.la
 
 # "make check" target
 TESTS = $(check_PROGRAMS)

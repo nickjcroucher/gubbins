@@ -7,6 +7,9 @@ AC_PROG_LIBTOOL
 AC_PROG_CC                                   
 AC_PROG_CXX
 
+m4_include([m4/ax_python_devel.m4])
+AX_PYTHON_DEVEL
+
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 

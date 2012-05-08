@@ -2,7 +2,13 @@ AC_INIT([Gubbins], [0.1])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])   
+
+AC_PROG_LIBTOOL
 AC_PROG_CC                                   
+AC_PROG_CXX
+
+m4_include([m4/ax_python_devel.m4])
+AX_PYTHON_DEVEL
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

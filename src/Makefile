@@ -16,6 +16,7 @@
 
 
 
+
 pkgdatadir = $(datadir)/gubbins
 pkglibdir = $(libdir)/gubbins
 pkgincludedir = $(includedir)/gubbins
@@ -31,44 +32,77 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = i386-apple-darwin9.8.0
+host_triplet = i386-apple-darwin9.8.0
 bin_PROGRAMS = gubbins$(EXEEXT)
+check_PROGRAMS = run_all_tests$(EXEEXT)
 subdir = src
 DIST_COMMON = $(dist_data_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_python_devel.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)"
-binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
-am_gubbins_OBJECTS = Newickform.$(OBJEXT) alignment_file.$(OBJEXT) \
-	block_tab_file.$(OBJEXT) branch_sequences.$(OBJEXT) \
-	fasta_of_snp_sites.$(OBJEXT) gff_file.$(OBJEXT) \
-	gubbins.$(OBJEXT) main.$(OBJEXT) parse_phylip.$(OBJEXT) \
-	parse_vcf.$(OBJEXT) phylib_of_snp_sites.$(OBJEXT) \
-	seqUtil.$(OBJEXT) snp_searching.$(OBJEXT) snp_sites.$(OBJEXT) \
-	tree_statistics.$(OBJEXT) vcf.$(OBJEXT)
-gubbins_OBJECTS = $(am_gubbins_OBJECTS)
-gubbins_LDADD = $(LDADD)
-DEFAULT_INCLUDES = -I. -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(gubbins_SOURCES)
-DIST_SOURCES = $(gubbins_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(datadir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
+libgubbins_la_LIBADD =
+am_libgubbins_la_OBJECTS = Newickform.lo alignment_file.lo \
+	block_tab_file.lo branch_sequences.lo fasta_of_snp_sites.lo \
+	gff_file.lo gubbins.lo parse_phylip.lo parse_vcf.lo \
+	phylib_of_snp_sites.lo seqUtil.lo snp_searching.lo \
+	snp_sites.lo tree_statistics.lo vcf.lo
+libgubbins_la_OBJECTS = $(am_libgubbins_la_OBJECTS)
+libgubbins_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libgubbins_la_LDFLAGS) $(LDFLAGS) -o $@
+binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+PROGRAMS = $(bin_PROGRAMS)
+am_gubbins_OBJECTS = main.$(OBJEXT)
+gubbins_OBJECTS = $(am_gubbins_OBJECTS)
+gubbins_DEPENDENCIES = libgubbins.la
+am_run_all_tests_OBJECTS =  \
+	run_all_tests-check_branch_sequences.$(OBJEXT) \
+	run_all_tests-check_calculate_ancestor_sequence.$(OBJEXT) \
+	run_all_tests-check_gubbins.$(OBJEXT) \
+	run_all_tests-check_parse_phylip.$(OBJEXT) \
+	run_all_tests-check_snp_searching.$(OBJEXT) \
+	run_all_tests-check_snp_sites.$(OBJEXT) \
+	run_all_tests-check_vcf_parsing.$(OBJEXT) \
+	run_all_tests-helper_methods.$(OBJEXT) \
+	run_all_tests-run_all_tests.$(OBJEXT)
+run_all_tests_OBJECTS = $(am_run_all_tests_OBJECTS)
+run_all_tests_DEPENDENCIES = libgubbins.la
+run_all_tests_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(run_all_tests_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+DEFAULT_INCLUDES = -I. -I$(top_builddir)
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__depfiles_maybe = depfiles
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(libgubbins_la_SOURCES) $(gubbins_SOURCES) \
+	$(run_all_tests_SOURCES)
+DIST_SOURCES = $(libgubbins_la_SOURCES) $(gubbins_SOURCES) \
+	$(run_all_tests_SOURCES)
 dist_dataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_data_DATA)
 ETAGS = etags
@@ -76,6 +110,7 @@ CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run aclocal-1.10
 AMTAR = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run tar
+AR = ar
 AUTOCONF = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run autoconf
 AUTOHEADER = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run autoheader
 AUTOMAKE = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run automake-1.10
@@ -83,25 +118,34 @@ AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
-CPP = @CPP@
+CPP = gcc -E
 CPPFLAGS = 
+CXX = g++
+CXXCPP = g++ -E
+CXXDEPMODE = depmode=gcc3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
+ECHO = /bin/echo
 ECHO_C = \c
 ECHO_N = 
 ECHO_T = 
-EGREP = @EGREP@
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-GREP = @GREP@
+F77 = gfortran
+FFLAGS = -g -O2
+GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -lz -lm
+LDFLAGS = 
 LIBOBJS = 
 LIBS = 
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run makeinfo
 MKDIR_P = .././install-sh -c -d
@@ -113,29 +157,47 @@ PACKAGE_STRING = Gubbins 0.1
 PACKAGE_TARNAME = gubbins
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
+PYTHON = /usr/local/Cellar/python/2.7.2/bin/python
+PYTHON_CPPFLAGS = -I/usr/local/Cellar/python/2.7.2/include/python2.7
+PYTHON_EXTRA_LDFLAGS = -u _PyMac_Error
+PYTHON_EXTRA_LIBS =  -ldl  -framework CoreFoundation
+PYTHON_LDFLAGS = -L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7
+PYTHON_SITE_PKG = /usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages
+PYTHON_VERSION = 
+RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/sh
-STRIP = 
+STRIP = strip
 VERSION = 0.1
 abs_builddir = /Users/ap13/pathogens/multi_fasta_to_vcf/src
 abs_srcdir = /Users/ap13/pathogens/multi_fasta_to_vcf/src
 abs_top_builddir = /Users/ap13/pathogens/multi_fasta_to_vcf
 abs_top_srcdir = /Users/ap13/pathogens/multi_fasta_to_vcf
 ac_ct_CC = gcc
+ac_ct_CXX = g++
+ac_ct_F77 = gfortran
 am__include = include
 am__leading_dot = .
 am__quote = 
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
+build = i386-apple-darwin9.8.0
 build_alias = 
+build_cpu = i386
+build_os = darwin9.8.0
+build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
+host = i386-apple-darwin9.8.0
 host_alias = 
+host_cpu = i386
+host_os = darwin9.8.0
+host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
@@ -158,12 +220,41 @@ sysconfdir = ${prefix}/etc
 target_alias = 
 top_builddir = ..
 top_srcdir = ..
-gubbins_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c main.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c vcf.c
+
+# ship these headers in the "make dist" target
 dist_data_DATA = Newickform.h alignment_file.h block_tab_file.h branch_sequences.h fasta_of_snp_sites.h gff_file.h gubbins.h kseq.h parse_phylip.h parse_vcf.h phylib_of_snp_sites.h seqUtil.h snp_searching.h snp_sites.h tree_statistics.h vcf.h
+gubbins_SOURCES = main.c
+gubbins_LDADD = -lz -lm libgubbins.la
+
+# libgubbins.so is our library
+lib_LTLIBRARIES = libgubbins.la
+libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c vcf.c
+libgubbins_la_LDFLAGS = -version-info 0:1
+
+#libPyGubbins_la_SOURCES = PyGubbins.cpp
+#libPyGubbins_la_LDFLAGS = -version-info 0:1
+#libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
+#libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lz -lm libgubbins.la
+
+# "make check" target
+TESTS = $(check_PROGRAMS)
+run_all_tests_SOURCES = \
+	../tests/check_branch_sequences.c \
+	../tests/check_calculate_ancestor_sequence.c \
+	../tests/check_gubbins.c \
+	../tests/check_parse_phylip.c \
+	../tests/check_snp_searching.c \
+	../tests/check_snp_sites.c \
+	../tests/check_vcf_parsing.c \
+	../tests/helper_methods.c \
+	../tests/run_all_tests.c
+
+run_all_tests_CFLAGS = -I../tests
+run_all_tests_LDADD = -lm -lz -lcheck libgubbins.la
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -193,16 +284,46 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libgubbins.la: $(libgubbins_la_OBJECTS) $(libgubbins_la_DEPENDENCIES) 
+	$(libgubbins_la_LINK) -rpath $(libdir) $(libgubbins_la_OBJECTS) $(libgubbins_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
+	     || test -f $$p1 \
 	  ; then \
 	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
 
@@ -215,10 +336,24 @@ uninstall-binPROGRAMS:
 	done
 
 clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
+
+clean-checkPROGRAMS:
+	@list='$(check_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
 gubbins$(EXEEXT): $(gubbins_OBJECTS) $(gubbins_DEPENDENCIES) 
 	@rm -f gubbins$(EXEEXT)
 	$(LINK) $(gubbins_OBJECTS) $(gubbins_LDADD) $(LIBS)
+run_all_tests$(EXEEXT): $(run_all_tests_OBJECTS) $(run_all_tests_DEPENDENCIES) 
+	@rm -f run_all_tests$(EXEEXT)
+	$(run_all_tests_LINK) $(run_all_tests_OBJECTS) $(run_all_tests_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -226,22 +361,31 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/Newickform.Po
-include ./$(DEPDIR)/alignment_file.Po
-include ./$(DEPDIR)/block_tab_file.Po
-include ./$(DEPDIR)/branch_sequences.Po
-include ./$(DEPDIR)/fasta_of_snp_sites.Po
-include ./$(DEPDIR)/gff_file.Po
-include ./$(DEPDIR)/gubbins.Po
+include ./$(DEPDIR)/Newickform.Plo
+include ./$(DEPDIR)/alignment_file.Plo
+include ./$(DEPDIR)/block_tab_file.Plo
+include ./$(DEPDIR)/branch_sequences.Plo
+include ./$(DEPDIR)/fasta_of_snp_sites.Plo
+include ./$(DEPDIR)/gff_file.Plo
+include ./$(DEPDIR)/gubbins.Plo
 include ./$(DEPDIR)/main.Po
-include ./$(DEPDIR)/parse_phylip.Po
-include ./$(DEPDIR)/parse_vcf.Po
-include ./$(DEPDIR)/phylib_of_snp_sites.Po
-include ./$(DEPDIR)/seqUtil.Po
-include ./$(DEPDIR)/snp_searching.Po
-include ./$(DEPDIR)/snp_sites.Po
-include ./$(DEPDIR)/tree_statistics.Po
-include ./$(DEPDIR)/vcf.Po
+include ./$(DEPDIR)/parse_phylip.Plo
+include ./$(DEPDIR)/parse_vcf.Plo
+include ./$(DEPDIR)/phylib_of_snp_sites.Plo
+include ./$(DEPDIR)/run_all_tests-check_branch_sequences.Po
+include ./$(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Po
+include ./$(DEPDIR)/run_all_tests-check_gubbins.Po
+include ./$(DEPDIR)/run_all_tests-check_parse_phylip.Po
+include ./$(DEPDIR)/run_all_tests-check_snp_searching.Po
+include ./$(DEPDIR)/run_all_tests-check_snp_sites.Po
+include ./$(DEPDIR)/run_all_tests-check_vcf_parsing.Po
+include ./$(DEPDIR)/run_all_tests-helper_methods.Po
+include ./$(DEPDIR)/run_all_tests-run_all_tests.Po
+include ./$(DEPDIR)/seqUtil.Plo
+include ./$(DEPDIR)/snp_searching.Plo
+include ./$(DEPDIR)/snp_sites.Plo
+include ./$(DEPDIR)/tree_statistics.Plo
+include ./$(DEPDIR)/vcf.Plo
 
 .c.o:
 	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -256,6 +400,145 @@ include ./$(DEPDIR)/vcf.Po
 #	source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+#	source='$<' object='$@' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LTCOMPILE) -c -o $@ $<
+
+run_all_tests-check_branch_sequences.o: ../tests/check_branch_sequences.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_branch_sequences.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_branch_sequences.Tpo -c -o run_all_tests-check_branch_sequences.o `test -f '../tests/check_branch_sequences.c' || echo '$(srcdir)/'`../tests/check_branch_sequences.c
+	mv -f $(DEPDIR)/run_all_tests-check_branch_sequences.Tpo $(DEPDIR)/run_all_tests-check_branch_sequences.Po
+#	source='../tests/check_branch_sequences.c' object='run_all_tests-check_branch_sequences.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_branch_sequences.o `test -f '../tests/check_branch_sequences.c' || echo '$(srcdir)/'`../tests/check_branch_sequences.c
+
+run_all_tests-check_branch_sequences.obj: ../tests/check_branch_sequences.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_branch_sequences.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_branch_sequences.Tpo -c -o run_all_tests-check_branch_sequences.obj `if test -f '../tests/check_branch_sequences.c'; then $(CYGPATH_W) '../tests/check_branch_sequences.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_branch_sequences.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_branch_sequences.Tpo $(DEPDIR)/run_all_tests-check_branch_sequences.Po
+#	source='../tests/check_branch_sequences.c' object='run_all_tests-check_branch_sequences.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_branch_sequences.obj `if test -f '../tests/check_branch_sequences.c'; then $(CYGPATH_W) '../tests/check_branch_sequences.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_branch_sequences.c'; fi`
+
+run_all_tests-check_calculate_ancestor_sequence.o: ../tests/check_calculate_ancestor_sequence.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_calculate_ancestor_sequence.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Tpo -c -o run_all_tests-check_calculate_ancestor_sequence.o `test -f '../tests/check_calculate_ancestor_sequence.c' || echo '$(srcdir)/'`../tests/check_calculate_ancestor_sequence.c
+	mv -f $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Tpo $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Po
+#	source='../tests/check_calculate_ancestor_sequence.c' object='run_all_tests-check_calculate_ancestor_sequence.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_calculate_ancestor_sequence.o `test -f '../tests/check_calculate_ancestor_sequence.c' || echo '$(srcdir)/'`../tests/check_calculate_ancestor_sequence.c
+
+run_all_tests-check_calculate_ancestor_sequence.obj: ../tests/check_calculate_ancestor_sequence.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_calculate_ancestor_sequence.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Tpo -c -o run_all_tests-check_calculate_ancestor_sequence.obj `if test -f '../tests/check_calculate_ancestor_sequence.c'; then $(CYGPATH_W) '../tests/check_calculate_ancestor_sequence.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_calculate_ancestor_sequence.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Tpo $(DEPDIR)/run_all_tests-check_calculate_ancestor_sequence.Po
+#	source='../tests/check_calculate_ancestor_sequence.c' object='run_all_tests-check_calculate_ancestor_sequence.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_calculate_ancestor_sequence.obj `if test -f '../tests/check_calculate_ancestor_sequence.c'; then $(CYGPATH_W) '../tests/check_calculate_ancestor_sequence.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_calculate_ancestor_sequence.c'; fi`
+
+run_all_tests-check_gubbins.o: ../tests/check_gubbins.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_gubbins.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_gubbins.Tpo -c -o run_all_tests-check_gubbins.o `test -f '../tests/check_gubbins.c' || echo '$(srcdir)/'`../tests/check_gubbins.c
+	mv -f $(DEPDIR)/run_all_tests-check_gubbins.Tpo $(DEPDIR)/run_all_tests-check_gubbins.Po
+#	source='../tests/check_gubbins.c' object='run_all_tests-check_gubbins.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_gubbins.o `test -f '../tests/check_gubbins.c' || echo '$(srcdir)/'`../tests/check_gubbins.c
+
+run_all_tests-check_gubbins.obj: ../tests/check_gubbins.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_gubbins.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_gubbins.Tpo -c -o run_all_tests-check_gubbins.obj `if test -f '../tests/check_gubbins.c'; then $(CYGPATH_W) '../tests/check_gubbins.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_gubbins.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_gubbins.Tpo $(DEPDIR)/run_all_tests-check_gubbins.Po
+#	source='../tests/check_gubbins.c' object='run_all_tests-check_gubbins.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_gubbins.obj `if test -f '../tests/check_gubbins.c'; then $(CYGPATH_W) '../tests/check_gubbins.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_gubbins.c'; fi`
+
+run_all_tests-check_parse_phylip.o: ../tests/check_parse_phylip.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_parse_phylip.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_parse_phylip.Tpo -c -o run_all_tests-check_parse_phylip.o `test -f '../tests/check_parse_phylip.c' || echo '$(srcdir)/'`../tests/check_parse_phylip.c
+	mv -f $(DEPDIR)/run_all_tests-check_parse_phylip.Tpo $(DEPDIR)/run_all_tests-check_parse_phylip.Po
+#	source='../tests/check_parse_phylip.c' object='run_all_tests-check_parse_phylip.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_parse_phylip.o `test -f '../tests/check_parse_phylip.c' || echo '$(srcdir)/'`../tests/check_parse_phylip.c
+
+run_all_tests-check_parse_phylip.obj: ../tests/check_parse_phylip.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_parse_phylip.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_parse_phylip.Tpo -c -o run_all_tests-check_parse_phylip.obj `if test -f '../tests/check_parse_phylip.c'; then $(CYGPATH_W) '../tests/check_parse_phylip.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_parse_phylip.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_parse_phylip.Tpo $(DEPDIR)/run_all_tests-check_parse_phylip.Po
+#	source='../tests/check_parse_phylip.c' object='run_all_tests-check_parse_phylip.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_parse_phylip.obj `if test -f '../tests/check_parse_phylip.c'; then $(CYGPATH_W) '../tests/check_parse_phylip.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_parse_phylip.c'; fi`
+
+run_all_tests-check_snp_searching.o: ../tests/check_snp_searching.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_snp_searching.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_snp_searching.Tpo -c -o run_all_tests-check_snp_searching.o `test -f '../tests/check_snp_searching.c' || echo '$(srcdir)/'`../tests/check_snp_searching.c
+	mv -f $(DEPDIR)/run_all_tests-check_snp_searching.Tpo $(DEPDIR)/run_all_tests-check_snp_searching.Po
+#	source='../tests/check_snp_searching.c' object='run_all_tests-check_snp_searching.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_snp_searching.o `test -f '../tests/check_snp_searching.c' || echo '$(srcdir)/'`../tests/check_snp_searching.c
+
+run_all_tests-check_snp_searching.obj: ../tests/check_snp_searching.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_snp_searching.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_snp_searching.Tpo -c -o run_all_tests-check_snp_searching.obj `if test -f '../tests/check_snp_searching.c'; then $(CYGPATH_W) '../tests/check_snp_searching.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_snp_searching.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_snp_searching.Tpo $(DEPDIR)/run_all_tests-check_snp_searching.Po
+#	source='../tests/check_snp_searching.c' object='run_all_tests-check_snp_searching.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_snp_searching.obj `if test -f '../tests/check_snp_searching.c'; then $(CYGPATH_W) '../tests/check_snp_searching.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_snp_searching.c'; fi`
+
+run_all_tests-check_snp_sites.o: ../tests/check_snp_sites.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_snp_sites.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_snp_sites.Tpo -c -o run_all_tests-check_snp_sites.o `test -f '../tests/check_snp_sites.c' || echo '$(srcdir)/'`../tests/check_snp_sites.c
+	mv -f $(DEPDIR)/run_all_tests-check_snp_sites.Tpo $(DEPDIR)/run_all_tests-check_snp_sites.Po
+#	source='../tests/check_snp_sites.c' object='run_all_tests-check_snp_sites.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_snp_sites.o `test -f '../tests/check_snp_sites.c' || echo '$(srcdir)/'`../tests/check_snp_sites.c
+
+run_all_tests-check_snp_sites.obj: ../tests/check_snp_sites.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_snp_sites.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_snp_sites.Tpo -c -o run_all_tests-check_snp_sites.obj `if test -f '../tests/check_snp_sites.c'; then $(CYGPATH_W) '../tests/check_snp_sites.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_snp_sites.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_snp_sites.Tpo $(DEPDIR)/run_all_tests-check_snp_sites.Po
+#	source='../tests/check_snp_sites.c' object='run_all_tests-check_snp_sites.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_snp_sites.obj `if test -f '../tests/check_snp_sites.c'; then $(CYGPATH_W) '../tests/check_snp_sites.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_snp_sites.c'; fi`
+
+run_all_tests-check_vcf_parsing.o: ../tests/check_vcf_parsing.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_vcf_parsing.o -MD -MP -MF $(DEPDIR)/run_all_tests-check_vcf_parsing.Tpo -c -o run_all_tests-check_vcf_parsing.o `test -f '../tests/check_vcf_parsing.c' || echo '$(srcdir)/'`../tests/check_vcf_parsing.c
+	mv -f $(DEPDIR)/run_all_tests-check_vcf_parsing.Tpo $(DEPDIR)/run_all_tests-check_vcf_parsing.Po
+#	source='../tests/check_vcf_parsing.c' object='run_all_tests-check_vcf_parsing.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_vcf_parsing.o `test -f '../tests/check_vcf_parsing.c' || echo '$(srcdir)/'`../tests/check_vcf_parsing.c
+
+run_all_tests-check_vcf_parsing.obj: ../tests/check_vcf_parsing.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-check_vcf_parsing.obj -MD -MP -MF $(DEPDIR)/run_all_tests-check_vcf_parsing.Tpo -c -o run_all_tests-check_vcf_parsing.obj `if test -f '../tests/check_vcf_parsing.c'; then $(CYGPATH_W) '../tests/check_vcf_parsing.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_vcf_parsing.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-check_vcf_parsing.Tpo $(DEPDIR)/run_all_tests-check_vcf_parsing.Po
+#	source='../tests/check_vcf_parsing.c' object='run_all_tests-check_vcf_parsing.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-check_vcf_parsing.obj `if test -f '../tests/check_vcf_parsing.c'; then $(CYGPATH_W) '../tests/check_vcf_parsing.c'; else $(CYGPATH_W) '$(srcdir)/../tests/check_vcf_parsing.c'; fi`
+
+run_all_tests-helper_methods.o: ../tests/helper_methods.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-helper_methods.o -MD -MP -MF $(DEPDIR)/run_all_tests-helper_methods.Tpo -c -o run_all_tests-helper_methods.o `test -f '../tests/helper_methods.c' || echo '$(srcdir)/'`../tests/helper_methods.c
+	mv -f $(DEPDIR)/run_all_tests-helper_methods.Tpo $(DEPDIR)/run_all_tests-helper_methods.Po
+#	source='../tests/helper_methods.c' object='run_all_tests-helper_methods.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-helper_methods.o `test -f '../tests/helper_methods.c' || echo '$(srcdir)/'`../tests/helper_methods.c
+
+run_all_tests-helper_methods.obj: ../tests/helper_methods.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-helper_methods.obj -MD -MP -MF $(DEPDIR)/run_all_tests-helper_methods.Tpo -c -o run_all_tests-helper_methods.obj `if test -f '../tests/helper_methods.c'; then $(CYGPATH_W) '../tests/helper_methods.c'; else $(CYGPATH_W) '$(srcdir)/../tests/helper_methods.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-helper_methods.Tpo $(DEPDIR)/run_all_tests-helper_methods.Po
+#	source='../tests/helper_methods.c' object='run_all_tests-helper_methods.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-helper_methods.obj `if test -f '../tests/helper_methods.c'; then $(CYGPATH_W) '../tests/helper_methods.c'; else $(CYGPATH_W) '$(srcdir)/../tests/helper_methods.c'; fi`
+
+run_all_tests-run_all_tests.o: ../tests/run_all_tests.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-run_all_tests.o -MD -MP -MF $(DEPDIR)/run_all_tests-run_all_tests.Tpo -c -o run_all_tests-run_all_tests.o `test -f '../tests/run_all_tests.c' || echo '$(srcdir)/'`../tests/run_all_tests.c
+	mv -f $(DEPDIR)/run_all_tests-run_all_tests.Tpo $(DEPDIR)/run_all_tests-run_all_tests.Po
+#	source='../tests/run_all_tests.c' object='run_all_tests-run_all_tests.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-run_all_tests.o `test -f '../tests/run_all_tests.c' || echo '$(srcdir)/'`../tests/run_all_tests.c
+
+run_all_tests-run_all_tests.obj: ../tests/run_all_tests.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -MT run_all_tests-run_all_tests.obj -MD -MP -MF $(DEPDIR)/run_all_tests-run_all_tests.Tpo -c -o run_all_tests-run_all_tests.obj `if test -f '../tests/run_all_tests.c'; then $(CYGPATH_W) '../tests/run_all_tests.c'; else $(CYGPATH_W) '$(srcdir)/../tests/run_all_tests.c'; fi`
+	mv -f $(DEPDIR)/run_all_tests-run_all_tests.Tpo $(DEPDIR)/run_all_tests-run_all_tests.Po
+#	source='../tests/run_all_tests.c' object='run_all_tests-run_all_tests.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(run_all_tests_CFLAGS) $(CFLAGS) -c -o run_all_tests-run_all_tests.obj `if test -f '../tests/run_all_tests.c'; then $(CYGPATH_W) '../tests/run_all_tests.c'; else $(CYGPATH_W) '$(srcdir)/../tests/run_all_tests.c'; fi`
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
 install-dist_dataDATA: $(dist_data_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(datadir)" || $(MKDIR_P) "$(DESTDIR)$(datadir)"
@@ -322,6 +605,79 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+check-TESTS: $(TESTS)
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; ws='[	 ]'; \
+	srcdir=$(srcdir); export srcdir; \
+	list=' $(TESTS) '; \
+	if test -n "$$list"; then \
+	  for tst in $$list; do \
+	    if test -f ./$$tst; then dir=./; \
+	    elif test -f $$tst; then dir=; \
+	    else dir="$(srcdir)/"; fi; \
+	    if $(TESTS_ENVIRONMENT) $${dir}$$tst; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *$$ws$$tst$$ws*) \
+		xpass=`expr $$xpass + 1`; \
+		failed=`expr $$failed + 1`; \
+		echo "XPASS: $$tst"; \
+	      ;; \
+	      *) \
+		echo "PASS: $$tst"; \
+	      ;; \
+	      esac; \
+	    elif test $$? -ne 77; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *$$ws$$tst$$ws*) \
+		xfail=`expr $$xfail + 1`; \
+		echo "XFAIL: $$tst"; \
+	      ;; \
+	      *) \
+		failed=`expr $$failed + 1`; \
+		echo "FAIL: $$tst"; \
+	      ;; \
+	      esac; \
+	    else \
+	      skip=`expr $$skip + 1`; \
+	      echo "SKIP: $$tst"; \
+	    fi; \
+	  done; \
+	  if test "$$failed" -eq 0; then \
+	    if test "$$xfail" -eq 0; then \
+	      banner="All $$all tests passed"; \
+	    else \
+	      banner="All $$all tests behaved as expected ($$xfail expected failures)"; \
+	    fi; \
+	  else \
+	    if test "$$xpass" -eq 0; then \
+	      banner="$$failed of $$all tests failed"; \
+	    else \
+	      banner="$$failed of $$all tests did not behave as expected ($$xpass unexpected passes)"; \
+	    fi; \
+	  fi; \
+	  dashes="$$banner"; \
+	  skipped=""; \
+	  if test "$$skip" -ne 0; then \
+	    skipped="($$skip tests were not run)"; \
+	    test `echo "$$skipped" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$skipped"; \
+	  fi; \
+	  report=""; \
+	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
+	    report="Please report to $(PACKAGE_BUGREPORT)"; \
+	    test `echo "$$report" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$report"; \
+	  fi; \
+	  dashes=`echo "$$dashes" | sed s/./=/g`; \
+	  echo "$$dashes"; \
+	  echo "$$banner"; \
+	  test -z "$$skipped" || echo "$$skipped"; \
+	  test -z "$$report" || echo "$$report"; \
+	  echo "$$dashes"; \
+	  test "$$failed" -eq 0; \
+	else :; fi
+
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -349,10 +705,14 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(PROGRAMS) $(DATA)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA)
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -381,7 +741,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -403,7 +764,7 @@ install-data-am: install-dist_dataDATA
 
 install-dvi: install-dvi-am
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-html: install-html-am
 
@@ -424,7 +785,8 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -434,23 +796,27 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-dist_dataDATA
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_dataDATA \
+	uninstall-libLTLIBRARIES
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic ctags distclean distclean-compile \
-	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dist_dataDATA install-dvi \
+.PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
+	clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dist_dataDATA install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-dist_dataDATA
+	uninstall-dist_dataDATA uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -4,7 +4,7 @@
 #include <check.h>
 #include "check_calculate_ancestor_sequence.h"
 #include "helper_methods.h"
-#include "../gubbins.h"
+#include "gubbins.h"
 
 START_TEST (check_calculate_ancestor_sequence)
 {

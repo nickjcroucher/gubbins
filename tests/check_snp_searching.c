@@ -5,7 +5,7 @@
 #include "check_snp_searching.h"
 #include "helper_methods.h"
 
-#include "../snp_searching.h"
+#include "snp_searching.h"
 
 
 START_TEST (check_find_starting_index_windows)

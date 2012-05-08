@@ -495,7 +495,7 @@ $debug ||
 if test -n "$CONFIG_FILES"; then
 
 cat >"$tmp/subs-1.sed" <<\CEOF
-/@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
+/@[a-zA-Z_][a-zA-Z_0-9]*@/!b
 s,@SHELL@,|#_!!_#|/bin/sh,g
 s,@PATH_SEPARATOR@,|#_!!_#|:,g
 s,@PACKAGE_NAME@,|#_!!_#|Gubbins,g
@@ -546,7 +546,7 @@ s,@AUTOMAKE@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing -
 s,@AUTOHEADER@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run autoheader,g
 s,@MAKEINFO@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run makeinfo,g
 s,@install_sh@,|#_!!_#|$(SHELL) /Users/ap13/pathogens/multi_fasta_to_vcf/install-sh,g
-s,@STRIP@,|#_!!_#|,g
+s,@STRIP@,|#_!!_#|strip,g
 s,@INSTALL_STRIP_PROGRAM@,|#_!!_#|$(install_sh) -c -s,g
 s,@mkdir_p@,|#_!!_#|$(top_builddir)/./install-sh -c -d,g
 s,@AWK@,|#_!!_#|awk,g
@@ -555,6 +555,14 @@ s,@am__leading_dot@,|#_!!_#|.,g
 s,@AMTAR@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run tar,g
 s,@am__tar@,|#_!!_#|${AMTAR} chof - "$$tardir",g
 s,@am__untar@,|#_!!_#|${AMTAR} xf -,g
+s,@build@,|#_!!_#|i386-apple-darwin9.8.0,g
+s,@build_cpu@,|#_!!_#|i386,g
+s,@build_vendor@,|#_!!_#|apple,g
+s,@build_os@,|#_!!_#|darwin9.8.0,g
+s,@host@,|#_!!_#|i386-apple-darwin9.8.0,g
+s,@host_cpu@,|#_!!_#|i386,g
+s,@host_vendor@,|#_!!_#|apple,g
+s,@host_os@,|#_!!_#|darwin9.8.0,g
 s,@CC@,|#_!!_#|gcc,g
 s,@CFLAGS@,|#_!!_#|-g -O2,g
 s,@LDFLAGS@,|#_!!_#|,g
@@ -571,6 +579,34 @@ s,@AMDEPBACKSLASH@,|#_!!_#|\\,g
 s,@CCDEPMODE@,|#_!!_#|depmode=gcc3,g
 s,@am__fastdepCC_TRUE@,|#_!!_#|,g
 s,@am__fastdepCC_FALSE@,|#_!!_#|#,g
+s,@GREP@,|#_!!_#|/usr/bin/grep,g
+s,@EGREP@,|#_!!_#|/usr/bin/grep -E,g
+s,@LN_S@,|#_!!_#|ln -s,g
+s,@ECHO@,|#_!!_#|/bin/echo,g
+s,@AR@,|#_!!_#|ar,g
+s,@RANLIB@,|#_!!_#|ranlib,g
+s,@CPP@,|#_!!_#|gcc -E,g
+s,@CXX@,|#_!!_#|g++,g
+s,@CXXFLAGS@,|#_!!_#|-g -O2,g
+s,@ac_ct_CXX@,|#_!!_#|g++,g
+s,@CXXDEPMODE@,|#_!!_#|depmode=gcc3,g
+s,@am__fastdepCXX_TRUE@,|#_!!_#|,g
+s,@am__fastdepCXX_FALSE@,|#_!!_#|#,g
+s,@CXXCPP@,|#_!!_#|g++ -E,g
+CEOF
+cat >"$tmp/subs-2.sed" <<\CEOF
+/@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
+s,@F77@,|#_!!_#|gfortran,g
+s,@FFLAGS@,|#_!!_#|-g -O2,g
+s,@ac_ct_F77@,|#_!!_#|gfortran,g
+s,@LIBTOOL@,|#_!!_#|$(SHELL) $(top_builddir)/libtool,g
+s,@PYTHON_VERSION@,|#_!!_#|,g
+s,@PYTHON@,|#_!!_#|/usr/local/Cellar/python/2.7.2/bin/python,g
+s,@PYTHON_CPPFLAGS@,|#_!!_#|-I/usr/local/Cellar/python/2.7.2/include/python2.7,g
+s,@PYTHON_LDFLAGS@,|#_!!_#|-L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7,g
+s,@PYTHON_SITE_PKG@,|#_!!_#|/usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages,g
+s,@PYTHON_EXTRA_LIBS@,|#_!!_#| -ldl  -framework CoreFoundation,g
+s,@PYTHON_EXTRA_LDFLAGS@,|#_!!_#|-u _PyMac_Error,g
 s,@LIBOBJS@,|#_!!_#|,g
 s,@LTLIBOBJS@,|#_!!_#|,g
 :end
@@ -803,7 +839,7 @@ s&@abs_top_builddir@&$ac_abs_top_builddir&;t t
 s&@INSTALL@&$ac_INSTALL&;t t
 s&@MKDIR_P@&$ac_MKDIR_P&;t t
 $ac_datarootdir_hack
-" $ac_file_inputs | sed -f "$tmp/subs-1.sed" >$tmp/out
+" $ac_file_inputs | sed -f "$tmp/subs-1.sed" | sed -f "$tmp/subs-2.sed" >$tmp/out
 
 test -z "$ac_datarootdir_hack$ac_datarootdir_seen" &&
   { ac_out=`sed -n '/\${datarootdir}/p' "$tmp/out"`; test -n "$ac_out"; } &&
@@ -837,6 +873,18 @@ s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE_STRING\)[	 (].*,\1define\2 "Gubbins 0.1" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE_BUGREPORT\)[	 (].*,\1define\2 "" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*PACKAGE\)[	 (].*,\1define\2 "gubbins" ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*VERSION\)[	 (].*,\1define\2 "0.1" ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*STDC_HEADERS\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_SYS_TYPES_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_SYS_STAT_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STDLIB_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STRING_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_MEMORY_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STRINGS_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_INTTYPES_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STDINT_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_UNISTD_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_DLFCN_H\)[	 (].*,\1define\2 1 ,
+s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_PYTHON\)[	 (].*,\1define\2 "2.7" ,
 s/ $//
 s,^[	 #]*u.*,/* & */,
 CEOF

@@ -8,14 +8,15 @@ gubbins_SOURCES = main.c
 gubbins_LDADD=-lz -lm libgubbins.la
 
 # libgubbins.so is our library
-lib_LTLIBRARIES = libgubbins.la libPyGubbins.la
+lib_LTLIBRARIES = libgubbins.la
 libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c vcf.c
 libgubbins_la_LDFLAGS= -version-info 0:1
 
-libPyGubbins_la_SOURCES = PyGubbins.cpp
-libPyGubbins_la_LDFLAGS = -version-info 0:1
-libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
-libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lz -lm libgubbins.la
+
+#libPyGubbins_la_SOURCES = PyGubbins.cpp
+#libPyGubbins_la_LDFLAGS = -version-info 0:1
+#libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
+#libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lz -lm libgubbins.la
 
 
 # "make check" target

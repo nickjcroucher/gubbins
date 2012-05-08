@@ -5,3 +5,8 @@ tests/run_all_tests
 Makefile
 src/.deps
 autom4te.cache/*
+*.lo
+*~
+src/.libs/*
+src/libPyGubbins_la-PyGubbins.loT
+src/libgubbins.la

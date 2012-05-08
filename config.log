@@ -30,26 +30,27 @@ Kernel configured for up to 2 processors.
 Processor type: i486 (Intel 80486)
 Processors active: 0 1
 Primary memory available: 4.00 gigabytes
-Default processor set: 99 tasks, 472 threads, 2 processors
-Load average: 0.84, Mach factor: 1.16
+Default processor set: 99 tasks, 444 threads, 2 processors
+Load average: 1.14, Mach factor: 1.13
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH: /Users/ap13/.rvm/gems/ruby-1.9.3-p125/bin
-PATH: /Users/ap13/.rvm/gems/ruby-1.9.3-p125@global/bin
-PATH: /Users/ap13/.rvm/rubies/ruby-1.9.3-p125/bin
-PATH: /Users/ap13/.rvm/bin
 PATH: /usr/local/share/python
 PATH: /usr/local/Cellar/python/2.7.2/bin
 PATH: /usr/local/lib/python2.7/site-packages
 PATH: /Users/ap13/perl5/perlbrew/bin
+PATH: /Users/ap13/.rvm/gems/ruby-1.9.3-p125/bin
+PATH: /Users/ap13/.rvm/gems/ruby-1.9.3-p125@global/bin
+PATH: /Users/ap13/.rvm/rubies/ruby-1.9.3-p125/bin
+PATH: /Users/ap13/.rvm/bin
 PATH: /usr/local/bin
 PATH: /usr/local/mysql/bin
 PATH: /usr/bin
 PATH: /bin
 PATH: /usr/sbin
 PATH: /sbin
+PATH: /usr/local/bin
 PATH: /usr/X11/bin
 PATH: /opt/local/bin
 PATH: /usr/local/git/bin
@@ -57,112 +58,113 @@ PATH: /Library/instantclient
 PATH: /sw/bin
 PATH: /usr/local/mysql-5.1.38-osx10.5-x86/bin
 PATH: ~/bin
+PATH: /Library/instantclient
 
 
 ## ----------- ##
 ## Core tests. ##
 ## ----------- ##
 
-configure:1987: checking for a BSD-compatible install
-configure:2043: result: /usr/bin/install -c
-configure:2054: checking whether build environment is sane
-configure:2097: result: yes
-configure:2125: checking for a thread-safe mkdir -p
-configure:2164: result: ./install-sh -c -d
-configure:2177: checking for gawk
-configure:2207: result: no
-configure:2177: checking for mawk
-configure:2207: result: no
-configure:2177: checking for nawk
-configure:2207: result: no
-configure:2177: checking for awk
-configure:2193: found /usr/bin/awk
-configure:2204: result: awk
-configure:2215: checking whether make sets $(MAKE)
-configure:2236: result: yes
-configure:2506: checking build system type
-configure:2524: result: i386-apple-darwin9.8.0
-configure:2546: checking host system type
-configure:2561: result: i386-apple-darwin9.8.0
-configure:2595: checking for style of include used by make
-configure:2623: result: GNU
-configure:2693: checking for gcc
-configure:2709: found /usr/bin/gcc
-configure:2720: result: gcc
-configure:2958: checking for C compiler version
-configure:2965: gcc --version >&5
+configure:1975: checking for a BSD-compatible install
+configure:2031: result: /usr/bin/install -c
+configure:2042: checking whether build environment is sane
+configure:2085: result: yes
+configure:2113: checking for a thread-safe mkdir -p
+configure:2152: result: ./install-sh -c -d
+configure:2165: checking for gawk
+configure:2195: result: no
+configure:2165: checking for mawk
+configure:2195: result: no
+configure:2165: checking for nawk
+configure:2195: result: no
+configure:2165: checking for awk
+configure:2181: found /usr/bin/awk
+configure:2192: result: awk
+configure:2203: checking whether make sets $(MAKE)
+configure:2224: result: yes
+configure:2494: checking build system type
+configure:2512: result: i386-apple-darwin9.8.0
+configure:2534: checking host system type
+configure:2549: result: i386-apple-darwin9.8.0
+configure:2583: checking for style of include used by make
+configure:2611: result: GNU
+configure:2681: checking for gcc
+configure:2697: found /usr/bin/gcc
+configure:2708: result: gcc
+configure:2946: checking for C compiler version
+configure:2953: gcc --version >&5
 i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5493)
 Copyright (C) 2005 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:2968: $? = 0
-configure:2975: gcc -v >&5
+configure:2956: $? = 0
+configure:2963: gcc -v >&5
 Using built-in specs.
 Target: i686-apple-darwin9
 Configured with: /var/tmp/gcc/gcc-5493~1/src/configure --disable-checking -enable-werror --prefix=/usr --mandir=/share/man --enable-languages=c,objc,c++,obj-c++ --program-transform-name=/^[cg][^.-]*$/s/$/-4.0/ --with-gxx-include-dir=/include/c++/4.0.0 --with-slibdir=/usr/lib --build=i686-apple-darwin9 --with-arch=apple --with-tune=generic --host=i686-apple-darwin9 --target=i686-apple-darwin9
 Thread model: posix
 gcc version 4.0.1 (Apple Inc. build 5493)
-configure:2978: $? = 0
-configure:2985: gcc -V >&5
+configure:2966: $? = 0
+configure:2973: gcc -V >&5
 gcc-4.0: argument to `-V' is missing
-configure:2988: $? = 1
-configure:3011: checking for C compiler default output file name
-configure:3038: gcc    conftest.c  >&5
-configure:3041: $? = 0
-configure:3079: result: a.out
-configure:3096: checking whether the C compiler works
-configure:3106: ./a.out
-configure:3109: $? = 0
-configure:3126: result: yes
-configure:3133: checking whether we are cross compiling
-configure:3135: result: no
-configure:3138: checking for suffix of executables
-configure:3145: gcc -o conftest    conftest.c  >&5
-configure:3148: $? = 0
-configure:3172: result: 
-configure:3178: checking for suffix of object files
-configure:3204: gcc -c   conftest.c >&5
-configure:3207: $? = 0
-configure:3230: result: o
-configure:3234: checking whether we are using the GNU C compiler
-configure:3263: gcc -c   conftest.c >&5
-configure:3269: $? = 0
-configure:3286: result: yes
-configure:3291: checking whether gcc accepts -g
-configure:3321: gcc -c -g  conftest.c >&5
-configure:3327: $? = 0
-configure:3426: result: yes
-configure:3443: checking for gcc option to accept ISO C89
-configure:3517: gcc  -c -g -O2  conftest.c >&5
-configure:3523: $? = 0
-configure:3546: result: none needed
-configure:3566: checking dependency style of gcc
-configure:3657: result: gcc3
-configure:3672: checking for a sed that does not truncate output
-configure:3726: result: /usr/bin/sed
-configure:3729: checking for grep that handles long lines and -e
-configure:3803: result: /usr/bin/grep
-configure:3808: checking for egrep
-configure:3886: result: /usr/bin/grep -E
-configure:3902: checking for ld used by gcc
-configure:3969: result: /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
-configure:3978: checking if the linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) is GNU ld
-configure:3993: result: no
-configure:3998: checking for /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld option to reload object files
-configure:4005: result: -r
-configure:4023: checking for BSD-compatible nm
-configure:4072: result: /usr/bin/nm -p
-configure:4076: checking whether ln -s works
-configure:4080: result: yes
-configure:4087: checking how to recognise dependent libraries
-configure:4263: result: pass_all
-configure:4497: checking how to run the C preprocessor
-configure:4537: gcc -E  conftest.c
-configure:4543: $? = 0
-configure:4574: gcc -E  conftest.c
+configure:2976: $? = 1
+configure:2999: checking for C compiler default output file name
+configure:3026: gcc    conftest.c  >&5
+configure:3029: $? = 0
+configure:3067: result: a.out
+configure:3084: checking whether the C compiler works
+configure:3094: ./a.out
+configure:3097: $? = 0
+configure:3114: result: yes
+configure:3121: checking whether we are cross compiling
+configure:3123: result: no
+configure:3126: checking for suffix of executables
+configure:3133: gcc -o conftest    conftest.c  >&5
+configure:3136: $? = 0
+configure:3160: result: 
+configure:3166: checking for suffix of object files
+configure:3192: gcc -c   conftest.c >&5
+configure:3195: $? = 0
+configure:3218: result: o
+configure:3222: checking whether we are using the GNU C compiler
+configure:3251: gcc -c   conftest.c >&5
+configure:3257: $? = 0
+configure:3274: result: yes
+configure:3279: checking whether gcc accepts -g
+configure:3309: gcc -c -g  conftest.c >&5
+configure:3315: $? = 0
+configure:3414: result: yes
+configure:3431: checking for gcc option to accept ISO C89
+configure:3505: gcc  -c -g -O2  conftest.c >&5
+configure:3511: $? = 0
+configure:3534: result: none needed
+configure:3554: checking dependency style of gcc
+configure:3645: result: gcc3
+configure:3660: checking for a sed that does not truncate output
+configure:3714: result: /usr/bin/sed
+configure:3717: checking for grep that handles long lines and -e
+configure:3791: result: /usr/bin/grep
+configure:3796: checking for egrep
+configure:3874: result: /usr/bin/grep -E
+configure:3890: checking for ld used by gcc
+configure:3957: result: /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
+configure:3966: checking if the linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) is GNU ld
+configure:3981: result: no
+configure:3986: checking for /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld option to reload object files
+configure:3993: result: -r
+configure:4011: checking for BSD-compatible nm
+configure:4060: result: /usr/bin/nm -p
+configure:4064: checking whether ln -s works
+configure:4068: result: yes
+configure:4075: checking how to recognise dependent libraries
+configure:4251: result: pass_all
+configure:4485: checking how to run the C preprocessor
+configure:4525: gcc -E  conftest.c
+configure:4531: $? = 0
+configure:4562: gcc -E  conftest.c
 conftest.c:10:28: error: ac_nonexistent.h: No such file or directory
-configure:4580: $? = 1
+configure:4568: $? = 1
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "Gubbins"
@@ -174,12 +176,12 @@ configure: failed program was:
 | #define VERSION "0.1"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:4613: result: gcc -E
-configure:4642: gcc -E  conftest.c
-configure:4648: $? = 0
-configure:4679: gcc -E  conftest.c
+configure:4601: result: gcc -E
+configure:4630: gcc -E  conftest.c
+configure:4636: $? = 0
+configure:4667: gcc -E  conftest.c
 conftest.c:10:28: error: ac_nonexistent.h: No such file or directory
-configure:4685: $? = 1
+configure:4673: $? = 1
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "Gubbins"
@@ -191,97 +193,97 @@ configure: failed program was:
 | #define VERSION "0.1"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:4723: checking for ANSI C header files
-configure:4753: gcc -c -g -O2  conftest.c >&5
-configure:4759: $? = 0
-configure:4858: gcc -o conftest -g -O2   conftest.c  >&5
-configure:4861: $? = 0
-configure:4867: ./conftest
-configure:4870: $? = 0
-configure:4887: result: yes
-configure:4911: checking for sys/types.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for sys/stat.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for stdlib.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for string.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for memory.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for strings.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for inttypes.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for stdint.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4911: checking for unistd.h
-configure:4932: gcc -c -g -O2  conftest.c >&5
-configure:4938: $? = 0
-configure:4954: result: yes
-configure:4981: checking dlfcn.h usability
-configure:4998: gcc -c -g -O2  conftest.c >&5
-configure:5004: $? = 0
-configure:5018: result: yes
-configure:5022: checking dlfcn.h presence
-configure:5037: gcc -E  conftest.c
-configure:5043: $? = 0
-configure:5057: result: yes
-configure:5085: checking for dlfcn.h
-configure:5093: result: yes
-configure:5164: checking for g++
-configure:5180: found /usr/bin/g++
-configure:5191: result: g++
-configure:5222: checking for C++ compiler version
-configure:5229: g++ --version >&5
+configure:4711: checking for ANSI C header files
+configure:4741: gcc -c -g -O2  conftest.c >&5
+configure:4747: $? = 0
+configure:4846: gcc -o conftest -g -O2   conftest.c  >&5
+configure:4849: $? = 0
+configure:4855: ./conftest
+configure:4858: $? = 0
+configure:4875: result: yes
+configure:4899: checking for sys/types.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for sys/stat.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for stdlib.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for string.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for memory.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for strings.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for inttypes.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for stdint.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4899: checking for unistd.h
+configure:4920: gcc -c -g -O2  conftest.c >&5
+configure:4926: $? = 0
+configure:4942: result: yes
+configure:4969: checking dlfcn.h usability
+configure:4986: gcc -c -g -O2  conftest.c >&5
+configure:4992: $? = 0
+configure:5006: result: yes
+configure:5010: checking dlfcn.h presence
+configure:5025: gcc -E  conftest.c
+configure:5031: $? = 0
+configure:5045: result: yes
+configure:5073: checking for dlfcn.h
+configure:5081: result: yes
+configure:5152: checking for g++
+configure:5168: found /usr/bin/g++
+configure:5179: result: g++
+configure:5210: checking for C++ compiler version
+configure:5217: g++ --version >&5
 i686-apple-darwin9-g++-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5493)
 Copyright (C) 2005 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:5232: $? = 0
-configure:5239: g++ -v >&5
+configure:5220: $? = 0
+configure:5227: g++ -v >&5
 Using built-in specs.
 Target: i686-apple-darwin9
 Configured with: /var/tmp/gcc/gcc-5493~1/src/configure --disable-checking -enable-werror --prefix=/usr --mandir=/share/man --enable-languages=c,objc,c++,obj-c++ --program-transform-name=/^[cg][^.-]*$/s/$/-4.0/ --with-gxx-include-dir=/include/c++/4.0.0 --with-slibdir=/usr/lib --build=i686-apple-darwin9 --with-arch=apple --with-tune=generic --host=i686-apple-darwin9 --target=i686-apple-darwin9
 Thread model: posix
 gcc version 4.0.1 (Apple Inc. build 5493)
-configure:5242: $? = 0
-configure:5249: g++ -V >&5
+configure:5230: $? = 0
+configure:5237: g++ -V >&5
 g++-4.0: argument to `-V' is missing
-configure:5252: $? = 1
-configure:5255: checking whether we are using the GNU C++ compiler
-configure:5284: g++ -c   conftest.cpp >&5
-configure:5290: $? = 0
-configure:5307: result: yes
-configure:5312: checking whether g++ accepts -g
-configure:5342: g++ -c -g  conftest.cpp >&5
-configure:5348: $? = 0
-configure:5447: result: yes
-configure:5472: checking dependency style of g++
-configure:5563: result: gcc3
-configure:5588: checking how to run the C++ preprocessor
-configure:5624: g++ -E  conftest.cpp
-configure:5630: $? = 0
-configure:5661: g++ -E  conftest.cpp
+configure:5240: $? = 1
+configure:5243: checking whether we are using the GNU C++ compiler
+configure:5272: g++ -c   conftest.cpp >&5
+configure:5278: $? = 0
+configure:5295: result: yes
+configure:5300: checking whether g++ accepts -g
+configure:5330: g++ -c -g  conftest.cpp >&5
+configure:5336: $? = 0
+configure:5435: result: yes
+configure:5460: checking dependency style of g++
+configure:5551: result: gcc3
+configure:5576: checking how to run the C++ preprocessor
+configure:5612: g++ -E  conftest.cpp
+configure:5618: $? = 0
+configure:5649: g++ -E  conftest.cpp
 conftest.cpp:21:28: error: ac_nonexistent.h: No such file or directory
-configure:5667: $? = 1
+configure:5655: $? = 1
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "Gubbins"
@@ -304,12 +306,12 @@ configure: failed program was:
 | #define HAVE_DLFCN_H 1
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:5700: result: g++ -E
-configure:5729: g++ -E  conftest.cpp
-configure:5735: $? = 0
-configure:5766: g++ -E  conftest.cpp
+configure:5688: result: g++ -E
+configure:5717: g++ -E  conftest.cpp
+configure:5723: $? = 0
+configure:5754: g++ -E  conftest.cpp
 conftest.cpp:21:28: error: ac_nonexistent.h: No such file or directory
-configure:5772: $? = 1
+configure:5760: $? = 1
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "Gubbins"
@@ -332,39 +334,39 @@ configure: failed program was:
 | #define HAVE_DLFCN_H 1
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:5865: checking for g77
-configure:5895: result: no
-configure:5865: checking for xlf
-configure:5895: result: no
-configure:5865: checking for f77
-configure:5895: result: no
-configure:5865: checking for frt
-configure:5895: result: no
-configure:5865: checking for pgf77
-configure:5895: result: no
-configure:5865: checking for cf77
-configure:5895: result: no
-configure:5865: checking for fort77
-configure:5895: result: no
-configure:5865: checking for fl32
-configure:5895: result: no
-configure:5865: checking for af77
-configure:5895: result: no
-configure:5865: checking for xlf90
-configure:5895: result: no
-configure:5865: checking for f90
-configure:5895: result: no
-configure:5865: checking for pgf90
-configure:5895: result: no
-configure:5865: checking for pghpf
-configure:5895: result: no
-configure:5865: checking for epcf90
-configure:5895: result: no
-configure:5865: checking for gfortran
-configure:5881: found /usr/local/bin/gfortran
-configure:5892: result: gfortran
-configure:5922: checking for Fortran 77 compiler version
-configure:5929: gfortran --version >&5
+configure:5853: checking for g77
+configure:5883: result: no
+configure:5853: checking for xlf
+configure:5883: result: no
+configure:5853: checking for f77
+configure:5883: result: no
+configure:5853: checking for frt
+configure:5883: result: no
+configure:5853: checking for pgf77
+configure:5883: result: no
+configure:5853: checking for cf77
+configure:5883: result: no
+configure:5853: checking for fort77
+configure:5883: result: no
+configure:5853: checking for fl32
+configure:5883: result: no
+configure:5853: checking for af77
+configure:5883: result: no
+configure:5853: checking for xlf90
+configure:5883: result: no
+configure:5853: checking for f90
+configure:5883: result: no
+configure:5853: checking for pgf90
+configure:5883: result: no
+configure:5853: checking for pghpf
+configure:5883: result: no
+configure:5853: checking for epcf90
+configure:5883: result: no
+configure:5853: checking for gfortran
+configure:5869: found /usr/local/bin/gfortran
+configure:5880: result: gfortran
+configure:5910: checking for Fortran 77 compiler version
+configure:5917: gfortran --version >&5
 GNU Fortran (GCC) 4.2.3
 Copyright (C) 2007 Free Software Foundation, Inc.
 
@@ -373,210 +375,186 @@ You may redistribute copies of GNU Fortran
 under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING
 
-configure:5932: $? = 0
-configure:5939: gfortran -v >&5
+configure:5920: $? = 0
+configure:5927: gfortran -v >&5
 Using built-in specs.
 Target: i686-apple-darwin8
 Configured with: /Builds/unix/gcc/gcc-4.2/configure --prefix=/usr/local --mandir=/share/man --program-transform-name=/^[cg][^.-]*$/s/$/-4.2/ --build=i686-apple-darwin8 --host=i686-apple-darwin8 --target=i686-apple-darwin8 --enable-languages=fortran
 Thread model: posix
 gcc version 4.2.3
-configure:5942: $? = 0
-configure:5949: gfortran -V >&5
+configure:5930: $? = 0
+configure:5937: gfortran -V >&5
 gfortran: argument to `-V' is missing
-configure:5952: $? = 1
-configure:5960: checking whether we are using the GNU Fortran 77 compiler
-configure:5979: gfortran -c  conftest.F >&5
-configure:5985: $? = 0
-configure:6002: result: yes
-configure:6008: checking whether gfortran accepts -g
-configure:6025: gfortran -c -g conftest.f >&5
-configure:6031: $? = 0
-configure:6047: result: yes
-configure:6077: checking the maximum length of command line arguments
-configure:6186: result: 196608
-configure:6197: checking command to parse /usr/bin/nm -p output from gcc object
-configure:6302: gcc -c -g -O2  conftest.c >&5
-configure:6305: $? = 0
-configure:6309: /usr/bin/nm -p conftest.o \| sed -n -e 's/^.*[ 	]\([BCDEGRST][BCDEGRST]*\)[ 	][ 	]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' \> conftest.nm
-configure:6312: $? = 0
+configure:5940: $? = 1
+configure:5948: checking whether we are using the GNU Fortran 77 compiler
+configure:5967: gfortran -c  conftest.F >&5
+configure:5973: $? = 0
+configure:5990: result: yes
+configure:5996: checking whether gfortran accepts -g
+configure:6013: gfortran -c -g conftest.f >&5
+configure:6019: $? = 0
+configure:6035: result: yes
+configure:6065: checking the maximum length of command line arguments
+configure:6174: result: 196608
+configure:6185: checking command to parse /usr/bin/nm -p output from gcc object
+configure:6290: gcc -c -g -O2  conftest.c >&5
+configure:6293: $? = 0
+configure:6297: /usr/bin/nm -p conftest.o \| sed -n -e 's/^.*[ 	]\([BCDEGRST][BCDEGRST]*\)[ 	][ 	]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' \> conftest.nm
+configure:6300: $? = 0
 cannot find nm_test_var in conftest.nm
-configure:6302: gcc -c -g -O2  conftest.c >&5
-configure:6305: $? = 0
-configure:6309: /usr/bin/nm -p conftest.o \| sed -n -e 's/^.*[ 	]\([BCDEGRST][BCDEGRST]*\)[ 	][ 	]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' \> conftest.nm
-configure:6312: $? = 0
-configure:6364: gcc -o conftest -g -O2   conftest.c conftstm.o >&5
-configure:6367: $? = 0
-configure:6405: result: ok
-configure:6409: checking for objdir
-configure:6424: result: .libs
-configure:6516: checking for ar
-configure:6532: found /usr/bin/ar
-configure:6543: result: ar
-configure:6612: checking for ranlib
-configure:6628: found /usr/bin/ranlib
-configure:6639: result: ranlib
-configure:6708: checking for strip
-configure:6724: found /usr/bin/strip
-configure:6735: result: strip
-configure:7021: checking if gcc supports -fno-rtti -fno-exceptions
-configure:7039: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
+configure:6290: gcc -c -g -O2  conftest.c >&5
+configure:6293: $? = 0
+configure:6297: /usr/bin/nm -p conftest.o \| sed -n -e 's/^.*[ 	]\([BCDEGRST][BCDEGRST]*\)[ 	][ 	]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' \> conftest.nm
+configure:6300: $? = 0
+configure:6352: gcc -o conftest -g -O2   conftest.c conftstm.o >&5
+configure:6355: $? = 0
+configure:6393: result: ok
+configure:6397: checking for objdir
+configure:6412: result: .libs
+configure:6504: checking for ar
+configure:6520: found /usr/bin/ar
+configure:6531: result: ar
+configure:6600: checking for ranlib
+configure:6616: found /usr/bin/ranlib
+configure:6627: result: ranlib
+configure:6696: checking for strip
+configure:6712: found /usr/bin/strip
+configure:6723: result: strip
+configure:7009: checking if gcc supports -fno-rtti -fno-exceptions
+configure:7027: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
 cc1: warning: command line option "-fno-rtti" is valid for C++/ObjC++ but not for C
-configure:7043: $? = 0
-configure:7056: result: no
-configure:7071: checking for gcc option to produce PIC
-configure:7281: result: -fno-common
-configure:7289: checking if gcc PIC flag -fno-common works
-configure:7307: gcc -c -g -O2  -fno-common -DPIC conftest.c >&5
-configure:7311: $? = 0
-configure:7324: result: yes
-configure:7352: checking if gcc static flag -static works
-configure:7380: result: no
-configure:7390: checking if gcc supports -c -o file.o
-configure:7411: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
-configure:7415: $? = 0
-configure:7437: result: yes
-configure:7463: checking whether the gcc linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
-configure:8417: result: yes
-configure:8484: checking dynamic linker characteristics
-configure:9072: result: darwin9.8.0 dyld
-configure:9081: checking how to hardcode library paths into programs
-configure:9106: result: immediate
-configure:9120: checking whether stripping libraries is possible
-configure:9133: result: yes
-configure:9926: checking if libtool supports shared libraries
-configure:9928: result: yes
-configure:9931: checking whether to build shared libraries
-configure:9952: result: yes
-configure:9955: checking whether to build static libraries
-configure:9959: result: yes
-configure:10051: creating libtool
-configure:10639: checking for ld used by g++
-configure:10706: result: /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
-configure:10715: checking if the linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) is GNU ld
-configure:10730: result: no
-configure:10781: checking whether the g++ linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
-configure:11715: result: yes
-configure:11733: g++ -c -g -O2  conftest.cpp >&5
-configure:11736: $? = 0
-configure:11855: checking for g++ option to produce PIC
-configure:12129: result: -fno-common
-configure:12137: checking if g++ PIC flag -fno-common works
-configure:12155: g++ -c -g -O2  -fno-common -DPIC conftest.cpp >&5
-configure:12159: $? = 0
-configure:12172: result: yes
-configure:12200: checking if g++ static flag -static works
-configure:12228: result: no
-configure:12238: checking if g++ supports -c -o file.o
-configure:12259: g++ -c -g -O2  -o out/conftest2.o conftest.cpp >&5
-configure:12263: $? = 0
-configure:12285: result: yes
-configure:12311: checking whether the g++ linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
-configure:12336: result: yes
-configure:12403: checking dynamic linker characteristics
-configure:12991: result: darwin9.8.0 dyld
-configure:13000: checking how to hardcode library paths into programs
-configure:13025: result: immediate
-configure:13551: checking if libtool supports shared libraries
-configure:13553: result: yes
-configure:13556: checking whether to build shared libraries
-configure:13576: result: yes
-configure:13579: checking whether to build static libraries
-configure:13583: result: yes
-configure:13593: checking for gfortran option to produce PIC
-configure:13803: result: -fno-common
-configure:13811: checking if gfortran PIC flag -fno-common works
-configure:13829: gfortran -c -g -O2 -fno-common conftest.f >&5
-configure:13833: $? = 0
-configure:13846: result: yes
-configure:13874: checking if gfortran static flag -static works
-configure:13902: result: no
-configure:13912: checking if gfortran supports -c -o file.o
-configure:13933: gfortran -c -g -O2 -o out/conftest2.o conftest.f >&5
-configure:13937: $? = 0
-configure:13959: result: yes
-configure:13985: checking whether the gfortran linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
-configure:14919: result: yes
-configure:14986: checking dynamic linker characteristics
-configure:15574: result: darwin9.8.0 dyld
-configure:15583: checking how to hardcode library paths into programs
-configure:15608: result: immediate
-configure:19213: checking for gcc
-configure:19240: result: gcc
-configure:19478: checking for C compiler version
-configure:19485: gcc --version >&5
+configure:7031: $? = 0
+configure:7044: result: no
+configure:7059: checking for gcc option to produce PIC
+configure:7269: result: -fno-common
+configure:7277: checking if gcc PIC flag -fno-common works
+configure:7295: gcc -c -g -O2  -fno-common -DPIC conftest.c >&5
+configure:7299: $? = 0
+configure:7312: result: yes
+configure:7340: checking if gcc static flag -static works
+configure:7368: result: no
+configure:7378: checking if gcc supports -c -o file.o
+configure:7399: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
+configure:7403: $? = 0
+configure:7425: result: yes
+configure:7451: checking whether the gcc linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
+configure:8405: result: yes
+configure:8472: checking dynamic linker characteristics
+configure:9060: result: darwin9.8.0 dyld
+configure:9069: checking how to hardcode library paths into programs
+configure:9094: result: immediate
+configure:9108: checking whether stripping libraries is possible
+configure:9121: result: yes
+configure:9914: checking if libtool supports shared libraries
+configure:9916: result: yes
+configure:9919: checking whether to build shared libraries
+configure:9940: result: yes
+configure:9943: checking whether to build static libraries
+configure:9947: result: yes
+configure:10039: creating libtool
+configure:10627: checking for ld used by g++
+configure:10694: result: /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
+configure:10703: checking if the linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) is GNU ld
+configure:10718: result: no
+configure:10769: checking whether the g++ linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
+configure:11703: result: yes
+configure:11721: g++ -c -g -O2  conftest.cpp >&5
+configure:11724: $? = 0
+configure:11843: checking for g++ option to produce PIC
+configure:12117: result: -fno-common
+configure:12125: checking if g++ PIC flag -fno-common works
+configure:12143: g++ -c -g -O2  -fno-common -DPIC conftest.cpp >&5
+configure:12147: $? = 0
+configure:12160: result: yes
+configure:12188: checking if g++ static flag -static works
+configure:12216: result: no
+configure:12226: checking if g++ supports -c -o file.o
+configure:12247: g++ -c -g -O2  -o out/conftest2.o conftest.cpp >&5
+configure:12251: $? = 0
+configure:12273: result: yes
+configure:12299: checking whether the g++ linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
+configure:12324: result: yes
+configure:12391: checking dynamic linker characteristics
+configure:12979: result: darwin9.8.0 dyld
+configure:12988: checking how to hardcode library paths into programs
+configure:13013: result: immediate
+configure:13539: checking if libtool supports shared libraries
+configure:13541: result: yes
+configure:13544: checking whether to build shared libraries
+configure:13564: result: yes
+configure:13567: checking whether to build static libraries
+configure:13571: result: yes
+configure:13581: checking for gfortran option to produce PIC
+configure:13791: result: -fno-common
+configure:13799: checking if gfortran PIC flag -fno-common works
+configure:13817: gfortran -c -g -O2 -fno-common conftest.f >&5
+configure:13821: $? = 0
+configure:13834: result: yes
+configure:13862: checking if gfortran static flag -static works
+configure:13890: result: no
+configure:13900: checking if gfortran supports -c -o file.o
+configure:13921: gfortran -c -g -O2 -o out/conftest2.o conftest.f >&5
+configure:13925: $? = 0
+configure:13947: result: yes
+configure:13973: checking whether the gfortran linker (/usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld) supports shared libraries
+configure:14907: result: yes
+configure:14974: checking dynamic linker characteristics
+configure:15562: result: darwin9.8.0 dyld
+configure:15571: checking how to hardcode library paths into programs
+configure:15596: result: immediate
+configure:19201: checking for gcc
+configure:19228: result: gcc
+configure:19466: checking for C compiler version
+configure:19473: gcc --version >&5
 i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5493)
 Copyright (C) 2005 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:19488: $? = 0
-configure:19495: gcc -v >&5
+configure:19476: $? = 0
+configure:19483: gcc -v >&5
 Using built-in specs.
 Target: i686-apple-darwin9
 Configured with: /var/tmp/gcc/gcc-5493~1/src/configure --disable-checking -enable-werror --prefix=/usr --mandir=/share/man --enable-languages=c,objc,c++,obj-c++ --program-transform-name=/^[cg][^.-]*$/s/$/-4.0/ --with-gxx-include-dir=/include/c++/4.0.0 --with-slibdir=/usr/lib --build=i686-apple-darwin9 --with-arch=apple --with-tune=generic --host=i686-apple-darwin9 --target=i686-apple-darwin9
 Thread model: posix
 gcc version 4.0.1 (Apple Inc. build 5493)
-configure:19498: $? = 0
-configure:19505: gcc -V >&5
+configure:19486: $? = 0
+configure:19493: gcc -V >&5
 gcc-4.0: argument to `-V' is missing
-configure:19508: $? = 1
-configure:19511: checking whether we are using the GNU C compiler
-configure:19563: result: yes
-configure:19568: checking whether gcc accepts -g
-configure:19703: result: yes
-configure:19720: checking for gcc option to accept ISO C89
-configure:19823: result: none needed
-configure:19843: checking dependency style of gcc
-configure:19934: result: gcc3
-configure:20065: checking for C++ compiler version
-configure:20072: g++ --version >&5
+configure:19496: $? = 1
+configure:19499: checking whether we are using the GNU C compiler
+configure:19551: result: yes
+configure:19556: checking whether gcc accepts -g
+configure:19691: result: yes
+configure:19708: checking for gcc option to accept ISO C89
+configure:19811: result: none needed
+configure:19831: checking dependency style of gcc
+configure:19922: result: gcc3
+configure:20053: checking for C++ compiler version
+configure:20060: g++ --version >&5
 i686-apple-darwin9-g++-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5493)
 Copyright (C) 2005 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:20075: $? = 0
-configure:20082: g++ -v >&5
+configure:20063: $? = 0
+configure:20070: g++ -v >&5
 Using built-in specs.
 Target: i686-apple-darwin9
 Configured with: /var/tmp/gcc/gcc-5493~1/src/configure --disable-checking -enable-werror --prefix=/usr --mandir=/share/man --enable-languages=c,objc,c++,obj-c++ --program-transform-name=/^[cg][^.-]*$/s/$/-4.0/ --with-gxx-include-dir=/include/c++/4.0.0 --with-slibdir=/usr/lib --build=i686-apple-darwin9 --with-arch=apple --with-tune=generic --host=i686-apple-darwin9 --target=i686-apple-darwin9
 Thread model: posix
 gcc version 4.0.1 (Apple Inc. build 5493)
-configure:20085: $? = 0
-configure:20092: g++ -V >&5
+configure:20073: $? = 0
+configure:20080: g++ -V >&5
 g++-4.0: argument to `-V' is missing
-configure:20095: $? = 1
-configure:20098: checking whether we are using the GNU C++ compiler
-configure:20150: result: yes
-configure:20155: checking whether g++ accepts -g
-configure:20290: result: yes
-configure:20315: checking dependency style of g++
-configure:20406: result: gcc3
-configure:20521: checking for python
-configure:20539: found /usr/local/Cellar/python/2.7.2/bin/python
-configure:20551: result: /usr/local/Cellar/python/2.7.2/bin/python
-configure:20569: checking for a version of Python >= '2.1.0'
-configure:20604: result: yes
-configure:20641: checking for the distutils Python package
-configure:20645: result: yes
-configure:20663: checking for Python include path
-configure:20673: result: -I/usr/local/Cellar/python/2.7.2/include/python2.7
-configure:20680: checking for Python library path
-configure:20770: result: -L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7
-configure:20777: checking for Python site-packages path
-configure:20783: result: /usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages
-configure:20790: checking python extra libraries
-configure:20797: result:  -ldl  -framework CoreFoundation
-configure:20804: checking python extra linking flags
-configure:20811: result: -u _PyMac_Error
-configure:20818: checking consistency of all components of python development environment
-configure:20854: gcc -o conftest -g -O2  -I/usr/local/Cellar/python/2.7.2/include/python2.7  conftest.c  -L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7 -u _PyMac_Error  -ldl  -framework CoreFoundation >&5
-In file included from /usr/local/Cellar/python/2.7.2/include/python2.7/Python.h:126,
-                 from conftest.c:23:
-/usr/local/Cellar/python/2.7.2/include/python2.7/modsupport.h:27: warning: 'PyArg_ParseTuple' is an unrecognized format function type
-configure:20860: $? = 0
-configure:20886: result: yes
-configure:21060: creating ./config.status
+configure:20083: $? = 1
+configure:20086: checking whether we are using the GNU C++ compiler
+configure:20138: result: yes
+configure:20143: checking whether g++ accepts -g
+configure:20278: result: yes
+configure:20303: checking dependency style of g++
+configure:20394: result: gcc3
+configure:20550: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -593,31 +571,30 @@ generated by GNU Autoconf 2.61.  Invocation command line was
 
 on mib100408i.local
 
-config.status:669: creating Makefile
-config.status:669: creating src/Makefile
-config.status:669: creating config.h
-config.status:897: config.h is unchanged
-config.status:943: executing depfiles commands
-configure:22357: checking zlib.h usability
-configure:22374: gcc -c -g -O2  conftest.c >&5
-configure:22380: $? = 0
-configure:22394: result: yes
-configure:22398: checking zlib.h presence
-configure:22413: gcc -E  conftest.c
-configure:22419: $? = 0
-configure:22433: result: yes
-configure:22461: checking for zlib.h
-configure:22469: result: yes
-configure:22357: checking math.h usability
-configure:22374: gcc -c -g -O2  conftest.c >&5
-configure:22380: $? = 0
-configure:22394: result: yes
-configure:22398: checking math.h presence
-configure:22413: gcc -E  conftest.c
-configure:22419: $? = 0
-configure:22433: result: yes
-configure:22461: checking for math.h
-configure:22469: result: yes
+config.status:662: creating Makefile
+config.status:662: creating src/Makefile
+config.status:662: creating config.h
+config.status:935: executing depfiles commands
+configure:21840: checking zlib.h usability
+configure:21857: gcc -c -g -O2  conftest.c >&5
+configure:21863: $? = 0
+configure:21877: result: yes
+configure:21881: checking zlib.h presence
+configure:21896: gcc -E  conftest.c
+configure:21902: $? = 0
+configure:21916: result: yes
+configure:21944: checking for zlib.h
+configure:21952: result: yes
+configure:21840: checking math.h usability
+configure:21857: gcc -c -g -O2  conftest.c >&5
+configure:21863: $? = 0
+configure:21877: result: yes
+configure:21881: checking math.h presence
+configure:21896: gcc -E  conftest.c
+configure:21902: $? = 0
+configure:21916: result: yes
+configure:21944: checking for math.h
+configure:21952: result: yes
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -650,8 +627,6 @@ ac_cv_env_LDFLAGS_set=
 ac_cv_env_LDFLAGS_value=
 ac_cv_env_LIBS_set=
 ac_cv_env_LIBS_value=
-ac_cv_env_PYTHON_VERSION_set=
-ac_cv_env_PYTHON_VERSION_value=
 ac_cv_env_build_alias_set=
 ac_cv_env_build_alias_value=
 ac_cv_env_host_alias_set=
@@ -676,7 +651,6 @@ ac_cv_host=i386-apple-darwin9.8.0
 ac_cv_objext=o
 ac_cv_path_EGREP='/usr/bin/grep -E'
 ac_cv_path_GREP=/usr/bin/grep
-ac_cv_path_PYTHON=/usr/local/Cellar/python/2.7.2/bin/python
 ac_cv_path_install='/usr/bin/install -c'
 ac_cv_prog_AWK=awk
 ac_cv_prog_CPP='gcc -E'
@@ -773,13 +747,6 @@ PACKAGE_STRING='Gubbins 0.1'
 PACKAGE_TARNAME='gubbins'
 PACKAGE_VERSION='0.1'
 PATH_SEPARATOR=':'
-PYTHON='/usr/local/Cellar/python/2.7.2/bin/python'
-PYTHON_CPPFLAGS='-I/usr/local/Cellar/python/2.7.2/include/python2.7'
-PYTHON_EXTRA_LDFLAGS='-u _PyMac_Error'
-PYTHON_EXTRA_LIBS=' -ldl  -framework CoreFoundation'
-PYTHON_LDFLAGS='-L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7'
-PYTHON_SITE_PKG='/usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages'
-PYTHON_VERSION=''
 RANLIB='ranlib'
 SET_MAKE=''
 SHELL='/bin/sh'
@@ -856,7 +823,6 @@ target_alias=''
 #define HAVE_STDINT_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_DLFCN_H 1
-#define HAVE_PYTHON "2.7"
 #define HAVE_ZLIB_H 1
 #define HAVE_MATH_H 1
 

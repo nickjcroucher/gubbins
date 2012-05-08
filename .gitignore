@@ -1,6 +1,7 @@
 *.o
 gubbins
 tests/run_all_tests
+src/run_all_tests
 .DS_Store
 Makefile
 src/.deps

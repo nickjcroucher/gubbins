@@ -868,13 +868,6 @@ F77
 FFLAGS
 ac_ct_F77
 LIBTOOL
-PYTHON_VERSION
-PYTHON
-PYTHON_CPPFLAGS
-PYTHON_LDFLAGS
-PYTHON_SITE_PKG
-PYTHON_EXTRA_LIBS
-PYTHON_EXTRA_LDFLAGS
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -892,8 +885,7 @@ CXXFLAGS
 CCC
 CXXCPP
 F77
-FFLAGS
-PYTHON_VERSION'
+FFLAGS'
 
 
 # Initialize some variables set by options.
@@ -1503,10 +1495,6 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   F77         Fortran 77 compiler command
   FFLAGS      Fortran 77 compiler flags
-  PYTHON_VERSION
-              The installed Python version to use, for example '2.3'. This
-              string will be appended to the Python interpreter canonical
-              name.
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4310,7 +4298,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4313 "configure"' > conftest.$ac_ext
+  echo '#line 4301 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7036,11 +7024,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7039: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7027: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7043: \$? = $ac_status" >&5
+   echo "$as_me:7031: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7304,11 +7292,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7307: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7295: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7311: \$? = $ac_status" >&5
+   echo "$as_me:7299: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7408,11 +7396,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7411: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7399: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7415: \$? = $ac_status" >&5
+   echo "$as_me:7403: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9716,7 +9704,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9719 "configure"
+#line 9707 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9816,7 +9804,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9819 "configure"
+#line 9807 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12152,11 +12140,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12155: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12143: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12159: \$? = $ac_status" >&5
+   echo "$as_me:12147: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12256,11 +12244,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12259: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12247: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12263: \$? = $ac_status" >&5
+   echo "$as_me:12251: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13826,11 +13814,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13829: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13817: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13833: \$? = $ac_status" >&5
+   echo "$as_me:13821: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13930,11 +13918,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13933: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13921: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13937: \$? = $ac_status" >&5
+   echo "$as_me:13925: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16128,11 +16116,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16131: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16119: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16135: \$? = $ac_status" >&5
+   echo "$as_me:16123: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16396,11 +16384,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16399: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16387: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16403: \$? = $ac_status" >&5
+   echo "$as_me:16391: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16500,11 +16488,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16503: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16491: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16507: \$? = $ac_status" >&5
+   echo "$as_me:16495: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20419,506 +20407,8 @@ fi
 
 
 
-# ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_python_devel.html
-# ===========================================================================
-#
-# SYNOPSIS
-#
-#   AX_PYTHON_DEVEL([version])
-#
-# DESCRIPTION
-#
-#   Note: Defines as a precious variable "PYTHON_VERSION". Don't override it
-#   in your configure.ac.
-#
-#   This macro checks for Python and tries to get the include path to
-#   'Python.h'. It provides the $(PYTHON_CPPFLAGS) and $(PYTHON_LDFLAGS)
-#   output variables. It also exports $(PYTHON_EXTRA_LIBS) and
-#   $(PYTHON_EXTRA_LDFLAGS) for embedding Python in your code.
-#
-#   You can search for some particular version of Python by passing a
-#   parameter to this macro, for example ">= '2.3.1'", or "== '2.4'". Please
-#   note that you *have* to pass also an operator along with the version to
-#   match, and pay special attention to the single quotes surrounding the
-#   version number. Don't use "PYTHON_VERSION" for this: that environment
-#   variable is declared as precious and thus reserved for the end-user.
-#
-#   This macro should work for all versions of Python >= 2.1.0. As an end
-#   user, you can disable the check for the python version by setting the
-#   PYTHON_NOVERSIONCHECK environment variable to something else than the
-#   empty string.
-#
-#   If you need to use this macro for an older Python version, please
-#   contact the authors. We're always open for feedback.
-#
-# LICENSE
-#
-#   Copyright (c) 2009 Sebastian Huber <sebastian-huber@web.de>
-#   Copyright (c) 2009 Alan W. Irwin <irwin@beluga.phys.uvic.ca>
-#   Copyright (c) 2009 Rafael Laboissiere <rafael@laboissiere.net>
-#   Copyright (c) 2009 Andrew Collier <colliera@ukzn.ac.za>
-#   Copyright (c) 2009 Matteo Settenvini <matteo@member.fsf.org>
-#   Copyright (c) 2009 Horst Knorr <hk_classes@knoda.org>
-#
-#   This program is free software: you can redistribute it and/or modify it
-#   under the terms of the GNU General Public License as published by the
-#   Free Software Foundation, either version 3 of the License, or (at your
-#   option) any later version.
-#
-#   This program is distributed in the hope that it will be useful, but
-#   WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-#   As a special exception, the respective Autoconf Macro's copyright owner
-#   gives unlimited permission to copy, distribute and modify the configure
-#   scripts that are the output of Autoconf when processing the Macro. You
-#   need not follow the terms of the GNU General Public License when using
-#   or distributing such scripts, even though portions of the text of the
-#   Macro appear in them. The GNU General Public License (GPL) does govern
-#   all other use of the material that constitutes the Autoconf Macro.
-#
-#   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Archive. When you make and distribute a
-#   modified version of the Autoconf Macro, you may extend this special
-#   exception to the GPL to apply to your modified version as well.
-
-#serial 8
-
-# This is what autoupdate's m4 run will expand.  It fires
-# the warning (with _au_warn_XXX), outputs it into the
-# updated configure.ac (with AC_DIAGNOSE), and then outputs
-# the replacement expansion.
-
-
-# This is an auxiliary macro that is also run when
-# autoupdate runs m4.  It simply calls m4_warning, but
-# we need a wrapper so that each warning is emitted only
-# once.  We break the quoting in m4_warning's argument in
-# order to expand this macro's arguments, not AU_DEFUN's.
-
-
-# Finally, this is the expansion that is picked up by
-# autoconf.  It tells the user to run autoupdate, and
-# then outputs the replacement expansion.  We do not care
-# about autoupdate's warning because that contains
-# information on what to do *after* running autoupdate.
-
-
-
-
-	#
-	# Allow the use of a (user set) custom python version
-	#
-
-
-	# Extract the first word of "python[$PYTHON_VERSION]", so it can be a program name with args.
-set dummy python$PYTHON_VERSION; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_PYTHON+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PYTHON in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PYTHON="$PYTHON" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PYTHON="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-PYTHON=$ac_cv_path_PYTHON
-if test -n "$PYTHON"; then
-  { echo "$as_me:$LINENO: result: $PYTHON" >&5
-echo "${ECHO_T}$PYTHON" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-	if test -z "$PYTHON"; then
-	   { { echo "$as_me:$LINENO: error: Cannot find python$PYTHON_VERSION in your system path" >&5
-echo "$as_me: error: Cannot find python$PYTHON_VERSION in your system path" >&2;}
-   { (exit 1); exit 1; }; }
-	   PYTHON_VERSION=""
-	fi
-
-	#
-	# Check for a version of Python >= 2.1.0
-	#
-	{ echo "$as_me:$LINENO: checking for a version of Python >= '2.1.0'" >&5
-echo $ECHO_N "checking for a version of Python >= '2.1.0'... $ECHO_C" >&6; }
-	ac_supports_python_ver=`$PYTHON -c "import sys; \
-		ver = sys.version.split ()[0]; \
-		print (ver >= '2.1.0')"`
-	if test "$ac_supports_python_ver" != "True"; then
-		if test -z "$PYTHON_NOVERSIONCHECK"; then
-			{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-			{ { echo "$as_me:$LINENO: error:
-This version of the AC_PYTHON_DEVEL macro
-doesn't work properly with versions of Python before
-2.1.0. You may need to re-run configure, setting the
-variables PYTHON_CPPFLAGS, PYTHON_LDFLAGS, PYTHON_SITE_PKG,
-PYTHON_EXTRA_LIBS and PYTHON_EXTRA_LDFLAGS by hand.
-Moreover, to disable this check, set PYTHON_NOVERSIONCHECK
-to something else than an empty string.
-
-See \`config.log' for more details." >&5
-echo "$as_me: error:
-This version of the AC_PYTHON_DEVEL macro
-doesn't work properly with versions of Python before
-2.1.0. You may need to re-run configure, setting the
-variables PYTHON_CPPFLAGS, PYTHON_LDFLAGS, PYTHON_SITE_PKG,
-PYTHON_EXTRA_LIBS and PYTHON_EXTRA_LDFLAGS by hand.
-Moreover, to disable this check, set PYTHON_NOVERSIONCHECK
-to something else than an empty string.
-
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-		else
-			{ echo "$as_me:$LINENO: result: skip at user request" >&5
-echo "${ECHO_T}skip at user request" >&6; }
-		fi
-	else
-		{ echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	fi
-
-	#
-	# if the macro parameter ``version'' is set, honour it
-	#
-	if test -n ""; then
-		{ echo "$as_me:$LINENO: checking for a version of Python " >&5
-echo $ECHO_N "checking for a version of Python ... $ECHO_C" >&6; }
-		ac_supports_python_ver=`$PYTHON -c "import sys; \
-			ver = sys.version.split ()[0]; \
-			print (ver )"`
-		if test "$ac_supports_python_ver" = "True"; then
-		   { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-		else
-			{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-			{ { echo "$as_me:$LINENO: error: this package requires Python .
-If you have it installed, but it isn't the default Python
-interpreter in your system path, please pass the PYTHON_VERSION
-variable to configure. See \`\`configure --help'' for reference.
-" >&5
-echo "$as_me: error: this package requires Python .
-If you have it installed, but it isn't the default Python
-interpreter in your system path, please pass the PYTHON_VERSION
-variable to configure. See \`\`configure --help'' for reference.
-" >&2;}
-   { (exit 1); exit 1; }; }
-			PYTHON_VERSION=""
-		fi
-	fi
-
-	#
-	# Check if you have distutils, else fail
-	#
-	{ echo "$as_me:$LINENO: checking for the distutils Python package" >&5
-echo $ECHO_N "checking for the distutils Python package... $ECHO_C" >&6; }
-	ac_distutils_result=`$PYTHON -c "import distutils" 2>&1`
-	if test -z "$ac_distutils_result"; then
-		{ echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	else
-		{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-		{ { echo "$as_me:$LINENO: error: cannot import Python module \"distutils\".
-Please check your Python installation. The error was:
-$ac_distutils_result" >&5
-echo "$as_me: error: cannot import Python module \"distutils\".
-Please check your Python installation. The error was:
-$ac_distutils_result" >&2;}
-   { (exit 1); exit 1; }; }
-		PYTHON_VERSION=""
-	fi
-
-	#
-	# Check for Python include path
-	#
-	{ echo "$as_me:$LINENO: checking for Python include path" >&5
-echo $ECHO_N "checking for Python include path... $ECHO_C" >&6; }
-	if test -z "$PYTHON_CPPFLAGS"; then
-		python_path=`$PYTHON -c "import distutils.sysconfig; \
-			print (distutils.sysconfig.get_python_inc ());"`
-		if test -n "${python_path}"; then
-			python_path="-I$python_path"
-		fi
-		PYTHON_CPPFLAGS=$python_path
-	fi
-	{ echo "$as_me:$LINENO: result: $PYTHON_CPPFLAGS" >&5
-echo "${ECHO_T}$PYTHON_CPPFLAGS" >&6; }
-
-
-	#
-	# Check for Python library path
-	#
-	{ echo "$as_me:$LINENO: checking for Python library path" >&5
-echo $ECHO_N "checking for Python library path... $ECHO_C" >&6; }
-	if test -z "$PYTHON_LDFLAGS"; then
-		# (makes two attempts to ensure we've got a version number
-		# from the interpreter)
-		ac_python_version=`cat<<EOD | $PYTHON -
-
-# join all versioning strings, on some systems
-# major/minor numbers could be in different list elements
-from distutils.sysconfig import *
-ret = ''
-for e in get_config_vars ('VERSION'):
-	if (e != None):
-		ret += e
-print (ret)
-EOD`
-
-		if test -z "$ac_python_version"; then
-			if test -n "$PYTHON_VERSION"; then
-				ac_python_version=$PYTHON_VERSION
-			else
-				ac_python_version=`$PYTHON -c "import sys; \
-					print (sys.version[:3])"`
-			fi
-		fi
-
-		# Make the versioning information available to the compiler
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_PYTHON "$ac_python_version"
-_ACEOF
-
-
-		# First, the library directory:
-		ac_python_libdir=`cat<<EOD | $PYTHON -
-
-# There should be only one
-import distutils.sysconfig
-for e in distutils.sysconfig.get_config_vars ('LIBDIR'):
-	if e != None:
-		print (e)
-		break
-EOD`
-
-		# Before checking for libpythonX.Y, we need to know
-		# the extension the OS we're on uses for libraries
-		# (we take the first one, if there's more than one fix me!):
-		ac_python_soext=`$PYTHON -c \
-		  "import distutils.sysconfig; \
-		  print (distutils.sysconfig.get_config_vars('SO')[0])"`
-
-		# Now, for the library:
-		ac_python_soname=`$PYTHON -c \
-		  "import distutils.sysconfig; \
-		  print (distutils.sysconfig.get_config_vars('LDLIBRARY')[0])"`
-
-		# Strip away extension from the end to canonicalize its name:
-		ac_python_library=`echo "$ac_python_soname" | sed "s/${ac_python_soext}$//"`
-
-		# This small piece shamelessly adapted from PostgreSQL python macro;
-		# credits goes to momjian, I think. I'd like to put the right name
-		# in the credits, if someone can point me in the right direction... ?
-		#
-		if test -n "$ac_python_libdir" -a -n "$ac_python_library" \
-			-a x"$ac_python_library" != x"$ac_python_soname"
-		then
-			# use the official shared library
-			ac_python_library=`echo "$ac_python_library" | sed "s/^lib//"`
-			PYTHON_LDFLAGS="-L$ac_python_libdir -l$ac_python_library"
-		else
-			# old way: use libpython from python_configdir
-			ac_python_libdir=`$PYTHON -c \
-			  "from distutils.sysconfig import get_python_lib as f; \
-			  import os; \
-			  print (os.path.join(f(plat_specific=1, standard_lib=1), 'config'));"`
-			PYTHON_LDFLAGS="-L$ac_python_libdir -lpython$ac_python_version"
-		fi
-
-		if test -z "PYTHON_LDFLAGS"; then
-			{ { echo "$as_me:$LINENO: error:
-  Cannot determine location of your Python DSO. Please check it was installed with
-  dynamic libraries enabled, or try setting PYTHON_LDFLAGS by hand.
-			" >&5
-echo "$as_me: error:
-  Cannot determine location of your Python DSO. Please check it was installed with
-  dynamic libraries enabled, or try setting PYTHON_LDFLAGS by hand.
-			" >&2;}
-   { (exit 1); exit 1; }; }
-		fi
-	fi
-	{ echo "$as_me:$LINENO: result: $PYTHON_LDFLAGS" >&5
-echo "${ECHO_T}$PYTHON_LDFLAGS" >&6; }
-
-
-	#
-	# Check for site packages
-	#
-	{ echo "$as_me:$LINENO: checking for Python site-packages path" >&5
-echo $ECHO_N "checking for Python site-packages path... $ECHO_C" >&6; }
-	if test -z "$PYTHON_SITE_PKG"; then
-		PYTHON_SITE_PKG=`$PYTHON -c "import distutils.sysconfig; \
-			print (distutils.sysconfig.get_python_lib(0,0));"`
-	fi
-	{ echo "$as_me:$LINENO: result: $PYTHON_SITE_PKG" >&5
-echo "${ECHO_T}$PYTHON_SITE_PKG" >&6; }
-
-
-	#
-	# libraries which must be linked in when embedding
-	#
-	{ echo "$as_me:$LINENO: checking python extra libraries" >&5
-echo $ECHO_N "checking python extra libraries... $ECHO_C" >&6; }
-	if test -z "$PYTHON_EXTRA_LIBS"; then
-	   PYTHON_EXTRA_LIBS=`$PYTHON -c "import distutils.sysconfig; \
-                conf = distutils.sysconfig.get_config_var; \
-                print (conf('LOCALMODLIBS') + ' ' + conf('LIBS'))"`
-	fi
-	{ echo "$as_me:$LINENO: result: $PYTHON_EXTRA_LIBS" >&5
-echo "${ECHO_T}$PYTHON_EXTRA_LIBS" >&6; }
-
-
-	#
-	# linking flags needed when embedding
-	#
-	{ echo "$as_me:$LINENO: checking python extra linking flags" >&5
-echo $ECHO_N "checking python extra linking flags... $ECHO_C" >&6; }
-	if test -z "$PYTHON_EXTRA_LDFLAGS"; then
-		PYTHON_EXTRA_LDFLAGS=`$PYTHON -c "import distutils.sysconfig; \
-			conf = distutils.sysconfig.get_config_var; \
-			print (conf('LINKFORSHARED'))"`
-	fi
-	{ echo "$as_me:$LINENO: result: $PYTHON_EXTRA_LDFLAGS" >&5
-echo "${ECHO_T}$PYTHON_EXTRA_LDFLAGS" >&6; }
-
-
-	#
-	# final check to see if everything compiles alright
-	#
-	{ echo "$as_me:$LINENO: checking consistency of all components of python development environment" >&5
-echo $ECHO_N "checking consistency of all components of python development environment... $ECHO_C" >&6; }
-	# save current global flags
-	ac_save_LIBS="$LIBS"
-	ac_save_CPPFLAGS="$CPPFLAGS"
-	LIBS="$ac_save_LIBS $PYTHON_LDFLAGS $PYTHON_EXTRA_LDFLAGS $PYTHON_EXTRA_LIBS"
-	CPPFLAGS="$ac_save_CPPFLAGS $PYTHON_CPPFLAGS"
-	ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-	cat >conftest.$ac_ext <<_ACEOF
-
-		/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <Python.h>
-int
-main ()
-{
-Py_Initialize();
-  ;
-  return 0;
-}
-
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  pythonexists=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	pythonexists=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-	ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-	# turn back to default flags
-	CPPFLAGS="$ac_save_CPPFLAGS"
-	LIBS="$ac_save_LIBS"
-
-	{ echo "$as_me:$LINENO: result: $pythonexists" >&5
-echo "${ECHO_T}$pythonexists" >&6; }
-
-        if test ! "x$pythonexists" = "xyes"; then
-	   { { echo "$as_me:$LINENO: error:
-  Could not link test program to Python. Maybe the main Python library has been
-  installed in some non-standard library path. If so, pass it to configure,
-  via the LDFLAGS environment variable.
-  Example: ./configure LDFLAGS=\"-L/usr/non-standard-path/python/lib\"
-  ============================================================================
-   ERROR!
-   You probably have to install the development version of the Python package
-   for your distribution.  The exact name of this package varies among them.
-  ============================================================================
-
-See \`config.log' for more details." >&5
-echo "$as_me: error:
-  Could not link test program to Python. Maybe the main Python library has been
-  installed in some non-standard library path. If so, pass it to configure,
-  via the LDFLAGS environment variable.
-  Example: ./configure LDFLAGS=\"-L/usr/non-standard-path/python/lib\"
-  ============================================================================
-   ERROR!
-   You probably have to install the development version of the Python package
-   for your distribution.  The exact name of this package varies among them.
-  ============================================================================
-
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-	  PYTHON_VERSION=""
-	fi
-
-	#
-	# all done!
-	#
-
+#m4_include([m4/ax_python_devel.m4])
+#AX_PYTHON_DEVEL
 
 ac_config_files="$ac_config_files Makefile src/Makefile"
 
@@ -21728,18 +21218,11 @@ F77!$F77$ac_delim
 FFLAGS!$FFLAGS$ac_delim
 ac_ct_F77!$ac_ct_F77$ac_delim
 LIBTOOL!$LIBTOOL$ac_delim
-PYTHON_VERSION!$PYTHON_VERSION$ac_delim
-PYTHON!$PYTHON$ac_delim
-PYTHON_CPPFLAGS!$PYTHON_CPPFLAGS$ac_delim
-PYTHON_LDFLAGS!$PYTHON_LDFLAGS$ac_delim
-PYTHON_SITE_PKG!$PYTHON_SITE_PKG$ac_delim
-PYTHON_EXTRA_LIBS!$PYTHON_EXTRA_LIBS$ac_delim
-PYTHON_EXTRA_LDFLAGS!$PYTHON_EXTRA_LDFLAGS$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 13; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 6; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

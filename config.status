@@ -600,13 +600,6 @@ s,@F77@,|#_!!_#|gfortran,g
 s,@FFLAGS@,|#_!!_#|-g -O2,g
 s,@ac_ct_F77@,|#_!!_#|gfortran,g
 s,@LIBTOOL@,|#_!!_#|$(SHELL) $(top_builddir)/libtool,g
-s,@PYTHON_VERSION@,|#_!!_#|,g
-s,@PYTHON@,|#_!!_#|/usr/local/Cellar/python/2.7.2/bin/python,g
-s,@PYTHON_CPPFLAGS@,|#_!!_#|-I/usr/local/Cellar/python/2.7.2/include/python2.7,g
-s,@PYTHON_LDFLAGS@,|#_!!_#|-L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7,g
-s,@PYTHON_SITE_PKG@,|#_!!_#|/usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages,g
-s,@PYTHON_EXTRA_LIBS@,|#_!!_#| -ldl  -framework CoreFoundation,g
-s,@PYTHON_EXTRA_LDFLAGS@,|#_!!_#|-u _PyMac_Error,g
 s,@LIBOBJS@,|#_!!_#|,g
 s,@LTLIBOBJS@,|#_!!_#|,g
 :end
@@ -884,7 +877,6 @@ s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_INTTYPES_H\)[	 (].*,\1define\2 1 ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_STDINT_H\)[	 (].*,\1define\2 1 ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_UNISTD_H\)[	 (].*,\1define\2 1 ,
 s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_DLFCN_H\)[	 (].*,\1define\2 1 ,
-s,^\([	 #]*\)[^	 ]*\([	 ]*HAVE_PYTHON\)[	 (].*,\1define\2 "2.7" ,
 s/ $//
 s,^[	 #]*u.*,/* & */,
 CEOF

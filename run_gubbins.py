@@ -8,13 +8,15 @@ import time
 from Bio import Phylo
 import dendropy
 from array import *
+from Bio import SeqIO
+from cStringIO import StringIO
 
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
-GUBBINS_EXEC = 'gubbins'
+GUBBINS_EXEC = './src/gubbins'
 
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -78,6 +80,25 @@ def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_
   current_tree_name = fasttree_current_tree_name(base_filename, i)
   return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip "+ alignment_filename
  
+def number_of_sequences_in_alignment(filename):
+  return len(get_sequence_names_from_alignment(filename))
+  
+def get_sequence_names_from_alignment(filename):
+  sequence_names = []
+  handle = open(filename, "rU")
+  for record in SeqIO.parse(handle, "fasta") :
+    sequence_names.append(record.id)
+  handle.close()
+  return sequence_names
+
+def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
+  sequence_names = get_sequence_names_from_alignment(filename)
+  create_pairwise_newick_tree(sequence_names, base_filename+".tre")
+  subprocess.call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre "+" -p "+base_filename+".phylip "+ alignment_filename, shell=True)
+  
+def create_pairwise_newick_tree(sequence_names, output_filename):
+  tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
+  Phylo.write(tree, output_filename, 'newick')
 
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
@@ -96,6 +117,12 @@ subprocess.call([GUBBINS_EXEC, args.alignment_filename])
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
 starting_base_filename = base_filename
+
+# Perform pairwise comparison if there are only 2 sequences
+number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
+if(number_of_sequences == 2):
+  pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
+  sys.exit()
 
 current_time = int(time.time())
 

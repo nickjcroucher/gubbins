@@ -43,7 +43,6 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	
 	pcInputFile = NULL;
 	pcOutputFile = NULL;
-	sDEBUG = 0;
 	
 	pcInputFile = filename;
 
@@ -108,10 +107,6 @@ newick_node* parseTree(char *str)
 	char cTemp;
 	int iCount;
 
-	if (sDEBUG == 1)
-	{
-		printf("%s\n", str);
-	}
 	pcStart = str;
 
 	if (*pcStart != '(')

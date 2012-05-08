@@ -42,7 +42,6 @@ typedef struct newick_node
 	struct newick_node *parent;
 } newick_node;
 
-short sDEBUG;
 #define MAX_FILENAME_SIZE 250
 
 #ifdef __NEWICKFORM_C__

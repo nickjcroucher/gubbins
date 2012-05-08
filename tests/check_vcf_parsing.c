@@ -4,7 +4,7 @@
 #include <check.h>
 #include "check_vcf_parsing.h"
 #include "helper_methods.h"
-#include "../parse_vcf.h"
+#include "parse_vcf.h"
 
 
 START_TEST (check_parsing_of_vcf_files)

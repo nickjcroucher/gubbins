@@ -103,6 +103,11 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 int genome_length(char filename[])
 {
 	int length_of_genome;
+	
+	if( access( filename, F_OK ) == -1 ) {
+		printf("Cannot calculate genome_length because file '%s' doesnt exist\n",filename);
+		exit(0);
+  }
 
 	gzFile fp;
 	kseq_t *seq;

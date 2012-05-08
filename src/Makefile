@@ -40,8 +40,7 @@ subdir = src
 DIST_COMMON = $(dist_data_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_python_devel.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -157,13 +156,6 @@ PACKAGE_STRING = Gubbins 0.1
 PACKAGE_TARNAME = gubbins
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
-PYTHON = /usr/local/Cellar/python/2.7.2/bin/python
-PYTHON_CPPFLAGS = -I/usr/local/Cellar/python/2.7.2/include/python2.7
-PYTHON_EXTRA_LDFLAGS = -u _PyMac_Error
-PYTHON_EXTRA_LIBS =  -ldl  -framework CoreFoundation
-PYTHON_LDFLAGS = -L/usr/local/Cellar/python/2.7.2/lib/python2.7/config -lpython2.7
-PYTHON_SITE_PKG = /usr/local/Cellar/python/2.7.2/lib/python2.7/site-packages
-PYTHON_VERSION = 
 RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/sh

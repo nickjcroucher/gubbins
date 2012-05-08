@@ -56,9 +56,9 @@ void print_usage(FILE* stream, int exit_code)
 );
 
   fprintf (stream, "Step 1: Detect SNP sites (generates inputs files for step 2)\n");
-  fprintf (stream, "%s alignment_file\n\n", program_name);
+  fprintf (stream, "gubbins alignment_file\n\n", program_name);
   fprintf (stream, "Step 2: Detect recombinations\n");
-  fprintf (stream, "%s -r -v vcf_file -t newick_tree -p phylip_file alignment_file\n\n", program_name);
+  fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -p phylip_file alignment_file\n\n", program_name);
   exit (exit_code);
 }
 

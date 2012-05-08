@@ -72,12 +72,14 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 
 int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
 {
-	int i;
-	int end_index =  find_starting_index( window_end_coordinate, snp_locations, 0, number_of_branch_snps);
-	if(end_index +1 <number_of_branch_snps )
+	int i = 0;
+	
+	if(window_end_coordinate == 0)
 	{
-		end_index++;
+		return 0;
 	}
+	
+	int end_index =  find_starting_index( window_end_coordinate, snp_locations, 0, number_of_branch_snps);
 	if(end_index +1 <number_of_branch_snps )
 	{
 		end_index++;
@@ -91,6 +93,7 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 		}
 		
 	}
+	
 	return window_end_coordinate;
 }
 

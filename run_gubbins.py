@@ -16,20 +16,47 @@ from cStringIO import StringIO
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
-GUBBINS_EXEC = 'gubbins'
+GUBBINS_EXEC = './src/gubbins'
 
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
   output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
   return input_tree.robinson_foulds_distance(output_tree)
 
+def reroot_tree(tree_name, outgroup):
+  if outgroup:
+    reroot_tree_with_outgroup(tree_name, outgroup)
+  else:
+    reroot_tree_at_midpoint(tree_name)
 
 def reroot_tree_with_outgroup(tree_name, outgroup):
-  if outgroup:
-    tree = Phylo.read(tree_name, 'newick')
-    tree.root_with_outgroup({'name': outgroup})
-    Phylo.write(tree, tree_name, 'newick')
+  tree = Phylo.read(tree_name, 'newick')
+  tree.root_with_outgroup({'name': outgroup})
+  Phylo.write(tree, tree_name, 'newick')
     
+def reroot_tree_at_midpoint(tree_name):
+  tree  = dendropy.Tree.get_from_path(tree_name, 'newick')
+  tree.reroot_at_midpoint(update_splits=False, delete_outdegree_one=False)
+  tree.deroot()
+  tree.write_to_path(
+    tree_name, 
+    'newick',
+    taxon_set=None,
+    suppress_leaf_taxon_labels=False,
+    suppress_leaf_node_labels=True,
+    suppress_internal_taxon_labels=False,
+    suppress_internal_node_labels=False,
+    suppress_rooting=True,
+    suppress_edge_lengths=False,
+    unquoted_underscores=False,
+    preserve_spaces=False,
+    store_tree_weights=False,
+    suppress_annotations=True,
+    annotations_as_nhx=False,
+    suppress_item_comments=True,
+    node_label_element_separator=' ',
+    node_label_compose_func=None)
+
 def raxml_current_tree_name(base_filename_without_ext,current_time, i):
   return "RAxML_result."+base_filename_without_ext+"."+str(current_time) +".iteration_"+str(i)
     
@@ -174,7 +201,7 @@ for i in range(1, args.iterations+1):
     print tree_building_command
   subprocess.call(tree_building_command, shell=True)
   
-  reroot_tree_with_outgroup(str(current_tree_name), args.outgroup)
+  reroot_tree(str(current_tree_name), args.outgroup)
   
   if args.verbose > 0:
     print gubbins_command

@@ -31,7 +31,7 @@ void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	int snp_counter;
 	char * base_filename;
 	
-	base_filename = (char *) malloc(256*sizeof(char));
+	base_filename = (char *) malloc(1024*sizeof(char));
 	strcpy(base_filename, filename);
 	
 	fasta_file_pointer = fopen(strcat(base_filename,".phylip"), "w");
@@ -47,8 +47,6 @@ void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bas
 		for(snp_counter=0; snp_counter< number_of_snps; snp_counter++)
 		{
 			fprintf( fasta_file_pointer, "%c", bases_for_snps[snp_counter][sample_counter]);
-			// Need to flush to stop wierd EOF on Linux
-			fflush(fasta_file_pointer);
 		}
 		fprintf( fasta_file_pointer, "\n");
 	}

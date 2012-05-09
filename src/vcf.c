@@ -32,7 +32,7 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
-	base_filename = (char *) malloc(256*sizeof(char));
+	base_filename = (char *) malloc(1024*sizeof(char));
 	strcpy(base_filename, filename);
 	
 	vcf_file_pointer=fopen(strcat(base_filename,".vcf"), "w");

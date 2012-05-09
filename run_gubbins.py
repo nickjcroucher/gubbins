@@ -127,6 +127,22 @@ def create_pairwise_newick_tree(sequence_names, output_filename):
   tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
   Phylo.write(tree, output_filename, 'newick')
 
+def which(program):
+  def is_exe(fpath):
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+  fpath, fname = os.path.split(program)
+  if fpath:
+    if is_exe(program):
+      return program
+  else:
+    for path in os.environ["PATH"].split(os.pathsep):
+      exe_file = os.path.join(path, program)
+      if is_exe(exe_file):
+        return exe_file
+ 
+  return None
+
+
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
@@ -136,6 +152,18 @@ parser.add_argument('--verbose',          '-v', action='count', help='Turn on de
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
 args = parser.parse_args()
+
+# check that all the external executable dependancies are available
+if which(GUBBINS_EXEC) is None:
+  print "gubbins is not in your path"
+  sys.exit()
+if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which(RAXML_EXEC) is None:
+  print "RAxML is not in your path"
+  sys.exit()
+if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(FASTTREE_EXEC) is None:
+  print "FastTree is not in your path"
+  sys.exit()
+
 
 # find all snp sites
 subprocess.call([GUBBINS_EXEC, args.alignment_filename])
@@ -166,7 +194,7 @@ for i in range(1, args.iterations+1):
     if i == 1:
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
-      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
+      tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC,'-fastest' )
       gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename,GUBBINS_EXEC)
       
     elif i == 2:

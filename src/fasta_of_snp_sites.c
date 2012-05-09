@@ -31,7 +31,7 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 	int snp_counter; 
 	char * base_filename;
 	
-	base_filename = (char *) malloc(256*sizeof(char));
+	base_filename = (char *) malloc(1024*sizeof(char));
 	strcpy(base_filename, filename);
 	
 	fasta_file_pointer = fopen(strcat(base_filename,".snp_sites.aln"), "w");

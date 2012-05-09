@@ -187,13 +187,11 @@ for i in range(1, args.iterations+1):
     gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,args.alignment_filename,GUBBINS_EXEC)
     
   elif args.tree_builder == "fasttree":
+    if i == 2:
+      previous_tree_name  = current_tree_name
+
     previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
     current_tree_name     = fasttree_current_tree_name(base_filename, i)
-    
-    if i == 1:
-      os.rename(base_filename+".vcf",           previous_tree_name+".vcf")
-      os.rename(base_filename+".phylip",        previous_tree_name+".phylip")
-      os.rename(base_filename+".snp_sites.aln", previous_tree_name+".snp_sites.aln")
     tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
     gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename,GUBBINS_EXEC)
   
@@ -204,7 +202,7 @@ for i in range(1, args.iterations+1):
   reroot_tree(str(current_tree_name), args.outgroup)
 
   if(os.path.exists("latest.tre")):
-    remove("latest.tre")
+    os.remove("latest.tre")
   os.symlink(str(current_tree_name), "latest.tre")
  
   if args.verbose > 0:

@@ -133,7 +133,7 @@ parser.add_argument('alignment_filename',       help='Multifasta alignment file'
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
 parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging')
-parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree), default is to use FastTree for 1st iteration and RAxML for rest', default = "hybrid")
+parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
 args = parser.parse_args()
 
@@ -202,7 +202,11 @@ for i in range(1, args.iterations+1):
   subprocess.call(tree_building_command, shell=True)
   
   reroot_tree(str(current_tree_name), args.outgroup)
-  
+
+  if(os.path.exists("latest.tre")):
+    remove("latest.tre")
+  os.symlink(str(current_tree_name), "latest.tre")
+ 
   if args.verbose > 0:
     print gubbins_command
   subprocess.call(gubbins_command, shell=True)

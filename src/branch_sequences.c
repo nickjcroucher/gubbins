@@ -279,7 +279,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		}
 
 		// block_coordinates will now contain merged blocks
-		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks);
+		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords);
 		int * candidate_blocks[3];
 		candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
@@ -417,15 +417,21 @@ int get_smallest_log_likelihood(int ** candidate_blocks, int number_of_candidate
 
 
 // merge blocks which are beside each other into large blocks and return the number of blocks
-int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
+int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords)
 {
-	int i;
+	int i = 1;
 	int merged_block_coordinates[2][number_of_blocks];
 	int current_merged_block = 0;
 
 	if(number_of_blocks == 0)
 	{
 		return number_of_blocks;	
+	}
+	
+	for(i=0; i < number_of_blocks; i++)
+	{
+			block_coordinates[0][i] = extend_end_of_block_left_over_gap( block_coordinates[0][i], branch_snp_sequence, number_of_bases, snp_site_coords);
+			block_coordinates[1][i] = extend_end_of_block_right_over_gap(block_coordinates[1][i], branch_snp_sequence, number_of_bases, snp_site_coords);
 	}
 	
 	merged_block_coordinates[0][current_merged_block] = block_coordinates[0][current_merged_block];
@@ -463,6 +469,83 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 		}
 	}
 	return current_merged_block;
+}
+
+
+int extend_end_of_block_left_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords)
+{
+	int index = 0;
+	int last_snp_index = 0;
+	index = find_starting_index( block_coord, snp_site_coords, 0, number_of_bases);
+	last_snp_index = index;
+	
+	if(index >= number_of_bases ||  snp_site_coords[index] != block_coord)
+	{
+		return block_coord;
+	}
+	
+	while(index > 0 )
+	{
+	  if((snp_site_coords[index] -1) == snp_site_coords[index-1] )
+	  {
+	  	if(branch_snp_sequence[index-1] != '-')
+	  	{
+	  		last_snp_index = index-1;
+	  	}
+	  }
+	  else
+	  {
+	  	break;
+	  }
+  	index--;
+  }
+	
+	if(index ==0 || last_snp_index == 0 )
+	{
+	  return block_coord; 
+  }
+  else
+  {
+		return snp_site_coords[last_snp_index];
+	}
+}
+
+int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords)
+{
+	int index = 0;
+	int last_snp_index = 0;
+	index = find_starting_index( block_coord, snp_site_coords, 0, number_of_bases);
+	last_snp_index = index;
+	
+	if(index+1 >= number_of_bases ||  snp_site_coords[index] != block_coord)
+	{
+		return block_coord;
+	}
+	
+	while(index+1 < number_of_bases )
+	{
+		if((snp_site_coords[index] +1) == snp_site_coords[index+1] )
+		{
+			if(branch_snp_sequence[index+1] != '-')
+			{
+				last_snp_index = index+1;
+			}
+		}
+		else
+		{
+			break;
+		}
+  	index++;
+  }
+	
+	if(index ==0 || last_snp_index == 0 )
+	{
+	  return block_coord; 
+  }
+  else
+  {
+		return snp_site_coords[last_snp_index];
+	}
 }
 
 

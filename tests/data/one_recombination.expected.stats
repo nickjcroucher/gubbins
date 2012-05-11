@@ -1,6 +1,6 @@
 Sample name	Num recombinations	Num mutations	r/m	Genome Length
 sequence_1	0	135	0.000000	135
-sequence_2	95	129	0.736434	129
+sequence_2	103	129	0.798450	129
 sequence_3	0	129	0.000000	129
 sequence_4	0	129	0.000000	129
 sequence_5	0	129	0.000000	129

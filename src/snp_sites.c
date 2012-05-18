@@ -45,7 +45,7 @@ void build_snp_locations(int snp_locations[], char reference_sequence[])
 }
 
 
-int generate_snp_sites(char filename[])
+int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 {
 	int length_of_genome;
 	char * reference_sequence;
@@ -58,7 +58,7 @@ int generate_snp_sites(char filename[])
 	reference_sequence = (char *) malloc((length_of_genome+1)*sizeof(char));
 	
 	build_reference_sequence(reference_sequence,filename);
-	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome);
+	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome, exclude_gaps);
 	
 	snp_locations = (int *) malloc((number_of_snps+1)*sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
@@ -88,20 +88,12 @@ int generate_snp_sites(char filename[])
   char filename_without_directory[MAX_FILENAME_SIZE];
   strip_directory_from_filename(filename, filename_without_directory);
 	
+	strcat(filename_without_directory,suffix);
+	
 	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	create_phylib_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	
-	
-	int filtered_snp_locations[number_of_snps];
-	int number_of_filtered_snps;
-	number_of_filtered_snps = refilter_existing_snps(reference_sequence, number_of_snps, snp_locations, filtered_snp_locations);
-	char * filtered_bases_for_snps[number_of_filtered_snps];
 
-	filter_sequence_bases_and_rotate(reference_sequence, filtered_bases_for_snps, number_of_filtered_snps);
-	create_phylib_of_snp_sites(strcat(filename_without_directory,".start"), number_of_filtered_snps, filtered_bases_for_snps, sequence_names, number_of_samples);
-	create_fasta_of_snp_sites(strcat(filename_without_directory,".start"), number_of_filtered_snps, filtered_bases_for_snps, sequence_names, number_of_samples);
-	
 	free(snp_locations);
 	return 1;
 }

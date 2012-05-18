@@ -142,7 +142,8 @@ int main (argc, argv) int argc; char **argv;
     }
     else
     {
-      generate_snp_sites(multi_fasta_filename);
+      generate_snp_sites(multi_fasta_filename, 0, "");
+			generate_snp_sites(multi_fasta_filename, 1, ".no_gaps");
     }
 
     exit(EXIT_SUCCESS);

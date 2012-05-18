@@ -53,9 +53,9 @@ START_TEST (phylip_read_in_file_with_gaps)
 {
 	load_sequences_from_phylib_file("../tests/data/alignment_with_gaps.phylip");
 	fail_unless( does_column_contain_snps(0, 'A') == 0);
-  fail_unless( does_column_contain_snps(1, '-') == 0);
-  fail_unless( does_column_contain_snps(2, '-') == 0);
-  fail_unless( does_column_contain_snps(3, 'T') == 0);
+  fail_unless( does_column_contain_snps(1, '-') == 1);
+  fail_unless( does_column_contain_snps(2, '-') == 1);
+  fail_unless( does_column_contain_snps(3, 'T') == 1);
   fail_unless( does_column_contain_snps(4, 'G') == 1);
   fail_unless( does_column_contain_snps(4, '-') == 1);
   fail_unless( does_column_contain_snps(5, 'N') == 0);

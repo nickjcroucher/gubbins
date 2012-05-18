@@ -59,7 +59,12 @@ int does_column_contain_snps(int snp_column, char reference_base)
 			return 0;	
 		}
 		
-		if(sequences[i][snp_column]  != '-' && toupper(sequences[i][snp_column])  != 'N' && sequences[i][snp_column] != reference_base)
+		if(sequences[i][snp_column]  == '-' || toupper(sequences[i][snp_column])  == 'N')
+		{
+			return 1;
+		}
+		
+		if( sequences[i][snp_column] != reference_base)
 		{
 			return 1;
 		}

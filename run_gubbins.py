@@ -164,9 +164,16 @@ if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(
   print "FastTree is not in your path"
   sys.exit()
 
+current_time = int(time.time())
+if args.verbose > 0:
+  print current_time
 
 # find all snp sites
+if args.verbose > 0:
+  print GUBBINS_EXEC + args.alignment_filename
 subprocess.call([GUBBINS_EXEC, args.alignment_filename])
+if args.verbose > 0:
+  print int(time.time())
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
@@ -179,7 +186,7 @@ if(number_of_sequences == 2):
   pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
   sys.exit()
 
-current_time = int(time.time())
+
 
 previous_robinson_foulds_distances = array('d',[])
 
@@ -226,6 +233,8 @@ for i in range(1, args.iterations+1):
   if args.verbose > 0:
     print tree_building_command
   subprocess.call(tree_building_command, shell=True)
+  if args.verbose > 0:
+    print int(time.time())
   
   reroot_tree(str(current_tree_name), args.outgroup)
 
@@ -236,6 +245,8 @@ for i in range(1, args.iterations+1):
   if args.verbose > 0:
     print gubbins_command
   subprocess.call(gubbins_command, shell=True)
+  if args.verbose > 0:
+    print int(time.time())
   
   # first iteration creates tree 1
   # 2nd iteration creates tree 2, and you can calculate first RF distance

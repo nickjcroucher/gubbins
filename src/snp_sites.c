@@ -92,6 +92,16 @@ int generate_snp_sites(char filename[])
 	create_phylib_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	
+	
+	int filtered_snp_locations[number_of_snps];
+	int number_of_filtered_snps;
+	number_of_filtered_snps = refilter_existing_snps(reference_sequence, number_of_snps, snp_locations, filtered_snp_locations);
+	char * filtered_bases_for_snps[number_of_filtered_snps];
+
+	filter_sequence_bases_and_rotate(reference_sequence, filtered_bases_for_snps, number_of_filtered_snps);
+	create_phylib_of_snp_sites(strcat(filename_without_directory,".start"), number_of_filtered_snps, filtered_bases_for_snps, sequence_names, number_of_samples);
+	create_fasta_of_snp_sites(strcat(filename_without_directory,".start"), number_of_filtered_snps, filtered_bases_for_snps, sequence_names, number_of_samples);
+	
 	free(snp_locations);
 	return 1;
 }

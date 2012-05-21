@@ -21,7 +21,7 @@
 #define _SNP_SITES_H_
 
 void build_snp_locations(int snp_locations[], char reference_sequence[]);
-int generate_snp_sites(char filename[]);
+int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[]);
 int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations);
 void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locations, int number_of_snps);
 void strip_directory_from_filename(char * input_filename, char * output_filename);

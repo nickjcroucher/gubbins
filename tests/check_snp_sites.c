@@ -12,7 +12,7 @@
 
 START_TEST (valid_alignment_with_one_line_per_sequence)
 {
-  generate_snp_sites("../tests/data/alignment_file_one_line_per_sequence.aln");
+  generate_snp_sites("../tests/data/alignment_file_one_line_per_sequence.aln",0,"");
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_one_line_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_one_line_per_sequence.aln.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_one_line_per_sequence.aln.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
@@ -25,7 +25,7 @@ END_TEST
 
 START_TEST (valid_alignment_with_n_as_gap)
 {
-	  generate_snp_sites("../tests/data/alignment_file_with_n.aln");
+	  generate_snp_sites("../tests/data/alignment_file_with_n.aln",0,"");
 	  fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_with_n.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
 	  fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_with_n.aln.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
 	  fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_with_n.aln.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
@@ -39,7 +39,7 @@ END_TEST
 
 START_TEST (valid_alignment_with_one_line_per_sequence_gzipped)
 {
-  generate_snp_sites("../tests/data/alignment_file_one_line_per_sequence.aln.gz");
+  generate_snp_sites("../tests/data/alignment_file_one_line_per_sequence.aln.gz",0,"");
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_one_line_per_sequence.aln.gz.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_one_line_per_sequence.aln.gz.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_one_line_per_sequence.aln.gz.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
@@ -51,7 +51,7 @@ END_TEST
 
 START_TEST (valid_alignment_with_multiple_lines_per_sequence)
 {
-    generate_snp_sites("../tests/data/alignment_file_multiple_lines_per_sequence.aln");
+    generate_snp_sites("../tests/data/alignment_file_multiple_lines_per_sequence.aln",0,"");
     fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_multiple_lines_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for multiple lines per seq" );
     fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_multiple_lines_per_sequence.aln.phylip" ) == 1, "Invalid Phylip file for multiple lines per seq" );
     fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_multiple_lines_per_sequence.aln.snp_sites.aln" ) == 1 ,"Invalid ALN file for multiple lines per seq");
@@ -63,7 +63,7 @@ END_TEST
 
 START_TEST (two_sequences)
 {
-    generate_snp_sites("../tests/data/two_sequences.aln");
+    generate_snp_sites("../tests/data/two_sequences.aln",0,"");
     fail_unless( compare_files("../tests/data/two_sequences.aln.vcf", "two_sequences.aln.vcf" ) == 1, "Invalid VCF file for multiple lines per seq" );
     fail_unless( compare_files("../tests/data/two_sequences.aln.phylip", "two_sequences.aln.phylip" ) == 1, "Invalid Phylip file for multiple lines per seq" );
     fail_unless( compare_files("../tests/data/two_sequences.aln.snp_sites.aln","two_sequences.aln.snp_sites.aln" ) == 1 ,"Invalid ALN file for multiple lines per seq");
@@ -111,7 +111,7 @@ START_TEST (number_of_snps_detected)
 {
   char actual_reference_sequence[2001];
   build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
-  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000) == 5);
+  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,0) == 5);
 }
 END_TEST
 
@@ -119,7 +119,7 @@ START_TEST (number_of_snps_detected_small)
 {
   char actual_reference_sequence[9];
   build_reference_sequence(actual_reference_sequence, "../tests/data/small_alignment.aln");
-  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/small_alignment.aln", 8) == 1);
+  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/small_alignment.aln", 8,0) == 1);
 }
 END_TEST
 

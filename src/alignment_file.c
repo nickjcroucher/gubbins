@@ -169,8 +169,8 @@ int build_reference_sequence(char reference_sequence[], char filename[])
 
 int detect_snps(char reference_sequence[], char filename[], int length_of_genome, int exclude_gaps)
 {
-	int i;
-	int number_of_snps = 0;
+  int i;
+  int number_of_snps = 0;
   int l;
   
   gzFile fp;
@@ -183,28 +183,37 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
   
   while ((l = kseq_read(seq)) >= 0) {
     for(i = 0; i < length_of_genome; i++)
-		{
-			if(exclude_gaps)
-			{
-			  // If there is an indel in the reference sequence, replace with the first proper base you find
-			  if((reference_sequence[i] == '-' && seq->seq.s[i] != '-' ) || (toupper(reference_sequence[i]) == 'N' && seq->seq.s[i] != 'N' ))
-			  {
-			  	reference_sequence[i] = toupper(seq->seq.s[i]);
-			  }
-			}
-			
-			if(reference_sequence[i] != '*' && reference_sequence[i] != toupper(seq->seq.s[i]))
-			{
-				reference_sequence[i] = '*';
-				number_of_snps++;
-			}
-		}
+    {
+    
+      if(exclude_gaps)
+      {
+        // If there is an indel in the reference sequence, replace with the first proper base you find
+        if((reference_sequence[i] == '-' && seq->seq.s[i] != '-' ) || (toupper(reference_sequence[i]) == 'N' && seq->seq.s[i] != 'N' ))
+        {
+          reference_sequence[i] = toupper(seq->seq.s[i]);
+        }
+        
+        if(reference_sequence[i] != '*' && seq->seq.s[i] != '-' && toupper(seq->seq.s[i]) != 'N' && reference_sequence[i] != toupper(seq->seq.s[i]))
+        {
+          reference_sequence[i] = '*';
+          number_of_snps++;
+        }
+      }
+      else
+      {
+        if(reference_sequence[i] != '*' && reference_sequence[i] != toupper(seq->seq.s[i]))
+        {
+         reference_sequence[i] = '*';
+         number_of_snps++;
+        }
+      }
+    }
     
   }
   kseq_destroy(seq);
   gzclose(fp);
 
-	return number_of_snps;
+  return number_of_snps;
 }
 
 int read_line(char sequence[], FILE * pFilePtr)

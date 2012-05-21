@@ -202,24 +202,24 @@ for i in range(1, args.iterations+1):
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
       tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC,'-fastest' )
-      gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename,GUBBINS_EXEC)
+      gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC)
       
     elif i == 2:
       previous_tree_name    = current_tree_name
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-      gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,args.alignment_filename,GUBBINS_EXEC)
+      gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC)
     else:
       previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-      gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,args.alignment_filename,GUBBINS_EXEC)
+      gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC)
   
   elif args.tree_builder == "raxml":
     previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
     current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-    gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,args.alignment_filename,GUBBINS_EXEC)
+    gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC)
     
   elif args.tree_builder == "fasttree":
     previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
@@ -228,7 +228,7 @@ for i in range(1, args.iterations+1):
     current_tree_name     = fasttree_current_tree_name(base_filename, i)
 
     tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
-    gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename, i,args.alignment_filename,GUBBINS_EXEC)
+    gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC)
   
   if args.verbose > 0:
     print tree_building_command

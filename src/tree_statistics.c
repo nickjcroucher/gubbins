@@ -41,8 +41,8 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 		
 		fprintf( file_pointer, "%s\t", sample_details->sample_name);
     fprintf( file_pointer, "%i\t", sample_details->number_of_recombinations);
-    fprintf( file_pointer, "%i\t", sample_details->number_of_snps);
-    fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", (sample_details->number_of_snps+sample_details->number_of_recombinations));
+    fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps+sample_details->number_of_recombinations)));
     fprintf( file_pointer, "%i", sample_details->genome_length_without_gaps);
 		
 		

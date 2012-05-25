@@ -94,7 +94,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 }
 
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer)
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -132,7 +132,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		while (child != NULL)
 		{
 			// recursion
-			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns, reference_bases, child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer);
+			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns, reference_bases, child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 			child_nodes[child_counter] = child->node;
       strcat(root->taxon_names, " ");
       strcat(root->taxon_names, child_nodes[child_counter]->taxon_names);
@@ -155,7 +155,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
 			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations, reference_bases,branch_snp_sequence);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps);
 		}
 		
 		return leaf_sequence;
@@ -190,7 +190,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps)
 }
 
 
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer)
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps)
 {
 	int i = 0;
 	int window_size = 0;
@@ -205,9 +205,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	// place to store coordinates of recombinations snps
 	current_node->recombinations = (int *) malloc((length_of_sequence+1)*sizeof(int));
 	
-	while(number_of_branch_snps > MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+	while(number_of_branch_snps > min_snps)
 	{
-		if(number_of_branch_snps <= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+		if(number_of_branch_snps <= min_snps)
 		{
 			return;
 		}
@@ -262,7 +262,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			}
 
 			// minimum number of snps to be statistically significant in block
-			if(number_of_snps_in_block < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+			if(number_of_snps_in_block < min_snps)
 			{
 				continue;
 			}
@@ -291,7 +291,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		{
 			int current_start = block_coordinates[0][i];
 			int current_end = block_coordinates[1][i];
-			int cutoff_value = MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS;
+			int cutoff_value = min_snps;
 			int block_snp_count;
 			int loop_counter =0;
 		
@@ -303,7 +303,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		
 			//printf("%d\t%d\t%d\t%d\t%d\n",current_start,current_end,block_snp_count,block_genome_size_without_gaps,cutoff_value);
 			
-			while(current_start < current_end && block_snp_count >= MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
+			while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
 			{
 				// move inwards until pvalue test is satisfied 
 				// move inwards so that the boundrys of the block are snps
@@ -315,7 +315,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 					block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
 				}
 			
-				if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count) == 1)
+				if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count, min_snps) == 1)
 				{
 					candidate_blocks[0][number_of_candidate_blocks] = current_start;
 					candidate_blocks[1][number_of_candidate_blocks] = current_end;
@@ -586,14 +586,14 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 	return cutoff;
 }
 
-int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count)
+int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps)
 {
 	double threshold = 0.0;
 	int cutoff = 0;
 	double pvalue = 0.0;
 	double part1, part2, part3 = 0.0;
 	
-	if( block_snp_count < MIN_SNPS_FOR_IDENTIFYING_RECOMBINATIONS)
+	if( block_snp_count < min_snps)
 	{
 		return 0;	
 	}

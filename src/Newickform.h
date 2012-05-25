@@ -37,6 +37,7 @@ typedef struct newick_node
 	int childNum;
 	int * recombinations;
 	int num_recombinations;
+  int number_of_snps;
   int current_node_id;
 	struct newick_child *child;
 	struct newick_node *parent;

@@ -97,7 +97,7 @@ def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_
   
   input_tree = ""
   if starting_tree is not None:
-    input_tree = " -intree" + starting_tree
+    input_tree = " -intree " + starting_tree
   elif i > 1 :
     input_tree = " -intree "+ previous_tree_name
 

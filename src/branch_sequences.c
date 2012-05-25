@@ -53,7 +53,7 @@ int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_
 }
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases)
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps)
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -71,6 +71,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		sequence_index = find_sequence_index_from_sample_name(root->taxon);
 		
 		set_number_of_recombinations_for_sample(root->taxon,num_current_recombinations);
+		set_number_of_snps_for_sample(root->taxon,(current_total_snps + root->number_of_snps));
 		
 		for(i = 0; i < num_current_recombinations; i++)
 		{
@@ -87,7 +88,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		while (child != NULL)
 		{
 			// recursion
-			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases);
+			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps));
 			child = child->next;
 		}
 	}
@@ -115,7 +116,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
 		int number_of_gaps = length_of_original_genome-branch_genome_size;
-		set_number_of_snps_for_sample(root->taxon,number_of_snps - number_of_gaps);
 		
 		return leaf_sequence;
 	}
@@ -381,6 +381,7 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps, FILE * gff_file_pointer)
 {
 	int number_of_branch_snps_excluding_block = number_of_branch_snps;
+	current_node->number_of_snps = number_of_branch_snps;
 	if(number_of_candidate_blocks > 0)
 	{
 		int smallest_index = 0;

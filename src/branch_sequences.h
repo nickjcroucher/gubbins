@@ -31,7 +31,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
 double calculate_threshold(int branch_genome_size, int window_size);
 int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps);
 double reduce_factorial(int l, int i);
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases);
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases,int current_total_snps);
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array);
 double snp_density(int length_of_sequence, int number_of_snps);
 int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);

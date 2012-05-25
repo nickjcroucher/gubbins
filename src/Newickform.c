@@ -85,7 +85,7 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 	//printf("\n\n\n\n%s\n\n\n\n", root_sequence);
 	int * parent_recombinations;
-	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases);
+	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases,0);
 	// Free occupied memory
 	//seqFree(pcOutputFile);
 	//seqFree(pcTreeStr);

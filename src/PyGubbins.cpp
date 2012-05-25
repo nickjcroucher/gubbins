@@ -3,7 +3,7 @@
 
 // don't include this
 //#include "gubbins.h"
-extern "C" void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[], char multi_fasta_filename[]);
+extern "C" void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[], char multi_fasta_filename[], int min_snps);
 
 class PyGubbins {
 public:
@@ -16,7 +16,8 @@ public:
     run_gubbins((char *) vcf_filename.c_str(),
 		(char *) tree_filename.c_str(),
 		(char *) phylip_filename.c_str(),
-		(char *) multi_fasta_filename.c_str());
+		(char *) multi_fasta_filename.c_str()
+		);
   }
 };
 

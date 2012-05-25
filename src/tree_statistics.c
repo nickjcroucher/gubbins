@@ -53,5 +53,9 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 
 float recombination_to_mutation_ratio(int number_of_recombinations, int number_of_snps)
 {
+	if(number_of_snps == 0)
+	{
+		return 0;	
+	}
 	return (number_of_recombinations*1.0)/(number_of_snps*1.0);
 }

@@ -52,13 +52,14 @@ void print_usage(FILE* stream, int exit_code)
            "  -t    Newick tree file\n"
            "  -p    Phylip file\n"
            "  -v    VCF file\n"
+           "  -m    Min SNPs for identifying a recombination block\n"
            "  -h    Display this usage information.\n\n"
 );
 
   fprintf (stream, "Step 1: Detect SNP sites (generates inputs files for step 2)\n");
   fprintf (stream, "gubbins alignment_file\n\n", program_name);
   fprintf (stream, "Step 2: Detect recombinations\n");
-  fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -p phylip_file alignment_file\n\n", program_name);
+  fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -p phylip_file -m 10 alignment_file\n\n", program_name);
   exit (exit_code);
 }
 
@@ -70,6 +71,7 @@ int main (argc, argv) int argc; char **argv;
   char tree_filename[MAX_FILENAME_SIZE];
   char phylip_filename[MAX_FILENAME_SIZE];
   int recombination_flag = 0 ;
+	int min_snps = 3;
   program_name = argv[0];
   
   while (1)
@@ -80,12 +82,13 @@ int main (argc, argv) int argc; char **argv;
           {"recombination", no_argument,       0, 'r'},
           {"vcf",           required_argument, 0, 'v'},
           {"tree",          required_argument, 0, 't'},
+          {"min_snps",      required_argument, 0, 'm'},
           {"phylip",        required_argument, 0, 'p'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
-      c = getopt_long (argc, argv, "hrv:t:p:",
+      c = getopt_long (argc, argv, "hrv:t:p:m:",
                        long_options, &option_index);
       /* Detect the end of the options. */
       if (c == -1)
@@ -110,6 +113,9 @@ int main (argc, argv) int argc; char **argv;
         case 'v':
           strcpy(vcf_filename,optarg);
           break;
+	      case 'm':
+	        min_snps = atoi(optarg);
+	        break;
         case 't':
           strcpy(tree_filename,optarg);
           break;
@@ -138,7 +144,7 @@ int main (argc, argv) int argc; char **argv;
 			check_file_exists_or_exit(vcf_filename);
 			check_file_exists_or_exit(tree_filename);
 			check_file_exists_or_exit(phylip_filename);
-      run_gubbins(vcf_filename,tree_filename,phylip_filename,multi_fasta_filename);
+      run_gubbins(vcf_filename,tree_filename,phylip_filename,multi_fasta_filename, min_snps);
     }
     else
     {

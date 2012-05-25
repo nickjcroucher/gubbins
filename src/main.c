@@ -88,7 +88,7 @@ int main (argc, argv) int argc; char **argv;
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
-      c = getopt_long (argc, argv, "hrv:t:p:s:",
+      c = getopt_long (argc, argv, "hrv:t:p:m:",
                        long_options, &option_index);
       /* Detect the end of the options. */
       if (c == -1)

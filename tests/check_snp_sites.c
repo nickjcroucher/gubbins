@@ -52,9 +52,9 @@ END_TEST
 START_TEST (valid_alignment_with_multiple_lines_per_sequence)
 {
     generate_snp_sites("../tests/data/alignment_file_multiple_lines_per_sequence.aln",0,"");
-    fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_multiple_lines_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for multiple lines per seq" );
-    fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_multiple_lines_per_sequence.aln.phylip" ) == 1, "Invalid Phylip file for multiple lines per seq" );
-    fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_multiple_lines_per_sequence.aln.snp_sites.aln" ) == 1 ,"Invalid ALN file for multiple lines per seq");
+    fail_unless( compare_files("../tests/data/alignment_file_multiple_lines_per_sequence.aln.vcf", "alignment_file_multiple_lines_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for multiple lines per seq" );
+    fail_unless( compare_files("../tests/data/alignment_file_multiple_lines_per_sequence.aln.phylip", "alignment_file_multiple_lines_per_sequence.aln.phylip" ) == 1, "Invalid Phylip file for multiple lines per seq" );
+    fail_unless( compare_files("../tests/data/alignment_file_multiple_lines_per_sequence.aln.snp_sites.aln","alignment_file_multiple_lines_per_sequence.aln.snp_sites.aln" ) == 1 ,"Invalid ALN file for multiple lines per seq");
     remove("alignment_file_multiple_lines_per_sequence.aln.vcf");
     remove("alignment_file_multiple_lines_per_sequence.aln.phylip");
     remove("alignment_file_multiple_lines_per_sequence.aln.snp_sites.aln");
@@ -111,7 +111,15 @@ START_TEST (number_of_snps_detected)
 {
   char actual_reference_sequence[2001];
   build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
-  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,0) == 5);
+  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,1) == 5);
+}
+END_TEST
+
+START_TEST (number_of_snps_detected_include_gaps)
+{
+  char actual_reference_sequence[2001];
+  build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
+  fail_unless(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,0) == 1975);
 }
 END_TEST
 
@@ -175,6 +183,7 @@ Suite * snp_sites_suite (void)
   tcase_add_test (tc_alignment_file, valid_initial_reference_sequence);
   tcase_add_test (tc_alignment_file, number_of_snps_detected_small);
   tcase_add_test (tc_alignment_file, number_of_snps_detected);
+	tcase_add_test (tc_alignment_file, number_of_snps_detected_include_gaps);
   tcase_add_test (tc_alignment_file, sample_names_from_alignment_file);
   tcase_add_test (tc_alignment_file, check_strip_directory_from_filename_without_directory);
 	tcase_add_test (tc_alignment_file, check_strip_directory_from_filename_with_directory);

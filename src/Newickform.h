@@ -37,6 +37,7 @@ typedef struct newick_node
 	int childNum;
 	int * recombinations;
 	int num_recombinations;
+  int number_of_snps;
   int current_node_id;
 	struct newick_child *child;
 	struct newick_node *parent;
@@ -46,11 +47,11 @@ typedef struct newick_node
 
 #ifdef __NEWICKFORM_C__
 newick_node* parseTree(char *str);
-void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome);
+void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
 
 #else
 extern newick_node* parseTree(char *str);
-extern void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome);
+extern void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
 
 #endif
 

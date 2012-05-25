@@ -8,7 +8,7 @@
 
 START_TEST (check_gubbins_no_recombinations)
 {
-	run_gubbins("../tests/data/no_recombinations.aln.vcf", "../tests/data/no_recombinations.tre", "../tests/data/no_recombinations.aln.phylip","../tests/data/no_recombinations.aln.snp_sites.aln");
+	run_gubbins("../tests/data/no_recombinations.aln.vcf", "../tests/data/no_recombinations.tre", "../tests/data/no_recombinations.aln.phylip","../tests/data/no_recombinations.aln.snp_sites.aln",3);
 	fail_unless(file_exists("../tests/data/no_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("../tests/data/no_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("../tests/data/no_recombinations.tre.phylip") == 1);
@@ -29,7 +29,7 @@ END_TEST
 
 START_TEST (check_gubbins_one_recombination)
 {
-	run_gubbins("../tests/data/one_recombination.aln.vcf", "../tests/data/one_recombination.tre", "../tests/data/one_recombination.aln.phylip","../tests/data/one_recombination.aln.snp_sites.aln");
+	run_gubbins("../tests/data/one_recombination.aln.vcf", "../tests/data/one_recombination.tre", "../tests/data/one_recombination.aln.phylip","../tests/data/one_recombination.aln.snp_sites.aln",3);
 	fail_unless(file_exists("../tests/data/one_recombination.tre.tab") == 1);
 	fail_unless(file_exists("../tests/data/one_recombination.tre.vcf") == 1);
 	fail_unless(file_exists("../tests/data/one_recombination.tre.phylip") == 1);
@@ -52,7 +52,7 @@ END_TEST
 
 START_TEST (check_gubbins_multiple_recombinations)
 {
-	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.aln.phylip","../tests/data/multiple_recombinations.aln.snp_sites.aln");
+	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.aln.phylip","../tests/data/multiple_recombinations.aln.snp_sites.aln",3);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.phylip") == 1);

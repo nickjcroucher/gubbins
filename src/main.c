@@ -114,7 +114,7 @@ int main (argc, argv) int argc; char **argv;
           strcpy(vcf_filename,optarg);
           break;
 	      case 'm':
-	        strcpy(min_snps,optarg);
+	        min_snps = atoi(optarg);
 	        break;
         case 't':
           strcpy(tree_filename,optarg);

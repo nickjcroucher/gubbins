@@ -84,7 +84,7 @@ def raxml_tree_building_command(i,base_filename_without_ext,base_filename,curren
 
 def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps):
   current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ min_snps+" "+ alignment_filename
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
   
 def fasttree_current_tree_name(base_filename, i):
   return base_filename+".iteration_"+str(i)
@@ -105,7 +105,7 @@ def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_
 
 def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps):
   current_tree_name = fasttree_current_tree_name(base_filename, i)
-  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ min_snps+" "+ alignment_filename
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
  
 def number_of_sequences_in_alignment(filename):
   return len(get_sequence_names_from_alignment(filename))

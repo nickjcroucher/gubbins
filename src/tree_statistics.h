@@ -22,7 +22,7 @@
 
  void create_tree_statistics_file(char filename[], sample_statistics ** statistics_for_samples, int number_of_samples);
  float recombination_to_mutation_ratio(int number_of_recombinations, int number_of_snps);
-
+ float recombination_blocks_to_mutation_ratio(int number_of_blocks, int number_of_snps);
 #define MAX_FILE_NAME_SIZE 1024
 
 #endif

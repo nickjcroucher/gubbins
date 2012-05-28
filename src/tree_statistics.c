@@ -33,7 +33,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	strcpy(base_filename, filename);
 	
 	file_pointer = fopen(strcat(base_filename,".stats"), "w");
-	fprintf( file_pointer, "Sample name\tNum recombinations\tNum mutations\tr/m\tGenome Length\n");
+	fprintf( file_pointer, "Sample name\tNum SNPs in recombinations\tNum of SNPs outside recombinations\tTotal SNPs\tNum Recombination Blocks\tr/m\tb/m\tGenome Length\n");
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{
@@ -41,8 +41,11 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 		
 		fprintf( file_pointer, "%s\t", sample_details->sample_name);
     fprintf( file_pointer, "%i\t", sample_details->number_of_recombinations);
-    fprintf( file_pointer, "%i\t", (sample_details->number_of_snps+sample_details->number_of_recombinations));
-    fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps+sample_details->number_of_recombinations)));
+    fprintf( file_pointer, "%i\t", (sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", (sample_details->number_of_recombinations + sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", sample_details->number_of_blocks);
+    fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
+		fprintf( file_pointer, "%f\t", recombination_blocks_to_mutation_ratio(sample_details->number_of_blocks,sample_details->number_of_snps));
     fprintf( file_pointer, "%i", sample_details->genome_length_without_gaps);
 		
 		
@@ -58,4 +61,13 @@ float recombination_to_mutation_ratio(int number_of_recombinations, int number_o
 		return 0;	
 	}
 	return (number_of_recombinations*1.0)/(number_of_snps*1.0);
+}
+
+float recombination_blocks_to_mutation_ratio(int number_of_blocks, int number_of_snps)
+{
+	if(number_of_snps == 0 || number_of_blocks == 0)
+	{
+		return 0;	
+	}
+	return (number_of_blocks*1.0)/(number_of_snps*1.0);
 }

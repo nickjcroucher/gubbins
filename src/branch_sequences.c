@@ -53,7 +53,7 @@ int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_
 }
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps)
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks)
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -72,6 +72,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		
 		set_number_of_recombinations_for_sample(root->taxon,num_current_recombinations);
 		set_number_of_snps_for_sample(root->taxon,(current_total_snps + root->number_of_snps));
+		set_number_of_blocks_for_sample(root->taxon,(num_blocks + root->number_of_blocks));
 		
 		for(i = 0; i < num_current_recombinations; i++)
 		{
@@ -88,7 +89,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		while (child != NULL)
 		{
 			// recursion
-			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps));
+			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks));
 			child = child->next;
 		}
 	}
@@ -381,7 +382,6 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps, FILE * gff_file_pointer)
 {
 	int number_of_branch_snps_excluding_block = number_of_branch_snps;
-	current_node->number_of_snps = number_of_branch_snps;
 	if(number_of_candidate_blocks > 0)
 	{
 		int smallest_index = 0;
@@ -396,7 +396,10 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 
 		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
 		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
+		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 	}
+	current_node->number_of_snps = number_of_branch_snps_excluding_block;
+	
 	return number_of_branch_snps_excluding_block;
 }
 

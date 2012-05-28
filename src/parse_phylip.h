@@ -26,6 +26,7 @@
    int number_of_recombinations;
    int number_of_snps;
    int genome_length_without_gaps;
+   int number_of_blocks;
  } sample_statistics;
 
 
@@ -43,6 +44,7 @@ char convert_reference_to_real_base_in_column(int snp_column, char reference_bas
 void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps);
 void set_number_of_snps_for_sample(char * sample_name, int number_of_snps);
 void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations);
+void set_number_of_blocks_for_sample(char * sample_name,int num_blocks);
 sample_statistics ** get_sample_statistics();
 
 #define MAX_READ_BUFFER 1048576

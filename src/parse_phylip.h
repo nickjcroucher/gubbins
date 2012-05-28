@@ -27,6 +27,7 @@
    int number_of_snps;
    int genome_length_without_gaps;
    int number_of_blocks;
+   int bases_in_recombinations;
  } sample_statistics;
 
 

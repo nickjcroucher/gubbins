@@ -31,7 +31,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
 double calculate_threshold(int branch_genome_size, int window_size);
 int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps);
 double reduce_factorial(int l, int i);
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases,int current_total_snps,int num_blocks);
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases,int current_total_snps,int num_blocks, int ** current_block_coordinates);
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array);
 double snp_density(int length_of_sequence, int number_of_snps);
 int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);
@@ -41,6 +41,7 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps, FILE * gff_file_pointer);
 int extend_end_of_block_left_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords);
 int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords);
+int calculate_number_of_bases_in_recombations(int ** block_coordinates, int num_blocks);
 
 #define DEFAULT_SNP_DENSITY 0.000001
 #define WINDOW_SNP_MODE_TARGET 10

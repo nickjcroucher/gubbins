@@ -52,8 +52,28 @@ int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_
 	return array_1_size+array_2_size;
 }
 
+int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** array_2, int array_2_size, int ** output_array)
+{
+	int array_1_counter=0;
+	int array_2_counter=0;
+	
+	for(array_1_counter = 0; array_1_counter< array_1_size; array_1_counter++)
+	{
+		output_array[0][array_1_counter] = array_1[0][array_1_counter];
+		output_array[1][array_1_counter] = array_1[1][array_1_counter];
+	}
+	
+	for(array_2_counter = 0; array_2_counter < array_2_size; array_2_counter++)
+	{
+		output_array[0][array_2_counter+array_1_size] = array_2[0][array_2_counter];
+		output_array[1][array_2_counter+array_1_size] = array_2[1][array_2_counter];
+	}
+	return array_1_size+array_2_size;
+}
+
+
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks)
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks, int ** current_block_coordinates)
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -61,7 +81,6 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 	
 	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
-	
 	
 	if (root->childNum == 0)
 	{
@@ -73,6 +92,15 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		set_number_of_recombinations_for_sample(root->taxon,num_current_recombinations);
 		set_number_of_snps_for_sample(root->taxon,(current_total_snps + root->number_of_snps));
 		set_number_of_blocks_for_sample(root->taxon,(num_blocks + root->number_of_blocks));
+		
+		int ** merged_block_coordinates;
+		merged_block_coordinates = (int **) malloc(3*sizeof(int *));
+		merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
+		merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
+
+		copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
+
+		set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations(merged_block_coordinates, (num_blocks + root->number_of_blocks)));
 		
 		for(i = 0; i < num_current_recombinations; i++)
 		{
@@ -89,10 +117,74 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 		while (child != NULL)
 		{
 			// recursion
-			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks));
+			int ** merged_block_coordinates;
+			merged_block_coordinates = (int **) malloc(3*sizeof(int *));
+			merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
+			merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
+			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
+			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates);
 			child = child->next;
 		}
 	}
+}
+
+int calculate_number_of_bases_in_recombations(int ** block_coordinates, int num_blocks)
+{
+	int total_bases = 0;
+	int current_block = 1;
+	int start_block = 0;
+	
+	for(start_block = 0; start_block < num_blocks; start_block++)
+	{
+		if(block_coordinates[0][start_block] == -1 || block_coordinates[1][start_block] == -1)
+		{
+			continue;
+		}
+		
+		for(current_block = 0 ; current_block < num_blocks; current_block++)
+		{ 
+			if(current_block == start_block)
+			{
+				continue;	
+			}
+			
+			if(block_coordinates[0][current_block] == -1 || block_coordinates[1][current_block] == -1)
+			{
+				continue;
+			}
+			
+			
+			int found_overlap = 0;
+		  if(block_coordinates[0][start_block] >=  block_coordinates[0][current_block] && block_coordinates[0][start_block] <= block_coordinates[1][current_block] )
+		  {
+				block_coordinates[0][start_block] = block_coordinates[0][current_block];
+				found_overlap = 1;
+			}
+			
+			if(block_coordinates[1][start_block] >=  block_coordinates[0][current_block]  && block_coordinates[1][start_block] <= block_coordinates[1][current_block])
+		  {
+				block_coordinates[1][start_block] = block_coordinates[1][current_block];
+				found_overlap = 1;
+			}
+			
+			if(found_overlap == 1)
+			{
+				block_coordinates[0][current_block] = -1;
+				block_coordinates[1][current_block] = -1;
+			}
+		}	
+		
+	}
+	for(start_block = 0; start_block < num_blocks; start_block++)
+	{
+		if(block_coordinates[0][start_block] == -1 || block_coordinates[1][start_block] == -1)
+		{
+			continue;
+		}
+	  total_bases += (block_coordinates[1][start_block] - block_coordinates[0][start_block]);
+  }
+	
+	return total_bases;
 }
 
 
@@ -397,6 +489,12 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
 		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
+
+		current_node->block_coordinates[0] = realloc((int *)current_node->block_coordinates[0], ((int)current_node->number_of_blocks +1)*sizeof(int));
+		current_node->block_coordinates[1] = realloc((int *)current_node->block_coordinates[1], ((int)current_node->number_of_blocks +1)*sizeof(int));
+		
+		current_node->block_coordinates[0][current_node->number_of_blocks -1] = candidate_blocks[0][smallest_index];
+		current_node->block_coordinates[1][current_node->number_of_blocks -1] = candidate_blocks[1][smallest_index];
 	}
 	current_node->number_of_snps = number_of_branch_snps_excluding_block;
 	

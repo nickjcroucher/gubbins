@@ -78,11 +78,11 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	// get reference sequence from VCF
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
-	
+
 	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome,min_snps);
 	// check for snps in the phylib sequence
 	// create a new vcf file, and phylib file
-	
+
 	int filtered_snp_locations[number_of_snps];
 	int number_of_filtered_snps;
 	int number_of_samples = number_of_samples_from_parse_phylip();

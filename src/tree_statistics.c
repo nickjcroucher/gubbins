@@ -33,7 +33,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	strcpy(base_filename, filename);
 	
 	file_pointer = fopen(strcat(base_filename,".stats"), "w");
-	fprintf( file_pointer, "Sample name\tNum SNPs in recombinations\tNum of SNPs outside recombinations\tTotal SNPs\tNum Recombination Blocks\tr/m\tb/m\tGenome Length\n");
+	fprintf( file_pointer, "Sample name\tNum SNPs in recombinations\tNum of SNPs outside recombinations\tTotal SNPs\tBases in Recombinations\tEstimated Num SNPs if there were no recombinations\tNum Recombination Blocks\tr/m\tb/m\tGenome Length\n");
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{
@@ -43,6 +43,8 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
     fprintf( file_pointer, "%i\t", sample_details->number_of_recombinations);
     fprintf( file_pointer, "%i\t", (sample_details->number_of_snps));
     fprintf( file_pointer, "%i\t", (sample_details->number_of_recombinations + sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations);
+		fprintf( file_pointer, "%i\t", estimate_snps_genome_would_have_without_recombinations(sample_details->number_of_snps, sample_details->genome_length_without_gaps,sample_details->bases_in_recombinations));
     fprintf( file_pointer, "%i\t", sample_details->number_of_blocks);
     fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
 		fprintf( file_pointer, "%f\t", recombination_blocks_to_mutation_ratio(sample_details->number_of_blocks,sample_details->number_of_snps));
@@ -71,3 +73,11 @@ float recombination_blocks_to_mutation_ratio(int number_of_blocks, int number_of
 	}
 	return (number_of_blocks*1.0)/(number_of_snps*1.0);
 }
+
+int estimate_snps_genome_would_have_without_recombinations(int number_of_snps_outside_recomb, int genome_length_without_gaps,int bases_in_recombinations )
+{
+	return (int) (number_of_snps_outside_recomb*genome_length_without_gaps)/(genome_length_without_gaps - bases_in_recombinations);
+}
+
+
+

@@ -40,7 +40,7 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(number_of_recombinations_in_file("../tests/data/one_recombination.tre.tab") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.vcf","../tests/data/one_recombination.expected.vcf") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.stats","../tests/data/one_recombination.expected.stats") == 1);
-
+  
 	remove("../tests/data/one_recombination.tre.tab");
 	remove("../tests/data/one_recombination.tre.vcf");
 	remove("../tests/data/one_recombination.tre.phylip");

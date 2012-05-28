@@ -260,6 +260,77 @@ START_TEST (check_exclude_snp_sites_in_block)
 }
 END_TEST
 
+START_TEST (check_copy_and_concat_2d_integer_arrays)
+{
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((3)*sizeof(int ));
+	block_coords[1] = (int*) malloc((3)*sizeof(int ));
+	
+	int ** block_coords_2;  
+	block_coords_2  = (int **) malloc(2*sizeof(int*));
+	block_coords_2[0] = (int*) malloc((2)*sizeof(int ));
+	block_coords_2[1] = (int*) malloc((2)*sizeof(int ));
+	
+	int ** block_coords_out;  
+	block_coords_out  = (int **) malloc(2*sizeof(int*));
+	block_coords_out[0] = (int*) malloc((5)*sizeof(int ));
+	block_coords_out[1] = (int*) malloc((5)*sizeof(int ));
+	
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
+	block_coords[0][1] = 100;
+	block_coords[1][1] = 110;
+	block_coords[0][2] = 7;
+	block_coords[1][2] = 15;
+	
+	block_coords_2[0][0] = 200;
+	block_coords_2[1][0] = 204;
+	block_coords_2[0][1] = 2;
+	block_coords_2[1][1] = 8;
+	
+	int output_size = 0;
+	output_size = copy_and_concat_2d_integer_arrays(block_coords, 3, block_coords_2, 2, block_coords_out) ;
+	fail_unless(output_size == 5); 
+	fail_unless(block_coords_out[0][0] == 5);
+	fail_unless(block_coords_out[1][0] == 10);
+	fail_unless(block_coords_out[0][2] == 7);
+	fail_unless(block_coords_out[1][2] == 15);
+	fail_unless(block_coords_out[0][4] == 2);
+	fail_unless(block_coords_out[1][4] == 8);
+	
+}
+END_TEST
+
+int test_bases_in_recombinations(int block_size)
+{
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
+	block_coords[0][1] = 100;
+	block_coords[1][1] = 110;
+	block_coords[0][2] = 15;
+	block_coords[1][2] = 20;
+	block_coords[0][3] = 7;
+	block_coords[1][3] = 15;
+	calculate_number_of_bases_in_recombations(block_coords, block_size);
+}
+
+START_TEST (check_calculate_number_of_bases_in_recombations)
+{
+	fail_unless(test_bases_in_recombinations(4) == 25);
+	fail_unless(test_bases_in_recombinations(3) == 20);
+	fail_unless(test_bases_in_recombinations(2) == 15);
+	fail_unless(test_bases_in_recombinations(1) == 5);
+}
+END_TEST
+
+
+
+
 Suite * check_branch_sequences_suite (void)
 {
   Suite *s = suite_create ("checking branch sequences");
@@ -279,6 +350,8 @@ Suite * check_branch_sequences_suite (void)
 	tcase_add_test (tc_branch_sequences, check_dont_extend_left_if_gap_non_contiguous);
 	tcase_add_test (tc_branch_sequences, check_extend_left_over_multiple_gaps);
 	tcase_add_test (tc_branch_sequences, check_extend_left_over_multiple_gaps_stopping_at_last_snp);
+	tcase_add_test (tc_branch_sequences, check_copy_and_concat_2d_integer_arrays);
+	tcase_add_test (tc_branch_sequences, check_calculate_number_of_bases_in_recombations);
   suite_add_tcase (s, tc_branch_sequences);
 
   return s;

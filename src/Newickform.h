@@ -40,6 +40,8 @@ typedef struct newick_node
   int number_of_snps;
   int current_node_id;
   int number_of_blocks;
+  int ** block_coordinates;
+  
 	struct newick_child *child;
 	struct newick_node *parent;
 } newick_node;

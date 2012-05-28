@@ -174,6 +174,20 @@ void set_number_of_snps_for_sample(char * sample_name, int number_of_snps)
 	((sample_statistics *) statistics_for_samples[sample_index])->number_of_snps = number_of_snps;
 }
 
+void set_number_of_blocks_for_sample(char * sample_name,int num_blocks)
+{
+	int sample_index ;
+	sample_index = find_sequence_index_from_sample_name( sample_name);
+  if( sample_index == -1)
+  {
+		return;
+	}
+	
+	((sample_statistics *) statistics_for_samples[sample_index])->number_of_blocks = num_blocks;
+}
+
+
+
 void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps)
 {
 	int sample_index ;

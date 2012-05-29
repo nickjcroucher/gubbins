@@ -1,6 +1,6 @@
 /*
  *  Wellcome Trust Sanger Institute
- *  Copyright (C) 2011  Wellcome Trust Sanger Institute
+ *  Copyright (C) 2012  Wellcome Trust Sanger Institute
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,16 +17,29 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _SNP_SITES_H_
-#define _SNP_SITES_H_
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "seqUtil.h"
+#include "Newickform.h"
+#include "tree_scaling.h"
 
-void build_snp_locations(int snp_locations[], char reference_sequence[]);
-int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[]);
-int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations);
-void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locations, int number_of_snps);
-void strip_directory_from_filename(char * input_filename, char * output_filename);
+void scale_branch_distances(newick_node * root_node, int number_of_filtered_snps)
+{
 
-#define MAX_FILENAME_SIZE 1024
-#define MAX_SAMPLE_NAME_SIZE 1024
-
-#endif
+	if (root_node->childNum == 0)
+	{
+		root_node->dist = (root_node->dist * number_of_filtered_snps);
+	}
+	else
+	{
+		root_node->dist = root_node->dist * number_of_filtered_snps;
+		newick_child *child;
+		child = root_node->child;
+		while (child != NULL)
+		{
+			scale_branch_distances(child->node, number_of_filtered_snps);
+			child = child->next;
+		}
+	}
+}

@@ -17,16 +17,12 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _SNP_SITES_H_
-#define _SNP_SITES_H_
-
-void build_snp_locations(int snp_locations[], char reference_sequence[]);
-int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[]);
-int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations);
-void remove_filtered_snp_locations(int * filtered_snp_locations, int * snp_locations, int number_of_snps);
-void strip_directory_from_filename(char * input_filename, char * output_filename);
-
-#define MAX_FILENAME_SIZE 1024
-#define MAX_SAMPLE_NAME_SIZE 1024
+#ifndef _TREE_SCALING_H_
+#define _TREE_SCALING_H_
+void scale_branch_distances(newick_node * root_node, int number_of_filtered_snps);
 
 #endif
+
+
+
+

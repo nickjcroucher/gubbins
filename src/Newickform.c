@@ -27,7 +27,7 @@
 
 #define STR_OUT	"out"
 
-void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps)
+newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps)
 {
 	int iLen, iMaxLen;
 	char *pcTreeStr;
@@ -86,8 +86,10 @@ void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locatio
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 	int * parent_recombinations;
 	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases,0,0,root->block_coordinates);
+
 	fclose(block_file_pointer);
 	fclose(gff_file_pointer);
+	return root;
 }
 
 
@@ -283,5 +285,39 @@ newick_node* parseTree(char *str)
 	node->block_coordinates[1] = (int*) malloc((3)*sizeof(int ));
 
 	return node;
+}
+
+
+
+void print_tree(newick_node *root, FILE * outputfile)
+{
+	newick_child *child;
+	if (root->childNum == 0)
+	{
+		fprintf(outputfile,"%s:%0.6f", root->taxon, root->dist);
+	}
+	else
+	{
+		child = root->child;
+		fprintf(outputfile,"(");
+		while (child != NULL)
+		{
+			print_tree(child->node,outputfile);
+			if (child->next != NULL)
+			{
+				fprintf(outputfile,",");
+			}
+			child = child->next;
+		}
+		if (root->taxon != NULL)
+		{
+			fprintf(outputfile,")%s:%0.6f", root->taxon, root->dist);
+		}
+		else
+		{
+			fprintf(outputfile,"):%0.6f", root->dist);
+		}
+	}
+	fflush(outputfile);
 }
 

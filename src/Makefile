@@ -61,7 +61,7 @@ am_libgubbins_la_OBJECTS = Newickform.lo alignment_file.lo \
 	block_tab_file.lo branch_sequences.lo fasta_of_snp_sites.lo \
 	gff_file.lo gubbins.lo parse_phylip.lo parse_vcf.lo \
 	phylib_of_snp_sites.lo seqUtil.lo snp_searching.lo \
-	snp_sites.lo tree_statistics.lo vcf.lo
+	snp_sites.lo tree_statistics.lo tree_scaling.lo vcf.lo
 libgubbins_la_OBJECTS = $(am_libgubbins_la_OBJECTS)
 libgubbins_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -214,13 +214,13 @@ top_builddir = ..
 top_srcdir = ..
 
 # ship these headers in the "make dist" target
-dist_data_DATA = Newickform.h alignment_file.h block_tab_file.h branch_sequences.h fasta_of_snp_sites.h gff_file.h gubbins.h kseq.h parse_phylip.h parse_vcf.h phylib_of_snp_sites.h seqUtil.h snp_searching.h snp_sites.h tree_statistics.h vcf.h
+dist_data_DATA = Newickform.h alignment_file.h block_tab_file.h branch_sequences.h fasta_of_snp_sites.h gff_file.h gubbins.h kseq.h parse_phylip.h parse_vcf.h phylib_of_snp_sites.h seqUtil.h snp_searching.h snp_sites.h tree_statistics.h tree_scaling.h vcf.h
 gubbins_SOURCES = main.c
 gubbins_LDADD = -lz -lm libgubbins.la
 
 # libgubbins.so is our library
 lib_LTLIBRARIES = libgubbins.la
-libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c vcf.c
+libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylib_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c tree_scaling.c vcf.c
 libgubbins_la_LDFLAGS = -version-info 0:1
 
 #libPyGubbins_la_SOURCES = PyGubbins.cpp
@@ -376,6 +376,7 @@ include ./$(DEPDIR)/run_all_tests-run_all_tests.Po
 include ./$(DEPDIR)/seqUtil.Plo
 include ./$(DEPDIR)/snp_searching.Plo
 include ./$(DEPDIR)/snp_sites.Plo
+include ./$(DEPDIR)/tree_scaling.Plo
 include ./$(DEPDIR)/tree_statistics.Plo
 include ./$(DEPDIR)/vcf.Plo
 

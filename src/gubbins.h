@@ -28,6 +28,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
 char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences);
 
+
 #define MAX_EDGES_IN_TREE 20000
 #define MAX_SAMPLE_NAME_SIZE 1024
 

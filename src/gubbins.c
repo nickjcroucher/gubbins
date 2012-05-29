@@ -28,7 +28,7 @@
 #include "snp_sites.h"
 #include "vcf.h"
 #include "phylib_of_snp_sites.h"
-
+#include "tree_scaling.h"
 #include "seqUtil.h"
 #include "Newickform.h"
 
@@ -52,7 +52,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	vcf_file_pointer=fopen(vcf_filename, "r");
 	
 	char * reference_bases;
-	
+	newick_node* root_node;
 	int number_of_snps;
 	int number_of_columns;
 	int i;
@@ -79,7 +79,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
 
-	build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome,min_snps);
+	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome,min_snps);
 	// check for snps in the phylib sequence
 	// create a new vcf file, and phylib file
 
@@ -102,6 +102,13 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	create_phylib_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
+	
+	// Create an new tree with updated distances
+	scale_branch_distances(root_node, number_of_filtered_snps);
+
+	FILE *output_tree_pointer;
+	output_tree_pointer=fopen(tree_filename, "w");
+	print_tree(root_node,output_tree_pointer);
 }
 
 

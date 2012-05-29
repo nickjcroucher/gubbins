@@ -25,7 +25,7 @@
 #include "snp_sites.h"
 #include "gubbins.h"
 
-#define MAX_FILENAME_SIZE 250
+#define MAX_FILENAME_SIZE 1024
 const char* program_name;
 
 // Assumptions:

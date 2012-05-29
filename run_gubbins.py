@@ -10,6 +10,7 @@ import dendropy
 from array import *
 from Bio import SeqIO
 from cStringIO import StringIO
+import shutil
 
 
 # config variables
@@ -106,7 +107,11 @@ def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_
 def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps):
   current_tree_name = fasttree_current_tree_name(base_filename, i)
   return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
- 
+
+def  starting_tree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,starting_tree):
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(starting_tree)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
+
+
 def number_of_sequences_in_alignment(filename):
   return len(get_sequence_names_from_alignment(filename))
   
@@ -197,7 +202,7 @@ previous_tree_name    = ""
 current_tree_name     = ""
 
 for i in range(1, args.iterations+1):
-
+    
   if args.tree_builder == "hybrid" :
     if i == 1:
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
@@ -233,7 +238,13 @@ for i in range(1, args.iterations+1):
   
   if args.verbose > 0:
     print tree_building_command
-  subprocess.call(tree_building_command, shell=True)
+    
+    
+  if args.starting_tree is not None and i == 1:
+    copyfile(args.starting_tree, current_tree_name)
+  else:
+    subprocess.call(tree_building_command, shell=True)
+    
   if args.verbose > 0:
     print int(time.time())
   

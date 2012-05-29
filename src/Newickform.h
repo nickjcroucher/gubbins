@@ -46,16 +46,16 @@ typedef struct newick_node
 	struct newick_node *parent;
 } newick_node;
 
-#define MAX_FILENAME_SIZE 250
+#define MAX_FILENAME_SIZE 1024
 
 #ifdef __NEWICKFORM_C__
 newick_node* parseTree(char *str);
-void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
-
+newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
+void print_tree(newick_node *root, FILE * outputfile);
 #else
 extern newick_node* parseTree(char *str);
-extern void build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
-
+extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, int length_of_original_genome,int min_snps);
+extern void print_tree(newick_node *root, FILE * outputfile);
 #endif
 
 #endif

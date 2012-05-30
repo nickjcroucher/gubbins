@@ -37,6 +37,7 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
 
 
 #define MAX_READ_BUFFER 1048576
+#define MAX_READ_BUFFER_SMALL 1024
 #define MAX_SAMPLE_NAME_SIZE 1024
 
 #endif

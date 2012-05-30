@@ -223,10 +223,10 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
     
     char *pcRes         = NULL;  
     int   lineLength    = 0; 
-	char current_line_buffer[MAX_READ_BUFFER] = {0};
+	char current_line_buffer[MAX_READ_BUFFER_SMALL] = {0};
 	
 	
-    while((pcRes = fgets(current_line_buffer, MAX_READ_BUFFER, pFilePtr))  != NULL){
+    while((pcRes = fgets(current_line_buffer, MAX_READ_BUFFER_SMALL, pFilePtr))  != NULL){
 	      if(lineLength < max_characters)
       	{
           //append string to line buffer
@@ -238,14 +238,6 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
 	            break;
 	        }
         }
-        else
-        {
-	        // Advance to end of line
-					lineLength = strlen(current_line_buffer) - 1;
-	        if((current_line_buffer)[lineLength] == '\n' || (current_line_buffer)[lineLength] == '\0'){
-	            break;
-	        }
-	      }
     }
     return 1;
 }

@@ -34,12 +34,12 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 	rewind(vcf_file_pointer);
 	char szBuffer[100000] = {0};  
 	int reference_index = 0;
-	char result[10000] = {0};  
+	char result[1000] = {0};  
 	
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_line(szBuffer, vcf_file_pointer);
+		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 50);
 		
 		if(szBuffer[0] == '\0')
 		{
@@ -58,20 +58,17 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 }
 
 
-
-
-
 void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_bases, int number_of_snps, int column_number)
 {
 	rewind(vcf_file_pointer);
 	char szBuffer[100000] = {0};  
 	int reference_index = 0;
-	char result[10000] = {0};  
+	char result[1000] = {0};  
 		
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_line(szBuffer, vcf_file_pointer);
+		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 200);
 		
 		if(szBuffer[0] == '\0')
 		{

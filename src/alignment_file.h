@@ -33,7 +33,7 @@ int number_of_sequences_in_file(char filename[]);
 void get_sample_names_for_header(char filename[], char ** sequence_names, int number_of_samples);
 char filter_invalid_characters(char input_char);
 void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps);
-
+int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_characters);
 
 
 #define MAX_READ_BUFFER 1048576

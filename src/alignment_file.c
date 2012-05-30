@@ -241,10 +241,10 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
         else
         {
 	        // Advance to end of line
-					lineLength = strlen(current_line_buffer) - 1;
-	        if((current_line_buffer)[lineLength] == '\n' || (current_line_buffer)[lineLength] == '\0'){
-	            break;
-	        }
+					//lineLength = strlen(current_line_buffer) - 1;
+	        //if((current_line_buffer)[lineLength] == '\n' || (current_line_buffer)[lineLength] == '\0'){
+	        //    break;
+	        //}
 	      }
     }
     return 1;

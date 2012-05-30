@@ -68,7 +68,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	}
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
-	number_of_snps  = get_number_of_snps(vcf_file_pointer);
+	number_of_snps  = number_of_snps_in_phylib();
 	reference_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 	
 	int snp_locations[number_of_snps];

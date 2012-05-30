@@ -216,6 +216,34 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
   return number_of_snps;
 }
 
+
+
+int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_characters)
+{
+    
+    char *pcRes         = NULL;  
+    int   lineLength    = 0; 
+	char current_line_buffer[MAX_READ_BUFFER_SMALL] = {0};
+	
+	
+    while((pcRes = fgets(current_line_buffer, MAX_READ_BUFFER_SMALL, pFilePtr))  != NULL){
+	      if(lineLength < max_characters)
+      	{
+          //append string to line buffer
+          strcat(sequence, current_line_buffer);
+          strcpy(current_line_buffer, "");
+          lineLength = strlen(sequence) - 1;
+          //if end of line character is found then exit from loop
+	        if((sequence)[lineLength] == '\n' || (sequence)[lineLength] == '\0'){
+	            break;
+	        }
+        }
+    }
+    return 1;
+}
+
+
+
 int read_line(char sequence[], FILE * pFilePtr)
 {
     

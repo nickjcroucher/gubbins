@@ -252,6 +252,11 @@ void load_sequences_from_phylib_file(char phylip_filename[])
 	load_sequences_from_phylib(phylib_file_pointer);
 }
 
+int number_of_snps_in_phylib()
+{
+	return num_snps;
+}
+
 void load_sequences_from_phylib(FILE * phylip_file_pointer)
 {	
 	rewind(phylip_file_pointer);

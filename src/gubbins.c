@@ -109,6 +109,9 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	FILE *output_tree_pointer;
 	output_tree_pointer=fopen(tree_filename, "w");
 	print_tree(root_node,output_tree_pointer);
+	fprintf(output_tree_pointer,";");
+	fflush(output_tree_pointer);
+	fclose(output_tree_pointer);
 }
 
 

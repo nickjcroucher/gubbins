@@ -61,14 +61,14 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_bases, int number_of_snps, int column_number)
 {
 	rewind(vcf_file_pointer);
-	char szBuffer[204] = {0};  
+	char szBuffer[10000] = {0};  
 	int reference_index = 0;
 	char result[1000] = {0};  
 		
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 200);
+		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 1000);
 		
 		if(szBuffer[0] == '\0')
 		{
@@ -77,7 +77,7 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_ba
 		
 		if(szBuffer[0] != '#')
 		{
-			split_string_and_return_specific_index(result, szBuffer, column_number, 200);
+			split_string_and_return_specific_index(result, szBuffer, column_number, 1000);
 			sequence_bases[reference_index] = result[0];
 			reference_index++;
 		}

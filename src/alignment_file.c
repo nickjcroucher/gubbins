@@ -244,11 +244,11 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
 
 
 
-int read_line(char sequence[], FILE * pFilePtr)
+char * read_line(char sequence[], FILE * pFilePtr)
 {
-    
+    strcpy(sequence, "");
     char *pcRes         = NULL;  
-    int   lineLength    = 0; 
+    long   lineLength    = 0; 
 	char current_line_buffer[MAX_READ_BUFFER] = {0};
 	
 	
@@ -266,7 +266,7 @@ int read_line(char sequence[], FILE * pFilePtr)
     }
 	 
 	 
-    return 1;
+    return sequence;
 }
 
 

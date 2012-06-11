@@ -175,7 +175,7 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_line(szBuffer, vcf_file_pointer);
+		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		if(szBuffer[0] == '\0' || szBuffer[0] != '#')
 		{
 			break;
@@ -204,7 +204,7 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_line(szBuffer, vcf_file_pointer);
+		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
 		if(szBuffer[0] == '\0' || szBuffer[0] != '#')
 		{

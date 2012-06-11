@@ -253,7 +253,11 @@ int read_line(char sequence[], FILE * pFilePtr)
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
-        //append string to line buffer
+        if( strlen(current_line_buffer) > MAX_READ_BUFFER - 10 )
+        {
+					realloc(sequence, strlen(sequence) + MAX_READ_BUFFER + 10 );
+	      }
+
         strcat(sequence, current_line_buffer);
         strcpy(current_line_buffer, "");
         lineLength = strlen(sequence) - 1;

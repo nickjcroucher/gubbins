@@ -167,14 +167,15 @@ int get_number_of_columns(char * column_header)
 int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 {
 	rewind(vcf_file_pointer);
-	char szBuffer[100000] = {0};
 	char result[100] = {0};
+	
+	char * szBuffer;
+	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
 		read_line(szBuffer, vcf_file_pointer);
-		
 		if(szBuffer[0] == '\0' || szBuffer[0] != '#')
 		{
 			break;
@@ -195,7 +196,8 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_of_columns)
 {
 	rewind(vcf_file_pointer);
-	char szBuffer[100000] = {0};
+	char * szBuffer;
+	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	char result[100] = {0};  
 	int i;
 	

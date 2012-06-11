@@ -260,7 +260,9 @@ int number_of_snps_in_phylib()
 void load_sequences_from_phylib(FILE * phylip_file_pointer)
 {	
 	rewind(phylip_file_pointer);
-	char line_buffer[MAX_READ_BUFFER] = {0}; 
+	char * line_buffer;
+	line_buffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
+	
 	int i;
 	
 	// The first line contains the number of samples and snps

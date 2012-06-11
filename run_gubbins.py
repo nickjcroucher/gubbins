@@ -241,7 +241,7 @@ for i in range(1, args.iterations+1):
     
     
   if args.starting_tree is not None and i == 1:
-    copyfile(args.starting_tree, current_tree_name)
+    shutil.copyfile(args.starting_tree, current_tree_name)
   else:
     subprocess.call(tree_building_command, shell=True)
     

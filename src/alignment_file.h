@@ -36,7 +36,7 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_characters);
 
 
-#define MAX_READ_BUFFER 262144
+#define MAX_READ_BUFFER 65536
 #define MAX_READ_BUFFER_SMALL 1024
 #define MAX_SAMPLE_NAME_SIZE 1024
 

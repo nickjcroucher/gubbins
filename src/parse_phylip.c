@@ -286,6 +286,9 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 
 	do{
 		strcpy(line_buffer,""); 
+		free(line_buffer);
+		line_buffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
+		
 		line_buffer = read_line(line_buffer, phylip_file_pointer);
 		
 		if(line_buffer[0] == '\0')
@@ -325,7 +328,7 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 		sample_counter++;
 
 	}while(line_buffer[0] != '\0');
-	
+	free(line_buffer);
 	initialise_statistics();
 }
 

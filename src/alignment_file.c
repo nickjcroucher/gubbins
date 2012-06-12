@@ -244,20 +244,19 @@ int read_first_few_characters_of_line(char sequence[], FILE * pFilePtr, int max_
 
 
 
-int read_line(char sequence[], FILE * pFilePtr)
+char * read_line(char sequence[], FILE * pFilePtr)
 {
-    
+    strcpy(sequence, "");
     char *pcRes         = NULL;  
-    int   lineLength    = 0; 
+    long   lineLength    = 0; 
 	char current_line_buffer[MAX_READ_BUFFER] = {0};
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
-        if( strlen(current_line_buffer) > MAX_READ_BUFFER - 10 )
-        {
-					realloc(sequence, strlen(sequence) + MAX_READ_BUFFER + 10 );
-	      }
-
+	      if(strlen(sequence) > 0)
+	      {
+	    			sequence = realloc(sequence, strlen(sequence) + strlen(current_line_buffer) + 2 );
+        }
         strcat(sequence, current_line_buffer);
         strcpy(current_line_buffer, "");
         lineLength = strlen(sequence) - 1;
@@ -269,7 +268,7 @@ int read_line(char sequence[], FILE * pFilePtr)
     }
 	 
 	 
-    return 1;
+    return sequence;
 }
 
 

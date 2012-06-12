@@ -49,7 +49,7 @@ void set_number_of_blocks_for_sample(char * sample_name,int num_blocks);
 sample_statistics ** get_sample_statistics();
 int number_of_snps_in_phylib();
 
-#define MAX_READ_BUFFER 262144
+#define MAX_READ_BUFFER 65536
 #define MAX_SAMPLE_NAME_SIZE 1024
 
 

@@ -31,6 +31,6 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 int column_number_for_column_name(char ** column_names, char * column_name, int number_of_columns);
 
 void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_values, int number_of_snps, int column_number);
-#define MAX_READ_BUFFER 262144
+#define MAX_READ_BUFFER 65536
 
 #endif

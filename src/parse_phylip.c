@@ -267,7 +267,7 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 	
 	// The first line contains the number of samples and snps
 	strcpy(line_buffer,"");
-	read_line(line_buffer, phylip_file_pointer);
+	line_buffer = read_line(line_buffer, phylip_file_pointer);
 	
 	num_samples = get_number_of_samples_from_phylip(line_buffer);
 	num_snps = get_number_of_snps_from_phylip(line_buffer);
@@ -286,7 +286,10 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 
 	do{
 		strcpy(line_buffer,""); 
-		read_line(line_buffer, phylip_file_pointer);
+		free(line_buffer);
+		line_buffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
+		
+		line_buffer = read_line(line_buffer, phylip_file_pointer);
 		
 		if(line_buffer[0] == '\0')
 		{
@@ -325,7 +328,7 @@ void load_sequences_from_phylib(FILE * phylip_file_pointer)
 		sample_counter++;
 
 	}while(line_buffer[0] != '\0');
-	
+	free(line_buffer);
 	initialise_statistics();
 }
 

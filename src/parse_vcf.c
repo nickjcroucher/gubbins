@@ -32,14 +32,15 @@ int * column_data;
 void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_values, int number_of_snps, int column_number)
 {
 	rewind(vcf_file_pointer);
-	char szBuffer[100000] = {0};  
+	char * szBuffer;
+	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	int reference_index = 0;
 	char result[1000] = {0};  
 	
 	do{
 		strcpy(szBuffer,""); 
-		// check the first character of the line to see if its in the header
-		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 50);
+ 		// check the first character of the line to see if its in the header
+  	szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
 		if(szBuffer[0] == '\0')
 		{
@@ -61,14 +62,15 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_bases, int number_of_snps, int column_number)
 {
 	rewind(vcf_file_pointer);
-	char szBuffer[10000] = {0};  
+	char * szBuffer;
+	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	int reference_index = 0;
 	char result[1000] = {0};  
 		
 	do{
 		strcpy(szBuffer,""); 
 		// check the first character of the line to see if its in the header
-		read_first_few_characters_of_line(szBuffer, vcf_file_pointer, 1000);
+		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
 		if(szBuffer[0] == '\0')
 		{

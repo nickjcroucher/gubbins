@@ -35,10 +35,35 @@ def reroot_tree_with_outgroup(tree_name, outgroup):
   tree.root_with_outgroup({'name': outgroup})
   Phylo.write(tree, tree_name, 'newick')
     
+def split_all_non_bi_nodes(node):
+  if node.is_leaf():
+    return None
+  elif len(node.child_nodes()) > 2:
+    split_child_nodes(node)
+
+  for child_node in node.child_nodes():
+    split_all_non_bi_nodes(child_node)
+
+  return None
+
+def split_child_nodes(node):
+  all_child_nodes = node.child_nodes()
+  #skip over the first node
+  first_child = all_child_nodes.pop()
+  # create a placeholder node to hang everything else off
+  new_child_node = node.new_child(edge_length=0)
+  # move the subtree into the placeholder
+  new_child_node.set_child_nodes(all_child_nodes)
+  # probably not really nessisary
+  node.set_child_nodes((first_child,new_child_node))
+    
 def reroot_tree_at_midpoint(tree_name):
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick')
-  tree.reroot_at_midpoint(update_splits=False, delete_outdegree_one=False)
+  split_all_non_bi_nodes(tree.seed_node)
+    
+  tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
   tree.deroot()
+  tree.update_splits()
   tree.write_to_path(
     tree_name, 
     'newick',

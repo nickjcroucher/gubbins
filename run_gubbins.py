@@ -127,7 +127,7 @@ def get_sequence_names_from_alignment(filename):
 def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
   sequence_names = get_sequence_names_from_alignment(filename)
   create_pairwise_newick_tree(sequence_names, base_filename+".tre")
-  subprocess.call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre "+" -p "+base_filename+".phylip "+ alignment_filename, shell=True)
+  subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre "+" -p "+base_filename+".phylip "+ alignment_filename, shell=True)
   
 def create_pairwise_newick_tree(sequence_names, output_filename):
   tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
@@ -180,7 +180,7 @@ if args.verbose > 0:
 # find all snp sites
 if args.verbose > 0:
   print GUBBINS_EXEC + args.alignment_filename
-subprocess.call([GUBBINS_EXEC, args.alignment_filename])
+subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
 if args.verbose > 0:
   snps_time = int(time.time() - current_time);
   print "SNPs Time:"+ int(snps_time)
@@ -250,7 +250,7 @@ for i in range(1, args.iterations+1):
   if args.starting_tree is not None and i == 1:
     shutil.copyfile(args.starting_tree, current_tree_name)
   else:
-    subprocess.call(tree_building_command, shell=True)
+    subprocess.check_call(tree_building_command, shell=True)
     
   if args.verbose > 0:
     print int(time.time() - current_time)
@@ -264,7 +264,7 @@ for i in range(1, args.iterations+1):
   start_gubbins = int(time.time())
   if args.verbose > 0:
     print gubbins_command
-  subprocess.call(gubbins_command, shell=True)
+  subprocess.check_call(gubbins_command, shell=True)
   if args.verbose > 0:
     recombinations_time = recombinations_time + int(time.time() - start_gubbins)
     print int(time.time() - current_time)

@@ -92,7 +92,24 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	return root;
 }
 
-
+char * strip_quotes(char *taxon)
+{
+	int i = 0;
+	int target_i =0;
+	char cleaned_taxon[MAX_FILENAME_SIZE];
+	while(taxon[i] != '\0')
+	{
+		if(taxon[i] != '\'')
+		{
+			cleaned_taxon[target_i] = taxon[i];
+			target_i++;
+		}
+		i++;
+	}
+	cleaned_taxon[target_i] = '\0';
+	strcpy(taxon,cleaned_taxon);
+	return taxon;
+}
 
 newick_node* parseTree(char *str)
 {
@@ -136,6 +153,7 @@ newick_node* parseTree(char *str)
 			pcColon++;
 			node->dist = (float)atof(pcColon);
 		}
+		node->taxon = strip_quotes(node->taxon);
 		node->number_of_blocks = 0;
 		node->childNum = 0;
 	}
@@ -266,6 +284,7 @@ newick_node* parseTree(char *str)
 			*pcCurrent = '\0';
 			node->taxon = seqMalloc(strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
+			node->taxon = strip_quotes(node->taxon);
 			*pcCurrent = cTemp;
 			pcCurrent++;
 			pcStart = pcCurrent;

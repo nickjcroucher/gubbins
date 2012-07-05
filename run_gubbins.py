@@ -35,11 +35,36 @@ def reroot_tree_with_outgroup(tree_name, outgroup):
   tree.root_with_outgroup({'name': outgroup})
   Phylo.write(tree, tree_name, 'newick')
     
+def split_all_non_bi_nodes(node):
+  if node.is_leaf():
+    return None
+  elif len(node.child_nodes()) > 2:
+    split_child_nodes(node)
+
+  for child_node in node.child_nodes():
+    split_all_non_bi_nodes(child_node)
+
+  return None
+
+def split_child_nodes(node):
+  all_child_nodes = node.child_nodes()
+  #skip over the first node
+  first_child = all_child_nodes.pop()
+  # create a placeholder node to hang everything else off
+  new_child_node = node.new_child(edge_length=0)
+  # move the subtree into the placeholder
+  new_child_node.set_child_nodes(all_child_nodes)
+  # probably not really nessisary
+  node.set_child_nodes((first_child,new_child_node))
+    
 def reroot_tree_at_midpoint(tree_name):
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
             preserve_underscores=True)
-  tree.reroot_at_midpoint(update_splits=False, delete_outdegree_one=False)
+  split_all_non_bi_nodes(tree.seed_node)
+    
+  tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
   tree.deroot()
+  tree.update_splits()
   tree.write_to_path(
     tree_name, 
     'newick',
@@ -172,8 +197,6 @@ if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(
   sys.exit()
 
 current_time = int(time.time())
-snps_time =0;
-recombinations_time =0;
 if args.verbose > 0:
   print current_time
 
@@ -182,8 +205,7 @@ if args.verbose > 0:
   print GUBBINS_EXEC + args.alignment_filename
 subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
 if args.verbose > 0:
-  snps_time = int(time.time() - current_time);
-  print "SNPs Time:"+ int(snps_time)
+  print int(time.time())
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
@@ -194,9 +216,6 @@ starting_base_filename = base_filename
 number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
 if(number_of_sequences == 2):
   pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
-  if args.verbose > 0:
-    print "Recombinations Time:"+ int(time.time() - current_time - snps_time)
-    print "Total Time:"+ int(time.time() - current_time)
   sys.exit()
 
 
@@ -253,7 +272,7 @@ for i in range(1, args.iterations+1):
     subprocess.check_call(tree_building_command, shell=True)
     
   if args.verbose > 0:
-    print int(time.time() - current_time)
+    print int(time.time())
   
   reroot_tree(str(current_tree_name), args.outgroup)
 
@@ -261,13 +280,11 @@ for i in range(1, args.iterations+1):
     os.remove("latest.tre")
   os.symlink(str(current_tree_name), "latest.tre")
  
-  start_gubbins = int(time.time())
   if args.verbose > 0:
     print gubbins_command
   subprocess.check_call(gubbins_command, shell=True)
   if args.verbose > 0:
-    recombinations_time = recombinations_time + int(time.time() - start_gubbins)
-    print int(time.time() - current_time)
+    print int(time.time())
   
   # first iteration creates tree 1
   # 2nd iteration creates tree 2, and you can calculate first RF distance
@@ -285,8 +302,3 @@ for i in range(1, args.iterations+1):
     except ValueError:
       previous_robinson_foulds_distances.append(current_robinson_foulds_distance)
 
-if args.verbose > 0:
-  print "Tree Building Time:"+ int(time.time() - current_time - snps_time - recombinations_time )
-  print "Recombinations Time:"+ int(recombinations_time)
-  print "Total Time:"+ int(time.time() - current_time)
-  

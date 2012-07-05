@@ -37,7 +37,7 @@ def reroot_tree_with_outgroup(tree_name, outgroup):
     
 def reroot_tree_at_midpoint(tree_name):
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
-            preserve_underscores=False)
+            preserve_underscores=True)
   tree.reroot_at_midpoint(update_splits=False, delete_outdegree_one=False)
   tree.deroot()
   tree.write_to_path(

@@ -24,7 +24,7 @@
 
 void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, int current_node_id, int parent_node_id, char * taxon_names)
 {
-  fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate, end_coordinate);
+  fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate+1, end_coordinate+1);
   fprintf(block_file_pointer, "FT                   /node=\"%d->%d\"\n",parent_node_id,current_node_id);
   fprintf(block_file_pointer, "FT                   /colour=2\n");
   fprintf(block_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);

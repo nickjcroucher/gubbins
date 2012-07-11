@@ -207,13 +207,14 @@ START_TEST (check_find_number_of_snps_in_block)
   int coords_empty[0] = {};
   int coords_even[8]  = {1,3,5,7,11,13,17,19};
 	char *child_sequence = "AAAAA-AAAAAAAAAAAAA";
-	
+
 	fail_unless( find_number_of_snps_in_block(1,3,  coords_empty, child_sequence, 8) == 0);
 	fail_unless( find_number_of_snps_in_block(2,2,  coords_even, child_sequence, 8) == 0);
 	fail_unless( find_number_of_snps_in_block(1,3,  coords_even, child_sequence, 8) == 1);
   fail_unless( find_number_of_snps_in_block(1,4,  coords_even, child_sequence, 8) == 2);
-  fail_unless( find_number_of_snps_in_block(1,19, coords_even, child_sequence, 8) == 6);
-  fail_unless( find_number_of_snps_in_block(0,20, coords_even, child_sequence, 8) == 7);
+  fail_unless( find_number_of_snps_in_block(1,5,  coords_even, child_sequence, 8) == 2);
+  fail_unless( find_number_of_snps_in_block(1,19, coords_even, child_sequence, 8) == 7);
+  fail_unless( find_number_of_snps_in_block(0,20, coords_even, child_sequence, 8) == 8);
 	
 }
 END_TEST

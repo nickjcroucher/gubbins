@@ -31,7 +31,7 @@ int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_loca
 	
 	for(i = start_index; i < number_of_branch_snps; i++)
 	{
-		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-')
+		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-' && child_sequence[i] != 'N')
 		{
 			return snp_locations[i];
 		}
@@ -87,7 +87,7 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 	
 	for(i = end_index; i >= 0; i--)
 	{
-		if(snp_locations[i]<= window_end_coordinate && child_sequence[i] != '-')
+		if(snp_locations[i]<= window_end_coordinate && child_sequence[i] != '-' && child_sequence[i] != 'N')
 		{
 			return (snp_locations[i] );
 		}
@@ -107,7 +107,7 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 	{
 		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
 		{
-			if(child_sequence[i] == '-')
+			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 			{
 				window_end_coordinate++;
 			}
@@ -132,7 +132,7 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	{
 		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
 		{
-			if(child_sequence[i] != '-')
+			if(child_sequence[i] != '-' || child_sequence[i] != 'N')
 			{
 				number_of_snps_in_block++;
 			}
@@ -155,7 +155,7 @@ int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations
 	{
 		if(snp_locations[i]< ending_coordinate && snp_locations[i]>= starting_coordinate)
 		{
-			if(child_sequence[i] == '-')
+			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 			{
 				block_size--;
 			}
@@ -183,7 +183,7 @@ int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index
 			break;
 		}
 		
-		if(child_sequence[i] == '-')
+		if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 		{
 			length_of_original_genome--;
 		}
@@ -204,7 +204,7 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 			break;
 		}
 		
-		if(ancestor_sequence[i]  == '.' && child_sequence[i] != '-'  && child_sequence[i] != '.' &&  child_sequence[i] != reference_bases[i] && reference_bases[i] != '-'  &&  reference_bases[i] != 'N')
+		if(ancestor_sequence[i]  == '.' && child_sequence[i] != '-' && child_sequence[i] != 'N'  && child_sequence[i] != '.' &&  child_sequence[i] != reference_bases[i] && reference_bases[i] != '-'  &&  reference_bases[i] != 'N')
 		{
 			branch_snp_coords[number_of_branch_snp_sites]   = snp_locations[i];
 			branch_snp_sequence[number_of_branch_snp_sites] = child_sequence[i];

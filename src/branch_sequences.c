@@ -590,7 +590,7 @@ int extend_end_of_block_left_over_gap(int block_coord, char * branch_snp_sequenc
 	{
 	  if((snp_site_coords[index] -1) == snp_site_coords[index-1] )
 	  {
-	  	if(branch_snp_sequence[index-1] != '-')
+	  	if(branch_snp_sequence[index-1] != '-' && branch_snp_sequence[index-1] != 'N' )
 	  	{
 	  		last_snp_index = index-1;
 	  	}
@@ -628,7 +628,7 @@ int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequen
 	{
 		if((snp_site_coords[index] +1) == snp_site_coords[index+1] )
 		{
-			if(branch_snp_sequence[index+1] != '-')
+			if(branch_snp_sequence[index+1] != '-' && branch_snp_sequence[index+1] != 'N')
 			{
 				last_snp_index = index+1;
 			}

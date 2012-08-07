@@ -21,7 +21,6 @@ GUBBINS_EXEC = 'gubbins'
 
 # Todo
 # timestamp in fasttree intermediate and results files
-# RF distance comparison
 # extract code into modules
 # add python code to deployment
 # catch exception errors when shelling out

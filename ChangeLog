@@ -1,2 +1,7 @@
+2012-8-7 Andrew J. Page <ap13@sanger.ac.uk>
+* Cleanup intermediate files by default
+* Fix RF distance calculation and comparison
+
 2012-4-24 Andrew J. Page <ap13@sanger.ac.uk>
 * Initial beta testing version
+

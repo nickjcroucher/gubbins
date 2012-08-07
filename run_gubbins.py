@@ -35,15 +35,12 @@ def robinson_foulds_distance(input_tree_name,output_tree_name):
 def has_tree_been_seen_before(tree_file_names):
   if len(tree_file_names) <= 2:
     return 0
-  
-  rf_distances = []
+
   for tree_file_name in tree_file_names:
-    if tree_file_name is not tree_file_names[-1]
+    if tree_file_name is not tree_file_names[-1]:
       current_rf_distance = robinson_foulds_distance(tree_file_name,tree_file_names[-1])
-      for previous_rf_distance in rf_distances
-        if(current_rf_distance == previous_rf_distance)
-          return 1
-      rf_distances.append(current_rf_distance)
+      if(current_rf_distance == 0.0):
+        return 1
 
   return 0
 

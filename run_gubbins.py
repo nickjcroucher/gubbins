@@ -8,7 +8,6 @@ import time
 import re
 from Bio import Phylo
 import dendropy
-from array import *
 from Bio import SeqIO
 from cStringIO import StringIO
 import shutil
@@ -20,10 +19,33 @@ FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
 
+# Todo
+# timestamp in fasttree intermediate and results files
+# RF distance comparison
+# extract code into modules
+# add python code to deployment
+# catch exception errors when shelling out
+
+
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
   output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
   return input_tree.robinson_foulds_distance(output_tree)
+  
+def has_tree_been_seen_before(tree_file_names):
+  if len(tree_file_names) <= 2:
+    return 0
+  
+  rf_distances = []
+  for tree_file_name in tree_file_names:
+    if tree_file_name is not tree_file_names[-1]
+      current_rf_distance = robinson_foulds_distance(tree_file_name,tree_file_names[-1])
+      for previous_rf_distance in rf_distances
+        if(current_rf_distance == previous_rf_distance)
+          return 1
+      rf_distances.append(current_rf_distance)
+
+  return 0
 
 def reroot_tree(tree_name, outgroup):
   if outgroup:
@@ -132,7 +154,7 @@ def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starti
   
 def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
   regex_for_file_deletions = []
-  regex_for_file_deletions.append(starting_files_regex)
+  regex_for_file_deletions.append(starting_files_regex(starting_base_filename))
 
   # loop over previous iterations and delete
   for file_iteration in range(1,max_intermediate_iteration):
@@ -225,7 +247,7 @@ parser.add_argument('--verbose',          '-v', action='count', help='Turn on de
 parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
-parser.add_argument('--min_snps',       '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
 args = parser.parse_args()
 
 # check that all the external executable dependancies are available
@@ -262,8 +284,8 @@ if(number_of_sequences == 2):
   sys.exit()
 
 
-latest_file_name = "latest"+base_filename_without_ext+"."+str(current_time)+".tre"
-previous_robinson_foulds_distances = array('d',[])
+latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"
+tree_file_names = []
 
 tree_building_command = ""
 gubbins_command       = ""
@@ -331,22 +353,12 @@ for i in range(1, args.iterations+1):
   if args.verbose > 0:
     print int(time.time())
   
-  # first iteration creates tree 1
-  # 2nd iteration creates tree 2, and you can calculate first RF distance
-  # 3rd iteration creates tree 3, and you can now compare RF distances with the previous iteration
-  if i == 2:
-    previous_robinson_foulds_distances.append(robinson_foulds_distance(previous_tree_name,current_tree_name))
-  elif i > 2:
-    current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)
-    if args.verbose > 0:
-      print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distances) +", "+ str(current_robinson_foulds_distance)
-      
-    try:
-      previous_robinson_foulds_distances.index(current_robinson_foulds_distance)
+  tree_file_names.append(current_tree_name)
+  if i > 2:
+    if has_tree_been_seen_before(tree_file_names):
+      if args.verbose > 0:
+        print "Tree observed before so stopping: "+ str(current_tree_name)
       break
-    except ValueError:
-      previous_robinson_foulds_distances.append(current_robinson_foulds_distance)
-
 
 # cleanup intermediate files
 if args.no_cleanup == 0 or args.no_cleanup is None:

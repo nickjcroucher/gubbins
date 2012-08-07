@@ -5,6 +5,7 @@ import argparse
 import subprocess
 import os
 import time
+import re
 from Bio import Phylo
 import dendropy
 from array import *
@@ -125,7 +126,7 @@ def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starti
   
   # loop over previous iterations and delete
   for file_iteration in range(1,max_intermediate_iteration):
-    regex_for_file_deletions.append("^RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+file_iteration)
+    regex_for_file_deletions.append("^RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
 
   return regex_for_file_deletions
   
@@ -135,7 +136,7 @@ def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_i
 
   # loop over previous iterations and delete
   for file_iteration in range(1,max_intermediate_iteration):
-    regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+file_iteration)
+    regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration))
 
   return regex_for_file_deletions
 
@@ -192,10 +193,10 @@ def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_de
   for dirname, dirnames, filenames in os.walk(directory_to_search):
     for filename in filenames:
       for deletion_regex in regex_for_file_deletions:
-        if(re.match(deletion_regex, filename) != None):
+        if(re.match(str(deletion_regex), filename) != None):
           if verbose > 0:
             print "Deleting file: "+ os.path.join(directory_to_search, filename)
-          #os.remove(os.path.join(directory_to_search, filename))
+          os.remove(os.path.join(directory_to_search, filename))
         
 
 
@@ -261,7 +262,7 @@ if(number_of_sequences == 2):
   sys.exit()
 
 
-latest_file_name = "latest"+base_filename_without_ext+"."+current_time+".tre"
+latest_file_name = "latest"+base_filename_without_ext+"."+str(current_time)+".tre"
 previous_robinson_foulds_distances = array('d',[])
 
 tree_building_command = ""
@@ -348,7 +349,7 @@ for i in range(1, args.iterations+1):
 
 
 # cleanup intermediate files
-if args.no_cleanup == 0:
+if args.no_cleanup == 0 or args.no_cleanup is None:
   max_intermediate_iteration  = max_iteration - 1
   
   raxml_regex_for_file_deletions = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)

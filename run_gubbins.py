@@ -5,9 +5,9 @@ import argparse
 import subprocess
 import os
 import time
+import re
 from Bio import Phylo
 import dendropy
-from array import *
 from Bio import SeqIO
 from cStringIO import StringIO
 import shutil
@@ -19,10 +19,29 @@ FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
 
+# Todo
+# timestamp in fasttree intermediate and results files
+# extract code into modules
+# add python code to deployment
+# catch exception errors when shelling out
+
+
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
   output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
   return input_tree.robinson_foulds_distance(output_tree)
+  
+def has_tree_been_seen_before(tree_file_names):
+  if len(tree_file_names) <= 2:
+    return 0
+
+  for tree_file_name in tree_file_names:
+    if tree_file_name is not tree_file_names[-1]:
+      current_rf_distance = robinson_foulds_distance(tree_file_name,tree_file_names[-1])
+      if(current_rf_distance == 0.0):
+        return 1
+
+  return 0
 
 def reroot_tree(tree_name, outgroup):
   if outgroup:
@@ -84,15 +103,18 @@ def reroot_tree_at_midpoint(tree_name):
     node_label_element_separator=' ',
     node_label_compose_func=None)
 
+def raxml_base_name(base_filename_without_ext,current_time):
+  return base_filename_without_ext+"."+str(current_time) +".iteration_"
+
 def raxml_current_tree_name(base_filename_without_ext,current_time, i):
-  return "RAxML_result."+base_filename_without_ext+"."+str(current_time) +".iteration_"+str(i)
+  return "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(i)
     
     
 def raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i):
   previous_tree_name = base_filename
   
   if i> 1:
-    previous_tree_name = "RAxML_result."+base_filename_without_ext+"."+str(current_time)+".iteration_"+ str(i-1)
+    previous_tree_name = "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+ str(i-1)
   return previous_tree_name
   
   
@@ -113,6 +135,33 @@ def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,curre
   current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
   return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
   
+def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration):
+  regex_for_file_deletions = []
+  # Can delete all of these files
+  regex_for_file_deletions.append("^RAxML_(bestTree|info|log|parsimonyTree)."+raxml_base_name(base_filename_without_ext,current_time))
+  
+  regex_for_file_deletions.append(starting_files_regex)
+  
+  # loop over previous iterations and delete
+  for file_iteration in range(1,max_intermediate_iteration):
+    regex_for_file_deletions.append("^RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
+
+  return regex_for_file_deletions
+  
+def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
+  regex_for_file_deletions = []
+  regex_for_file_deletions.append(starting_files_regex(starting_base_filename))
+
+  # loop over previous iterations and delete
+  for file_iteration in range(1,max_intermediate_iteration):
+    regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration))
+
+  return regex_for_file_deletions
+
+def starting_files_regex(starting_base_filename):
+  # starting file with gapped and ungapped snps
+  return starting_base_filename+".(gaps|vcf|snp_sites|phylip)"
+
 def fasttree_current_tree_name(base_filename, i):
   return base_filename+".iteration_"+str(i)
 
@@ -157,6 +206,17 @@ def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
 def create_pairwise_newick_tree(sequence_names, output_filename):
   tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
   Phylo.write(tree, output_filename, 'newick')
+  
+def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_deletions, verbose):
+  for dirname, dirnames, filenames in os.walk(directory_to_search):
+    for filename in filenames:
+      for deletion_regex in regex_for_file_deletions:
+        if(re.match(str(deletion_regex), filename) != None):
+          if verbose > 0:
+            print "Deleting file: "+ os.path.join(directory_to_search, filename)
+          os.remove(os.path.join(directory_to_search, filename))
+        
+
 
 def which(program):
   def is_exe(fpath):
@@ -180,9 +240,10 @@ parser.add_argument('alignment_filename',       help='Multifasta alignment file'
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
 parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging')
+parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
-parser.add_argument('--min_snps',       '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
 args = parser.parse_args()
 
 # check that all the external executable dependancies are available
@@ -219,16 +280,18 @@ if(number_of_sequences == 2):
   sys.exit()
 
 
-
-previous_robinson_foulds_distances = array('d',[])
+latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"
+tree_file_names = []
 
 tree_building_command = ""
 gubbins_command       = ""
 previous_tree_name    = ""
 current_tree_name     = ""
+max_iteration = 1
 
 for i in range(1, args.iterations+1):
-    
+  max_iteration += 1
+  
   if args.tree_builder == "hybrid" :
     if i == 1:
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
@@ -276,9 +339,9 @@ for i in range(1, args.iterations+1):
   
   reroot_tree(str(current_tree_name), args.outgroup)
 
-  if(os.path.exists("latest.tre")):
-    os.remove("latest.tre")
-  os.symlink(str(current_tree_name), "latest.tre")
+  if(os.path.exists(latest_file_name)):
+    os.remove(latest_file_name)
+  os.symlink(str(current_tree_name), latest_file_name)
  
   if args.verbose > 0:
     print gubbins_command
@@ -286,19 +349,20 @@ for i in range(1, args.iterations+1):
   if args.verbose > 0:
     print int(time.time())
   
-  # first iteration creates tree 1
-  # 2nd iteration creates tree 2, and you can calculate first RF distance
-  # 3rd iteration creates tree 3, and you can now compare RF distances with the previous iteration
-  if i == 2:
-    previous_robinson_foulds_distances.append(robinson_foulds_distance(previous_tree_name,current_tree_name))
-  elif i > 2:
-    current_robinson_foulds_distance  = robinson_foulds_distance(previous_tree_name,current_tree_name)
-    if args.verbose > 0:
-      print "RF Distance (previous, current): "+ str(previous_robinson_foulds_distances) +", "+ str(current_robinson_foulds_distance)
-      
-    try:
-      previous_robinson_foulds_distances.index(current_robinson_foulds_distance)
+  tree_file_names.append(current_tree_name)
+  if i > 2:
+    if has_tree_been_seen_before(tree_file_names):
+      if args.verbose > 0:
+        print "Tree observed before so stopping: "+ str(current_tree_name)
       break
-    except ValueError:
-      previous_robinson_foulds_distances.append(current_robinson_foulds_distance)
 
+# cleanup intermediate files
+if args.no_cleanup == 0 or args.no_cleanup is None:
+  max_intermediate_iteration  = max_iteration - 1
+  
+  raxml_regex_for_file_deletions = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)
+  delete_files_based_on_list_of_regexes('.', raxml_regex_for_file_deletions, args.verbose)
+  
+  fasttree_regex_for_file_deletions = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
+  delete_files_based_on_list_of_regexes('.', fasttree_regex_for_file_deletions, args.verbose)
+  

@@ -9,8 +9,11 @@ FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/
 RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html
 Python 2.7
 
-
 These Python packages must be in your PYTHONPATH:
-Biopython (>=1.59)
+Biopython 	(>=1.59)
 DendroPy (>=3.11.1)
+ReportLab (>= 2.5)
 
+
+To run the application:
+run_gubbbins.py my_alignment.aln

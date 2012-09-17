@@ -341,10 +341,10 @@ Copyright (C) 2006 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/Users/ap13/pathogens/multi_fasta_to_vcf'
+ac_pwd='/home/aidan/tmp/gubbins'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
-MKDIR_P='./install-sh -c -d'
+MKDIR_P='/usr/bin/mkdir -p'
 # If no file are specified by the user, then we need to provide default
 # value.  By we need to know if files were specified by the user.
 ac_need_defaults=:
@@ -526,8 +526,8 @@ s,@libdir@,|#_!!_#|${exec_prefix}/lib,g
 s,@localedir@,|#_!!_#|${datarootdir}/locale,g
 s,@mandir@,|#_!!_#|${datarootdir}/man,g
 s,@DEFS@,|#_!!_#|-DHAVE_CONFIG_H,g
-s,@ECHO_C@,|#_!!_#|\\c,g
-s,@ECHO_N@,|#_!!_#|,g
+s,@ECHO_C@,|#_!!_#|,g
+s,@ECHO_N@,|#_!!_#|-n,g
 s,@ECHO_T@,|#_!!_#|,g
 s,@LIBS@,|#_!!_#|,g
 s,@build_alias@,|#_!!_#|,g
@@ -540,29 +540,29 @@ s,@am__isrc@,|#_!!_#|,g
 s,@CYGPATH_W@,|#_!!_#|echo,g
 s,@PACKAGE@,|#_!!_#|gubbins,g
 s,@VERSION@,|#_!!_#|0.1,g
-s,@ACLOCAL@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run aclocal-1.10,g
-s,@AUTOCONF@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run autoconf,g
-s,@AUTOMAKE@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run automake-1.10,g
-s,@AUTOHEADER@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run autoheader,g
-s,@MAKEINFO@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run makeinfo,g
-s,@install_sh@,|#_!!_#|$(SHELL) /Users/ap13/pathogens/multi_fasta_to_vcf/install-sh,g
+s,@ACLOCAL@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run aclocal-1.10,g
+s,@AUTOCONF@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run autoconf,g
+s,@AUTOMAKE@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run automake-1.10,g
+s,@AUTOHEADER@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run autoheader,g
+s,@MAKEINFO@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run makeinfo,g
+s,@install_sh@,|#_!!_#|$(SHELL) /home/aidan/tmp/gubbins/install-sh,g
 s,@STRIP@,|#_!!_#|strip,g
 s,@INSTALL_STRIP_PROGRAM@,|#_!!_#|$(install_sh) -c -s,g
-s,@mkdir_p@,|#_!!_#|$(top_builddir)/./install-sh -c -d,g
-s,@AWK@,|#_!!_#|awk,g
+s,@mkdir_p@,|#_!!_#|/usr/bin/mkdir -p,g
+s,@AWK@,|#_!!_#|gawk,g
 s,@SET_MAKE@,|#_!!_#|,g
 s,@am__leading_dot@,|#_!!_#|.,g
-s,@AMTAR@,|#_!!_#|${SHELL} /Users/ap13/pathogens/multi_fasta_to_vcf/missing --run tar,g
+s,@AMTAR@,|#_!!_#|${SHELL} /home/aidan/tmp/gubbins/missing --run tar,g
 s,@am__tar@,|#_!!_#|${AMTAR} chof - "$$tardir",g
 s,@am__untar@,|#_!!_#|${AMTAR} xf -,g
-s,@build@,|#_!!_#|i386-apple-darwin9.8.0,g
-s,@build_cpu@,|#_!!_#|i386,g
-s,@build_vendor@,|#_!!_#|apple,g
-s,@build_os@,|#_!!_#|darwin9.8.0,g
-s,@host@,|#_!!_#|i386-apple-darwin9.8.0,g
-s,@host_cpu@,|#_!!_#|i386,g
-s,@host_vendor@,|#_!!_#|apple,g
-s,@host_os@,|#_!!_#|darwin9.8.0,g
+s,@build@,|#_!!_#|x86_64-unknown-linux-gnu,g
+s,@build_cpu@,|#_!!_#|x86_64,g
+s,@build_vendor@,|#_!!_#|unknown,g
+s,@build_os@,|#_!!_#|linux-gnu,g
+s,@host@,|#_!!_#|x86_64-unknown-linux-gnu,g
+s,@host_cpu@,|#_!!_#|x86_64,g
+s,@host_vendor@,|#_!!_#|unknown,g
+s,@host_os@,|#_!!_#|linux-gnu,g
 s,@CC@,|#_!!_#|gcc,g
 s,@CFLAGS@,|#_!!_#|-g -O2,g
 s,@LDFLAGS@,|#_!!_#|,g
@@ -582,7 +582,7 @@ s,@am__fastdepCC_FALSE@,|#_!!_#|#,g
 s,@GREP@,|#_!!_#|/usr/bin/grep,g
 s,@EGREP@,|#_!!_#|/usr/bin/grep -E,g
 s,@LN_S@,|#_!!_#|ln -s,g
-s,@ECHO@,|#_!!_#|/bin/echo,g
+s,@ECHO@,|#_!!_#|echo,g
 s,@AR@,|#_!!_#|ar,g
 s,@RANLIB@,|#_!!_#|ranlib,g
 s,@CPP@,|#_!!_#|gcc -E,g
@@ -596,9 +596,9 @@ s,@CXXCPP@,|#_!!_#|g++ -E,g
 CEOF
 cat >"$tmp/subs-2.sed" <<\CEOF
 /@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
-s,@F77@,|#_!!_#|gfortran,g
-s,@FFLAGS@,|#_!!_#|-g -O2,g
-s,@ac_ct_F77@,|#_!!_#|gfortran,g
+s,@F77@,|#_!!_#|,g
+s,@FFLAGS@,|#_!!_#|,g
+s,@ac_ct_F77@,|#_!!_#|,g
 s,@LIBTOOL@,|#_!!_#|$(SHELL) $(top_builddir)/libtool,g
 s,@LIBOBJS@,|#_!!_#|,g
 s,@LTLIBOBJS@,|#_!!_#|,g

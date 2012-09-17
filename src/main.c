@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include "snp_sites.h"
 #include "gubbins.h"
+#include "../config.h"
 
 #define MAX_FILENAME_SIZE 1024
 const char* program_name;
@@ -47,6 +48,7 @@ int check_file_exists_or_exit(char * filename)
 void print_usage(FILE* stream, int exit_code)
 {
   fprintf (stream, "Usage:  %s [options] alignment_file\n", program_name);
+  fprintf (stream, "Version: %s\n", PACKAGE_VERSION);
   fprintf (stream,
            "  -r    detect recombinations mode\n"
            "  -t    Newick tree file\n"

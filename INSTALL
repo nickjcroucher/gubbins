@@ -1,3 +1,19 @@
+== Prep work ==
+As listed in the dependacies section below, you need
+ * FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/,
+ * RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html, and
+ * Python 2.7.
+Gubbins will build and install without FastTree and RAxML, but it won't work.
+
+TODO:  Enure the Gubbins build process checks for FastTree and RAxML
+
+Furthermore, we currently don't support RAxML build with PThreads.  You'll have
+to use a more vanilla build such as using Makefile.SSE3.gcc or Makefile.gcc.
+
+TODO: Ensure that Gubbins can deal with RAxML build for PThreads
+
+Finally, the raxmlHPC binary should be named "raxmlHPC".
+
 == Installing from a git checkout ==
 $ autoreconf -i
 $ ./configure
@@ -50,7 +66,8 @@ FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/
 RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html
 Python 2.7
 
-These Python packages must be in your PYTHONPATH:
+These Python packages must be in your PYTHONPATH or will be automatically 
+installed:
 Biopython (>=1.59)
 DendroPy  (>=3.11.1)
 ReportLab (>= 2.5)

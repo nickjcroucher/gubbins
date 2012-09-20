@@ -1,19 +1,81 @@
-./configure
-make
-make install
+== Prep work ==
+As listed in the dependacies section below, you need
+ * FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/,
+ * RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html, and
+ * Python 2.7.
+Gubbins will build and install without FastTree and RAxML, but it won't work.
 
-The main executable should be in ./src/gubbins
+TODO:  Enure the Gubbins build process checks for FastTree and RAxML
+
+Furthermore, we currently don't support RAxML build with PThreads.  You'll have
+to use a more vanilla build such as using Makefile.SSE3.gcc or Makefile.gcc.
+
+TODO: Ensure that Gubbins can deal with RAxML build for PThreads
+
+Finally, the raxmlHPC binary should be named "raxmlHPC".
+
+== Installing from a git checkout ==
+$ autoreconf -i
+$ ./configure
+$ su -
+$ make
+$ make install
+
+Then install the Python scripts.
+$ python setup.py install
+
+== Installing from a released source tarball ==
+
+$ tar xzvf gubbins-0.1.tar.gz
+$ cd gubbins-0.1
+$ ./configure
+$ make
+$ su -
+$ make install
+$ python setup.py install
+
+The main executable should be in ./src/gubbins and in the system-wide directory
+for locally compiled applications.  On Linux this is /usr/local/bin.
+
+On Linux, you should ensure that /usr/local/bin is in your $PATH and that
+/usr/local/lib (or /usr/local/lib64 on 64bit machines) are in $LD_LIBRARY_PATH.
+
+== Installing into a specific user directory ==
+
+It is common to want to build and install an application so that it is not
+system-wide and is only available to your user.  On a Linux system this is
+generally achieved by installing into the .local directory in your home
+directory.
+
+$ ./configure --prefix=~/.local
+$ make
+$ make install
+
+On Linux, you should ensure that ~/.local/bin is in your $PATH and that
+~/.local/lib (or ~/.local/lib64 on 64bit machines) are in $LD_LIBRARY_PATH.
+
+If you are in the situation where your home directory is mounted over NFS (or
+similar) and shared between multiple Linux distros (for example, 32bit Debian on
+a cluster and 64bit Ubuntu on a desktop) then installing per-user in this manner
+is probably not a good idea.
+
+== Dependancies ==
 
 These applications must be already installed in your PATH:
 FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/
 RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html
 Python 2.7
 
-These Python packages must be in your PYTHONPATH:
-Biopython 	(>=1.59)
-DendroPy (>=3.11.1)
+These Python packages must be in your PYTHONPATH or will be automatically 
+installed:
+Biopython (>=1.59)
+DendroPy  (>=3.11.1)
 ReportLab (>= 2.5)
 
+== Running the Python wrapper ==
+
+There is a Pythong wrapper script that automates some of the preparatory work
+that is necessary to run Gubbins.
 
 To run the application:
 run_gubbbins.py my_alignment.aln

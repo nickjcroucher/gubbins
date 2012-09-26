@@ -41,6 +41,10 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 		fprintf( fasta_file_pointer, ">%s\n", sequence_names[sample_counter]);
 		for(snp_counter=0; snp_counter< number_of_snps; snp_counter++)
 		{
+			if(snp_counter > 0 && snp_counter % FASTA_LINE_LENGTH == 0)
+			{
+				fprintf( fasta_file_pointer, "\n");
+			}
 			fprintf( fasta_file_pointer, "%c", bases_for_snps[snp_counter][sample_counter]);
 		}
 		fprintf( fasta_file_pointer, "\n");

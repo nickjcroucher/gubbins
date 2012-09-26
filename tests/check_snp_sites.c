@@ -9,6 +9,19 @@
 #include "snp_sites.h"
 #include "alignment_file.h"
 	
+	
+START_TEST (valid_alignment_with_large_numbers_of_snps)
+{
+  generate_snp_sites("../tests/data/alignment_file_with_large_number_of_snps.aln",0,"");
+  fail_unless( compare_files("../tests/data/alignment_file_with_large_number_of_snps.aln.vcf", "alignment_file_with_large_number_of_snps.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
+  fail_unless( compare_files("../tests/data/alignment_file_with_large_number_of_snps.aln.phylip", "alignment_file_with_large_number_of_snps.aln.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
+  fail_unless( compare_files("../tests/data/alignment_file_with_large_number_of_snps.aln.snp_sites.aln","alignment_file_with_large_number_of_snps.aln.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
+  remove("alignment_file_with_large_number_of_snps.aln.vcf");
+  remove("alignment_file_with_large_number_of_snps.aln.phylip");
+  remove("alignment_file_with_large_number_of_snps.aln.snp_sites.aln");
+}
+END_TEST
+	
 
 START_TEST (valid_alignment_with_one_line_per_sequence)
 {
@@ -176,6 +189,7 @@ Suite * snp_sites_suite (void)
   Suite *s = suite_create ("Creating_SNP_Sites");
 
   TCase *tc_alignment_file = tcase_create ("alignment_file");
+	tcase_add_test (tc_alignment_file, valid_alignment_with_large_numbers_of_snps);
   tcase_add_test (tc_alignment_file, valid_genome_length);
   tcase_add_test (tc_alignment_file, valid_genome_length_with_multiple_lines_per_sequence);
   tcase_add_test (tc_alignment_file, valid_number_of_sequences_in_file);

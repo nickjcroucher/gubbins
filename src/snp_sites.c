@@ -25,7 +25,7 @@
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
-#include "phylib_of_snp_sites.h"
+#include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
 
 
@@ -91,7 +91,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	strcat(filename_without_directory,suffix);
 	
 	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	create_phylib_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
 
 	free(snp_locations);

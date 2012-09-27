@@ -27,7 +27,7 @@
 #include "alignment_file.h"
 #include "snp_sites.h"
 #include "vcf.h"
-#include "phylib_of_snp_sites.h"
+#include "phylip_of_snp_sites.h"
 #include "tree_scaling.h"
 #include "seqUtil.h"
 #include "Newickform.h"
@@ -38,9 +38,9 @@
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
-void run_gubbins(char vcf_filename[], char tree_filename[], char phylip_filename[],char multi_fasta_filename[], int min_snps)
+void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps)
 {
-	load_sequences_from_phylib_file(phylip_filename);
+	load_sequences_from_multifasta_file(multi_fasta_filename);
 	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps);
 	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
 }
@@ -68,7 +68,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	}
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
-	number_of_snps  = number_of_snps_in_phylib();
+	number_of_snps  = number_of_snps_in_phylip();
 	reference_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 	
 	int snp_locations[number_of_snps];
@@ -80,8 +80,8 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
 
 	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome,min_snps);
-	// check for snps in the phylib sequence
-	// create a new vcf file, and phylib file
+	// check for snps in the phylip sequence
+	// create a new vcf file, and phylip file
 
 	int filtered_snp_locations[number_of_snps];
 	int number_of_filtered_snps;
@@ -99,7 +99,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	char * filtered_bases_for_snps[number_of_filtered_snps];
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
-	create_phylib_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
+	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
 	

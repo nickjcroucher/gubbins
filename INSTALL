@@ -1,6 +1,7 @@
 == Prep work ==
 As listed in the dependacies section below, you need
  * FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/,
+ * FASTML (2.02) http://fastml.tau.ac.il/,
  * RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html, and
  * Python 2.7.
 Gubbins will build and install without FastTree and RAxML, but it won't work.
@@ -64,6 +65,7 @@ is probably not a good idea.
 These applications must be already installed in your PATH:
 FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/
 RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html
+FASTML (2.02) http://fastml.tau.ac.il/
 Python 2.7
 
 These Python packages must be in your PYTHONPATH or will be automatically 

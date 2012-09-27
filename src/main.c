@@ -145,8 +145,7 @@ int main (argc, argv) int argc; char **argv;
     {
 			check_file_exists_or_exit(vcf_filename);
 			check_file_exists_or_exit(tree_filename);
-			check_file_exists_or_exit(phylip_filename);
-      run_gubbins(vcf_filename,tree_filename,phylip_filename,multi_fasta_filename, min_snps);
+      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps);
     }
     else
     {

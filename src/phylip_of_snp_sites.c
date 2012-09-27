@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "phylib_of_snp_sites.h"
+#include "phylip_of_snp_sites.h"
 
 
-void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples)
+void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples)
 {
 	FILE *fasta_file_pointer;
 	int sample_counter;
@@ -40,7 +40,7 @@ void create_phylib_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{
-		// sequence_name can be more than 10 (relaxed phylib format) and contain [\w\s]
+		// sequence_name can be more than 10 (relaxed phylip format) and contain [\w\s]
 		//TODO check for illegal characters [^\w\s]
 		fprintf( fasta_file_pointer, "%s\t", sequence_names[sample_counter]);
 		

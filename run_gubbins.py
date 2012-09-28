@@ -1,5 +1,24 @@
 #!/usr/bin/env python-2.7
 # encoding: utf-8
+#
+# Wellcome Trust Sanger Institute
+# Copyright (C) 2012  Wellcome Trust Sanger Institute
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+
 import sys
 import argparse
 import subprocess
@@ -12,17 +31,15 @@ from Bio import SeqIO
 from cStringIO import StringIO
 import shutil
 
-
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
+FASTML_EXEC = 'fastml -mn -qf'
 
 # Todo
-# timestamp in fasttree intermediate and results files
 # extract code into modules
-# add python code to deployment
 # catch exception errors when shelling out
 
 
@@ -133,7 +150,7 @@ def raxml_tree_building_command(i,base_filename_without_ext,base_filename,curren
 
 def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps):
   current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
   
 def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration):
   regex_for_file_deletions = []
@@ -181,10 +198,27 @@ def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_
 
 def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps):
   current_tree_name = fasttree_current_tree_name(base_filename, i)
-  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
+  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
-def  starting_tree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,starting_tree):
-  return gubbins_exec+" -r -v "+starting_base_filename+".vcf -t "+str(starting_tree)+" -p "+starting_base_filename+".phylip -m "+ str(min_snps)+" "+ alignment_filename
+def fasttree_fastml_command(fastml_exec, alignment_filename, base_filename,i):
+  current_tree_name = fasttree_current_tree_name(base_filename, i)
+  return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
+
+
+def raxml_fastml_command(fastml_exec, alignment_filename, base_filename_without_ext,current_time, i):
+  current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
+  return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
+
+def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
+  return (fastml_exec 
+    + " -s " + alignment_filename 
+    + " -t " + tree_filename 
+    + " -x " + tree_filename + ".output"
+    + " -y " + tree_filename + ".ancestor.tre"
+    + " -j " + tree_filename + ".seq.joint.txt"
+    + " -k " + tree_filename + ".seq.marginal.txt"
+    + " -d " + tree_filename + ".prob.joint.txt"
+    + " -e " + tree_filename + ".prob.marginal.txt")
 
 
 def number_of_sequences_in_alignment(filename):
@@ -201,7 +235,7 @@ def get_sequence_names_from_alignment(filename):
 def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
   sequence_names = get_sequence_names_from_alignment(filename)
   create_pairwise_newick_tree(sequence_names, base_filename+".tre")
-  subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre "+" -p "+base_filename+".phylip "+ alignment_filename, shell=True)
+  subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre "+ base_filename+".snp_sites.aln", shell=True)
   
 def create_pairwise_newick_tree(sequence_names, output_filename):
   tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
@@ -211,12 +245,11 @@ def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_de
   for dirname, dirnames, filenames in os.walk(directory_to_search):
     for filename in filenames:
       for deletion_regex in regex_for_file_deletions:
-        if(re.match(str(deletion_regex), filename) != None):
+        full_path_of_file_for_deletion = os.path.join(directory_to_search, filename)
+        if(re.match(str(deletion_regex), filename) != None and os.path.exists(full_path_of_file_for_deletion)):
           if verbose > 0:
             print "Deleting file: "+ os.path.join(directory_to_search, filename)
-          os.remove(os.path.join(directory_to_search, filename))
-        
-
+          os.remove(full_path_of_file_for_deletion)
 
 def which(program):
   def is_exe(fpath):
@@ -297,23 +330,27 @@ for i in range(1, args.iterations+1):
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
       tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC, FASTTREE_PARAMS )
+      fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename, i)
       gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
-      
+
     elif i == 2:
       previous_tree_name    = current_tree_name
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
+      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
       gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
     else:
       previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
+      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
       gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
   
   elif args.tree_builder == "raxml":
     previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
     current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
+    fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
     gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
     
   elif args.tree_builder == "fasttree":
@@ -323,6 +360,7 @@ for i in range(1, args.iterations+1):
     current_tree_name     = fasttree_current_tree_name(base_filename, i)
 
     tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
+    fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename, i)
     gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
   
   if args.verbose > 0:

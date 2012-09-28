@@ -222,6 +222,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 
 		// generate pointers for each child seuqn
 		
+
+		
 		while (child != NULL)
 		{
 			// recursion
@@ -236,7 +238,16 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence
-		leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
+		
+		if(root->taxon != NULL && find_sequence_index_from_sample_name(root->taxon)  != -1 )
+		{
+			strcat(root->taxon_names, root->taxon);
+			get_sequence_for_sample_name(leaf_sequence, root->taxon);
+		}
+		else
+		{
+	  	leaf_sequence = calculate_ancestor_sequence(leaf_sequence, child_sequences, number_of_snps, root->childNum);
+  	}
 		int * branches_snp_sites[root->childNum];
 		
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)

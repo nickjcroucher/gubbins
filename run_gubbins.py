@@ -33,6 +33,7 @@ import re
 from Bio import Phylo
 import dendropy
 from Bio import SeqIO
+from Bio import AlignIO
 from cStringIO import StringIO
 import shutil
 
@@ -236,6 +237,16 @@ def get_sequence_names_from_alignment(filename):
     sequence_names.append(record.id)
   handle.close()
   return sequence_names
+  
+  # reparsing a fasta file splits the lines which makes fastml work
+def reconvert_fasta_file(input_filename, output_filename):
+  input_handle = open(input_filename, "rU")
+  output_handle = open(output_filename, "w+")
+  alignments = AlignIO.parse(input_handle, "fasta")
+  AlignIO.write(alignments, output_handle, "fasta")
+  output_handle.close()
+  input_handle.close()
+  return
 
 def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
   sequence_names = get_sequence_names_from_alignment(filename)
@@ -393,8 +404,7 @@ for i in range(1, args.iterations+1):
     print fastml_command
   subprocess.check_call(fastml_command, shell=True)
   shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
-  shutil.copyfile(current_tree_name+'.seq.joint.txt',starting_base_filename+".gaps.snp_sites.aln")
-  
+  reconvert_fasta_file(current_tree_name+'.seq.joint.txt',starting_base_filename+".gaps.snp_sites.aln")
 
   if args.verbose > 0:
     print int(time.time())

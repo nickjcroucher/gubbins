@@ -218,7 +218,7 @@ def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
   return (fastml_exec 
     + " -s " + alignment_filename 
     + " -t " + tree_filename 
-    + " -x " + tree_filename + ".output"
+    + " -x " + tree_filename + ".output_tree"
     + " -y " + tree_filename + ".ancestor.tre"
     + " -j " + tree_filename + ".seq.joint.txt"
     + " -k " + tree_filename + ".seq.marginal.txt"
@@ -297,7 +297,7 @@ if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(
   sys.exit()
 
 current_time = ''
-if args.use_time_stamp > 0
+if args.use_time_stamp > 0:
   current_time = int(time.time())
   if args.verbose > 0:
     print current_time
@@ -392,6 +392,10 @@ for i in range(1, args.iterations+1):
   if args.verbose > 0:
     print fastml_command
   subprocess.check_call(fastml_command, shell=True)
+  shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
+  shutil.copyfile(current_tree_name+'.seq.joint.txt',starting_base_filename+".gaps.snp_sites.aln")
+  
+
   if args.verbose > 0:
     print int(time.time())
  

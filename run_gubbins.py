@@ -19,6 +19,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
+# fastml
+# disable timestamp by default to allow pipelineing
+# check a file exists before trying to delete it
+
+
 import sys
 import argparse
 import subprocess
@@ -36,7 +41,7 @@ RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
-FASTML_EXEC = 'fastml -mn -qf'
+FASTML_EXEC = 'fastml -mg -qf'
 
 # Todo
 # extract code into modules
@@ -111,7 +116,7 @@ def reroot_tree_at_midpoint(tree_name):
     suppress_internal_node_labels=False,
     suppress_rooting=True,
     suppress_edge_lengths=False,
-    unquoted_underscores=False,
+    unquoted_underscores=True,
     preserve_spaces=False,
     store_tree_weights=False,
     suppress_annotations=True,
@@ -272,6 +277,7 @@ parser = argparse.ArgumentParser(description='Iteratively detect recombinations'
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
 parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging')
 parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
@@ -290,9 +296,11 @@ if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(
   print "FastTree is not in your path"
   sys.exit()
 
-current_time = int(time.time())
-if args.verbose > 0:
-  print current_time
+current_time = ''
+if args.use_time_stamp > 0
+  current_time = int(time.time())
+  if args.verbose > 0:
+    print current_time
 
 # find all snp sites
 if args.verbose > 0:
@@ -380,6 +388,12 @@ for i in range(1, args.iterations+1):
   if(os.path.exists(latest_file_name)):
     os.remove(latest_file_name)
   os.symlink(str(current_tree_name), latest_file_name)
+ 
+  if args.verbose > 0:
+    print fastml_command
+  subprocess.check_call(fastml_command, shell=True)
+  if args.verbose > 0:
+    print int(time.time())
  
   if args.verbose > 0:
     print gubbins_command

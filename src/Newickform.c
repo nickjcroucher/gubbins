@@ -122,7 +122,7 @@ newick_node* parseTree(char *str)
 	int iCount;
 
 	pcStart = str;
-
+	
 	if (*pcStart != '(')
 	{
 		// Leaf node. Separate taxon name from distance. If distance not exist then take care of taxon name only
@@ -276,7 +276,7 @@ newick_node* parseTree(char *str)
 			// Find ':' to retrieve distance, if any.
 			// At this time *pcCurrent should equal to ')'
 			pcStart = pcCurrent;
-			while (*pcCurrent != ':')
+			while (*pcCurrent != ':' && *pcCurrent != '\0' && *pcCurrent != ';')
 			{
 				pcCurrent++;
 			}
@@ -285,6 +285,7 @@ newick_node* parseTree(char *str)
 			node->taxon = seqMalloc(strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
 			node->taxon = strip_quotes(node->taxon);
+			
 			*pcCurrent = cTemp;
 			pcCurrent++;
 			pcStart = pcCurrent;
@@ -298,6 +299,7 @@ newick_node* parseTree(char *str)
 			*pcCurrent = cTemp;
 		}
 	}
+
 	node->number_of_blocks = 0;
 	node->block_coordinates =  (int **) malloc((3)*sizeof(int *));	
 	node->block_coordinates[0] = (int*) malloc((3)*sizeof(int ));

@@ -22,9 +22,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "phylip_of_snp_sites.h"
+#include "parse_phylip.h"
 
 
-void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples)
+void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples, int internal_nodes[])
 {
 	FILE *fasta_file_pointer;
 	int sample_counter;
@@ -42,6 +43,10 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	{
 		// sequence_name can be more than 10 (relaxed phylip format) and contain [\w\s]
 		//TODO check for illegal characters [^\w\s]
+		if(internal_nodes[sample_counter] == 1)
+		{
+			continue;
+		}
 		fprintf( fasta_file_pointer, "%s\t", sequence_names[sample_counter]);
 		
 		for(snp_counter=0; snp_counter< number_of_snps; snp_counter++)

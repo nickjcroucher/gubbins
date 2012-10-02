@@ -94,14 +94,20 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
   reference_sequence_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 
 	get_sequence_for_sample_name(reference_sequence_bases, sample_names[0]);
+	int internal_nodes[number_of_samples];
+	int a = 0;
+	for(a =0; a < number_of_samples; a++)
+	{
+		internal_nodes[a] = get_internal_node(a);
+	}
 
-	number_of_filtered_snps = refilter_existing_snps(reference_sequence_bases, number_of_snps, snp_locations, filtered_snp_locations);
+	number_of_filtered_snps = refilter_existing_snps(reference_sequence_bases, number_of_snps, snp_locations, filtered_snp_locations,internal_nodes);
 	char * filtered_bases_for_snps[number_of_filtered_snps];
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
-	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
-	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
-	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples);
+	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
+	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
+	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
 	
 	// Create an new tree with updated distances
 	scale_branch_distances(root_node, number_of_filtered_snps);

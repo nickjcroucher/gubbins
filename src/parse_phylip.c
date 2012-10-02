@@ -34,12 +34,23 @@ int num_samples;
 int num_snps;
 char ** sequences;
 char ** phylip_sample_names;
+int * internal_node;
 sample_statistics ** statistics_for_samples;
 
 
 void update_sequence_base(char new_sequence_base, int sequence_index, int base_index)
 {
 	sequences[sequence_index][base_index] = new_sequence_base;	
+}
+
+void set_internal_node(int internal_node_value,int sequence_index)
+{
+	internal_node[sequence_index] = internal_node_value;
+}
+
+int get_internal_node(int sequence_index)
+{
+	return internal_node[sequence_index];
 }
 
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
@@ -61,6 +72,11 @@ int does_column_contain_snps(int snp_column, char reference_base)
 	reference_base = convert_reference_to_real_base_in_column( snp_column,  reference_base);
 	for(i = 0; i < num_samples; i++)
 	{
+		if(internal_node[i]==1)
+		{
+			continue;	
+		}
+		
 		if(sequences[i][snp_column] == '\0' || sequences[i][snp_column] == '\n')
 		{
 			return 0;	
@@ -234,6 +250,16 @@ int find_sequence_index_from_sample_name( char * sample_name)
 	return -1;
 }
 
+void initialise_internal_node()
+{
+	int i=0;
+	internal_node = (int *) malloc((num_samples+1)*sizeof(int));
+	for(i=0; i< num_samples; i++)
+	{
+		internal_node[i] = 0;
+	}
+}
+
 void initialise_statistics()
 {
 	int i=0;
@@ -299,5 +325,6 @@ void load_sequences_from_multifasta_file(char filename[])
  	gzclose(fp);
 
 	initialise_statistics();
+	initialise_internal_node();
 }
 

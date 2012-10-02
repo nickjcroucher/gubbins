@@ -26,8 +26,8 @@ END_TEST
 START_TEST (valid_alignment_with_one_line_per_sequence)
 {
   generate_snp_sites("../tests/data/alignment_file_one_line_per_sequence.aln",0,"");
-  fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_one_line_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.phylip", "alignment_file_one_line_per_sequence.aln.phylip" ) == 1, "Invalid Phylip file for 1 line per seq" );
+  fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.vcf", "alignment_file_one_line_per_sequence.aln.vcf" ) == 1, "Invalid VCF file for 1 line per seq" );
   fail_unless( compare_files("../tests/data/alignment_file_one_line_per_sequence.aln.snp_sites.aln","alignment_file_one_line_per_sequence.aln.snp_sites.aln" ) == 1 , "Invalid ALN file for 1 line per seq");
   remove("alignment_file_one_line_per_sequence.aln.vcf");
   remove("alignment_file_one_line_per_sequence.aln.phylip");

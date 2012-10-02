@@ -44,6 +44,9 @@ void set_number_of_blocks_for_sample(char * sample_name,int num_blocks);
 sample_statistics ** get_sample_statistics();
 int number_of_snps_in_phylip();
 void load_sequences_from_multifasta_file(char filename[]);
+void set_internal_node(int internal_node_value,int sequence_index);
+void initialise_internal_node();
+int get_internal_node(int sequence_index);
 
 #define MAX_READ_BUFFER 65536
 #define MAX_SAMPLE_NAME_SIZE 1024

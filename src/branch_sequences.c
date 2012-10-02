@@ -112,6 +112,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 	if (root->childNum > 0)
 	{
 		child = root->child;
+		set_internal_node(1,sequence_index);
 
 		while (child != NULL)
 		{
@@ -124,6 +125,10 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates);
 			child = child->next;
 		}
+	}
+	else
+	{
+	set_internal_node(0,sequence_index);	
 	}
 }
 

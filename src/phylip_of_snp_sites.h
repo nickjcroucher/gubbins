@@ -21,6 +21,6 @@
 #ifndef _PHYLIP_OF_SNP_SITES_
 #define _PHYLIP_OF_SNP_SITES_
 
-void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples);
+void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[]);
 
 #endif

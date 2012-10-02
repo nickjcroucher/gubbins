@@ -76,6 +76,13 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	get_sample_names_for_header(filename, sequence_names, number_of_samples);
 	
+	int internal_nodes[number_of_samples];
+	int a = 0;
+	for(a =0; a < number_of_samples; a++)
+	{
+		internal_nodes[a] = 0;
+	}
+	
 	char* bases_for_snps[number_of_snps];
 	
 	for(i = 0; i < number_of_snps; i++)
@@ -90,9 +97,9 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	strcat(filename_without_directory,suffix);
 	
-	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
-	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
+	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
+	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
 
 	free(snp_locations);
 	return 1;
@@ -128,7 +135,7 @@ void strip_directory_from_filename(char * input_filename, char * output_filename
 }
 
 // return new number of snps
-int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations)
+int refilter_existing_snps(char * reference_bases, int number_of_snps, int * snp_locations, int * filtered_snp_locations, int internal_nodes[])
 {
 	// go through each snp column and check to see if there is still variation
 	int i;

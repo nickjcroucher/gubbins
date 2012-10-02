@@ -37,6 +37,15 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	
 	fasta_file_pointer = fopen(strcat(base_filename,".phylip"), "w");
 	
+	int number_of_leaves = number_of_samples;
+	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
+	{
+		if(internal_nodes[sample_counter] == 1)
+		{
+			number_of_leaves--;
+		}
+	}
+	
 	fprintf( fasta_file_pointer, "%d %d\n", number_of_samples, number_of_snps);
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)

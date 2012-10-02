@@ -325,6 +325,8 @@ if args.verbose > 0:
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
 starting_base_filename = base_filename
 
+reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
+
 # Perform pairwise comparison if there are only 2 sequences
 number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
 if(number_of_sequences == 2):
@@ -369,7 +371,7 @@ for i in range(1, args.iterations+1):
     previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
     current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-    fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
+    fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".start", base_filename_without_ext,current_time, i)
     gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps)
     
   elif args.tree_builder == "fasttree":

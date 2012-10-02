@@ -69,7 +69,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.gff") == 1);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
-	fail_unless(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 4);
+	fail_unless(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 3);
   fail_unless(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
 
 	remove("../tests/data/multiple_recombinations.tre");

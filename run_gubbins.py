@@ -300,6 +300,9 @@ args = parser.parse_args()
 if which(GUBBINS_EXEC) is None:
   print "gubbins is not in your path"
   sys.exit()
+if which(FASTML_EXEC) is None:
+  print "fastml is not in your path"
+  sys.exit()
 if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which('raxmlHPC') is None:
   print "RAxML is not in your path"
   sys.exit()

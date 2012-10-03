@@ -316,8 +316,30 @@ int test_bases_in_recombinations(int block_size)
 	block_coords[1][2] = 20;
 	block_coords[0][3] = 7;
 	block_coords[1][3] = 15;
-	calculate_number_of_bases_in_recombations(block_coords, block_size);
+	char * child_sequence      = "AAAAAAAAATAA";
+	int snp_locations[12] = {1,2,3,5,7,10,11,15,20,30,100,110};
+	calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,12);
 }
+
+int test_bases_in_recombinations_with_gaps(int block_size)
+{
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
+	block_coords[0][1] = 100;
+	block_coords[1][1] = 110;
+	block_coords[0][2] = 15;
+	block_coords[1][2] = 20;
+	block_coords[0][3] = 7;
+	block_coords[1][3] = 15;
+	char * child_sequence      =  "--A---AAAAAAAAAAAAAT";
+	int snp_locations[16] = {1,4,5,6,7,8,9,10,11,15,20,30,40,50,100,110};
+	calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,16);
+}
+
 
 START_TEST (check_calculate_number_of_bases_in_recombations)
 {
@@ -325,6 +347,11 @@ START_TEST (check_calculate_number_of_bases_in_recombations)
 	fail_unless(test_bases_in_recombinations(3) == 20);
 	fail_unless(test_bases_in_recombinations(2) == 15);
 	fail_unless(test_bases_in_recombinations(1) == 5);
+	
+	fail_unless(test_bases_in_recombinations_with_gaps(4) == 22);
+	fail_unless(test_bases_in_recombinations_with_gaps(3) == 17);
+	fail_unless(test_bases_in_recombinations_with_gaps(2) == 12);
+	fail_unless(test_bases_in_recombinations_with_gaps(1) == 2);
 }
 END_TEST
 

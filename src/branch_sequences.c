@@ -247,8 +247,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence
-		strcat(root->taxon_names, " ");
-		strcat(root->taxon_names, root->taxon);
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);

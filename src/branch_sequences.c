@@ -73,7 +73,7 @@ int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** a
 
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks, int ** current_block_coordinates)
+void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations )
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -99,7 +99,10 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 
  	copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 
- 	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations(merged_block_coordinates, (num_blocks + root->number_of_blocks)));
+	char * child_sequence = (char *) malloc((length_of_original_genome +1)*sizeof(char));
+	get_sequence_for_sample_name(child_sequence, root->taxon);
+
+ 	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates, (num_blocks + root->number_of_blocks), child_sequence, snp_locations,current_total_snps));
  	
  	for(i = 0; i < num_current_recombinations; i++)
  	{
@@ -122,7 +125,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 			merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
 			merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
 			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
-			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates);
+			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations );
 			child = child->next;
 		}
 	}
@@ -132,7 +135,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 	}
 }
 
-int calculate_number_of_bases_in_recombations(int ** block_coordinates, int num_blocks)
+int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome)
 {
 	int total_bases = 0;
 	int current_block = 1;
@@ -185,7 +188,9 @@ int calculate_number_of_bases_in_recombations(int ** block_coordinates, int num_
 		{
 			continue;
 		}
-	  total_bases += (block_coordinates[1][start_block] - block_coordinates[0][start_block]);
+		
+		
+	  total_bases += calculate_block_size_without_gaps(child_sequence,  snp_locations, block_coordinates[0][start_block], block_coordinates[1][start_block], length_of_original_genome);
   }
 	
 	return total_bases;

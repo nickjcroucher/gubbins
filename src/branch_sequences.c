@@ -242,6 +242,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence
+		strcat(root->taxon_names, " ");
 		strcat(root->taxon_names, root->taxon);
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
@@ -496,8 +497,8 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		//current_node->recombinations = realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 		current_node->num_recombinations = number_of_recombinations;
 
-		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon);
-		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon);
+		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
+		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->current_node_id,  root->current_node_id, current_node->taxon_names);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 
 		current_node->block_coordinates[0] = realloc((int *)current_node->block_coordinates[0], ((int)current_node->number_of_blocks +1)*sizeof(int));

@@ -648,7 +648,7 @@ if __name__ == "__main__":
 	pagesize=pagesizes.A4
 	height, width = pagesize
   
-  if len(args)==0:
+	if len(args)==0:
 		print "Found nothing to draw"
 		sys.exit()
 	

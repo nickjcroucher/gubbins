@@ -268,6 +268,8 @@ def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_de
           os.remove(full_path_of_file_for_deletion)
 
 def which(program):
+  executable = program.split(" ")
+  program = executable[0]
   def is_exe(fpath):
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
   fpath, fname = os.path.split(program)
@@ -279,7 +281,7 @@ def which(program):
       exe_file = os.path.join(path, program)
       if is_exe(exe_file):
         return exe_file
- 
+
   return None
 
 

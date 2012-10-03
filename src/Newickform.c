@@ -85,7 +85,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 	int * parent_recombinations;
-	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases,0,0,root->block_coordinates);
+	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases,0,0,root->block_coordinates,length_of_original_genome,snp_locations);
 
 	fclose(block_file_pointer);
 	fclose(gff_file_pointer);
@@ -122,7 +122,7 @@ newick_node* parseTree(char *str)
 	int iCount;
 
 	pcStart = str;
-
+	
 	if (*pcStart != '(')
 	{
 		// Leaf node. Separate taxon name from distance. If distance not exist then take care of taxon name only
@@ -276,7 +276,7 @@ newick_node* parseTree(char *str)
 			// Find ':' to retrieve distance, if any.
 			// At this time *pcCurrent should equal to ')'
 			pcStart = pcCurrent;
-			while (*pcCurrent != ':')
+			while (*pcCurrent != ':' && *pcCurrent != '\0' && *pcCurrent != ';')
 			{
 				pcCurrent++;
 			}
@@ -285,6 +285,7 @@ newick_node* parseTree(char *str)
 			node->taxon = seqMalloc(strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
 			node->taxon = strip_quotes(node->taxon);
+			
 			*pcCurrent = cTemp;
 			pcCurrent++;
 			pcStart = pcCurrent;
@@ -298,6 +299,7 @@ newick_node* parseTree(char *str)
 			*pcCurrent = cTemp;
 		}
 	}
+
 	node->number_of_blocks = 0;
 	node->block_coordinates =  (int **) malloc((3)*sizeof(int *));	
 	node->block_coordinates[0] = (int*) malloc((3)*sizeof(int ));

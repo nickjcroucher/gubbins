@@ -9,8 +9,8 @@
 
 START_TEST (phylip_read_in_small_file)
 {
-  load_sequences_from_phylib_file("../tests/data/small_phylip_file.phylip");
-  
+  load_sequences_from_multifasta_file("../tests/data/small_phylip_file.aln");
+
   fail_unless( number_of_samples_from_parse_phylip() == 3);
   fail_unless( find_sequence_index_from_sample_name("2956_6_1") == 0);
   fail_unless( find_sequence_index_from_sample_name("2956_6_2") == 1);
@@ -51,7 +51,7 @@ END_TEST
 
 START_TEST (phylip_read_in_file_with_gaps)
 {
-	load_sequences_from_phylib_file("../tests/data/alignment_with_gaps.phylip");
+	load_sequences_from_multifasta_file("../tests/data/alignment_with_gaps.aln");
 	fail_unless( does_column_contain_snps(0, 'A') == 0);
   fail_unless( does_column_contain_snps(1, '-') == 0);
   fail_unless( does_column_contain_snps(2, '-') == 0);

@@ -25,10 +25,10 @@
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
+#include "parse_phylip.h"
 
 
-
-void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples)
+void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[])
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
@@ -36,21 +36,21 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 	strcpy(base_filename, filename);
 	
 	vcf_file_pointer=fopen(strcat(base_filename,".vcf"), "w");
-	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples);
-	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples);
+	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples,internal_nodes);
+	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples,internal_nodes);
   fclose(vcf_file_pointer);
 }
 
-void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples)
+void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples,int internal_nodes[])
 {
 	int i;
 	for(i=0; i < number_of_snps; i++)
 	{
-		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i], number_of_samples);
+		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i], number_of_samples,internal_nodes);
 	}
 }
 
-void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int number_of_samples)
+void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int number_of_samples,int internal_nodes[])
 {
 	int i;
 	fprintf( vcf_file_pointer, "##fileformat=VCFv4.1\n" );	
@@ -59,12 +59,16 @@ void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int num
 	
 	for(i=0; i<number_of_samples; i++)
 	{
+		if(internal_nodes[i] == 1)
+		{
+			continue;
+		}
 		fprintf( vcf_file_pointer, "%s\t",  sequence_names[i]);
 	}
 	fprintf( vcf_file_pointer, "\n");
 }
 
-void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location, int number_of_samples)
+void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location, int number_of_samples,int internal_nodes[])
 {
 	char reference_base =  bases_for_snp[0];
 	char alt_bases[30];
@@ -104,7 +108,7 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	fprintf( vcf_file_pointer, ".\t");
 	
 	// Bases for each sample
-	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp, number_of_samples );
+	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp, number_of_samples,internal_nodes );
 	
 	fprintf( vcf_file_pointer, "\n");	
 }
@@ -150,12 +154,16 @@ int check_if_char_in_string(char search_string[], char target_char, int search_s
 	return 0;
 }
 
-void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char * bases_for_snp, int number_of_samples)
+void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char * bases_for_snp, int number_of_samples,int internal_nodes[])
 {
 	int i;
 	
 	for(i=0; i < number_of_samples ; i++ )
 	{
+		if(internal_nodes[i] == 1)
+		{
+			continue;
+		}
 		if((bases_for_snp[i] == reference_base))
 		{
 			fprintf( vcf_file_pointer, "." );	

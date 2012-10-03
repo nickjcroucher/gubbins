@@ -191,7 +191,7 @@ int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index
 	return length_of_original_genome;
 }
 
-int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations, char * reference_bases, char * branch_snp_sequence)
+int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations,char * branch_snp_sequence)
 {
 	int i ;
 	int number_of_branch_snp_sites = 0;
@@ -204,7 +204,7 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 			break;
 		}
 		
-		if(ancestor_sequence[i]  == '.' && child_sequence[i] != '-' && child_sequence[i] != 'N'  && child_sequence[i] != '.' &&  child_sequence[i] != reference_bases[i] && reference_bases[i] != '-'  &&  reference_bases[i] != 'N')
+		if(child_sequence[i] != ancestor_sequence[i] && child_sequence[i] != '-' && child_sequence[i] != 'N'  && child_sequence[i] != '.' &&   ancestor_sequence[i] != '-'  &&  ancestor_sequence[i] != 'N')
 		{
 			branch_snp_coords[number_of_branch_snp_sites]   = snp_locations[i];
 			branch_snp_sequence[number_of_branch_snp_sites] = child_sequence[i];

@@ -1,6 +1,6 @@
 Sample name	Num SNPs in recombinations	Num of SNPs outside recombinations	Total SNPs	Bases in Recombinations	Estimated Num SNPs if there were no recombinations	Num Recombination Blocks	r/m	b/m	Genome Length
 sequence_1	0	0	0	0	0	0	0.000000	0.000000	135
-sequence_2	103	0	103	104	0	1	0.000000	0.000000	129
+sequence_2	103	8	111	104	41	1	12.875000	0.125000	129
 sequence_3	0	0	0	0	0	0	0.000000	0.000000	129
 sequence_4	0	0	0	0	0	0	0.000000	0.000000	129
 sequence_5	0	0	0	0	0	0	0.000000	0.000000	129
@@ -9,3 +9,11 @@ sequence_7	0	0	0	0	0	0	0.000000	0.000000	127
 sequence_8	0	0	0	0	0	0	0.000000	0.000000	127
 sequence_9	0	0	0	0	0	0	0.000000	0.000000	127
 sequence_10	0	0	0	0	0	0	0.000000	0.000000	135
+N3	0	0	0	0	0	0	0.000000	0.000000	135
+N6	0	0	0	0	0	0	0.000000	0.000000	135
+N5	0	0	0	0	0	0	0.000000	0.000000	135
+N4	0	0	0	0	0	0	0.000000	0.000000	135
+N2	0	0	0	0	0	0	0.000000	0.000000	135
+N8	0	0	0	0	0	0	0.000000	0.000000	135
+N7	0	0	0	0	0	0	0.000000	0.000000	135
+N1	0	0	0	0	0	0	0.000000	0.000000	135

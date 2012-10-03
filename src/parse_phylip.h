@@ -30,11 +30,6 @@
    int bases_in_recombinations;
  } sample_statistics;
 
-
-void load_sequences_from_phylib(FILE * phylip_file_pointer);
-int get_number_of_samples_from_phylip(char * phylip_string);
-int get_number_of_snps_from_phylip(char * phylip_string);
-void load_sequences_from_phylib_file(char phylip_filename[]);
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name);
 int find_sequence_index_from_sample_name( char * sample_name);
 void update_sequence_base(char new_sequence_base, int sequence_index, int base_index);
@@ -47,7 +42,11 @@ void set_number_of_snps_for_sample(char * sample_name, int number_of_snps);
 void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations);
 void set_number_of_blocks_for_sample(char * sample_name,int num_blocks);
 sample_statistics ** get_sample_statistics();
-int number_of_snps_in_phylib();
+int number_of_snps_in_phylip();
+void load_sequences_from_multifasta_file(char filename[]);
+void set_internal_node(int internal_node_value,int sequence_index);
+void initialise_internal_node();
+int get_internal_node(int sequence_index);
 
 #define MAX_READ_BUFFER 65536
 #define MAX_SAMPLE_NAME_SIZE 1024

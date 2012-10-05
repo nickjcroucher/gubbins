@@ -51,12 +51,10 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
 	
-	char * reference_bases;
 	newick_node* root_node;
 	int number_of_snps;
 	int number_of_columns;
 	int i;
-	int reference_column_number;
 	int length_of_original_genome;
 	length_of_original_genome = genome_length(multi_fasta_filename);	
 	
@@ -69,19 +67,12 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
 	number_of_snps  = number_of_snps_in_phylip();
-	reference_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
 	
 	int snp_locations[number_of_snps];
 	
 	get_integers_from_column_in_vcf(vcf_file_pointer, snp_locations, number_of_snps, column_number_for_column_name(column_names, "POS", number_of_columns));
-	
-	// get reference sequence from VCF
-	reference_column_number = column_number_for_column_name(column_names, "REF", number_of_columns);
-	get_sequence_from_column_in_vcf(vcf_file_pointer, reference_bases, number_of_snps, reference_column_number);
 
-	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, reference_bases,length_of_original_genome,min_snps);
-	// check for snps in the phylip sequence
-	// create a new vcf file, and phylip file
+	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, length_of_original_genome,min_snps);
 
 	int filtered_snp_locations[number_of_snps];
 	int number_of_filtered_snps;

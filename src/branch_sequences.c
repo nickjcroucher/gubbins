@@ -73,7 +73,7 @@ int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** a
 
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent_recombinations, int parent_num_recombinations, char * reference_bases, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations )
+void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinations, int parent_num_recombinations, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations )
 {
 	newick_child *child;
 	int * current_recombinations;
@@ -125,7 +125,7 @@ void fill_in_recombinations_with_reference_bases(newick_node *root, int * parent
 			merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
 			merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
 			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
-			fill_in_recombinations_with_reference_bases(child->node, current_recombinations, num_current_recombinations, reference_bases,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations );
+			fill_in_recombinations_with_gaps(child->node, current_recombinations, num_current_recombinations,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations );
 			child = child->next;
 		}
 	}
@@ -219,7 +219,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps)
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -258,7 +258,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		while (child != NULL)
 		{
 			// recursion
-			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns, reference_bases, child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
+			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,  child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 			child_nodes[child_counter] = child->node;
       strcat(root->taxon_names, " ");
       strcat(root->taxon_names, child_nodes[child_counter]->taxon_names);

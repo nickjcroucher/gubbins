@@ -196,6 +196,28 @@ int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordi
 	return total_bases;
 }
 
+void carry_unambiguous_gaps_up_tree(newick_node *root)
+{
+	if(root->childNum > 0)
+	{
+		newick_child *child;
+		int parent_sequence_index =  find_sequence_index_from_sample_name(root->taxon);
+		
+		child = root->child;
+		int child_sequence_indices[number_of_snps_in_phylip()];
+		int child_counter = 0;
+		while (child != NULL)
+		{
+			child_sequence_indices[child_counter] = find_sequence_index_from_sample_name(child->node->taxon);
+			carry_unambiguous_gaps_up_tree(child->node);
+			child = child->next;
+			child_counter++;
+		}
+		
+		// compare the parent sequence to the each child sequence and update the gaps
+		fill_in_unambiguous_gaps_in_parent_from_children(parent_sequence_index, child_sequence_indices,child_counter);
+	}
+}
 
 char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * reference_bases, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps)
 {
@@ -244,6 +266,9 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			child = child->next;
 			child_counter++;
 		}
+		
+		// For all bases update the parent sequence with N if all child sequences.
+		
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence

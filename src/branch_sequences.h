@@ -42,6 +42,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 int extend_end_of_block_left_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords);
 int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords);
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome);
+void carry_unambiguous_gaps_up_tree(newick_node *root);
 
 #define DEFAULT_SNP_DENSITY 0.000001
 #define WINDOW_SNP_MODE_TARGET 10

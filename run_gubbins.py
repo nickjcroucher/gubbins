@@ -42,7 +42,7 @@ RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
-FASTML_EXEC = 'fastml -mg -qf'
+FASTML_EXEC = 'fastml -mg -qf -b '
 
 # Todo
 # extract code into modules

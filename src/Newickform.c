@@ -83,6 +83,8 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	
 	char * root_sequence;
 
+	carry_unambiguous_gaps_up_tree(root);
+
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,reference_bases,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
 	int * parent_recombinations;
 	fill_in_recombinations_with_reference_bases(root, parent_recombinations, 0, reference_bases,0,0,root->block_coordinates,length_of_original_genome,snp_locations);

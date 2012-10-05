@@ -251,7 +251,16 @@ def add_ordered_tab_to_diagram(filename):
 	new_tracks=add_ordered_embl_to_diagram(record, incfeatures=["i", "d", "li", "del", "snp", "misc_feature", "core", "cds", "insertion", "deletion", "recombination", "feature", "blastn_hit", "fasta_record"], emblfile=False)
 	return new_tracks
 
-
+def add_empty_track(existing_tracks, track_name):
+	newtrack = Track()
+	newtrack.name=taxonname
+	newtrack.beginning=0
+	newtrack.track_height=1
+	existing_tracks[track_name] = newtrack
+	existing_tracks[record.name].add_feature([0,0], fillcolour=translator.artemis_color(2), strokecolour=translator.artemis_color(2), arrows=0)
+	
+	return existing_tracks
+	
 #############################
 # Function to draw the tree #
 #############################
@@ -746,6 +755,9 @@ if __name__ == "__main__":
 	track_number=0
 	
 	for track in output_order:
+		unless( my_tracks.has_key(track)):
+			my_tracks = add_empty_track(my_tracks, track)
+		
 		track_height=my_tracks[track].track_height
 		
 		my_tracks[track].track_draw_proportion=0.8

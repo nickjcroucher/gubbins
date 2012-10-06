@@ -54,6 +54,7 @@ void print_usage(FILE* stream, int exit_code)
            "  -r    detect recombinations mode\n"
            "  -t    Newick tree file\n"
            "  -v    VCF file\n"
+           "  -f    Original Multifasta file"
            "  -m    Min SNPs for identifying a recombination block\n"
            "  -h    Display this usage information.\n\n"
 );
@@ -61,7 +62,7 @@ void print_usage(FILE* stream, int exit_code)
   fprintf (stream, "Step 1: Detect SNP sites (generates inputs files for step 2)\n");
   fprintf (stream, "gubbins alignment_file\n\n", program_name);
   fprintf (stream, "Step 2: Detect recombinations\n");
-  fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -m 10 alignment_file\n\n", program_name);
+  fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -f original.aln -m 10 alignment_file\n\n", program_name);
   exit (exit_code);
 }
 
@@ -72,6 +73,8 @@ int main (argc, argv) int argc; char **argv;
   char vcf_filename[MAX_FILENAME_SIZE];
   char tree_filename[MAX_FILENAME_SIZE];
   char phylip_filename[MAX_FILENAME_SIZE];
+  char original_multi_fasta_filename[MAX_FILENAME_SIZE];
+
   int recombination_flag = 0 ;
 	int min_snps = 3;
   program_name = argv[0];
@@ -80,16 +83,17 @@ int main (argc, argv) int argc; char **argv;
     {
       static struct option long_options[] =
         {
-					{"help",          no_argument,       0, 'h'},
-          {"recombination", no_argument,       0, 'r'},
-          {"vcf",           required_argument, 0, 'v'},
-          {"tree",          required_argument, 0, 't'},
-          {"min_snps",      required_argument, 0, 'm'},
+					{"help",                no_argument,       0, 'h'},
+          {"recombination",       no_argument,       0, 'r'},
+          {"vcf",                 required_argument, 0, 'v'},
+          {"tree",                required_argument, 0, 't'},
+          {"original_multifasta", required_argument, 0, 'f'},
+          {"min_snps",            required_argument, 0, 'm'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
-      c = getopt_long (argc, argv, "hrv:t:m:",
+      c = getopt_long (argc, argv, "hrv:f:t:m:",
                        long_options, &option_index);
       /* Detect the end of the options. */
       if (c == -1)
@@ -110,6 +114,9 @@ int main (argc, argv) int argc; char **argv;
 					print_usage(stdout, EXIT_SUCCESS);
 	      case 'r':
 				  recombination_flag = 1;
+	        break;
+	      case 'f':
+	        strcpy(original_multi_fasta_filename,optarg);
 	        break;
         case 'v':
           strcpy(vcf_filename,optarg);
@@ -136,12 +143,12 @@ int main (argc, argv) int argc; char **argv;
 
 	
 		check_file_exists_or_exit(multi_fasta_filename);
-  
     if(recombination_flag == 1)
     {
 			check_file_exists_or_exit(vcf_filename);
 			check_file_exists_or_exit(tree_filename);
-      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps);
+			check_file_exists_or_exit(original_multi_fasta_filename);
+      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename);
     }
     else
     {

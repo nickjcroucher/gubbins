@@ -59,7 +59,13 @@ START_TEST (phylip_read_in_file_with_gaps)
   fail_unless( does_column_contain_snps(4, 'G') == 1);
   fail_unless( does_column_contain_snps(4, '-') == 1);
   fail_unless( does_column_contain_snps(5, 'N') == 0);
-	
+
+  // Check you can fill in parent bases with gaps if all children have the same gap at the same place
+	int child_indices[2] = {1,2};
+	fill_in_unambiguous_gaps_in_parent_from_children(0, child_indices, 2);
+	char sequence_bases[10];
+  get_sequence_for_sample_name(sequence_bases, "2956_6_1");
+  fail_unless( strcmp(sequence_bases, "A-N-CT") == 0);
 }
 END_TEST
 

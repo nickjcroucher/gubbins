@@ -66,6 +66,30 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 }
 
 
+void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index, int * child_sequence_indices, int num_children)
+{
+	int snp_counter = 0; 
+	for(snp_counter = 0; snp_counter < num_snps ; snp_counter++)
+	{
+		int real_base_found = 0;
+		int child_counter = 0;
+		for(child_counter = 0 ; child_counter < num_children ; child_counter++)
+		{
+			int child_index = child_sequence_indices[child_counter];
+			if(!(sequences[child_index][snp_counter] == 'N' || sequences[child_index][snp_counter] == '-' ))
+			{
+				real_base_found = 1;
+				break;
+			}
+		}
+		
+		if(real_base_found == 0 && sequences[parent_sequence_index][snp_counter] != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
+		{
+			sequences[parent_sequence_index][snp_counter] = 'N';	
+		}
+	}
+}
+
 int does_column_contain_snps(int snp_column, char reference_base)
 {
 	int i;

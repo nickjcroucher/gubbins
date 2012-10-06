@@ -23,8 +23,8 @@
 #include "seqUtil.h"
 #include "Newickform.h"
 
-void run_gubbins(char vcf_filename[], char tree_filename[], char multi_fasta_filename[], int min_snps);
-void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps);
+void run_gubbins(char vcf_filename[], char tree_filename[], char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[]);
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[]);
 char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences);
 char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences);
 

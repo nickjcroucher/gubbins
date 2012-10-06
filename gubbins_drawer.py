@@ -253,11 +253,11 @@ def add_ordered_tab_to_diagram(filename):
 
 def add_empty_track(existing_tracks, track_name):
 	newtrack = Track()
-	newtrack.name=taxonname
+	newtrack.name=track_name
 	newtrack.beginning=0
 	newtrack.track_height=1
 	existing_tracks[track_name] = newtrack
-	existing_tracks[record.name].add_feature([0,0], fillcolour=translator.artemis_color(2), strokecolour=translator.artemis_color(2), arrows=0)
+	existing_tracks[track_name].add_feature(locations=[(0,0)], fillcolour=translator.artemis_color(2), strokecolour=translator.artemis_color(2), arrows=0)
 	
 	return existing_tracks
 	

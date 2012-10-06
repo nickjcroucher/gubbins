@@ -755,7 +755,7 @@ if __name__ == "__main__":
 	track_number=0
 	
 	for track in output_order:
-		unless( my_tracks.has_key(track)):
+		if(not my_tracks.has_key(track)):
 			my_tracks = add_empty_track(my_tracks, track)
 		
 		track_height=my_tracks[track].track_height

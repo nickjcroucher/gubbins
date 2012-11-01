@@ -34,6 +34,7 @@ from Bio import Phylo
 import dendropy
 from Bio import SeqIO
 from Bio import AlignIO
+from Bio.Align import MultipleSeqAlignment
 from cStringIO import StringIO
 import shutil
 
@@ -237,6 +238,27 @@ def get_sequence_names_from_alignment(filename):
     sequence_names.append(record.id)
   handle.close()
   return sequence_names
+ 
+
+# reparsing a fasta file splits the lines which makes fastml work
+def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage):
+  input_handle  = open(input_filename, "rU")
+  output_handle = open(output_filename, "w+")
+  alignments = AlignIO.parse(input_handle, "fasta")
+  output_alignments = []
+  for alignment in alignments:
+      number_of_gaps = 0
+      for record in alignment:
+        number_of_gaps += record.seq.count('n')
+        number_of_gaps += record.seq.count('N')
+        number_of_gaps += record.seq.count('-')
+      if((number_of_gaps*100/alignment.get_alignment_length()) > filter_percentage):
+        output_alignments.append(alignment)
+        
+  AlignIO.write(output_alignments, output_handle, "fasta")
+  output_handle.close()
+  input_handle.close()
+  return
   
   # reparsing a fasta file splits the lines which makes fastml work
 def reconvert_fasta_file(input_filename, output_filename):
@@ -296,6 +318,7 @@ parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont clean
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
 parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
 args = parser.parse_args()
 
 # check that all the external executable dependancies are available
@@ -331,6 +354,9 @@ if args.verbose > 0:
 starting_base_filename = base_filename
 
 reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
+filter_out_alignments_with_too_much_missing_data(starting_base_filename+".start", starting_base_filename+".start.filtered", args.filter_percentage)
+os.remove(starting_base_filename+".start")
+os.rename(starting_base_filename+".start.filtered", starting_base_filename+".start")
 
 # Perform pairwise comparison if there are only 2 sequences
 number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)

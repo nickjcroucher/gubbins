@@ -252,7 +252,7 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
         number_of_gaps += record.seq.count('n')
         number_of_gaps += record.seq.count('N')
         number_of_gaps += record.seq.count('-')
-      if((number_of_gaps*100/alignment.get_alignment_length()) > filter_percentage):
+      if((number_of_gaps*100/alignment.get_alignment_length()) <= filter_percentage):
         output_alignments.append(alignment)
         
   AlignIO.write(output_alignments, output_handle, "fasta")

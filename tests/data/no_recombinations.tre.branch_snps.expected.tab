@@ -1,0 +1,54 @@
+FT   variation       24
+FT                   /node="sequence_6->N2"
+FT                   /colour=4
+FT                   /taxa=" sequence_6  sequence_7 sequence_8"
+FT                   /parent_base="A"
+FT                   /replace="G"
+FT   variation       41
+FT                   /node="sequence_4->N6"
+FT                   /colour=4
+FT                   /taxa=" sequence_3 sequence_4"
+FT                   /parent_base="G"
+FT                   /replace="A"
+FT   variation       35
+FT                   /node="sequence_2->N5"
+FT                   /colour=4
+FT                   /taxa=" sequence_2  sequence_3 sequence_4"
+FT                   /parent_base="A"
+FT                   /replace="T"
+FT   variation       16
+FT                   /node="sequence_1->N7"
+FT                   /colour=4
+FT                   /taxa=" sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="A"
+FT                   /replace="G"
+FT   variation       16
+FT                   /node="N5->N4"
+FT                   /colour=4
+FT                   /taxa="  sequence_2  sequence_3 sequence_4  sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="A"
+FT                   /replace="G"
+FT   variation       22
+FT                   /node="N5->N4"
+FT                   /colour=4
+FT                   /taxa="  sequence_2  sequence_3 sequence_4  sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="C"
+FT                   /replace="A"
+FT   variation       35
+FT                   /node="N5->N4"
+FT                   /colour=4
+FT                   /taxa="  sequence_2  sequence_3 sequence_4  sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="T"
+FT                   /replace="A"
+FT   variation       28
+FT                   /node="N2->N1"
+FT                   /colour=4
+FT                   /taxa=" sequence_9  sequence_6  sequence_7 sequence_8   sequence_2  sequence_3 sequence_4  sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="C"
+FT                   /replace="A"
+FT   variation       24
+FT                   /node="N4->N1"
+FT                   /colour=4
+FT                   /taxa=" sequence_9  sequence_6  sequence_7 sequence_8   sequence_2  sequence_3 sequence_4  sequence_1  sequence_5 sequence_10"
+FT                   /parent_base="A"
+FT                   /replace="G"

@@ -20,6 +20,7 @@ START_TEST (check_gubbins_no_recombinations)
 	
   fail_unless(number_of_recombinations_in_file("../tests/data/no_recombinations.tre.tab") == 0);
   fail_unless(compare_files("../tests/data/no_recombinations.tre","../tests/data/no_recombinations.expected.tre") == 1);
+  fail_unless(compare_files("../tests/data/no_recombinations.tre.branch_snps.tab","../tests/data/no_recombinations.tre.branch_snps.expected.tab") == 1);
 
   remove("../tests/data/no_recombinations.tre");
 	remove("../tests/data/no_recombinations.tre.tab");
@@ -28,6 +29,7 @@ START_TEST (check_gubbins_no_recombinations)
 	remove("../tests/data/no_recombinations.tre.stats");
 	remove("../tests/data/no_recombinations.tre.gff");
 	remove("../tests/data/no_recombinations.tre.snp_sites.aln");
+	remove("../tests/data/no_recombinations.tre.branch_snps.tab");
 }
 END_TEST
 
@@ -46,6 +48,7 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(number_of_recombinations_in_file("../tests/data/one_recombination.tre.tab") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.vcf","../tests/data/one_recombination.expected.vcf") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.stats","../tests/data/one_recombination.expected.stats") == 1);
+	fail_unless(compare_files("../tests/data/one_recombination.tre.branch_snps.tab","../tests/data/one_recombination.tre.branch_snps.expected.tab") == 1);
   
   remove("../tests/data/one_recombination.tre");
 	remove("../tests/data/one_recombination.tre.tab");
@@ -54,6 +57,7 @@ START_TEST (check_gubbins_one_recombination)
 	remove("../tests/data/one_recombination.tre.stats");
 	remove("../tests/data/one_recombination.tre.gff");
 	remove("../tests/data/one_recombination.tre.snp_sites.aln");
+	remove("../tests/data/one_recombination.tre.branch_snps.tab");
 }
 END_TEST
 
@@ -71,6 +75,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 
 	fail_unless(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 3);
   fail_unless(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
+  fail_unless(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
 
 	remove("../tests/data/multiple_recombinations.tre");
 	remove("../tests/data/multiple_recombinations.tre.tab");
@@ -79,6 +84,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	remove("../tests/data/multiple_recombinations.tre.stats");
 	remove("../tests/data/multiple_recombinations.tre.gff");
 	remove("../tests/data/multiple_recombinations.tre.snp_sites.aln");
+	remove("../tests/data/multiple_recombinations.tre.branch_snps.tab");
 }
 END_TEST
 

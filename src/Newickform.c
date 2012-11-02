@@ -74,6 +74,12 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   strcpy(block_file_name, filename);
 	block_file_pointer = fopen(strcat(block_file_name,".tab"), "w");
 	
+	// output tab file
+  FILE * branch_snps_file_pointer;
+  char branch_snps_file_name[MAX_FILENAME_SIZE];
+  strcpy(branch_snps_file_name, filename);
+	branch_snps_file_pointer = fopen(strcat(branch_snps_file_name,".branch_snps.tab"), "w");
+	
 	// output gff file
 	FILE * gff_file_pointer;
   char gff_file_name[MAX_FILENAME_SIZE];
@@ -84,8 +90,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	char * root_sequence;
 
 	carry_unambiguous_gaps_up_tree(root);
-
-	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps);
+	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer);
 	int * parent_recombinations;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations);
 

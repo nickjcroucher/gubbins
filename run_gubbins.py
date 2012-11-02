@@ -240,20 +240,27 @@ def get_sequence_names_from_alignment(filename):
   return sequence_names
  
 
-# reparsing a fasta file splits the lines which makes fastml work
-def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage):
+def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
   input_handle  = open(input_filename, "rU")
   output_handle = open(output_filename, "w+")
   alignments = AlignIO.parse(input_handle, "fasta")
   output_alignments = []
   for alignment in alignments:
       number_of_gaps = 0
+      alignment_name = ""
       for record in alignment:
         number_of_gaps += record.seq.count('n')
         number_of_gaps += record.seq.count('N')
         number_of_gaps += record.seq.count('-')
-      if((number_of_gaps*100/alignment.get_alignment_length()) <= filter_percentage):
+        alignment_name = record.id
+      if alignment.get_alignment_length() == 0:
+        if verbose > 0:
+          print "Excluded sequence " + alignment_name + " because there werent enough bases in it"
+      elif((number_of_gaps*100/alignment.get_alignment_length()) <= filter_percentage):
         output_alignments.append(alignment)
+      else:
+        if verbose > 0:
+          print "Excluded sequence " + alignment_name + " because it had " + (number_of_gaps*100/alignment.get_alignment_length()) +" percentage gaps a maximum of "+ filter_percentage +" is allowed"
         
   AlignIO.write(output_alignments, output_handle, "fasta")
   output_handle.close()
@@ -354,7 +361,7 @@ if args.verbose > 0:
 starting_base_filename = base_filename
 
 reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
-filter_out_alignments_with_too_much_missing_data(starting_base_filename+".start", starting_base_filename+".start.filtered", args.filter_percentage)
+filter_out_alignments_with_too_much_missing_data(starting_base_filename+".start", starting_base_filename+".start.filtered", args.filter_percentage,args.verbose)
 os.remove(starting_base_filename+".start")
 os.rename(starting_base_filename+".start.filtered", starting_base_filename+".start")
 

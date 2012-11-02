@@ -355,7 +355,7 @@ if args.use_time_stamp > 0:
 starting_base_filename = base_filename
 
 # put a filtered copy into a temp directory and work from that
-temp_working_dir = tempfile.mkdtemp()
+temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
 filter_out_alignments_with_too_much_missing_data(args.alignment_filename, temp_working_dir+"/"+starting_base_filename, args.filter_percentage, args.verbose)
 args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 
@@ -364,11 +364,10 @@ args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
 starting_base_filename = base_filename
 
-
 # find all snp sites
 if args.verbose > 0:
-  print GUBBINS_EXEC + starting_base_filename
-subprocess.check_call([GUBBINS_EXEC, starting_base_filename])
+  print GUBBINS_EXEC +" "+ args.alignment_filename
+subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
 if args.verbose > 0:
   print int(time.time())
 
@@ -479,4 +478,5 @@ if args.no_cleanup == 0 or args.no_cleanup is None:
   
   fasttree_regex_for_file_deletions = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
   delete_files_based_on_list_of_regexes('.', fasttree_regex_for_file_deletions, args.verbose)
+  shutil.rmtree(temp_working_dir)
   

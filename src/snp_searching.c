@@ -191,7 +191,7 @@ int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index
 	return length_of_original_genome;
 }
 
-int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations,char * branch_snp_sequence)
+int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations,char * branch_snp_sequence, char * branch_snp_ancestor_sequence)
 {
 	int i ;
 	int number_of_branch_snp_sites = 0;
@@ -208,11 +208,13 @@ int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * chi
 		{
 			branch_snp_coords[number_of_branch_snp_sites]   = snp_locations[i];
 			branch_snp_sequence[number_of_branch_snp_sites] = child_sequence[i];
+			branch_snp_ancestor_sequence[number_of_branch_snp_sites] = ancestor_sequence[i];
 			number_of_branch_snp_sites++;
 		}
 	}	
 	branch_snp_coords = realloc(branch_snp_coords, (number_of_branch_snp_sites+1)*sizeof(int));
 	branch_snp_sequence[number_of_branch_snp_sites] = '\0';
+	branch_snp_ancestor_sequence[number_of_branch_snp_sites] = '\0';
 	return number_of_branch_snp_sites;
 }
 

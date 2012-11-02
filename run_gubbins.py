@@ -30,10 +30,12 @@ import subprocess
 import os
 import time
 import re
+import tempfile
 from Bio import Phylo
 import dendropy
 from Bio import SeqIO
 from Bio import AlignIO
+from Bio.Align import MultipleSeqAlignment
 from cStringIO import StringIO
 import shutil
 
@@ -237,6 +239,34 @@ def get_sequence_names_from_alignment(filename):
     sequence_names.append(record.id)
   handle.close()
   return sequence_names
+ 
+
+def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
+  input_handle  = open(input_filename, "rU")
+  output_handle = open(output_filename, "w+")
+  alignments = AlignIO.parse(input_handle, "fasta")
+  output_alignments = []
+  for alignment in alignments:
+      for record in alignment:
+        number_of_gaps = 0
+        number_of_gaps += record.seq.count('n')
+        number_of_gaps += record.seq.count('N')
+        number_of_gaps += record.seq.count('-')
+        sequence_length = len(record.seq)
+        
+        if sequence_length == 0:
+          if verbose > 0:
+            print "Excluded sequence " + record.id + " because there werent enough bases in it"
+        elif((number_of_gaps*100/sequence_length) <= filter_percentage):
+          output_alignments.append(record)
+        else:
+          if verbose > 0:
+            print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
+        
+  AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
+  output_handle.close()
+  input_handle.close()
+  return
   
   # reparsing a fasta file splits the lines which makes fastml work
 def reconvert_fasta_file(input_filename, output_filename):
@@ -296,6 +326,7 @@ parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont clean
 parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
 parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
 args = parser.parse_args()
 
 # check that all the external executable dependancies are available
@@ -318,17 +349,27 @@ if args.use_time_stamp > 0:
   if args.verbose > 0:
     print current_time
 
-# find all snp sites
-if args.verbose > 0:
-  print GUBBINS_EXEC + args.alignment_filename
-subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
-if args.verbose > 0:
-  print int(time.time())
+# get the base filename
+(base_directory,base_filename) = os.path.split(args.alignment_filename)
+(base_filename_without_ext,extension) = os.path.splitext(base_filename)
+starting_base_filename = base_filename
+
+# put a filtered copy into a temp directory and work from that
+temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
+filter_out_alignments_with_too_much_missing_data(args.alignment_filename, temp_working_dir+"/"+starting_base_filename, args.filter_percentage, args.verbose)
+args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
 starting_base_filename = base_filename
+
+# find all snp sites
+if args.verbose > 0:
+  print GUBBINS_EXEC +" "+ args.alignment_filename
+subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
+if args.verbose > 0:
+  print int(time.time())
 
 reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
 
@@ -337,7 +378,6 @@ number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
 if(number_of_sequences == 2):
   pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
   sys.exit()
-
 
 latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"
 tree_file_names = []
@@ -438,4 +478,5 @@ if args.no_cleanup == 0 or args.no_cleanup is None:
   
   fasttree_regex_for_file_deletions = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
   delete_files_based_on_list_of_regexes('.', fasttree_regex_for_file_deletions, args.verbose)
+  shutil.rmtree(temp_working_dir)
   

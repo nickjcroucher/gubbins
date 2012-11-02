@@ -59,6 +59,9 @@ START_TEST (valid_alignment_with_one_line_per_sequence_gzipped)
   remove("alignment_file_one_line_per_sequence.aln.gz.vcf");
   remove("alignment_file_one_line_per_sequence.aln.gz.phylip");
   remove("alignment_file_one_line_per_sequence.aln.gz.snp_sites.aln");
+  remove("alignment_file_one_line_per_sequence.aln.phylip");
+  remove("alignment_file_one_line_per_sequence.aln.snp_sites.aln");
+  remove("alignment_file_one_line_per_sequence.aln.vcf");
 }
 END_TEST
 

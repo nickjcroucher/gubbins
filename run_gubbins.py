@@ -30,6 +30,7 @@ import subprocess
 import os
 import time
 import re
+import tempfile
 from Bio import Phylo
 import dendropy
 from Bio import SeqIO
@@ -246,23 +247,23 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   alignments = AlignIO.parse(input_handle, "fasta")
   output_alignments = []
   for alignment in alignments:
-      number_of_gaps = 0
-      alignment_name = ""
       for record in alignment:
+        number_of_gaps = 0
         number_of_gaps += record.seq.count('n')
         number_of_gaps += record.seq.count('N')
         number_of_gaps += record.seq.count('-')
-        alignment_name = record.id
-      if alignment.get_alignment_length() == 0:
-        if verbose > 0:
-          print "Excluded sequence " + alignment_name + " because there werent enough bases in it"
-      elif((number_of_gaps*100/alignment.get_alignment_length()) <= filter_percentage):
-        output_alignments.append(alignment)
-      else:
-        if verbose > 0:
-          print "Excluded sequence " + alignment_name + " because it had " + (number_of_gaps*100/alignment.get_alignment_length()) +" percentage gaps a maximum of "+ filter_percentage +" is allowed"
+        sequence_length = len(record.seq)
         
-  AlignIO.write(output_alignments, output_handle, "fasta")
+        if sequence_length == 0:
+          if verbose > 0:
+            print "Excluded sequence " + record.id + " because there werent enough bases in it"
+        elif((number_of_gaps*100/sequence_length) <= filter_percentage):
+          output_alignments.append(record)
+        else:
+          if verbose > 0:
+            print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
+        
+  AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
   output_handle.close()
   input_handle.close()
   return
@@ -348,29 +349,36 @@ if args.use_time_stamp > 0:
   if args.verbose > 0:
     print current_time
 
-# find all snp sites
-if args.verbose > 0:
-  print GUBBINS_EXEC + args.alignment_filename
-subprocess.check_call([GUBBINS_EXEC, args.alignment_filename])
-if args.verbose > 0:
-  print int(time.time())
+# get the base filename
+(base_directory,base_filename) = os.path.split(args.alignment_filename)
+(base_filename_without_ext,extension) = os.path.splitext(base_filename)
+starting_base_filename = base_filename
+
+# put a filtered copy into a temp directory and work from that
+temp_working_dir = tempfile.mkdtemp()
+filter_out_alignments_with_too_much_missing_data(args.alignment_filename, temp_working_dir+"/"+starting_base_filename, args.filter_percentage, args.verbose)
+args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)
 (base_filename_without_ext,extension) = os.path.splitext(base_filename)
 starting_base_filename = base_filename
 
+
+# find all snp sites
+if args.verbose > 0:
+  print GUBBINS_EXEC + starting_base_filename
+subprocess.check_call([GUBBINS_EXEC, starting_base_filename])
+if args.verbose > 0:
+  print int(time.time())
+
 reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
-filter_out_alignments_with_too_much_missing_data(starting_base_filename+".start", starting_base_filename+".start.filtered", args.filter_percentage,args.verbose)
-os.remove(starting_base_filename+".start")
-os.rename(starting_base_filename+".start.filtered", starting_base_filename+".start")
 
 # Perform pairwise comparison if there are only 2 sequences
 number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
 if(number_of_sequences == 2):
   pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
   sys.exit()
-
 
 latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"
 tree_file_names = []

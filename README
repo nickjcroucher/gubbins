@@ -1,7 +1,2 @@
-This application takes in a multi fasta alignment and detects recombination regions.
-
-To use it:
-run_gubbins.py my_alignment.aln
-
-
-
+This piece of software is not the version that was used in Croucher et. al. "Rapid Pneumococcal Evolution in Response to Clinical Interventions", Science 2011, 331 (6016): 430-434.
+It is a work in progress and as such is not yet recommended for use by the community. We expect to make an official release of the software soon.

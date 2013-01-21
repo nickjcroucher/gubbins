@@ -11,7 +11,7 @@ setup(
     url='https://github.com/andrewjpage/gubbins/',
     scripts=['run_gubbins.py'],
     long_description="""\
-      Gubbins is a tool for tool for BioInformaticians that takes in a multi
+      Gubbins is a tool for BioInformaticians that takes in a multi
       fasta alignment and detects recombination regions.  This package provides
       a simple front end to the Gubbins tool.
       """,
@@ -26,6 +26,7 @@ setup(
         'Biopython >= 1.59',
         'Dendropy  >= 3.11.1',
         'Reportlab >= 2.5',
+        'PyVCF     >= 0.6.3',
         ],
     license='GPL',
     )

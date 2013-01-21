@@ -38,6 +38,7 @@ from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
 from cStringIO import StringIO
 import shutil
+import vcf
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
@@ -267,6 +268,46 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   output_handle.close()
   input_handle.close()
   return
+
+
+def only_contains_gaps(input_array):
+  if 'A' in input_array or 'C' in input_array or 'G' in input_array or 'T' in input_array:
+    return 0
+  else:
+    return 1
+  
+
+def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
+  
+  # find out where the gaps are located
+  vcf_reader = vcf.Reader(open(input_vcf_file, 'r'))
+  sample_names  = vcf_reader.samples
+  gap_position = []
+  for record in vcf_reader:
+    gap_position.append(only_contains_gaps(record.ALT))
+  
+  gapped_alignments = []
+  # interleave gap only and snp bases
+  input_handle = open(input_fasta_filename, "rU")
+  alignments = AlignIO.parse(input_handle, "fasta")
+  for record in alignments:
+    if record.id in sample_names:
+      continue
+    gap_index = 0
+    for input_base in record.seq:
+      while gap_position[gap_index] == 1 and gap_index < length(gap_position):
+        gap_position[gap_index] = '-'
+        gap_index+=1
+      gap_position[gap_index] = input_base
+    record.seq(''.join(gap_position)) 
+    gapped_alignments.append(record)
+    
+    
+  output_handle = open(output_fasta_filename, "a")
+  AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
+  
+  return
+
   
   # reparsing a fasta file splits the lines which makes fastml work
 def reconvert_fasta_file(input_filename, output_filename):
@@ -451,7 +492,8 @@ for i in range(1, args.iterations+1):
     print fastml_command
   subprocess.check_call(fastml_command, shell=True)
   shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
-  reconvert_fasta_file(current_tree_name+'.seq.joint.txt',starting_base_filename+".gaps.snp_sites.aln")
+  shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
+  reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
 
   if args.verbose > 0:
     print int(time.time())

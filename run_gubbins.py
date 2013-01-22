@@ -303,6 +303,10 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
         if gap_index < len(gap_position):
           gap_position[gap_index] = input_base
           gap_index+=1
+      
+      while gap_index < len(gap_position):
+        gap_position[gap_index] = '-'
+        gap_index+=1
 
       record.seq = Seq(''.join(gap_position))
       gapped_alignments.append(record)

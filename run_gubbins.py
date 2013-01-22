@@ -290,18 +290,18 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
   # interleave gap only and snp bases
   input_handle = open(input_fasta_filename, "rU")
   alignments = AlignIO.parse(input_handle, "fasta")
-  for record in alignments:
-    if record.id in sample_names:
-      continue
-    gap_index = 0
-    for input_base in record.seq:
-      while gap_position[gap_index] == 1 and gap_index < length(gap_position):
-        gap_position[gap_index] = '-'
-        gap_index+=1
-      gap_position[gap_index] = input_base
-    record.seq(''.join(gap_position)) 
-    gapped_alignments.append(record)
-    
+  for alignment in alignments:
+      for record in alignment:
+      if record.id in sample_names:
+        continue
+      gap_index = 0
+      for input_base in record.seq:
+        while gap_position[gap_index] == 1 and gap_index < length(gap_position):
+          gap_position[gap_index] = '-'
+          gap_index+=1
+        gap_position[gap_index] = input_base
+      record.seq(''.join(gap_position)) 
+      gapped_alignments.append(record)
     
   output_handle = open(output_fasta_filename, "a")
   AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
@@ -382,6 +382,10 @@ if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which('ra
   sys.exit()
 if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(FASTTREE_EXEC) is None:
   print "FastTree is not in your path"
+  sys.exit()
+  
+if(not os.path.exists(args.alignment_filename)):
+  print "Cannot access the input alignment file. Check its been entered correctly"
   sys.exit()
 
 current_time = ''

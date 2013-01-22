@@ -36,6 +36,7 @@ import dendropy
 from Bio import SeqIO
 from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
+from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 import vcf
@@ -296,11 +297,14 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
         continue
       gap_index = 0
       for input_base in record.seq:
-        while gap_position[gap_index] == 1 and gap_index < len(gap_position):
+        while gap_index < len(gap_position) and gap_position[gap_index] == 1:
           gap_position[gap_index] = '-'
           gap_index+=1
-        gap_position[gap_index] = input_base
-      record.seq(''.join(gap_position)) 
+        if gap_index < len(gap_position):
+          gap_position[gap_index] = input_base
+          gap_index+=1
+
+      record.seq = Seq(''.join(gap_position))
       gapped_alignments.append(record)
     
   output_handle = open(output_fasta_filename, "a")

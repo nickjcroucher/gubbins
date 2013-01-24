@@ -36,6 +36,7 @@ import dendropy
 from Bio import SeqIO
 from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
+from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 
@@ -267,6 +268,57 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   output_handle.close()
   input_handle.close()
   return
+
+
+
+def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
+  # find out where the gaps are located
+  # PyVCF removed for performance reasons
+  vcf_file = open(input_vcf_file, 'r')
+  
+  sample_names  = []
+  gap_position = []
+  
+  for vcf_line in vcf_file:
+    if re.match('^#CHROM', vcf_line)  != None :
+       sample_names = vcf_line.split('\t' )[9:-1]
+    elif re.match('^\d', vcf_line)  != None :
+      # If the alternate is only a gap it wont have a base in this column
+      if  re.match('^([^\t]+\t){4}([^ACGTacgt])\t', vcf_line)  != None:
+        gap_position.append(1)
+      else:
+        gap_position.append(0)
+  
+  gapped_alignments = []
+  # interleave gap only and snp bases
+  input_handle = open(input_fasta_filename, "rU")
+  alignments = AlignIO.parse(input_handle, "fasta")
+  for alignment in alignments:
+    for record in alignment:
+      inserted_gaps = []
+      if record.id in sample_names:
+        continue
+      gap_index = 0
+      for input_base in record.seq:
+        while gap_index < len(gap_position) and gap_position[gap_index] == 1:
+          inserted_gaps.append('-')
+          gap_index+=1
+        if gap_index < len(gap_position):
+          inserted_gaps.append(input_base)
+          gap_index+=1
+      
+      while gap_index < len(gap_position):
+        inserted_gaps.append('-')
+        gap_index+=1
+
+      record.seq = Seq(''.join(inserted_gaps))
+      gapped_alignments.append(record)
+    
+  output_handle = open(output_fasta_filename, "a")
+  AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
+  
+  return
+
   
   # reparsing a fasta file splits the lines which makes fastml work
 def reconvert_fasta_file(input_filename, output_filename):
@@ -342,6 +394,10 @@ if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which('ra
 if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(FASTTREE_EXEC) is None:
   print "FastTree is not in your path"
   sys.exit()
+  
+if(not os.path.exists(args.alignment_filename)):
+  print "Cannot access the input alignment file. Check its been entered correctly"
+  sys.exit()
 
 current_time = ''
 if args.use_time_stamp > 0:
@@ -396,27 +452,27 @@ for i in range(1, args.iterations+1):
       previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
       current_tree_name     = fasttree_current_tree_name(base_filename, i)
       tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC, FASTTREE_PARAMS )
-      fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename, i)
+      fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
       gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC,args.min_snps,args.alignment_filename)
 
     elif i == 2:
       previous_tree_name    = current_tree_name
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
+      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
       gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps,args.alignment_filename)
     else:
       previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
       current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
       tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename_without_ext,current_time, i)
+      fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
       gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps,args.alignment_filename)
   
   elif args.tree_builder == "raxml":
     previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
     current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name)
-    fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".start", base_filename_without_ext,current_time, i)
+    fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
     gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,args.alignment_filename,GUBBINS_EXEC,args.min_snps,args.alignment_filename)
     
   elif args.tree_builder == "fasttree":
@@ -426,7 +482,7 @@ for i in range(1, args.iterations+1):
     current_tree_name     = fasttree_current_tree_name(base_filename, i)
 
     tree_building_command = fasttree_tree_building_command(i, args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
-    fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".gaps.snp_sites.aln", base_filename, i)
+    fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
     gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,args.alignment_filename,GUBBINS_EXEC,args.min_snps,args.alignment_filename)
   
   if args.verbose > 0:
@@ -451,7 +507,8 @@ for i in range(1, args.iterations+1):
     print fastml_command
   subprocess.check_call(fastml_command, shell=True)
   shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
-  reconvert_fasta_file(current_tree_name+'.seq.joint.txt',starting_base_filename+".gaps.snp_sites.aln")
+  shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
+  reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
 
   if args.verbose > 0:
     print int(time.time())

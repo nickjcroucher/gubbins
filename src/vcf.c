@@ -54,7 +54,8 @@ void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int num
 {
 	int i;
 	fprintf( vcf_file_pointer, "##fileformat=VCFv4.1\n" );	
-	fprintf( vcf_file_pointer, "##INFO=<ID=AB,Number=1,Type=String,Description=\"Alt Base\">\n" );
+	fprintf( vcf_file_pointer, "##FORMAT=<ID=AB,Number=1,Type=String,Description=\"Alt Base\">\n" );
+	
 	fprintf( vcf_file_pointer, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" );
 	
 	for(i=0; i<number_of_samples; i++)
@@ -101,11 +102,11 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	// FILTER
 	fprintf( vcf_file_pointer, ".\t");
 	
-	// FORMAT
-	fprintf( vcf_file_pointer, "AB\t");
-	
 	// INFO
 	fprintf( vcf_file_pointer, ".\t");
+	
+	// FORMAT
+	fprintf( vcf_file_pointer, "AB\t");
 	
 	// Bases for each sample
 	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp, number_of_samples,internal_nodes );
@@ -166,7 +167,7 @@ void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, 
 		}
 		if((bases_for_snp[i] == reference_base))
 		{
-			fprintf( vcf_file_pointer, "." );	
+			fprintf( vcf_file_pointer, "%c", (char) reference_base );	
 		}
 		else
 		{

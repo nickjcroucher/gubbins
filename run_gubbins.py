@@ -284,6 +284,7 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
   vcf_reader = vcf.Reader(open(input_vcf_file, 'r'))
   sample_names  = vcf_reader.samples
   gap_position = []
+  
   for record in vcf_reader:
     gap_position.append(only_contains_gaps(record.ALT))
   
@@ -293,22 +294,23 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
   alignments = AlignIO.parse(input_handle, "fasta")
   for alignment in alignments:
     for record in alignment:
+      inserted_gaps = []
       if record.id in sample_names:
         continue
       gap_index = 0
       for input_base in record.seq:
         while gap_index < len(gap_position) and gap_position[gap_index] == 1:
-          gap_position[gap_index] = '-'
+          inserted_gaps.append('-')
           gap_index+=1
         if gap_index < len(gap_position):
-          gap_position[gap_index] = input_base
+          inserted_gaps.append(input_base)
           gap_index+=1
       
       while gap_index < len(gap_position):
-        gap_position[gap_index] = '-'
+        inserted_gaps.append('-')
         gap_index+=1
 
-      record.seq = Seq(''.join(gap_position))
+      record.seq = Seq(''.join(inserted_gaps))
       gapped_alignments.append(record)
     
   output_handle = open(output_fasta_filename, "a")

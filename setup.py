@@ -25,8 +25,7 @@ setup(
     install_requires=[
         'Biopython >= 1.59',
         'Dendropy  >= 3.11.1',
-        'Reportlab >= 2.5',
-        'PyVCF     >= 0.6.3',
+        'Reportlab >= 2.5'
         ],
     license='GPL',
     )

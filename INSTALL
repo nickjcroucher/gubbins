@@ -73,7 +73,6 @@ installed:
 Biopython (>=1.59)
 DendroPy  (>=3.11.1)
 ReportLab (>= 2.5)
-PyVCF     (>= 0.6.3)
 
 == Running the Python wrapper ==
 

@@ -39,7 +39,6 @@ from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
-import vcf
 
 # config variables
 RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
@@ -271,22 +270,24 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   return
 
 
-def only_contains_gaps(input_array):
-  if 'A' in input_array or 'C' in input_array or 'G' in input_array or 'T' in input_array:
-    return 0
-  else:
-    return 1
-  
 
 def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
-  
   # find out where the gaps are located
-  vcf_reader = vcf.Reader(open(input_vcf_file, 'r'))
-  sample_names  = vcf_reader.samples
+  # PyVCF removed for performance reasons
+  vcf_file = open(input_vcf_file, 'r')
+  
+  sample_names  = []
   gap_position = []
   
-  for record in vcf_reader:
-    gap_position.append(only_contains_gaps(record.ALT))
+  for vcf_line in vcf_file:
+    if re.match('^#CHROM', vcf_line)  != None :
+       sample_names = vcf_line.split('\t' )[9:-1]
+    elif re.match('^\d', vcf_line)  != None :
+      # If the alternate is only a gap it wont have a base in this column
+      if  re.match('^([^\t]+\t){4}([^ACGTacgt])\t', vcf_line)  != None:
+        gap_position.append(1)
+      else:
+        gap_position.append(0)
   
   gapped_alignments = []
   # interleave gap only and snp bases

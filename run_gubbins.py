@@ -106,11 +106,11 @@ def reroot_tree_at_midpoint(tree_name):
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
             preserve_underscores=True)
   split_all_non_bi_nodes(tree.seed_node)
-    
+
   tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
   tree.deroot()
   tree.update_splits()
-  tree.write_to_path(
+  output_tree_string = tree.as_string(
     tree_name, 
     'newick',
     taxon_set=None,
@@ -128,6 +128,9 @@ def reroot_tree_at_midpoint(tree_name):
     suppress_item_comments=True,
     node_label_element_separator=' ',
     node_label_compose_func=None)
+  output_file = open(tree_name, 'w+')
+  output_file.write(output_tree_string.replace('\'', ''))
+  output_file.closed
 
 def raxml_base_name(base_filename_without_ext,current_time):
   return base_filename_without_ext+"."+str(current_time) +".iteration_"

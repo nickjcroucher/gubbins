@@ -106,13 +106,12 @@ def reroot_tree_at_midpoint(tree_name):
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
             preserve_underscores=True)
   split_all_non_bi_nodes(tree.seed_node)
-    
+
   tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
   tree.deroot()
   tree.update_splits()
-  tree.write_to_path(
-    tree_name, 
-    'newick',
+  output_tree_string = tree.as_string(
+    'newick'
     taxon_set=None,
     suppress_leaf_taxon_labels=False,
     suppress_leaf_node_labels=True,
@@ -127,7 +126,11 @@ def reroot_tree_at_midpoint(tree_name):
     annotations_as_nhx=False,
     suppress_item_comments=True,
     node_label_element_separator=' ',
-    node_label_compose_func=None)
+    node_label_compose_func=None
+    )
+  output_file = open(tree_name, 'w+')
+  output_file.write(output_tree_string.replace('\'', ''))
+  output_file.closed
 
 def raxml_base_name(base_filename_without_ext,current_time):
   return base_filename_without_ext+"."+str(current_time) +".iteration_"
@@ -247,6 +250,7 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   output_handle = open(output_filename, "w+")
   alignments = AlignIO.parse(input_handle, "fasta")
   output_alignments = []
+  number_of_included_alignments = 0
   for alignment in alignments:
       for record in alignment:
         number_of_gaps = 0
@@ -260,10 +264,14 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
             print "Excluded sequence " + record.id + " because there werent enough bases in it"
         elif((number_of_gaps*100/sequence_length) <= filter_percentage):
           output_alignments.append(record)
+          number_of_included_alignments += 1
         else:
           if verbose > 0:
             print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
         
+  if number_of_included_alignments <= 1:
+    sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
+    
   AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
   output_handle.close()
   input_handle.close()

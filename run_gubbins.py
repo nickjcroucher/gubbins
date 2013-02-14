@@ -111,8 +111,7 @@ def reroot_tree_at_midpoint(tree_name):
   tree.deroot()
   tree.update_splits()
   output_tree_string = tree.as_string(
-    tree_name, 
-    'newick',
+    'newick'
     taxon_set=None,
     suppress_leaf_taxon_labels=False,
     suppress_leaf_node_labels=True,
@@ -127,7 +126,8 @@ def reroot_tree_at_midpoint(tree_name):
     annotations_as_nhx=False,
     suppress_item_comments=True,
     node_label_element_separator=' ',
-    node_label_compose_func=None)
+    node_label_compose_func=None
+    )
   output_file = open(tree_name, 'w+')
   output_file.write(output_tree_string.replace('\'', ''))
   output_file.closed

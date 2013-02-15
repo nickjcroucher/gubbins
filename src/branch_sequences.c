@@ -418,10 +418,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
 		// block_coordinates will now contain merged blocks
 		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords);
-		int * candidate_blocks[3];
+		int * candidate_blocks[4];
 		candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+		candidate_blocks[3] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 	
 		int number_of_candidate_blocks = 0;
 		
@@ -459,6 +460,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 					candidate_blocks[1][number_of_candidate_blocks] = current_end;
 					// TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
 					candidate_blocks[2][number_of_candidate_blocks] = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+					candidate_blocks[3][number_of_candidate_blocks] = block_genome_size_without_gaps;
 					number_of_candidate_blocks++;
 					break;
 				}
@@ -485,6 +487,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	  candidate_blocks[0] = NULL;
 	  candidate_blocks[1] = NULL;
 	  candidate_blocks[2] = NULL;
+	  candidate_blocks[3] = NULL;
 	
 	}
 }
@@ -536,7 +539,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 		
-		current_node->total_bases_removed_excluding_gaps = current_node->total_bases_removed_excluding_gaps  + candidate_blocks[2][smallest_index];
+		current_node->total_bases_removed_excluding_gaps = current_node->total_bases_removed_excluding_gaps  + candidate_blocks[3][smallest_index];
 
 		current_node->block_coordinates[0] = realloc((int *)current_node->block_coordinates[0], ((int)current_node->number_of_blocks +1)*sizeof(int));
 		current_node->block_coordinates[1] = realloc((int *)current_node->block_coordinates[1], ((int)current_node->number_of_blocks +1)*sizeof(int));

@@ -250,6 +250,7 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   output_handle = open(output_filename, "w+")
   alignments = AlignIO.parse(input_handle, "fasta")
   output_alignments = []
+  taxa_removed = []
   number_of_included_alignments = 0
   for alignment in alignments:
       for record in alignment:
@@ -260,12 +261,14 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
         sequence_length = len(record.seq)
         
         if sequence_length == 0:
+          taxa_removed.append(record.id)
           if verbose > 0:
             print "Excluded sequence " + record.id + " because there werent enough bases in it"
         elif((number_of_gaps*100/sequence_length) <= filter_percentage):
           output_alignments.append(record)
           number_of_included_alignments += 1
         else:
+          taxa_removed.append(record.id)
           if verbose > 0:
             print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
         
@@ -275,9 +278,44 @@ def filter_out_alignments_with_too_much_missing_data(input_filename, output_file
   AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
   output_handle.close()
   input_handle.close()
-  return
+  return taxa_removed
 
 
+def filter_out_removed_taxa_from_tree_and_return_new_file(starting_tree, temp_working_dir, taxa_removed):
+  if starting_tree is None:
+     return None
+     
+  (base_directory,base_filename) = os.path.split(starting_tree)
+  temp_starting_tree = temp_working_dir + '/'+ base_filename
+  
+  tree  = dendropy.Tree.get_from_path(args.starting_tree, 'newick',
+            preserve_underscores=True)
+  tree.prune_taxa_with_labels(taxa_removed, update_splits=True, delete_outdegree_one=False)          
+  tree.prune_leaves_without_taxa(update_splits=True, delete_outdegree_one=False)
+  tree.deroot()
+  output_tree_string = tree.as_string(
+    'newick',
+    taxon_set=None,
+    suppress_leaf_taxon_labels=False,
+    suppress_leaf_node_labels=True,
+    suppress_internal_taxon_labels=False,
+    suppress_internal_node_labels=False,
+    suppress_rooting=True,
+    suppress_edge_lengths=False,
+    unquoted_underscores=True,
+    preserve_spaces=False,
+    store_tree_weights=False,
+    suppress_annotations=True,
+    annotations_as_nhx=False,
+    suppress_item_comments=True,
+    node_label_element_separator=' ',
+    node_label_compose_func=None
+    )
+  output_file = open(temp_starting_tree, 'w+')
+  output_file.write(output_tree_string.replace('\'', ''))
+  output_file.closed
+  
+  return temp_starting_tree
 
 def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
   # find out where the gaps are located
@@ -420,8 +458,11 @@ starting_base_filename = base_filename
 
 # put a filtered copy into a temp directory and work from that
 temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-filter_out_alignments_with_too_much_missing_data(args.alignment_filename, temp_working_dir+"/"+starting_base_filename, args.filter_percentage, args.verbose)
+taxa_removed = filter_out_alignments_with_too_much_missing_data(args.alignment_filename, temp_working_dir+"/"+starting_base_filename, args.filter_percentage, args.verbose)
 args.alignment_filename = temp_working_dir+"/"+starting_base_filename
+
+# If a starting tree has been provided make sure that taxa filtered out in the previous step are removed from the tree
+args.starting_tree = filter_out_removed_taxa_from_tree_and_return_new_file(args.starting_tree, temp_working_dir, taxa_removed)
 
 # get the base filename
 (base_directory,base_filename) = os.path.split(args.alignment_filename)

@@ -4,7 +4,6 @@
 #include <check.h>
 #include "check_parse_phylip.h"
 #include "check_snp_sites.h"
-#include "check_calculate_ancestor_sequence.h"
 #include "check_vcf_parsing.h"
 #include "check_branch_sequences.h"
 #include "check_gubbins.h"
@@ -16,7 +15,6 @@ int main (void)
   Suite *s = snp_sites_suite ();
   SRunner *sr = srunner_create (s);
   srunner_add_suite (sr, parse_phylip_suite());
-  srunner_add_suite (sr, calculate_ancestor_sequence_suite());
   srunner_add_suite (sr, parse_vcf_suite());
   srunner_add_suite (sr, check_branch_sequences_suite());
   srunner_add_suite (sr, run_gubbins_suite());

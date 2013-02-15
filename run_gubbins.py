@@ -379,6 +379,10 @@ def reconvert_fasta_file(input_filename, output_filename):
 def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
   sequence_names = get_sequence_names_from_alignment(filename)
   create_pairwise_newick_tree(sequence_names, base_filename+".tre")
+  
+  subprocess.check_call(generate_fastml_command(fastml_exec, alignment_filename, base_filename+".tre"), shell=True)
+  shutil.copyfile(alignment_filename+'.output_tree',base_filename+".tre")
+  shutil.copyfile(current_tree_name+'.seq.joint.txt', base_filename+".snp_sites.aln")
   subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
   
 def create_pairwise_newick_tree(sequence_names, output_filename):

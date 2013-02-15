@@ -376,7 +376,7 @@ def reconvert_fasta_file(input_filename, output_filename):
   input_handle.close()
   return
 
-def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename):
+def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec):
   sequence_names = get_sequence_names_from_alignment(filename)
   create_pairwise_newick_tree(sequence_names, base_filename+".tre")
   
@@ -485,7 +485,7 @@ reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_
 # Perform pairwise comparison if there are only 2 sequences
 number_of_sequences = number_of_sequences_in_alignment(args.alignment_filename)
 if(number_of_sequences == 2):
-  pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename)
+  pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename,FASTML_EXEC)
   sys.exit()
 
 latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"

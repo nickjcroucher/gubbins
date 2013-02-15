@@ -124,6 +124,10 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 
 int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
 {
+	if(number_of_snps == 0)
+	{
+		return number_of_snps;
+	}
 	int i;
 	int number_of_snps_in_block =0;
 	int start_index = find_starting_index( window_start_coordinate, snp_locations,0, number_of_snps);

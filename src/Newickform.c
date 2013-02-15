@@ -308,6 +308,7 @@ newick_node* parseTree(char *str)
 	}
 
 	node->number_of_blocks = 0;
+	node->total_bases_removed_excluding_gaps = 0;
 	node->block_coordinates =  (int **) malloc((3)*sizeof(int *));	
 	node->block_coordinates[0] = (int*) malloc((3)*sizeof(int ));
 	node->block_coordinates[1] = (int*) malloc((3)*sizeof(int ));

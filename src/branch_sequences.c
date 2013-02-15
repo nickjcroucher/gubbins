@@ -338,6 +338,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	double branch_snp_density = 0.0;
 	double block_snp_density = 0.0;
 	int number_of_blocks = 0 ;
+	int original_branch_genome_size = branch_genome_size;
 
 	// place to store coordinates of recombinations snps
 	current_node->recombinations = (int *) malloc((length_of_sequence+1)*sizeof(int));
@@ -479,6 +480,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			return;	
 		}
 		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer );
+		branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
 	
 	  candidate_blocks[0] = NULL;
 	  candidate_blocks[1] = NULL;
@@ -533,6 +535,8 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
 		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
+		
+		current_node->total_bases_removed_excluding_gaps = current_node->total_bases_removed_excluding_gaps  + candidate_blocks[2][smallest_index];
 
 		current_node->block_coordinates[0] = realloc((int *)current_node->block_coordinates[0], ((int)current_node->number_of_blocks +1)*sizeof(int));
 		current_node->block_coordinates[1] = realloc((int *)current_node->block_coordinates[1], ((int)current_node->number_of_blocks +1)*sizeof(int));

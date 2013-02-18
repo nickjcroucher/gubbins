@@ -112,57 +112,6 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 }
 
 
-
-// If there are snps between the child sequences, fill in with the reference sequence
-char *calculate_ancestor_sequence(char * ancestor_sequence, char ** child_sequences, int sequence_length, int number_of_child_sequences)
-{
-	int base_position;
-	int sequence_number;
-	int found_snp;
-	strcpy(ancestor_sequence,"");
-		   
-		   
-	for(base_position = 0; base_position < sequence_length; base_position++)
-	{
-		if(child_sequences[0][base_position] == '\0')
-		{
-			ancestor_sequence[base_position] == '\0';
-			break;
-		}
-		found_snp = 0;
-		
-		char sequence_for_comparison;
-		sequence_for_comparison = find_first_real_base(base_position, number_of_child_sequences, child_sequences);
-		
-		for(sequence_number = 1; sequence_number < number_of_child_sequences; sequence_number++)	
-		{
-			if(sequence_for_comparison != child_sequences[sequence_number][base_position] && child_sequences[sequence_number][base_position] != '.' && child_sequences[sequence_number][base_position] != '-' && child_sequences[sequence_number][base_position] != 'N')
-			{
-				
-				found_snp = 1;
-				break;
-			}
-		}
-		if(found_snp == 1)
-		{
-			ancestor_sequence[base_position] = '.';
-		}
-		else
-		{
-			ancestor_sequence[base_position] = sequence_for_comparison;
-		}
-		
-	}
-	
-	if(ancestor_sequence[sequence_length] != '\0')
-	{
-		ancestor_sequence[sequence_length] = '\0';
-	}
-	
-	
-	return ancestor_sequence;
-}
-
 char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences)
 {
 	int i = 0; 

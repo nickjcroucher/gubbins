@@ -24,7 +24,6 @@ TESTS = $(check_PROGRAMS)
 check_PROGRAMS = run_all_tests
 run_all_tests_SOURCES = \
 	../tests/check_branch_sequences.c \
-	../tests/check_calculate_ancestor_sequence.c \
 	../tests/check_gubbins.c \
 	../tests/check_parse_phylip.c \
 	../tests/check_snp_searching.c \

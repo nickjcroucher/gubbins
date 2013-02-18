@@ -332,6 +332,9 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
       # If the alternate is only a gap it wont have a base in this column
       if  re.match('^([^\t]+\t){4}([^ACGTacgt])\t', vcf_line)  != None:
         gap_position.append(1)
+      elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
+        # sometimes the ref can be a gap only 
+        gap_position.append(1)
       else:
         gap_position.append(0)
   

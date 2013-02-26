@@ -133,7 +133,7 @@ def reroot_tree_at_midpoint(tree_name):
   output_file.closed
 
 def raxml_base_name(base_filename_without_ext,current_time):
-  return base_filename_without_ext+"."+str(current_time) +".iteration_"
+  return base_filename_without_ext+"."+str(current_time) +"iteration_"
 
 def raxml_current_tree_name(base_filename_without_ext,current_time, i):
   return "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(i)
@@ -157,7 +157,7 @@ def raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i
   
 def raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time, raxml_exec,previous_tree_name):
   previous_tree = raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name)
-  return raxml_exec+ " -s "+previous_tree_name+".phylip -n "+base_filename_without_ext+"."+str(current_time)+".iteration_"+str(i)+" "+previous_tree
+  return raxml_exec+ " -s "+previous_tree_name+".phylip -n "+base_filename_without_ext+"."+str(current_time)+"iteration_"+str(i)+" "+previous_tree
 
 
 def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps, original_aln):
@@ -454,7 +454,7 @@ if(not os.path.exists(args.alignment_filename)):
 
 current_time = ''
 if args.use_time_stamp > 0:
-  current_time = int(time.time())
+  current_time = str(int(time.time()))+'.'
   if args.verbose > 0:
     print current_time
 
@@ -491,7 +491,7 @@ if(number_of_sequences == 2):
   pairwise_comparison(args.alignment_filename,starting_base_filename,GUBBINS_EXEC,args.alignment_filename,FASTML_EXEC)
   sys.exit()
 
-latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+".tre"
+latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+"tre"
 tree_file_names = []
 
 tree_building_command = ""

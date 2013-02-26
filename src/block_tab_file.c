@@ -42,8 +42,8 @@ void print_branch_snp_details(FILE * branch_snps_file_pointer, char * current_no
     fprintf(branch_snps_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
     fprintf(branch_snps_file_pointer, "FT                   /colour=4\n");
     fprintf(branch_snps_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);
-    fprintf(branch_snps_file_pointer, "FT                   /parent_base=\"%c\"\n",branch_snp_sequence[i]);
-    fprintf(branch_snps_file_pointer, "FT                   /replace=\"%c\"\n",branch_snp_ancestor_sequence[i]);
+    fprintf(branch_snps_file_pointer, "FT                   /parent_base=\"%c\"\n",branch_snp_ancestor_sequence[i]);
+    fprintf(branch_snps_file_pointer, "FT                   /replace=\"%c\"\n",branch_snp_sequence[i]);
     fflush(branch_snps_file_pointer);
   }
 }

@@ -49,6 +49,8 @@ START_TEST (check_gubbins_one_recombination)
 	fail_unless(compare_files("../tests/data/one_recombination.tre.vcf","../tests/data/one_recombination.expected.vcf") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.stats","../tests/data/one_recombination.expected.stats") == 1);
 	fail_unless(compare_files("../tests/data/one_recombination.tre.branch_snps.tab","../tests/data/one_recombination.tre.branch_snps.expected.tab") == 1);
+	fail_unless(compare_files("../tests/data/one_recombination.tre.tab","../tests/data/one_recombination.tre.expected.tab") == 1);
+	fail_unless(compare_files("../tests/data/one_recombination.tre.gff","../tests/data/one_recombination.tre.expected.gff") == 1);
   
   remove("../tests/data/one_recombination.tre");
 	remove("../tests/data/one_recombination.tre.tab");

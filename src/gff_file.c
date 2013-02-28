@@ -29,14 +29,14 @@ void print_gff_header(FILE * gff_file_pointer, int genome_length)
 	fflush(gff_file_pointer);
 }
 
-void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, int current_node_id, int parent_node_id, char * taxon_names)
+void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names)
 {
 	fprintf(gff_file_pointer, "SEQUENCE\tGUBBINS\tCDS\t");
   fprintf(gff_file_pointer, "%d\t",start_coordinate);
   fprintf(gff_file_pointer, "%d\t",end_coordinate);
 	fprintf(gff_file_pointer, "0.000\t.\t0\t");
 	
-	fprintf(gff_file_pointer, "node=\"%d->%d\";", parent_node_id, current_node_id );
+	fprintf(gff_file_pointer, "node=\"%s->%s\";", parent_node_id, current_node_id );
 	fprintf(gff_file_pointer, "taxa=\"%s\";", taxon_names);
 	fprintf(gff_file_pointer, "snp_count=\"%d\"", number_of_snps);
 	fprintf(gff_file_pointer, "\n");

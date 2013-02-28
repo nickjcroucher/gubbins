@@ -28,7 +28,7 @@
 #include "parse_phylip.h"
 
 
-void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[])
+void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[], int offset)
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
@@ -37,16 +37,16 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 	
 	vcf_file_pointer=fopen(strcat(base_filename,".vcf"), "w");
 	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples,internal_nodes);
-	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples,internal_nodes);
+	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples,internal_nodes,offset);
   fclose(vcf_file_pointer);
 }
 
-void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples,int internal_nodes[])
+void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_locations, int number_of_snps, int number_of_samples,int internal_nodes[], int offset)
 {
 	int i;
 	for(i=0; i < number_of_snps; i++)
 	{
-		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i], number_of_samples,internal_nodes);
+		output_vcf_row(vcf_file_pointer, bases_for_snps[i], snp_locations[i], number_of_samples,internal_nodes, offset);
 	}
 }
 
@@ -69,7 +69,7 @@ void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int num
 	fprintf( vcf_file_pointer, "\n");
 }
 
-void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location, int number_of_samples,int internal_nodes[])
+void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_location, int number_of_samples,int internal_nodes[], int offset)
 {
 	char reference_base =  bases_for_snp[0];
 	char alt_bases[30];
@@ -82,7 +82,7 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	fprintf( vcf_file_pointer, "1\t");
 	
 	// Position
-	fprintf( vcf_file_pointer, "%d\t", (int) snp_location +1);	
+	fprintf( vcf_file_pointer, "%d\t", (int) snp_location + offset);	
 	
 	//ID
 	fprintf( vcf_file_pointer, ".\t");

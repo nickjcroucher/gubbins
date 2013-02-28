@@ -97,7 +97,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
 	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
-	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
+	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes,0);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
 	
 	// Create an new tree with updated distances

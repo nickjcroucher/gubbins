@@ -82,7 +82,7 @@ FT                   /colour=4
 FT                   /taxa="sequence_4"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       2
+FT   variation       1
 FT                   /node="N5->sequence_2"
 FT                   /colour=4
 FT                   /taxa="sequence_2"

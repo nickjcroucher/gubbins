@@ -387,8 +387,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			}
 
 			int current_window_start_coordinate = window_start_coordinate;
-			// Minimum statistically significant window size divided by 2 (Nyquist).
-			window_start_coordinate += (int) MIN_WINDOW_SIZE/2;
+			// Window size divided by 2 (Nyquist).
+			window_start_coordinate += (int) window_size/2;
 			// Move to next snp, more efficient but then the adjacent block check doesnt work.
 			//window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);s
 			

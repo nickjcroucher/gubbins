@@ -20,6 +20,6 @@
 #ifndef _GFF_FILE_H_
 #define _GFF_FILE_H_
  void print_gff_header(FILE * gff_file_pointer, int genome_length);
- void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, int current_node_id, int parent_node_id, char * taxon_names);
+ void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names);
 #endif
 

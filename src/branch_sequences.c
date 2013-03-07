@@ -204,7 +204,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 		int parent_sequence_index =  find_sequence_index_from_sample_name(root->taxon);
 		
 		child = root->child;
-		int child_sequence_indices[number_of_snps_in_phylip()];
+		int child_sequence_indices[root->childNum];
 		int child_counter = 0;
 		while (child != NULL)
 		{

@@ -22,11 +22,19 @@
 #include <string.h>
 #include "block_tab_file.h"
 
-void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names)
+void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names, int number_of_child_nodes)
 {
-  fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate+1, end_coordinate+1);
+  fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate, end_coordinate);
   fprintf(block_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
-  fprintf(block_file_pointer, "FT                   /colour=2\n");
+
+  if(number_of_child_nodes > 0)
+  {
+  	fprintf(block_file_pointer, "FT                   /colour=2\n");
+	}
+	else
+	{
+		fprintf(block_file_pointer, "FT                   /colour=4\n");
+	}
   fprintf(block_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);
   fprintf(block_file_pointer, "FT                   /SNP_count=%d\n",number_of_snps);
   fflush(block_file_pointer);
@@ -38,7 +46,7 @@ void print_branch_snp_details(FILE * branch_snps_file_pointer, char * current_no
 	int i = 0;
 	for(i=0; i< number_of_branch_snps; i++)
 	{
-	  fprintf(branch_snps_file_pointer, "FT   variation       %d\n", branches_snp_sites[i]+1);
+	  fprintf(branch_snps_file_pointer, "FT   variation       %d\n", branches_snp_sites[i]);
     fprintf(branch_snps_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
     fprintf(branch_snps_file_pointer, "FT                   /colour=4\n");
     fprintf(branch_snps_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);

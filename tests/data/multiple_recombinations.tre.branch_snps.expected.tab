@@ -1,16 +1,22 @@
-FT   variation       16
+FT   variation       15
 FT                   /node="N7->sequence_1"
 FT                   /colour=4
 FT                   /taxa="sequence_1"
 FT                   /parent_base="G"
 FT                   /replace="A"
-FT   variation       28
+FT   variation       27
 FT                   /node="N7->sequence_1"
 FT                   /colour=4
 FT                   /taxa="sequence_1"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       24
+FT   variation       23
+FT                   /node="N5->N7"
+FT                   /colour=4
+FT                   /taxa=" sequence_6 sequence_1"
+FT                   /parent_base="G"
+FT                   /replace="A"
+FT   variation       28
 FT                   /node="N5->N7"
 FT                   /colour=4
 FT                   /taxa=" sequence_6 sequence_1"
@@ -136,18 +142,18 @@ FT                   /colour=4
 FT                   /taxa=" sequence_6 sequence_1"
 FT                   /parent_base="G"
 FT                   /replace="A"
-FT   variation       49
-FT                   /node="N5->N7"
-FT                   /colour=4
-FT                   /taxa=" sequence_6 sequence_1"
-FT                   /parent_base="G"
-FT                   /replace="A"
-FT   variation       24
+FT   variation       23
 FT                   /node="N8->sequence_10"
 FT                   /colour=4
 FT                   /taxa="sequence_10"
 FT                   /parent_base="G"
 FT                   /replace="A"
+FT   variation       83
+FT                   /node="N8->sequence_10"
+FT                   /colour=4
+FT                   /taxa="sequence_10"
+FT                   /parent_base="A"
+FT                   /replace="T"
 FT   variation       84
 FT                   /node="N8->sequence_10"
 FT                   /colour=4
@@ -1096,30 +1102,30 @@ FT                   /colour=4
 FT                   /taxa="sequence_10"
 FT                   /parent_base="A"
 FT                   /replace="T"
-FT   variation       242
-FT                   /node="N8->sequence_10"
-FT                   /colour=4
-FT                   /taxa="sequence_10"
-FT                   /parent_base="A"
-FT                   /replace="T"
-FT   variation       28
+FT   variation       27
 FT                   /node="N4->N8"
 FT                   /colour=4
 FT                   /taxa=" sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       24
+FT   variation       23
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="A"
 FT                   /replace="G"
-FT   variation       28
+FT   variation       27
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="A"
 FT                   /replace="C"
+FT   variation       28
+FT                   /node="N3->N4"
+FT                   /colour=4
+FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
+FT                   /parent_base="A"
+FT                   /replace="G"
 FT   variation       29
 FT                   /node="N3->N4"
 FT                   /colour=4
@@ -1240,13 +1246,13 @@ FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="A"
 FT                   /replace="G"
-FT   variation       49
+FT   variation       50
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
-FT                   /parent_base="A"
-FT                   /replace="G"
-FT   variation       51
+FT                   /parent_base="C"
+FT                   /replace="A"
+FT   variation       52
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
@@ -1336,7 +1342,7 @@ FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       67
+FT   variation       68
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
@@ -1354,7 +1360,7 @@ FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       71
+FT   variation       72
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
@@ -1414,37 +1420,31 @@ FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       82
+FT   variation       83
 FT                   /node="N3->N4"
 FT                   /colour=4
 FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       84
-FT                   /node="N3->N4"
-FT                   /colour=4
-FT                   /taxa="   sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
-FT                   /parent_base="C"
-FT                   /replace="A"
-FT   variation       16
+FT   variation       15
 FT                   /node="N2->N3"
 FT                   /colour=4
 FT                   /taxa=" sequence_5    sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="A"
 FT                   /replace="G"
-FT   variation       22
+FT   variation       21
 FT                   /node="N2->N3"
 FT                   /colour=4
 FT                   /taxa=" sequence_5    sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"
 FT                   /parent_base="C"
 FT                   /replace="A"
-FT   variation       41
+FT   variation       40
 FT                   /node="N1->sequence_4"
 FT                   /colour=4
 FT                   /taxa="sequence_4"
 FT                   /parent_base="A"
 FT                   /replace="G"
-FT   variation       35
+FT   variation       34
 FT                   /node="N1->N2"
 FT                   /colour=4
 FT                   /taxa=" sequence_2  sequence_5    sequence_7 sequence_8  sequence_6 sequence_1  sequence_10 sequence_9"

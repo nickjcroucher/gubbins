@@ -76,14 +76,14 @@ void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index,
 		for(child_counter = 0 ; child_counter < num_children ; child_counter++)
 		{
 			int child_index = child_sequence_indices[child_counter];
-			if(!(sequences[child_index][snp_counter] == 'N' || sequences[child_index][snp_counter] == '-' ))
+			if(!( toupper(sequences[child_index][snp_counter]) == 'N' || sequences[child_index][snp_counter] == '-' ))
 			{
 				real_base_found = 1;
 				break;
 			}
 		}
 		
-		if(real_base_found == 0 && sequences[parent_sequence_index][snp_counter] != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
+		if(real_base_found == 0 &&  toupper(sequences[parent_sequence_index][snp_counter]) != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
 		{
 			sequences[parent_sequence_index][snp_counter] = 'N';	
 		}

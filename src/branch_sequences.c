@@ -204,7 +204,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 		int parent_sequence_index =  find_sequence_index_from_sample_name(root->taxon);
 		
 		child = root->child;
-		int child_sequence_indices[number_of_snps_in_phylip()];
+		int child_sequence_indices[root->childNum];
 		int child_counter = 0;
 		while (child != NULL)
 		{
@@ -387,8 +387,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			}
 
 			int current_window_start_coordinate = window_start_coordinate;
-			// Minimum statistically significant window size divided by 2 (Nyquist).
-			window_start_coordinate += (int) MIN_WINDOW_SIZE/2;
+			// Window size divided by 2 (Nyquist).
+			window_start_coordinate += (int) window_size/2;
 			// Move to next snp, more efficient but then the adjacent block check doesnt work.
 			//window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);s
 			
@@ -536,7 +536,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		//current_node->recombinations = realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 		current_node->num_recombinations = number_of_recombinations;
 
-		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
+		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum);
 		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 		

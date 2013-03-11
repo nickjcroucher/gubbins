@@ -392,6 +392,12 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			// Move to next snp, more efficient but then the adjacent block check doesnt work.
 			window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
 			
+			// minimum number of snps to be statistically significant in block
+			if(number_of_snps_in_block < min_snps)
+			{
+				continue;
+			}
+			
 			block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
 			// region with low number of snps so skip over
 			//printf("%lf\t%lf\t%d\t%d\t%s\n",block_snp_density,branch_snp_density,block_genome_size_without_gaps,number_of_snps_in_block,current_node->taxon_names);
@@ -399,16 +405,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			{
 				continue;	
 			}
-
-			// minimum number of snps to be statistically significant in block
-			if(number_of_snps_in_block < min_snps)
-			{
-				continue;
-			}
 			
 			if(calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, number_of_snps_in_block) > number_of_snps_in_block)
 			{
-
 				continue;
 			}
 			

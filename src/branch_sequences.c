@@ -356,18 +356,22 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		// start at the coordinate of the first snp
 		window_start_coordinate = snp_site_coords[0];
 		
-		int number_of_windows = branch_genome_size;
+		int number_of_windows = (branch_genome_size/(MIN_WINDOW_SIZE/2)) + 1;
 		// start coordinate, end coordinate, likelihood
 			
 		int * block_coordinates[2];
 		
-	
 		block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		number_of_blocks = 0;
 			
-		for(i = 0; i < branch_genome_size; i++)
+		for(i = 0; i < number_of_windows; i++)
 		{
+			if(window_start_coordinate > snp_site_coords[number_of_branch_snps-1])
+			{
+				break;
+			}
+			
 			window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);
 			
 			if(window_end_coordinate < window_start_coordinate)
@@ -388,7 +392,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
 			int current_window_start_coordinate = window_start_coordinate;
 			// Window size divided by 2 (Nyquist).
-			window_start_coordinate += (int) window_size/2;
+			window_start_coordinate += (int) MIN_WINDOW_SIZE/2;
 			// Move to next snp, more efficient but then the adjacent block check doesnt work.
 			window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
 			

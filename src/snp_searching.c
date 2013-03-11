@@ -31,10 +31,17 @@ int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_loca
 	
 	for(i = start_index; i < number_of_branch_snps; i++)
 	{
-		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-' && child_sequence[i] != 'N')
+		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-' && toupper(child_sequence[i]) != 'N')
 		{
 			return snp_locations[i];
 		}
+		
+		// Last position so return it 
+		if(i+1 == number_of_branch_snps && snp_locations[i] > window_start_coordinate)
+		{
+			return snp_locations[i];
+		}
+		
 	}
 	return window_start_coordinate;
 }

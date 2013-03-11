@@ -74,7 +74,7 @@ START_TEST (check_advance_window_start_to_next_snp)
 
   // With gaps
 	fail_unless( advance_window_start_to_next_snp(0, coords_empty,child_sequence_with_gaps,  0) == 0);
-  fail_unless( advance_window_start_to_next_snp(0, coords_one,  child_sequence_with_gaps,  1) == 0);
+  fail_unless( advance_window_start_to_next_snp(0, coords_one,  child_sequence_with_gaps,  1) == 1);
 	fail_unless( advance_window_start_to_next_snp(1, coords_one,  child_sequence_with_gaps,  1) == 1);
   fail_unless( advance_window_start_to_next_snp(1, coords_odd,  child_sequence_with_gaps,  3) == 3);
   fail_unless( advance_window_start_to_next_snp(3, coords_odd,  child_sequence_with_gaps,  3) == 3);
@@ -90,7 +90,7 @@ START_TEST (check_advance_window_start_to_next_snp)
   fail_unless( advance_window_start_to_next_snp(0, coords_even, child_sequence_with_gaps,  4) == 3);
   fail_unless( advance_window_start_to_next_snp(2, coords_even, child_sequence_with_gaps,  4) == 3);
   fail_unless( advance_window_start_to_next_snp(4, coords_even, child_sequence_with_gaps,  4) == 5);
-  fail_unless( advance_window_start_to_next_snp(6, coords_even, child_sequence_with_gaps,  4) == 6);
+  fail_unless( advance_window_start_to_next_snp(6, coords_even, child_sequence_with_gaps,  4) == 7);
   fail_unless( advance_window_start_to_next_snp(8, coords_even, child_sequence_with_gaps,  4) == 8);
 }
 END_TEST

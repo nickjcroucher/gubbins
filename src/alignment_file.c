@@ -199,6 +199,10 @@ int build_reference_sequence(char reference_sequence[], char filename[])
 	for(i = 0; i < seq->seq.l; i++)
 	{
 		reference_sequence[i] = toupper(seq->seq.s[i]);
+		if(reference_sequence[i] == 'N')
+		{
+			reference_sequence[i]  = '-';
+		}
 	}
 	
 	kseq_destroy(seq);
@@ -240,7 +244,14 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
       }
       else
       {
-        if(reference_sequence[i] != '*' && reference_sequence[i] != toupper(seq->seq.s[i]))
+	
+				char input_base = toupper(seq->seq.s[i]);
+				if(input_base == 'N')
+				{
+					input_base = '-';
+				}
+	
+        if(reference_sequence[i] != '*' && reference_sequence[i] != input_base)
         {
          reference_sequence[i] = '*';
          number_of_snps++;
@@ -249,6 +260,7 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
     }
     
   }
+
   kseq_destroy(seq);
   gzclose(fp);
 

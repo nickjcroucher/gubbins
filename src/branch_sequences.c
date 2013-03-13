@@ -473,9 +473,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 					number_of_candidate_blocks++;
 					break;
 				}
-				// TODO need a more intelligent way to move inwards.
-				current_start++;
-				current_end--;
+				
+				if(loop_counter %2 == 0)
+				{
+					current_start++;
+  			}
+				else
+				{
+					current_end--;
+				}
 				
 				if(loop_counter > 0)
 				{
@@ -590,11 +596,11 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks, char *
 		return number_of_blocks;	
 	}
 	
-	for(i=0; i < number_of_blocks; i++)
-	{
-			block_coordinates[0][i] = extend_end_of_block_left_over_gap( block_coordinates[0][i], branch_snp_sequence, number_of_bases, snp_site_coords);
-			block_coordinates[1][i] = extend_end_of_block_right_over_gap(block_coordinates[1][i], branch_snp_sequence, number_of_bases, snp_site_coords);
-	}
+	//for(i=0; i < number_of_blocks; i++)
+	//{
+	//		block_coordinates[0][i] = extend_end_of_block_left_over_gap( block_coordinates[0][i], branch_snp_sequence, number_of_bases, snp_site_coords);
+	//		block_coordinates[1][i] = extend_end_of_block_right_over_gap(block_coordinates[1][i], branch_snp_sequence, number_of_bases, snp_site_coords);
+	//}
 	
 	merged_block_coordinates[0][current_merged_block] = block_coordinates[0][current_merged_block];
 	merged_block_coordinates[1][current_merged_block] = block_coordinates[1][current_merged_block];	
@@ -760,7 +766,7 @@ int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, i
 		return 0;	
 	}
 	
-	threshold = 0.05/branch_genome_size;
+	threshold = 0.05/num_branch_snps;
 	
 	while( cutoff < block_snp_count)
 	{

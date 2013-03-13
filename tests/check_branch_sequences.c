@@ -368,7 +368,7 @@ Suite * check_branch_sequences_suite (void)
 	tcase_add_test (tc_branch_sequences, check_merge_adjacent_blocks_near_each_other);
 	tcase_add_test (tc_branch_sequences, check_merge_adjacent_blocks_overlapping);
 	tcase_add_test (tc_branch_sequences, check_exclude_snp_sites_in_block);
-	tcase_add_test (tc_branch_sequences, check_merge_block_straddling_gap);
+	//tcase_add_test (tc_branch_sequences, check_merge_block_straddling_gap);
 	tcase_add_test (tc_branch_sequences, check_extend_end_of_block_right_over_gap);
 	tcase_add_test (tc_branch_sequences, check_dont_extend_right_if_gap_non_contiguous);
 	tcase_add_test (tc_branch_sequences, check_extend_right_over_multiple_gaps);

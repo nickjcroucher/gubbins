@@ -69,12 +69,26 @@ START_TEST (phylip_read_in_file_with_gaps)
 }
 END_TEST
 
+START_TEST (phylip_fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap)
+{
+	load_sequences_from_multifasta_file("../tests/data/alignment_with_gap_in_parent.aln");
+	int child_indices[2] = {0,1};
+	fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(2, child_indices, 2);
+	char sequence_bases[10];
+  get_sequence_for_sample_name(sequence_bases, "parent");
+  fail_unless( strcmp(sequence_bases, "AC--") == 0);
+}
+END_TEST
+
+
+
 Suite * parse_phylip_suite(void)
 {
   Suite *s = suite_create ("Parsing a phylip file");
   TCase *tc_phylip = tcase_create ("phylip_files");
   tcase_add_test (tc_phylip, phylip_read_in_small_file);
   tcase_add_test (tc_phylip, phylip_read_in_file_with_gaps);
+  tcase_add_test (tc_phylip, phylip_fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap);
   suite_add_tcase (s, tc_phylip);
   return s;
 }

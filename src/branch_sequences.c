@@ -216,6 +216,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 		
 		// compare the parent sequence to the each child sequence and update the gaps
 		fill_in_unambiguous_gaps_in_parent_from_children(parent_sequence_index, child_sequence_indices,child_counter);
+		fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(parent_sequence_index, child_sequence_indices,child_counter);
 	}
 }
 

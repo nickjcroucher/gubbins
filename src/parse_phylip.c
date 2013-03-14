@@ -90,6 +90,41 @@ void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index,
 	}
 }
 
+void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(int parent_sequence_index, int * child_sequence_indices, int num_children)
+{
+	int snp_counter = 0; 
+
+	for(snp_counter = 0; snp_counter < num_snps ; snp_counter++)
+	{
+		if(toupper(sequences[parent_sequence_index][snp_counter]) != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
+		{
+			break;
+		}
+		
+		int real_base_found = 0;
+		int child_counter = 0;
+		char comparison_base ;
+		for(child_counter = 0 ; child_counter < num_children ; child_counter++)
+		{
+			int child_index = child_sequence_indices[child_counter];
+		  if(child_counter == 0)
+			{
+				comparison_base = toupper(sequences[child_index][snp_counter]);
+			}
+		
+			if(comparison_base !=  toupper(sequences[child_index][snp_counter])  )
+			{
+				break;
+			}
+		}
+		
+		if(toupper(sequences[parent_sequence_index][snp_counter]) != comparison_base)
+		{
+			sequences[parent_sequence_index][snp_counter] = comparison_base;
+		}
+	}
+}
+
 int does_column_contain_snps(int snp_column, char reference_base)
 {
 	int i;

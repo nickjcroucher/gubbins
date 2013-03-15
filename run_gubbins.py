@@ -324,19 +324,25 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
   
   sample_names  = []
   gap_position = []
+  gap_alt_base = []
   
   for vcf_line in vcf_file:
     if re.match('^#CHROM', vcf_line)  != None :
        sample_names = vcf_line.split('\t' )[9:-1]
     elif re.match('^\d', vcf_line)  != None :
       # If the alternate is only a gap it wont have a base in this column
-      if  re.match('^([^\t]+\t){4}([^ACGTacgt])\t', vcf_line)  != None:
+      if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:
+        m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) 
         gap_position.append(1)
+        gap_alt_base.append(m.group(2))
       elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
         # sometimes the ref can be a gap only 
+        m = re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line) 
         gap_position.append(1)
+        gap_alt_base.append(m.group(3))
       else:
         gap_position.append(0)
+        gap_alt_base.append('-')
   
   gapped_alignments = []
   # interleave gap only and snp bases
@@ -350,14 +356,14 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
       gap_index = 0
       for input_base in record.seq:
         while gap_index < len(gap_position) and gap_position[gap_index] == 1:
-          inserted_gaps.append('-')
+          inserted_gaps.append(gap_alt_base[gap_index])
           gap_index+=1
         if gap_index < len(gap_position):
           inserted_gaps.append(input_base)
           gap_index+=1
       
       while gap_index < len(gap_position):
-        inserted_gaps.append('-')
+        inserted_gaps.append(gap_alt_base[gap_index])
         gap_index+=1
 
       record.seq = Seq(''.join(inserted_gaps))

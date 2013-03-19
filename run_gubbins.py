@@ -76,9 +76,34 @@ def reroot_tree(tree_name, outgroup):
     reroot_tree_at_midpoint(tree_name)
 
 def reroot_tree_with_outgroup(tree_name, outgroup):
-  tree = Phylo.read(tree_name, 'newick')
-  tree.root_with_outgroup({'name': outgroup})
-  Phylo.write(tree, tree_name, 'newick')
+  tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
+            preserve_underscores=True)
+  split_all_non_bi_nodes(tree.seed_node)
+  outgroup_node = tree.find_node_with_taxon_label(outgroup)
+  tree.to_outgroup_position(outgroup_node, update_splits=True, delete_outdegree_one=False)
+  tree.deroot()
+  tree.update_splits()
+  output_tree_string = tree.as_string(
+    'newick',
+    taxon_set=None,
+    suppress_leaf_taxon_labels=False,
+    suppress_leaf_node_labels=True,
+    suppress_internal_taxon_labels=False,
+    suppress_internal_node_labels=False,
+    suppress_rooting=True,
+    suppress_edge_lengths=False,
+    unquoted_underscores=True,
+    preserve_spaces=False,
+    store_tree_weights=False,
+    suppress_annotations=True,
+    annotations_as_nhx=False,
+    suppress_item_comments=True,
+    node_label_element_separator=' ',
+    node_label_compose_func=None
+    )
+  output_file = open(tree_name, 'w+')
+  output_file.write(output_tree_string.replace('\'', ''))
+  output_file.closed
     
 def split_all_non_bi_nodes(node):
   if node.is_leaf():

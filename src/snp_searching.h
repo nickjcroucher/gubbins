@@ -29,4 +29,5 @@ int calculate_size_of_genome_without_gaps(char * child_sequence, int start_index
 int calculate_number_of_snps_excluding_gaps(char * ancestor_sequence, char * child_sequence, int child_sequence_size, int * branch_snp_coords, int * snp_locations, char * branch_snp_sequence, char * branch_snp_ancestor_sequence);
 int flag_recombinations_in_window(int window_start_coordinate, int window_end_coordinate, int number_of_snps, int * branch_snp_sites, int * recombinations, int number_of_recombinations,int * snp_locations, int total_num_snps);
 int find_matching_coordinate_index(int window_start_coordinate, int * snp_sites, int number_of_snps, int starting_index);
+int advance_window_start_to_next_snp_with_start_index(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index);
 #endif

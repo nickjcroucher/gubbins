@@ -24,11 +24,10 @@
 
 // Most of the methods in this file look the same, so should be DRYed out.
 
-int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
+int advance_window_start_to_next_snp_with_start_index(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index)
 {
 	int i;
-	int start_index = find_starting_index( window_start_coordinate, snp_locations,0, number_of_branch_snps);
-	
+
 	for(i = start_index; i < number_of_branch_snps; i++)
 	{
 		if(snp_locations[i]>= window_start_coordinate && child_sequence[i] != '-' && toupper(child_sequence[i]) != 'N')
@@ -46,11 +45,16 @@ int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_loca
 	return window_start_coordinate;
 }
 
+int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
+{
+	int start_index = find_starting_index( window_start_coordinate, snp_locations,0, number_of_branch_snps);
+	return advance_window_start_to_next_snp_with_start_index(window_start_coordinate,snp_locations, child_sequence, number_of_branch_snps, start_index);
+}
+
 int find_starting_index(int window_start_coordinate, int * snp_locations, int start_index, int end_index)
 {
 	int current_index = 0;
-	
-	
+
 	if(start_index == end_index  || start_index + 1 == end_index)
 	{
 		return start_index;
@@ -59,6 +63,12 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 	{
 		return end_index;
 	}
+
+	if(snp_locations[start_index] < window_start_coordinate && snp_locations[start_index]> window_start_coordinate )
+	{
+		return start_index;
+	}
+	
 	current_index = (int)((end_index-start_index)/2) + start_index;
 	
 	if( snp_locations[current_index] < window_start_coordinate)

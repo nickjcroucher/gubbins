@@ -124,11 +124,11 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 	return rewind_window_end_to_last_snp_with_start_end_index(window_end_coordinate, snp_locations, child_sequence,  number_of_branch_snps, 0, number_of_branch_snps);
 }
 
-int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps)
+int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps, int start_index,int end_index)
 {
 	int i;
 	int window_end_coordinate = window_start_coordinate + window_size;
-	int start_index = find_starting_index( window_start_coordinate, snp_locations, 0, number_of_snps);
+	start_index = find_starting_index( window_start_coordinate, snp_locations, start_index, end_index);
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
@@ -145,6 +145,12 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 		}
 	}
 	return window_end_coordinate;
+}
+
+
+int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps)
+{
+	return get_window_end_coordinates_excluding_gaps_with_start_end_index( window_start_coordinate,  window_size,  snp_locations,  child_sequence,  number_of_snps, 0, number_of_snps);
 }
 
 

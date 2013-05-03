@@ -366,7 +366,10 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		block_coordinates[2] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		block_coordinates[3] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		number_of_blocks = 0;
-			
+		
+		int next_snp_window_start_coordinate =0;
+		int next_snp_window_start_index =0;
+		
 		for(i = 0; i < number_of_windows; i++)
 		{
 			if(window_start_coordinate > snp_site_coords[number_of_branch_snps-1])
@@ -374,7 +377,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				break;
 			}
 			
-			window_end_coordinate = get_window_end_coordinates_excluding_gaps(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence);
+			window_end_coordinate = get_window_end_coordinates_excluding_gaps_with_start_end_index(window_start_coordinate, window_size, snp_locations, child_sequence,length_of_sequence,next_snp_window_start_index,length_of_sequence);
 			
 			if(window_end_coordinate < window_start_coordinate)
 			{
@@ -396,8 +399,12 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
 			window_start_coordinate++;
 			// Move to next snp, more efficient but then the adjacent block check doesnt work.
-			int next_snp_window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
 			
+			if(next_snp_window_start_coordinate <= window_start_coordinate)
+			{
+	  		next_snp_window_start_coordinate = advance_window_start_to_next_snp(window_start_coordinate, snp_site_coords, child_sequence, number_of_branch_snps);
+	      next_snp_window_start_index = find_starting_index( next_snp_window_start_coordinate, snp_locations, next_snp_window_start_index, length_of_sequence);
+  		}
 			if(next_snp_window_start_coordinate - window_size > window_start_coordinate)
 			{
 				window_start_coordinate = next_snp_window_start_coordinate - window_size;
@@ -583,7 +590,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		block_coordinates[0][i] = current_start;
 		block_coordinates[1][i] = current_end;
 		block_coordinates[2][i] = current_block_likelihood;
-			block_coordinates[3][i] = block_genome_size_without_gaps;
+		block_coordinates[3][i] = block_genome_size_without_gaps;
 	}	
 }
 

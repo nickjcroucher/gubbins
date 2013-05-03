@@ -32,4 +32,6 @@ int find_matching_coordinate_index(int window_start_coordinate, int * snp_sites,
 int advance_window_start_to_next_snp_with_start_index(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index);
 int rewind_window_end_to_last_snp_with_start_end_index(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index,int end_index);
 int find_number_of_snps_in_block_with_start_end_index(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps, int start_index,int end_index);
+int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps, int start_index,int end_index);
+
 #endif

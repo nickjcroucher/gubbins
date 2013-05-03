@@ -44,9 +44,8 @@ int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequen
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome);
 void carry_unambiguous_gaps_up_tree(newick_node *root);
 
-#define DEFAULT_SNP_DENSITY 0.000001
 #define WINDOW_SNP_MODE_TARGET 10
-#define MIN_WINDOW_SIZE 10
+#define MIN_WINDOW_SIZE 100
 #define MAX_WINDOW_SIZE 10000
 #define RANDOMNESS_DAMPNER 0.05
 #define MAX_SAMPLE_NAME_SIZE 1024

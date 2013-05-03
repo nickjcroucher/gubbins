@@ -419,111 +419,42 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				continue;
 			}
 			
-			block_coordinates[0][number_of_blocks] = current_window_start_coordinate;
-			block_coordinates[1][number_of_blocks] = window_end_coordinate;
-			number_of_blocks++;
+			if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, number_of_snps_in_block, min_snps) == 1)
+			{			
+			  block_coordinates[0][number_of_blocks] = current_window_start_coordinate;
+			  block_coordinates[1][number_of_blocks] = window_end_coordinate;
+			  number_of_blocks++;
+		  }
 		}
 
 		// block_coordinates will now contain merged blocks
-		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords);
+		//number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords);
 		int * candidate_blocks[4];
 		candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[3] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-	
 		int number_of_candidate_blocks = 0;
 		
+		move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates, min_snps, snp_site_coords, number_of_branch_snps, branch_snp_sequence, snp_locations, branch_genome_size, child_sequence, length_of_sequence);
+		
+		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords);
+
+		move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates, min_snps, snp_site_coords, number_of_branch_snps, branch_snp_sequence, snp_locations, branch_genome_size, child_sequence, length_of_sequence);
+
+
 		for(i = 0 ; i < number_of_blocks; i++)
 		{
 			int current_start = block_coordinates[0][i];
 			int current_end = block_coordinates[1][i];
-			int cutoff_value = min_snps;
-			int block_snp_count;
-			int current_block_likelihood;
-		
-			current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
-			cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-		
+		  int block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+		  int block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
 
-      current_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-      int next_start_position = current_start;
-      
-			// Move left inwards while the likelihood gets better
-			while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
-			{
-				  next_start_position++;
-				  next_start_position = advance_window_start_to_next_snp(next_start_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				
-					if(next_start_position == current_start)
-					{
-						break;
-					}
-				
-				  block_snp_count = find_number_of_snps_in_block(next_start_position, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, next_start_position, current_end, length_of_sequence);
-				  
-				  int next_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-					
-				if(next_block_likelihood >= current_block_likelihood)
-				  {
-				  	current_block_likelihood = next_block_likelihood;
-						current_start = next_start_position;
-				  }
-				  else
-				  {
-						break;
-				  }
-					cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-			}
-			
-			
-			current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
-			cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-			int next_end_position = current_end;
-			
-			// Move Right inwards while the likelihood gets better
-			while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value && number_of_candidate_blocks <= number_of_blocks)
-			{
-				  next_end_position--;
-					int next_end_position_proposed = rewind_window_end_to_last_snp(next_end_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-					
-					if(next_end_position_proposed > next_end_position)
-					{
-						next_end_position = next_end_position_proposed;
-					}
-					if(next_end_position == current_end)
-					{
-						break;
-					}
-					
-				  block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-				  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
-				  
-				  int next_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-				  if(next_block_likelihood >= current_block_likelihood)
-				  {
-				  	current_block_likelihood = next_block_likelihood;
-						current_end = next_end_position;
-				  }
-				  else
-				  {
-						break;
-				  }
-				
-					cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
-			}
-			
-			block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
-			
 			if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count, min_snps) == 1)
 			{
+				
+				int current_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+				
 				candidate_blocks[0][number_of_candidate_blocks] = current_start;
 				candidate_blocks[1][number_of_candidate_blocks] = current_end;
 				// TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
@@ -532,9 +463,10 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				number_of_candidate_blocks++;
 				//break;
 			}
-			
-		// calc and save likelihood
 		}
+		
+		
+		
 		if(number_of_candidate_blocks == 0 )
 		{
 			return;	
@@ -549,6 +481,111 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	
 	}
 }
+
+
+
+
+void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence)
+{
+	int i;
+	
+	
+	for(i = 0 ; i < number_of_blocks; i++)
+	{
+		int current_start = block_coordinates[0][i];
+		int current_end = block_coordinates[1][i];
+		int cutoff_value = min_snps;
+		int block_snp_count;
+		int current_block_likelihood;
+		int block_genome_size_without_gaps;
+	
+//		current_start = advance_window_start_to_next_snp(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+//		current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+		block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+		block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
+		cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+	
+
+    current_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+    int next_start_position = current_start;
+    
+		// Move left inwards while the likelihood gets better
+		while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value)
+		{
+			  next_start_position++;
+			  next_start_position = advance_window_start_to_next_snp(next_start_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			
+				if(next_start_position == current_start)
+				{
+					break;
+				}
+			
+				int previous_block_snp_count = block_snp_count;
+				int previous_block_genome_size_without_gaps = block_genome_size_without_gaps;
+			  block_snp_count = find_number_of_snps_in_block(next_start_position, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, next_start_position, current_end, length_of_sequence);
+			  
+			  int next_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+				
+			if(next_block_likelihood <= current_block_likelihood)
+			  {
+			  	current_block_likelihood = next_block_likelihood;
+					current_start = next_start_position;
+			  }
+			  else
+			  {
+					block_snp_count = previous_block_snp_count;
+					block_genome_size_without_gaps = previous_block_genome_size_without_gaps;
+					break;
+			  }
+				cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+		}
+		
+		
+//		current_end = rewind_window_end_to_last_snp(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+		//block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+		//block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,snp_locations, current_start, current_end, length_of_sequence);
+		cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+		int next_end_position = current_end;
+		
+		// Move Right inwards while the likelihood gets better
+		while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value)
+		{
+			  next_end_position--;
+				int next_end_position_proposed = rewind_window_end_to_last_snp(next_end_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+				
+				if(next_end_position_proposed > next_end_position)
+				{
+					next_end_position = next_end_position_proposed;
+				}
+				if(next_end_position == current_end)
+				{
+					break;
+				}
+				
+			  block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
+			  
+			  int next_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+			  if(next_block_likelihood <= current_block_likelihood)
+			  {
+			  	current_block_likelihood = next_block_likelihood;
+					current_end = next_end_position;
+			  }
+			  else
+			  {
+					break;
+			  }
+			
+				cutoff_value = calculate_cutoff(branch_genome_size, block_genome_size_without_gaps, block_snp_count);
+		}
+		
+		block_coordinates[0][i] = current_start;
+		block_coordinates[1][i] = current_end;
+	}	
+}
+
+
 
 int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_site_coords, int number_of_branch_snps)
 {

@@ -24,9 +24,10 @@
 
 // Most of the methods in this file look the same, so should be DRYed out.
 
-int advance_window_start_to_next_snp_with_start_index(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index)
+int advance_window_start_to_next_snp_with_start_end_index(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index,int end_index)
 {
 	int i;
+  start_index = find_starting_index( window_start_coordinate, snp_locations,start_index, end_index);
 
 	for(i = start_index; i < number_of_branch_snps; i++)
 	{
@@ -47,8 +48,7 @@ int advance_window_start_to_next_snp_with_start_index(int window_start_coordinat
 
 int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
 {
-	int start_index = find_starting_index( window_start_coordinate, snp_locations,0, number_of_branch_snps);
-	return advance_window_start_to_next_snp_with_start_index(window_start_coordinate,snp_locations, child_sequence, number_of_branch_snps, start_index);
+	return advance_window_start_to_next_snp_with_start_end_index(window_start_coordinate,snp_locations, child_sequence, number_of_branch_snps, 0,number_of_branch_snps);
 }
 
 int find_starting_index(int window_start_coordinate, int * snp_locations, int start_index, int end_index)
@@ -64,9 +64,14 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 		return end_index;
 	}
 
-	if(snp_locations[start_index] < window_start_coordinate && snp_locations[start_index]> window_start_coordinate )
+	if((snp_locations[start_index] < window_start_coordinate && snp_locations[start_index]> window_start_coordinate ))
 	{
 		return start_index;
+	}
+	
+	if((snp_locations[end_index] < window_start_coordinate && snp_locations[end_index]> window_start_coordinate ))
+	{
+		return end_index;
 	}
 	
 	current_index = (int)((end_index-start_index)/2) + start_index;
@@ -87,7 +92,7 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 	return find_starting_index(window_start_coordinate, snp_locations, start_index, end_index);
 }
 
-int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
+int rewind_window_end_to_last_snp_with_start_end_index(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps, int start_index,int end_index)
 {
 	int i = 0;
 	
@@ -96,7 +101,7 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 		return 0;
 	}
 	
-	int end_index =  find_starting_index( window_end_coordinate, snp_locations, 0, number_of_branch_snps);
+	end_index =  find_starting_index( window_end_coordinate, snp_locations, start_index, end_index);
 	if(end_index +1 <number_of_branch_snps )
 	{
 		end_index++;
@@ -112,6 +117,11 @@ int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations
 	}
 	
 	return window_end_coordinate;
+}
+
+int rewind_window_end_to_last_snp(int window_end_coordinate, int * snp_locations, char * child_sequence, int number_of_branch_snps)
+{
+	return rewind_window_end_to_last_snp_with_start_end_index(window_end_coordinate, snp_locations, child_sequence,  number_of_branch_snps, 0, number_of_branch_snps);
 }
 
 int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int window_size, int * snp_locations, char * child_sequence, int number_of_snps)
@@ -138,8 +148,7 @@ int get_window_end_coordinates_excluding_gaps(int window_start_coordinate, int w
 }
 
 
-
-int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
+int find_number_of_snps_in_block_with_start_end_index(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps, int start_index,int end_index)
 {
 	if(number_of_snps == 0)
 	{
@@ -147,7 +156,7 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	}
 	int i;
 	int number_of_snps_in_block =0;
-	int start_index = find_starting_index( window_start_coordinate, snp_locations,0, number_of_snps);
+	start_index = find_starting_index( window_start_coordinate, snp_locations,start_index, end_index);
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
@@ -166,11 +175,22 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	return number_of_snps_in_block;
 }
 
+
+int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_locations,  char * child_sequence, int number_of_snps)
+{
+	return find_number_of_snps_in_block_with_start_end_index( window_start_coordinate,  window_end_coordinate, snp_locations,   child_sequence, number_of_snps, 0, number_of_snps);
+}
+
 int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome)
+{
+	return calculate_block_size_without_gaps_with_start_end_index( child_sequence,  snp_locations,starting_coordinate,  ending_coordinate,   length_of_original_genome,0, length_of_original_genome);
+}
+
+int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome, int start_index,int end_index)
 {
 	int i;
 	int block_size = ending_coordinate - starting_coordinate;
-	int start_index = find_starting_index( starting_coordinate, snp_locations,0, length_of_original_genome);
+	start_index = find_starting_index( starting_coordinate, snp_locations,start_index, end_index);
 	
 	for(i = start_index; i < length_of_original_genome ; i++)
 	{

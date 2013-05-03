@@ -499,6 +499,8 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		{
 			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
 			current_block_likelihood = (int) get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
+			block_coordinates[2][i] = current_block_likelihood;
+			block_coordinates[3][i] = block_genome_size_without_gaps;
 		}
 	
 		block_snp_count = find_number_of_snps_in_block(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
@@ -580,6 +582,8 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		
 		block_coordinates[0][i] = current_start;
 		block_coordinates[1][i] = current_end;
+		block_coordinates[2][i] = current_block_likelihood;
+			block_coordinates[3][i] = block_genome_size_without_gaps;
 	}	
 }
 

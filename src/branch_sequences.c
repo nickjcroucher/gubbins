@@ -376,7 +376,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		int last_p_value_test = -1;
 		int last_block_genome_size_without_gaps_p_value_test = -1;
 		int last_number_of_snps_in_block_p_value_test = -1;
-		
+
 		for(i = 0; i < number_of_windows; i++)
 		{
 			if(window_start_coordinate > snp_site_coords[number_of_branch_snps-1])
@@ -392,20 +392,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				continue;
 			}
 			number_of_snps_in_block = find_number_of_snps_in_block_with_start_end_index(window_start_coordinate, window_end_coordinate, snp_site_coords, branch_snp_sequence, number_of_branch_snps,next_snp_window_start_index, number_of_branch_snps);
-			// the block size = window size, except for the last window
 			
-			if(window_end_coordinate - window_start_coordinate <= window_size)
-			{
-				block_genome_size_without_gaps = window_end_coordinate - window_start_coordinate;
-			}
-			else
-			{
-				block_genome_size_without_gaps = window_size;
-			}
-			
-			int current_end_snp_coords = rewind_window_end_to_last_snp_with_start_end_index(window_end_coordinate, snp_site_coords, branch_snp_sequence, number_of_branch_snps,next_snp_window_start_index,number_of_branch_snps);
-			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, next_snp_window_start_coordinate, current_end_snp_coords, length_of_sequence);
-			
+			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, next_snp_window_start_coordinate, window_end_coordinate, length_of_sequence);
+			 
 			int current_window_start_coordinate = window_start_coordinate;
 
 			window_start_coordinate++;

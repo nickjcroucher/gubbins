@@ -76,11 +76,12 @@ def reroot_tree(tree_name, outgroup):
     reroot_tree_at_midpoint(tree_name)
 
 def reroot_tree_with_outgroup(tree_name, outgroup):
+  tree = Phylo.read(tree_name, 'newick')
+  tree.root_with_outgroup({'name': outgroup})
+  Phylo.write(tree, tree_name, 'newick')
+  
   tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
             preserve_underscores=True)
-  split_all_non_bi_nodes(tree.seed_node)
-  outgroup_node = tree.find_node_with_taxon_label(outgroup)
-  tree.to_outgroup_position(outgroup_node, update_splits=True, delete_outdegree_one=False)
   tree.deroot()
   tree.update_splits()
   output_tree_string = tree.as_string(

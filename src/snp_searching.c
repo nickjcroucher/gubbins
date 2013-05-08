@@ -129,11 +129,13 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 	int i;
 	int window_end_coordinate = window_start_coordinate + window_size;
 	start_index = find_starting_index( window_start_coordinate, snp_locations, start_index, end_index);
+	int last_snp_location = 0;
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
 		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
 		{
+			last_snp_location = i;
 			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 			{
 				window_end_coordinate++;
@@ -144,7 +146,15 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 			break;	
 		}
 	}
-	return window_end_coordinate;
+	
+	if(last_snp_location > 0)
+	{
+		return snp_locations[last_snp_location] + 1 ;
+	}
+	else
+	{
+	  return window_end_coordinate;
+  }
 }
 
 

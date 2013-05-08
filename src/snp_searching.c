@@ -149,7 +149,7 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 	
 	if(last_snp_location > 0)
 	{
-		return snp_locations[i];
+		return snp_locations[last_snp_location] + 1 ;
 	}
 	else
 	{

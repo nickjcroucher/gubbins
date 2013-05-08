@@ -384,8 +384,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				break;
 			}
 			
-			window_end_coordinate = get_window_end_coordinates_excluding_gaps_with_start_end_index(window_start_coordinate, window_size, snp_site_coords, branch_snp_sequence,number_of_branch_snps,next_snp_window_start_index,number_of_branch_snps);
+			window_end_coordinate = get_window_end_coordinates_excluding_gaps_with_start_end_index(window_start_coordinate, window_size, snp_site_coords, 	branch_snp_sequence,number_of_branch_snps,next_snp_window_start_index,number_of_branch_snps);
 			
+		
 			
 			if(window_end_coordinate < window_start_coordinate)
 			{

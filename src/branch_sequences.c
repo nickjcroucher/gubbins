@@ -361,12 +361,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			
 		int * block_coordinates[4];
 		
-		double block_likelihoods[number_of_windows];
+
 		
 		block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		block_coordinates[2] = (int *) malloc((number_of_windows+1)*sizeof(int));
 		block_coordinates[3] = (int *) malloc((number_of_windows+1)*sizeof(int));
+		
+		double * block_likelihoods;
+		block_likelihoods = (double *) malloc((number_of_windows+1)*sizeof(double));
 		number_of_blocks = 0;
 		
 		int next_snp_window_start_coordinate =0;
@@ -467,7 +470,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		candidate_blocks[3] = (int *) malloc((number_of_blocks+1)*sizeof(int));
 		
-		double candidate_block_likelihoods[number_of_blocks];
+		double * candidate_block_likelihoods;
+		candidate_block_likelihoods = (double *) malloc((number_of_blocks+1)*sizeof(double));
 		
 		int number_of_candidate_blocks = 0;
 
@@ -737,7 +741,9 @@ int merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks, char *
 {
 	int i = 1;
 	int merged_block_coordinates[4][number_of_blocks];
-	double merged_block_likelihoods[number_of_blocks];
+	double * merged_block_likelihoods;
+	merged_block_likelihoods = (double *) malloc((number_of_blocks+1)*sizeof(double));
+	
 	int current_merged_block = 0;
 
 	if(number_of_blocks == 0)

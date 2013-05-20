@@ -293,7 +293,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			
 			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites[current_branch], number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
 		}
 		
 		return leaf_sequence;
@@ -328,7 +328,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps)
 }
 
 
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps)
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome)
 {
 	int i = 0;
 	int window_size = 0;
@@ -373,7 +373,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		
     int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
 
-		number_of_blocks = get_blocks(block_coordinates, length_of_sequence, snp_site_coords, number_of_branch_snps,  window_size, cutoff);
+		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff);
 
 
 		for(i = 0; i < number_of_blocks; i++)

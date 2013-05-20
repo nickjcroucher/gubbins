@@ -373,7 +373,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		
     int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
 
-		number_of_blocks = get_blocks(block_coordinates, branch_genome_size, snp_site_coords, number_of_branch_snps,  window_size, cutoff);
+		number_of_blocks = get_blocks(block_coordinates, length_of_sequence, snp_site_coords, number_of_branch_snps,  window_size, cutoff);
 
 
 		for(i = 0; i < number_of_blocks; i++)
@@ -461,15 +461,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 }
 
 
-int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff)
+int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff)
 {
 	// Set up the window counter with 1 value per base in the branch
  	int * window_count;
-	window_count = (int *) malloc((branch_genome_size+1)*sizeof(int));
+	window_count = (int *) malloc((genome_size+1)*sizeof(int));
 	int i;
-	for(i =0; i< branch_genome_size; i++)
+	for(i =0; i< genome_size; i++)
 	{
-		window_count = 0;
+		window_count[i] = 0;
 	}
 	
 	
@@ -486,15 +486,15 @@ int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_c
 		
 		// Upper bound of the window around a snp
 		int max_snp_sliding_window_counter = snp_site_coords[snp_counter]+window_size;
-		if(max_snp_sliding_window_counter>branch_genome_size)
+		if(max_snp_sliding_window_counter>genome_size)
 		{
-			max_snp_sliding_window_counter = branch_genome_size;
+			max_snp_sliding_window_counter = genome_size;
 		}
 		
 		int j = 0;
 		for(j = snp_sliding_window_counter; j < max_snp_sliding_window_counter; j++)
 		{
-			window_count[j]++;	
+			window_count[j] += 1;	
 		}
 	}
 	
@@ -502,12 +502,12 @@ int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_c
 	int in_block = 0;
 	int block_lower_bound = 0;
 	// Scan across the pileup and record where blocks are above the cutoff
-	for(i = 0; i < branch_genome_size; i++)
+	for(i = 0; i < genome_size; i++)
 	{
 		// Just entered the start of a block
 		if(window_count[i] > cutoff && in_block == 0)
 		{
-			block_lower_bound = snp_site_coords[i];
+			block_lower_bound = i;
 			in_block = 1;
     }
 
@@ -515,7 +515,7 @@ int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_c
 		if(window_count[i] <= cutoff && in_block == 1)
 		{
 			block_coordinates[0][number_of_blocks] = block_lower_bound;
-			block_coordinates[1][number_of_blocks] = snp_site_coords[i-1];
+			block_coordinates[1][number_of_blocks] = i-1;
 			number_of_blocks++;
 			in_block = 0;
 		}

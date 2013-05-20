@@ -11,9 +11,13 @@
 //merge_adjacent_blocks(int ** block_coordinates, int number_of_blocks)
 START_TEST (check_merge_adjacent_blocks_not_adjacent)
 {
-	int * blocks_not_adjacent[2]; 
+	int * blocks_not_adjacent[4]; 
 	blocks_not_adjacent[0]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_not_adjacent[1]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_not_adjacent[2]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_not_adjacent[3]   = (int *)  malloc((3)*sizeof(int)); 
+	double block_likelihood[4];
+	
 	blocks_not_adjacent[0][0] = 10; 
 	blocks_not_adjacent[1][0] = 20; 
 	blocks_not_adjacent[0][1] = 1000; 
@@ -23,7 +27,7 @@ START_TEST (check_merge_adjacent_blocks_not_adjacent)
 	int snp_site_coords[9] = {10};
 	int number_of_bases = 1;
 	
-	fail_unless(merge_adjacent_blocks(blocks_not_adjacent,2, branch_sequence,number_of_bases,snp_site_coords) == 2);
+	fail_unless(merge_adjacent_blocks(blocks_not_adjacent,2, branch_sequence,number_of_bases,snp_site_coords,block_likelihood) == 2);
 	fail_unless(blocks_not_adjacent[0][0] == 10  );
 	fail_unless(blocks_not_adjacent[1][0] == 20  );
 	fail_unless(blocks_not_adjacent[0][1] == 1000); 
@@ -34,19 +38,25 @@ END_TEST
 START_TEST (check_merge_adjacent_blocks_beside_each_other)
 {
 
-	int * blocks_beside_each_other[2]; 
+	int * blocks_beside_each_other[4]; 
 	blocks_beside_each_other[0]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_beside_each_other[1]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_beside_each_other[2]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_beside_each_other[3]   = (int *)  malloc((3)*sizeof(int));
 	blocks_beside_each_other[0][0] = 10; 
 	blocks_beside_each_other[1][0] = 20; 
 	blocks_beside_each_other[0][1] = 20; 
 	blocks_beside_each_other[1][1] = 30;
 	
+		double * block_likelihood;
+		block_likelihood = (double *) malloc((4+1)*sizeof(double));
+		
+	
 	char *branch_sequence = "A";
 	int snp_site_coords[9] = {10};
 	int number_of_bases = 1;
 	
-	fail_unless(merge_adjacent_blocks(blocks_beside_each_other,2, branch_sequence,number_of_bases,snp_site_coords) == 1);
+	fail_unless(merge_adjacent_blocks(blocks_beside_each_other,2, branch_sequence,number_of_bases,snp_site_coords,block_likelihood) == 1);
 	fail_unless(blocks_beside_each_other[0][0] == 10  );
 	fail_unless(blocks_beside_each_other[1][0] == 30  );
 	fail_unless(blocks_beside_each_other[0][1] == 0); 
@@ -56,19 +66,24 @@ END_TEST
 
 START_TEST (check_merge_adjacent_blocks_near_each_other)
 {	
-	int * blocks_near_each_other[2]; 
+	int * blocks_near_each_other[4]; 
 	blocks_near_each_other[0]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_near_each_other[1]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_near_each_other[2]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_near_each_other[3]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_near_each_other[0][0] = 10; 
 	blocks_near_each_other[1][0] = 20; 
 	blocks_near_each_other[0][1] = 21; 
 	blocks_near_each_other[1][1] = 30;
 	
+	double * block_likelihood;
+	block_likelihood = (double *) malloc((4+1)*sizeof(double));
+	
 	char *branch_sequence = "A";
 	int snp_site_coords[9] = {10};
 	int number_of_bases = 1;
 	
-	fail_unless(merge_adjacent_blocks(blocks_near_each_other,2, branch_sequence,number_of_bases,snp_site_coords) == 1);
+	fail_unless(merge_adjacent_blocks(blocks_near_each_other,2, branch_sequence,number_of_bases,snp_site_coords,block_likelihood) == 1);
 	fail_unless(blocks_near_each_other[0][0] == 10  );
 	fail_unless(blocks_near_each_other[1][0] == 30  );
 	fail_unless(blocks_near_each_other[0][1] == 0); 
@@ -78,9 +93,11 @@ END_TEST
 
 START_TEST (check_merge_adjacent_blocks_overlapping)
 {
-	int * blocks_overlapping[2]; 
+	int * blocks_overlapping[4]; 
 	blocks_overlapping[0]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_overlapping[1]   = (int *)  malloc((3)*sizeof(int)); 
+		blocks_overlapping[2]   = (int *)  malloc((3)*sizeof(int)); 
+			blocks_overlapping[3]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_overlapping[0][0] = 10; 
 	blocks_overlapping[1][0] = 20; 
 	blocks_overlapping[0][1] = 19; 
@@ -90,7 +107,10 @@ START_TEST (check_merge_adjacent_blocks_overlapping)
 	int snp_site_coords[9] = {10};
 	int number_of_bases = 1;
 	
-	fail_unless(merge_adjacent_blocks(blocks_overlapping,2, branch_sequence,number_of_bases,snp_site_coords) == 1);
+	double * block_likelihood;
+	block_likelihood = (double *) malloc((4+1)*sizeof(double));
+	
+	fail_unless(merge_adjacent_blocks(blocks_overlapping,2, branch_sequence,number_of_bases,snp_site_coords,block_likelihood) == 1);
 	fail_unless(blocks_overlapping[0][0] == 10  );
 	fail_unless(blocks_overlapping[1][0] == 30  );
 	fail_unless(blocks_overlapping[0][1] == 0); 
@@ -102,9 +122,11 @@ END_TEST
 
 START_TEST (check_merge_block_straddling_gap)
 {
-	int * blocks_overlapping[2]; 
+	int * blocks_overlapping[4]; 
 	blocks_overlapping[0]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_overlapping[1]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_overlapping[2]   = (int *)  malloc((3)*sizeof(int)); 
+	blocks_overlapping[3]   = (int *)  malloc((3)*sizeof(int)); 
 	blocks_overlapping[0][0] = 10; 
 	blocks_overlapping[1][0] = 40; 
 	blocks_overlapping[0][1] = 44; 
@@ -113,8 +135,10 @@ START_TEST (check_merge_block_straddling_gap)
 	char *branch_sequence = "AAA---CCC";
 	int snp_site_coords[9] = {10,30,40,41,42,43,44,60,70};
 	int number_of_bases = 9;
+	double * block_likelihood;
+	block_likelihood = (double *) malloc((4+1)*sizeof(double));
 
-	fail_unless(merge_adjacent_blocks(blocks_overlapping,2, branch_sequence,number_of_bases,snp_site_coords) == 1);
+	fail_unless(merge_adjacent_blocks(blocks_overlapping,2, branch_sequence,number_of_bases,snp_site_coords,block_likelihood) == 1);
 	
 	fail_unless(blocks_overlapping[0][0] == 10);
 	fail_unless(blocks_overlapping[1][0] == 70);

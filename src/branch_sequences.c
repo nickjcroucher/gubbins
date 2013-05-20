@@ -378,14 +378,14 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
 		for(i = 0; i < number_of_blocks; i++)
 		{
-			number_of_snps_in_block = find_number_of_snps_in_block(block_coordinates[0][number_of_blocks], block_coordinates[1][number_of_blocks], snp_site_coords, branch_snp_sequence, number_of_branch_snps);
-			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, block_coordinates[0][number_of_blocks], block_coordinates[1][number_of_blocks], length_of_sequence);
+			number_of_snps_in_block = find_number_of_snps_in_block(block_coordinates[0][i], block_coordinates[1][i], snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, block_coordinates[0][i], block_coordinates[1][i], length_of_sequence);
 
 			// minimum number of snps to be statistically significant in block
 			if(number_of_snps_in_block < min_snps)
 			{
-				block_coordinates[0][number_of_blocks] = -1;
-				block_coordinates[1][number_of_blocks] = -1;
+				block_coordinates[0][i] = -1;
+				block_coordinates[1][i] = -1;
 				continue;
 			}
 			
@@ -393,14 +393,14 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			// region with low number of snps so skip over
 			if(block_snp_density < branch_snp_density)
 			{
-				block_coordinates[0][number_of_blocks] = -1;
-				block_coordinates[1][number_of_blocks] = -1;
+				block_coordinates[0][i] = -1;
+				block_coordinates[1][i] = -1;
 				continue;	
 			}
 			
-			block_likelihoods[number_of_blocks] = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, number_of_snps_in_block);
-			block_coordinates[2][number_of_blocks] = (int) block_likelihoods[number_of_blocks];
-			block_coordinates[3][number_of_blocks] = block_genome_size_without_gaps;
+			block_likelihoods[i] = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, number_of_snps_in_block);
+			block_coordinates[2][i] = (int) block_likelihoods[i];
+			block_coordinates[3][i] = block_genome_size_without_gaps;
 		}
 				
 		number_of_blocks = merge_adjacent_blocks(block_coordinates, number_of_blocks,branch_snp_sequence,number_of_branch_snps,snp_site_coords,block_likelihoods);

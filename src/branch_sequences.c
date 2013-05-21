@@ -448,10 +448,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
 		branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
 	
-	  candidate_blocks[0] = NULL;
-	  candidate_blocks[1] = NULL;
-	  candidate_blocks[2] = NULL;
-	  candidate_blocks[3] = NULL;
+		free(block_coordinates[0]) ;
+		free(block_coordinates[1]) ;
+		free(block_coordinates[2]) ;
+		free(block_coordinates[3]) ;
+	  free(candidate_blocks[0]);
+	  free(candidate_blocks[1]);
+	  free(candidate_blocks[2]);
+	  free(candidate_blocks[3]);
+		free(block_likelihoods);
 	
 	}
 }

@@ -55,7 +55,7 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 		}
 		
 	}while(szBuffer[0] != '\0');
-	
+	free(szBuffer);
 }
 
 
@@ -191,6 +191,7 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 		}
 		
 	}while(szBuffer[0] != '\0');
+	free(szBuffer);
 	return 0;
 }
 

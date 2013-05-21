@@ -103,7 +103,8 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 
  	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(root->block_coordinates, root->number_of_blocks, child_sequence, snp_locations,current_total_snps));
- 	
+	free(child_sequence); 	
+
  	for(i = 0; i < num_current_recombinations; i++)
  	{
  		int snp_index;
@@ -297,6 +298,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
+			free(child_sequences[current_branch]);
 		}
 		
 		return leaf_sequence;

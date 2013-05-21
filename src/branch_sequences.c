@@ -133,6 +133,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	{
 	set_internal_node(0,sequence_index);	
 	}
+	
 }
 
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome)
@@ -440,9 +441,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 				number_of_candidate_blocks++;
 			}
 		}
-		
-		
-		
 		if(number_of_candidate_blocks == 0 )
 		{
 			return;	
@@ -519,7 +517,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 		}
 		
 	}
-	
+	free(window_count);
 	return number_of_blocks;
 
 }
@@ -736,83 +734,6 @@ int get_smallest_log_likelihood(double * candidate_blocks, int number_of_candida
 		}
 	}
 	return smallest_index;
-}
-
-
-int extend_end_of_block_left_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords)
-{
-	int index = 0;
-	int last_snp_index = 0;
-	index = find_starting_index( block_coord, snp_site_coords, 0, number_of_bases);
-	last_snp_index = index;
-	
-	if(index >= number_of_bases ||  snp_site_coords[index] != block_coord)
-	{
-		return block_coord;
-	}
-	
-	while(index > 0 )
-	{
-	  if((snp_site_coords[index] -1) == snp_site_coords[index-1] )
-	  {
-	  	if(branch_snp_sequence[index-1] != '-' && branch_snp_sequence[index-1] != 'N' )
-	  	{
-	  		last_snp_index = index-1;
-	  	}
-	  }
-	  else
-	  {
-	  	break;
-	  }
-  	index--;
-  }
-	
-	if(index ==0 || last_snp_index == 0 )
-	{
-	  return block_coord; 
-  }
-  else
-  {
-		return snp_site_coords[last_snp_index];
-	}
-}
-
-int extend_end_of_block_right_over_gap(int block_coord, char * branch_snp_sequence, int number_of_bases, int * snp_site_coords)
-{
-	int index = 0;
-	int last_snp_index = 0;
-	index = find_starting_index( block_coord, snp_site_coords, 0, number_of_bases);
-	last_snp_index = index;
-	
-	if(index+1 >= number_of_bases ||  snp_site_coords[index] != block_coord)
-	{
-		return block_coord;
-	}
-	
-	while(index+1 < number_of_bases )
-	{
-		if((snp_site_coords[index] +1) == snp_site_coords[index+1] )
-		{
-			if(branch_snp_sequence[index+1] != '-' && branch_snp_sequence[index+1] != 'N')
-			{
-				last_snp_index = index+1;
-			}
-		}
-		else
-		{
-			break;
-		}
-  	index++;
-  }
-	
-	if(index ==0 || last_snp_index == 0 )
-	{
-	  return block_coord; 
-  }
-  else
-  {
-		return snp_site_coords[last_snp_index];
-	}
 }
 
 

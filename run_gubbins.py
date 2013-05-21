@@ -248,6 +248,7 @@ def raxml_fastml_command(fastml_exec, alignment_filename, base_filename_without_
   return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
 
 def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
+  
   return (fastml_exec 
     + " -s " + alignment_filename 
     + " -t " + tree_filename 
@@ -591,9 +592,12 @@ for i in range(1, args.iterations+1):
     os.remove(latest_file_name)
   os.symlink(str(current_tree_name), latest_file_name)
  
+  fastml_command_suffix = ''
   if args.verbose > 0:
     print fastml_command
-  subprocess.check_call(fastml_command, shell=True)
+    fastml_command_suffix = ' > /dev/null 2>&1'
+    
+  subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
   shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
   shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
   reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")

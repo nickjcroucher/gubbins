@@ -187,7 +187,9 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 		split_string_and_return_specific_index( result, szBuffer, 0,100000);
 		if(strcmp(result, "#CHROM")==0)
 		{
-			return get_number_of_columns(szBuffer);
+			int number_of_columns =  get_number_of_columns(szBuffer);
+			free(szBuffer);
+			return number_of_columns;
 		}
 		
 	}while(szBuffer[0] != '\0');

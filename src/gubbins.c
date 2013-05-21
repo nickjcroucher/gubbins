@@ -112,6 +112,8 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	fprintf(output_tree_pointer,";");
 	fflush(output_tree_pointer);
 	fclose(output_tree_pointer);
+	
+	free(filtered_bases_for_snps);
 }
 
 

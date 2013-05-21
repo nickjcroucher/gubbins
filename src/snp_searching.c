@@ -75,6 +75,10 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 	}
 	
 	current_index = (int)((end_index-start_index)/2) + start_index;
+	if(current_index >= end_index)
+	{
+		current_index = end_index-1;
+	}
 	
 	if( snp_locations[current_index] < window_start_coordinate)
 	{

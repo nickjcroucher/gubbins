@@ -387,3 +387,15 @@ void load_sequences_from_multifasta_file(char filename[])
 	initialise_internal_node();
 }
 
+void freeup_memory()
+{
+	int i;
+	for(i = 0; i < num_samples; i++)
+	{
+	  free(sequences[i]);
+		free(phylip_sample_names[i]);
+  }
+  free(sequences);
+	free(phylip_sample_names);
+}
+

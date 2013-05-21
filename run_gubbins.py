@@ -184,9 +184,9 @@ def raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i
 def raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time, raxml_exec,previous_tree_name, verbose):
   previous_tree = raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name)
   
-  command_suffix = ''
+  command_suffix = '> /dev/null 2>&1'
   if verbose > 0:
-    command_suffix = ' > /dev/null 2>&1'
+    command_suffix = ''
     
   return raxml_exec+ " -s "+previous_tree_name+".phylip -n "+base_filename_without_ext+"."+str(current_time)+"iteration_"+str(i)+" "+previous_tree+ command_suffix
 
@@ -597,10 +597,10 @@ for i in range(1, args.iterations+1):
     os.remove(latest_file_name)
   os.symlink(str(current_tree_name), latest_file_name)
  
-  fastml_command_suffix = ''
+  fastml_command_suffix = ' > /dev/null 2>&1'
   if args.verbose > 0:
     print fastml_command
-    fastml_command_suffix = ' > /dev/null 2>&1'
+    fastml_command_suffix = ''
     
   subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
   shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)

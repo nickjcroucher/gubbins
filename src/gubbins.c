@@ -43,6 +43,8 @@ void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_file
 	load_sequences_from_multifasta_file(multi_fasta_filename);
 	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename);
 	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
+	freeup_memory();
+
 }
 
 
@@ -96,6 +98,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	char * filtered_bases_for_snps[number_of_filtered_snps];
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
+	free(reference_sequence_bases);
 	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
 	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes,0);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
@@ -109,6 +112,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	fprintf(output_tree_pointer,";");
 	fflush(output_tree_pointer);
 	fclose(output_tree_pointer);
+
 }
 
 

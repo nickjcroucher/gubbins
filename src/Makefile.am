@@ -5,7 +5,7 @@ dist_data_DATA = Newickform.h alignment_file.h block_tab_file.h branch_sequences
 # gubbins is our top level progra
 bin_PROGRAMS = gubbins
 gubbins_SOURCES = main.c
-gubbins_LDADD=-lz -lm libgubbins.la
+gubbins_LDADD=-lm libgubbins.la -lz
 
 # libgubbins.so is our library
 lib_LTLIBRARIES = libgubbins.la
@@ -16,7 +16,7 @@ libgubbins_la_LDFLAGS= -version-info 0:1
 #libPyGubbins_la_SOURCES = PyGubbins.cpp
 #libPyGubbins_la_LDFLAGS = -version-info 0:1
 #libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
-#libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lz -lm libgubbins.la
+#libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python -lm libgubbins.la -lz
 
 
 # "make check" target
@@ -32,4 +32,4 @@ run_all_tests_SOURCES = \
 	../tests/helper_methods.c \
 	../tests/run_all_tests.c
 run_all_tests_CFLAGS = -I../tests
-run_all_tests_LDADD = -lm -lz -lcheck libgubbins.la
+run_all_tests_LDADD = -lm -lcheck libgubbins.la -lz

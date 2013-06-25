@@ -299,6 +299,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(child_sequences[current_branch]);
+			free(branches_snp_sites[current_branch]);
 		}
 		
 		return leaf_sequence;

@@ -75,6 +75,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	get_integers_from_column_in_vcf(vcf_file_pointer, snp_locations, number_of_snps, column_number_for_column_name(column_names, "POS", number_of_columns));
 
 	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, length_of_original_genome,min_snps);
+	fclose(vcf_file_pointer);
 
 	int filtered_snp_locations[number_of_snps];
 	int number_of_filtered_snps;
@@ -123,6 +124,12 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	{
 		free(sample_names[i]);
 	}
+	
+	for(i=0; i<number_of_filtered_snps; i++ )
+	{
+		free(filtered_bases_for_snps[i]);
+	}
+	
 
 }
 

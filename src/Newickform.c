@@ -97,6 +97,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 
 	fclose(block_file_pointer);
 	fclose(gff_file_pointer);
+	fclose(branch_snps_file_pointer);
 	return root;
 }
 

@@ -82,7 +82,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
 	
-
  	// overwrite the bases of snps with N's
  	int i;
  	int sequence_index;
@@ -456,10 +455,9 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		  free(candidate_blocks[2]);
 		  free(candidate_blocks[3]);
 			free(candidate_block_likelihoods);
-			
 			return;	
 		}
-		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
+		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords, current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
 		branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
 	  free(candidate_blocks[0]);
 	  free(candidate_blocks[1]);

@@ -118,6 +118,11 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	{
 		free(column_names[i] );
 	}
+	
+	for(i=0; i<number_of_samples; i++ )
+	{
+		free(sample_names[i]);
+	}
 
 }
 

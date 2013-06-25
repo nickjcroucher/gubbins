@@ -51,7 +51,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 		
 		fprintf( file_pointer, "\n");
 
-
+    free(sample_details->sample_name);
 		free(sample_details);
 	}
 	

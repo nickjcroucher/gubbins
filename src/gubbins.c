@@ -113,6 +113,11 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	fflush(output_tree_pointer);
 	fclose(output_tree_pointer);
 	cleanup_node_memory(root_node);
+	
+	for(i = 0; i < number_of_columns; i++)
+	{
+		free(column_names[i] );
+	}
 
 }
 

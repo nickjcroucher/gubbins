@@ -43,3 +43,29 @@ void scale_branch_distances(newick_node * root_node, int number_of_filtered_snps
 		}
 	}
 }
+
+
+void cleanup_node_memory(newick_node * root_node)
+{
+  free(root_node->recombinations);
+	free(root_node->taxon);
+	free(root_node->taxon_names);
+	free(root_node->seq);
+	free(root_node->block_coordinates[0]);
+	free(root_node->block_coordinates[1]);
+	free(root_node->block_coordinates);
+
+	if (root_node->childNum == 0)
+	{
+	}
+	else
+	{
+		newick_child *child;
+		child = root_node->child;
+		while (child != NULL)
+		{
+			cleanup_node_memory(child->node);
+			child = child->next;
+		}
+	}
+}

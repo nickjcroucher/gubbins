@@ -714,7 +714,7 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 	{
 		int smallest_index = 0;
     int number_of_recombinations_in_window = 0;
-		smallest_index = get_smallest_log_likelihood(get_smallest_log_likelihood, number_of_candidate_blocks);
+		smallest_index = get_smallest_log_likelihood(block_likelihooods, number_of_candidate_blocks);
 		number_of_recombinations_in_window = flag_recombinations_in_window(candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],number_of_branch_snps, snp_site_coords, recombinations, number_of_recombinations,snp_locations,total_num_snps);	
     number_of_recombinations += number_of_recombinations_in_window;
 		number_of_branch_snps_excluding_block = exclude_snp_sites_in_block(candidate_blocks[0][smallest_index],candidate_blocks[1][smallest_index], snp_site_coords,number_of_branch_snps);

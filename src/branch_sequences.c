@@ -280,26 +280,27 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
 		
-		int * branches_snp_sites[root->childNum];
+		
 		
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
-			branches_snp_sites[current_branch] = (int *) malloc((number_of_snps +1)*sizeof(int));
+			int * branches_snp_sites;
+			branches_snp_sites = (int *) malloc((number_of_snps +1)*sizeof(int));
 			char * branch_snp_sequence;
 			char * branch_snp_ancestor_sequence;
 			branch_snp_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			branch_snp_ancestor_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
-			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
+			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
 			
-			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites[current_branch], number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
+			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
-			free(child_sequences[current_branch]);
-			free(branches_snp_sites[current_branch]);
+			//free(child_sequences[current_branch]);
+			free(branches_snp_sites);
 		}
 		
 		return leaf_sequence;

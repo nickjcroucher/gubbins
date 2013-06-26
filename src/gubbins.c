@@ -99,7 +99,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	char * filtered_bases_for_snps[number_of_filtered_snps];
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
-	free(reference_sequence_bases);
+	
 	create_phylip_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
 	create_vcf_file(tree_filename, filtered_snp_locations, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes,0);
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
@@ -113,24 +113,25 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	fprintf(output_tree_pointer,";");
 	fflush(output_tree_pointer);
 	fclose(output_tree_pointer);
-	cleanup_node_memory(root_node);
 	
-	for(i = 0; i < number_of_columns; i++)
-	{
-		free(column_names[i] );
-	}
 	
-	for(i=0; i<number_of_samples; i++ )
-	{
-		free(sample_names[i]);
-	}
-	
-	for(i=0; i<number_of_filtered_snps; i++ )
-	{
-		free(filtered_bases_for_snps[i]);
-	}
-	
-
+	// Theres a seg fault in here
+	//for(i = 0; i < number_of_columns; i++)
+	//{
+	//	free(column_names[i] );
+	//}
+	//
+	//for(i=0; i<number_of_samples; i++ )
+	//{
+	//	free(sample_names[i]);
+	//}
+	//
+	//for(i=0; i<number_of_filtered_snps; i++ )
+	//{
+	//	free(filtered_bases_for_snps[i]);
+	//}
+	//cleanup_node_memory(root_node);
+	//free(reference_sequence_bases);
 }
 
 

@@ -456,6 +456,12 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		  free(candidate_blocks[2]);
 		  free(candidate_blocks[3]);
 			free(candidate_block_likelihoods);
+			
+			int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
+			if(new_recombination_size > 1024)
+			{
+			  current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
+		  }
 			return;	
 		}
 		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords, current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
@@ -472,6 +478,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	free(block_coordinates[2]) ;
 	free(block_coordinates[3]) ;
 	free(block_likelihoods);
+	int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
+	if(new_recombination_size > 1024)
+	{
+	  current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
+  }
 }
 
 

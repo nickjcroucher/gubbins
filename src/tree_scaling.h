@@ -20,6 +20,7 @@
 #ifndef _TREE_SCALING_H_
 #define _TREE_SCALING_H_
 void scale_branch_distances(newick_node * root_node, int number_of_filtered_snps);
+void cleanup_node_memory(newick_node * root_node);
 
 #endif
 

@@ -50,7 +50,14 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
     fprintf( file_pointer, "%i", sample_details->genome_length_without_gaps);
 		
 		fprintf( file_pointer, "\n");
+
+    free(sample_details->sample_name);
+		free(sample_details);
 	}
+	
+	free(base_filename);
+	free(statistics_for_samples);
+	
   fclose(file_pointer);
 }
 

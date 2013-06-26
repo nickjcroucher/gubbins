@@ -82,7 +82,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
 	
-
  	// overwrite the bases of snps with N's
  	int i;
  	int sequence_index;
@@ -92,16 +91,11 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
  	set_number_of_snps_for_sample(root->taxon,root->number_of_snps);
  	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks);
  	
- 	int ** merged_block_coordinates;
- 	merged_block_coordinates = (int **) malloc(3*sizeof(int *));
- 	merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
- 	merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
-
- 	copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
-
 	char * child_sequence = (char *) malloc((length_of_original_genome +1)*sizeof(char));
+	strcpy(child_sequence,"");
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 
+  // This should take the merged block coordinates?
  	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(root->block_coordinates, root->number_of_blocks, child_sequence, snp_locations,current_total_snps));
 	free(child_sequence); 	
 
@@ -128,13 +122,17 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 			fill_in_recombinations_with_gaps(child->node, current_recombinations, num_current_recombinations,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations );
 			child = child->next;
+			
+			free(merged_block_coordinates[0]);
+			free(merged_block_coordinates[1]);
+			free(merged_block_coordinates);
 		}
 	}
 	else
 	{
 	set_internal_node(0,sequence_index);	
 	}
-	
+	free(current_recombinations);
 }
 
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome)
@@ -234,6 +232,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	if (root->childNum == 0)
 	{
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
+		strcpy(leaf_sequence, "");
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
@@ -274,31 +273,34 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
+		strcpy(leaf_sequence, "");
 		// All child sequneces should be available use them to find the ancestor sequence
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
 		
-		int * branches_snp_sites[root->childNum];
+		
 		
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
-			branches_snp_sites[current_branch] = (int *) malloc((number_of_snps +1)*sizeof(int));
+			int * branches_snp_sites;
+			branches_snp_sites = (int *) malloc((number_of_snps +1)*sizeof(int));
 			char * branch_snp_sequence;
 			char * branch_snp_ancestor_sequence;
 			branch_snp_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			branch_snp_ancestor_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
 			
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
-			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
+			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
 			
-			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites[current_branch], number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
+			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites[current_branch], branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
-			free(child_sequences[current_branch]);
+			//free(child_sequences[current_branch]);
+			free(branches_snp_sites);
 		}
 		
 		return leaf_sequence;
@@ -347,7 +349,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	int original_branch_genome_size = branch_genome_size;
 
 	// place to store coordinates of recombinations snps
-	current_node->recombinations = (int *) malloc((length_of_sequence+1)*sizeof(int));
+	current_node->recombinations = (int *) malloc((number_of_branch_snps+1)*sizeof(int));
 	
 	int number_of_windows = (branch_genome_size/MIN_WINDOW_SIZE) + 1;
 	int * block_coordinates[4];
@@ -450,17 +452,26 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			free(block_coordinates[2]) ;
 			free(block_coordinates[3]) ;
 			free(block_likelihoods);
+			free(candidate_blocks[0]);
+		  free(candidate_blocks[1]);
+		  free(candidate_blocks[2]);
+		  free(candidate_blocks[3]);
+			free(candidate_block_likelihoods);
+			
+			int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
+			if(new_recombination_size > 1024)
+			{
+			  current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
+		  }
 			return;	
 		}
-		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords,  current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
+		number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks, number_of_candidate_blocks, number_of_branch_snps, snp_site_coords, current_node->recombinations, current_node->num_recombinations,current_node, block_file_pointer, root, snp_locations, length_of_sequence,gff_file_pointer,candidate_block_likelihoods );
 		branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
-	
-
 	  free(candidate_blocks[0]);
 	  free(candidate_blocks[1]);
 	  free(candidate_blocks[2]);
 	  free(candidate_blocks[3]);
-
+		free(candidate_block_likelihoods);
 	
 	}
 	free(block_coordinates[0]) ;
@@ -468,6 +479,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	free(block_coordinates[2]) ;
 	free(block_coordinates[3]) ;
 	free(block_likelihoods);
+	int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
+	if(new_recombination_size > 1024)
+	{
+	  current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
+  }
 }
 
 
@@ -714,12 +730,11 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 	{
 		int smallest_index = 0;
     int number_of_recombinations_in_window = 0;
-		smallest_index = get_smallest_log_likelihood(get_smallest_log_likelihood, number_of_candidate_blocks);
+		smallest_index = get_smallest_log_likelihood(block_likelihooods, number_of_candidate_blocks);
 		number_of_recombinations_in_window = flag_recombinations_in_window(candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],number_of_branch_snps, snp_site_coords, recombinations, number_of_recombinations,snp_locations,total_num_snps);	
     number_of_recombinations += number_of_recombinations_in_window;
 		number_of_branch_snps_excluding_block = exclude_snp_sites_in_block(candidate_blocks[0][smallest_index],candidate_blocks[1][smallest_index], snp_site_coords,number_of_branch_snps);
 		
-		//current_node->recombinations = realloc(current_node->recombinations, number_of_recombinations*sizeof(int));
 		current_node->num_recombinations = number_of_recombinations;
 
 		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum);

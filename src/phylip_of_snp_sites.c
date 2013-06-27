@@ -33,7 +33,7 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	char * base_filename;
 	
 	base_filename = (char *) malloc(1024*sizeof(char));
-	memcpy(base_filename, filename, strlen(filename)+1);
+	memcpy(base_filename, filename, 1024*sizeof(char));
 	
 	fasta_file_pointer = fopen(strcat(base_filename,".phylip"), "w");
 	

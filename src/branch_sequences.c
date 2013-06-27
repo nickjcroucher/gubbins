@@ -239,7 +239,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		memcpy(root->taxon_names, root->taxon, strlen(root->taxon)+1);
+		memcpy(root->taxon_names, root->taxon, 30*sizeof(char));
 
     // Save some statistics about the sequence
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);

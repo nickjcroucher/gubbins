@@ -1,0 +1,254 @@
+fastml.o fastml.debug.o: fastml.cpp mainbb.h bb_options.h ../../libs/phylogeny/getopt.h \
+  ../../libs/phylogeny/definitions.h bb_options_list.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/sequence.h \
+  ../../libs/phylogeny/errorMsg.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/codon.h \
+  ../../libs/phylogeny/geneticCodeHolder.h \
+  ../../libs/phylogeny/suffStatComponent.h ../../libs/phylogeny/logFile.h \
+  sequenceDataDiff.h ../../libs/phylogeny/amino.h \
+  ../../libs/phylogeny/codon.h ../../libs/phylogeny/recognizeFormat.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/uniDistribution.h \
+  ../../libs/phylogeny/gammaDistribution.h \
+  ../../libs/phylogeny/generalGammaDistribution.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/readDatMatrix.h \
+  ../../libs/phylogeny/datMatrixHolder.h \
+  ../../libs/phylogeny/chebyshevAccelerator.h bbAlg.h \
+  ../../libs/phylogeny/computePijComponent.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/stochasticProcess.h bbNodeOrderAlg.h \
+  ../../libs/phylogeny/sequence.h bbEvaluateSpecificAV.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h bbfindBestAVDynProg.h bbReport.h \
+  ../../libs/phylogeny/distribution.h
+bbAlg.o bbAlg.debug.o: bbAlg.cpp bbAlg.h ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h bbNodeOrderAlg.h \
+  ../../libs/phylogeny/definitions.h bb_options.h bb_options_list.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/tree.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/gainLossAlphabet.h \
+  bbEvaluateSpecificAV.h ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h \
+  bbfindBestAVDynProg.h bbReport.h ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/computeUpAlg.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/likelihoodComputation.h \
+  ../../libs/phylogeny/unObservableData.h \
+  ../../libs/phylogeny/maseFormat.h
+bbComputeDownAlg.o bbComputeDownAlg.debug.o: bbComputeDownAlg.cpp bbComputeDownAlg.h \
+  ../../libs/phylogeny/tree.h ../../libs/phylogeny/definitions.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/computePijComponent.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequence.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
+bbComputeUpAlg.o bbComputeUpAlg.debug.o: bbComputeUpAlg.cpp bbComputeUpAlg.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/suffStatComponent.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/gainLossAlphabet.h ../../libs/phylogeny/sequence.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
+bbEvaluateSpecificAV.o bbEvaluateSpecificAV.debug.o: bbEvaluateSpecificAV.cpp bbEvaluateSpecificAV.h \
+  bb_options.h ../../libs/phylogeny/getopt.h \
+  ../../libs/phylogeny/definitions.h bb_options_list.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/stochasticProcess.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
+bbfindBestAVDynProg.o bbfindBestAVDynProg.debug.o: bbfindBestAVDynProg.cpp bbfindBestAVDynProg.h \
+  bb_options.h ../../libs/phylogeny/getopt.h \
+  ../../libs/phylogeny/definitions.h bb_options_list.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/tree.h ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
+bbNodeOrderAlg.o bbNodeOrderAlg.debug.o: bbNodeOrderAlg.cpp bbNodeOrderAlg.h \
+  ../../libs/phylogeny/definitions.h bb_options.h bb_options_list.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/tree.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/gainLossAlphabet.h \
+  bbComputeUpAlg.h bbComputeDownAlg.h \
+  ../../libs/phylogeny/computeMarginalAlg.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/computePijComponent.h
+bb_options.o bb_options.debug.o: bb_options.cpp bb_options.h ../../libs/phylogeny/getopt.h \
+  ../../libs/phylogeny/definitions.h bb_options_list.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/errorMsg.h
+bbReport.o bbReport.debug.o: bbReport.cpp bbReport.h ../../libs/phylogeny/definitions.h \
+  ../../libs/phylogeny/amino.h ../../libs/phylogeny/definitions.h \
+  ../../libs/phylogeny/errorMsg.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/geneticCodeHolder.h ../../libs/phylogeny/codon.h \
+  ../../libs/phylogeny/someUtil.h ../../libs/phylogeny/logFile.h \
+  ../../libs/phylogeny/nucleotide.h ../../libs/phylogeny/codon.h
+computeMarginalReconstruction.o computeMarginalReconstruction.debug.o: computeMarginalReconstruction.cpp \
+  computeMarginalReconstruction.h ../../libs/phylogeny/definitions.h \
+  ../../libs/phylogeny/tree.h ../../libs/phylogeny/definitions.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/errorMsg.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/computeUpAlg.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/computeDownAlg.h \
+  ../../libs/phylogeny/computeMarginalAlg.h ../../libs/phylogeny/treeIt.h
+jointNoGamma.o jointNoGamma.debug.o: jointNoGamma.cpp jointNoGamma.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/readTree.h \
+  ../../libs/phylogeny/errorMsg.h ../../libs/phylogeny/logFile.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/sequence.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/computePijComponent.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  suffStatComponentJointNoGamma.h ../../libs/phylogeny/treeIt.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
+mainbb.o mainbb.debug.o: mainbb.cpp mainbb.h bb_options.h ../../libs/phylogeny/getopt.h \
+  ../../libs/phylogeny/definitions.h bb_options_list.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/sequence.h \
+  ../../libs/phylogeny/errorMsg.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/gainLossAlphabet.h \
+  ../../libs/phylogeny/stochasticProcess.h \
+  ../../libs/phylogeny/pijAccelerator.h \
+  ../../libs/phylogeny/replacementModel.h \
+  ../../libs/phylogeny/distribution.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/readTree.h ../../libs/phylogeny/codon.h \
+  ../../libs/phylogeny/geneticCodeHolder.h \
+  ../../libs/phylogeny/suffStatComponent.h ../../libs/phylogeny/aaJC.h \
+  ../../libs/phylogeny/amino.h ../../libs/phylogeny/codon.h bbAlg.h \
+  ../../libs/phylogeny/computePijComponent.h ../../libs/phylogeny/tree.h \
+  ../../libs/phylogeny/stochasticProcess.h bbNodeOrderAlg.h \
+  ../../libs/phylogeny/sequence.h bbEvaluateSpecificAV.h \
+  ../../libs/phylogeny/seqContainerTreeMap.h \
+  ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h \
+  bbfindBestAVDynProg.h bbReport.h ../../libs/phylogeny/distribution.h \
+  ../../libs/phylogeny/bestAlpha.h \
+  ../../libs/phylogeny/likelihoodComputation.h \
+  ../../libs/phylogeny/computePijComponent.h \
+  ../../libs/phylogeny/suffStatComponent.h \
+  ../../libs/phylogeny/unObservableData.h \
+  ../../libs/phylogeny/gammaDistribution.h \
+  ../../libs/phylogeny/generalGammaDistribution.h \
+  ../../libs/phylogeny/bblEM.h ../../libs/phylogeny/countTableComponent.h \
+  ../../libs/phylogeny/chebyshevAccelerator.h \
+  ../../libs/phylogeny/clustalFormat.h computeMarginalReconstruction.h \
+  ../../libs/phylogeny/distanceTable.h \
+  ../../libs/phylogeny/distanceMethod.h \
+  ../../libs/phylogeny/fastaFormat.h \
+  ../../libs/phylogeny/gammaDistribution.h jointNoGamma.h \
+  suffStatComponentJointNoGamma.h ../../libs/phylogeny/likeDist.h \
+  ../../libs/phylogeny/jcDistance.h ../../libs/phylogeny/logFile.h \
+  ../../libs/phylogeny/maseFormat.h ../../libs/phylogeny/molphyFormat.h \
+  ../../libs/phylogeny/nexusFormat.h ../../libs/phylogeny/nucleotide.h \
+  ../../libs/phylogeny/nucJC.h ../../libs/phylogeny/nj.h \
+  ../../libs/phylogeny/njConstrain.h \
+  ../../libs/phylogeny/distances2Tree.h \
+  ../../libs/phylogeny/phylipFormat.h \
+  ../../libs/phylogeny/readDatMatrix.h \
+  ../../libs/phylogeny/datMatrixHolder.h \
+  ../../libs/phylogeny/recognizeFormat.h \
+  ../../libs/phylogeny/trivialAccelerator.h \
+  ../../libs/phylogeny/uniDistribution.h \
+  ../../libs/phylogeny/bestAlphaAndK.h \
+  ../../libs/phylogeny/likelihoodComputation2Codon.h \
+  ../../libs/phylogeny/wYangModel.h ../../libs/phylogeny/fromQtoPt.h \
+  ../../libs/phylogeny/bblEM2codon.h ../../libs/phylogeny/computeUpAlg.h \
+  ../../libs/phylogeny/numRec.h \
+  ../../libs/phylogeny/uniformDistribution.h \
+  ../../libs/phylogeny/codonUtils.h ../../libs/phylogeny/nucleotide.h \
+  ../../libs/phylogeny/amino.h ../../libs/phylogeny/fastaFormat.h \
+  ../../libs/phylogeny/clustalFormat.h \
+  ../../libs/phylogeny/recognizeFormat.h \
+  ../../libs/phylogeny/evaluateCharacterFreq.h
+sequenceDataDiff.o sequenceDataDiff.debug.o: sequenceDataDiff.cpp sequenceDataDiff.h \
+  ../../libs/phylogeny/sequenceContainer.h \
+  ../../libs/phylogeny/definitions.h ../../libs/phylogeny/sequence.h \
+  ../../libs/phylogeny/errorMsg.h ../../libs/phylogeny/alphabet.h \
+  ../../libs/phylogeny/mulAlphabet.h ../../libs/phylogeny/someUtil.h \
+  ../../libs/phylogeny/logFile.h ../../libs/phylogeny/gainLossAlphabet.h
+suffStatComponentJointNoGamma.o suffStatComponentJointNoGamma.debug.o: suffStatComponentJointNoGamma.cpp \
+  suffStatComponentJointNoGamma.h ../../libs/phylogeny/definitions.h

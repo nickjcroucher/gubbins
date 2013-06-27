@@ -1,0 +1,83 @@
+# $Id: cmdline.ggo 962 2006-11-07 15:13:34Z privmane $
+
+purpose "structural EM based Phylogeny"
+package "semphy"
+version "1.0.a3"
+
+# test default values
+
+#files 
+section "Basic Options"
+option  "sequence"		s    "Sequence file name"			string  typestr="FILENAME" default="-"			no
+option  "format" 		f    "Sequence format: [phylip], clustal, molphy, mase, fasta" string	default="phylip"			no
+option  "tree"			t    "Tree file name" 				string	typestr="FILENAME"				no
+option  "constraint"		c    "Constraint Tree file name"		string	typestr="FILENAME"				no
+option  "outputfile"		o    "Output tree file"     			string 	typestr="FILENAME" default="-"			no
+# model options:
+section "Model Options"
+option  "alphabet"		a    "Alphabet Size"				int	typestr="4|20"default="20"			no
+option  "ratio" 		z    "Transition/Transversion ratio"		float	default="2"			no
+option  "ACGprob" 		p    "User input nucleotide frequencies. String separated list for A,C,G"	string	typestr="A,C,G"  default="0.25,0.25,0.25"	no
+
+option  "gamma"			G    "Use Gamma RVAS (4 bins) and set alpha"			float	default="0.3"			no
+option  "optimizeGamma"		O    "Optimize Gamma and use it"		flag	off
+
+
+defgroup "Model"  groupdesc="Model type"
+
+groupoption 	  "day"		-  "Use 'day' model"	group="Model"
+groupoption	  "jtt"		-  "Use 'jtt' model (default)"	group="Model"
+groupoption	  "rev"		-  "Use 'rev' model"	group="Model"
+groupoption	  "wag"		-  "Use 'wag' model"	group="Model"
+groupoption	  "cprev"	-  "Use 'cprev' model"	group="Model"
+groupoption	  "nucjc"	-  "Use nucleic acid JC model"	group="Model"
+groupoption	  "aaJC"	-  "Use amino acid JC model"	group="Model"
+groupoption	  "k2p"		-  "Use 'k2p' model"	group="Model"
+groupoption	  "hky"		-  "Use 'k2p' model"	group="Model"
+
+option            "modelfile"	-  "Use user input file as model"		string	typestr="NAME" 			no
+
+
+section "Log Options"
+
+option  "verbose"  		v    "Log report level (verbose)"		int    	default="1"			no
+option  "Logfile"		l    "Log output file name"			string 	typestr="FILENAME" default="-"			no
+
+
+section "Algorithm Options"
+
+# algorithm options
+defgroup "Run Options" groupdesc="Which algorithm to run"
+
+groupoption  "SEMPHY"       	S    "Do SEMPHY step (default)"		 	group="Run Options"
+groupoption  "bbl"       	n    "Only optimize branch length"	 	group="Run Options"
+groupoption  "likelihood"	L    "Compute likelihood for fixed tree" 	group="Run Options"
+groupoption  "NJ"		J    "compute NJ tree only"		 	group="Run Options"
+option       "rate"		R    "optimize rate of gene"			flag	off
+
+
+section "Other Algorithm Options"
+option  "max-semphy-iter"	M    "Max number of SEM iterations"		int	default="100"			no
+option  "max-bbl-iter"    b    "Max number of BBL iterations"		int	default="1000"			no
+option  "min-improv"   d    "Minimum improvement"			float   default="0.001"			no
+option  "gaps"			g    "Remove positions with gaps"		flag 	off
+option  "dont-use-NJ"		N    "Do not Use NJ to break stars in treeRearrange"	flag	on
+option  "exact"			e    "Compute exact counts" 			flag 	off
+option  "maxDistance"		x    "'infinity' distance for sequence pairs"	float	default="2.0"			no
+
+option  "seed"			r    "Seed random number generator"		long					no
+
+
+#option  "paramFile"		f    "Parameter file name"			string					no
+#option  "cin"			I    "Get input sequence file from cin"		flag	off
+
+# annealing:
+#option  "anneal"		A    "Do anneal step" 				flag 	off
+#option  "ratchet"		R    "Do Ratchet step"				flag 	off
+#option  "start-temp"		H    "Starting temp"				float					no
+#option  "cooling-factor"	c    "Variance decay factor for anneal noise"	float	default="1.1"			no
+#option  "final-temp"		C    "Final temperature of anneal noise"  	float	default="0.1"			no
+#option	 "adversarial"		-    "Use Adversarial Re-weighting"		flag	off
+#option  "learning-rate"   	L    "learning rate for Adversary"		float	default="1.0"			no
+#option  "Orig-dumping"    	D    "Dumping to the original weights"		float	default="0.5"			no
+#option  "prev-dumping"    	X    "Dumping to the previous weights"		float	default="0.5"			no

@@ -36,7 +36,8 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	base_filename = (char *) malloc(1024*sizeof(char));
 	memcpy(base_filename, filename, 1024*sizeof(char));
 	
-	fasta_file_pointer = fopen(strcat(base_filename,".phylip"), "w");
+	concat_strings_created_with_malloc(base_filename,".phylip");
+	fasta_file_pointer = fopen(base_filename, "w");
 	
 	int number_of_leaves = number_of_samples;
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)

@@ -24,6 +24,7 @@
 #include <regex.h>
 #include "fasta_of_snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[])
 {
@@ -35,7 +36,8 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 	base_filename = (char *) malloc(1024*sizeof(char));
 	memcpy(base_filename, filename, 1024*sizeof(char));
 	
-	fasta_file_pointer = fopen(strcat(base_filename,".snp_sites.aln"), "w");
+	concat_strings_created_with_malloc(base_filename,".snp_sites.aln");
+	fasta_file_pointer = fopen(base_filename, "w");
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{

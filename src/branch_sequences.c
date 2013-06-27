@@ -30,6 +30,7 @@
 #include "snp_searching.h"
 #include "block_tab_file.h"
 #include "gff_file.h"
+#include "string_cat.h"
 
 int node_counter = 0;
 
@@ -257,16 +258,15 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
     memcpy(root->taxon_names, empty_str, strlen(empty_str)+1);
 
 		// generate pointers for each child seuqn
-		
 
-		
 		while (child != NULL)
 		{
 			// recursion
 			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,  child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer);
 			child_nodes[child_counter] = child->node;
-      strcat(root->taxon_names, " ");
-      strcat(root->taxon_names, child_nodes[child_counter]->taxon_names);
+			
+			concat_strings_created_with_malloc(root->taxon_names, " ");
+			concat_strings_created_with_malloc(root->taxon_names, child_nodes[child_counter]->taxon_names);
 			
 			child_counter++;
 			child = child->next;

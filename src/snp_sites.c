@@ -27,6 +27,7 @@
 #include "snp_sites.h"
 #include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 
 void build_snp_locations(int snp_locations[], char reference_sequence[])
@@ -95,7 +96,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
   char filename_without_directory[MAX_FILENAME_SIZE];
   strip_directory_from_filename(filename, filename_without_directory);
 	
-	strcat(filename_without_directory,suffix);
+	concat_strings_created_with_malloc(filename_without_directory,suffix);
 	
 	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes,1);
 	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);

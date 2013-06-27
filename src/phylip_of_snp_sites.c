@@ -23,6 +23,7 @@
 #include <string.h>
 #include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 
 void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples, int internal_nodes[])

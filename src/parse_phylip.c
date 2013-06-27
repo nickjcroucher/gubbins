@@ -62,7 +62,7 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
     printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
 	  exit(1);
   }
-	strcpy(sequence_bases, sequences[sequence_index]);
+	memcpy(sequence_bases, sequences[sequence_index], strlen(sequences[sequence_index])+1);
 }
 
 
@@ -190,7 +190,7 @@ void get_sample_names_from_parse_phylip(char ** sample_names)
 	for(i = 0; i< num_samples; i++)
 	{
 		sample_names[i] =  (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		strcpy(sample_names[i], phylip_sample_names[i]);
+		memcpy(sample_names[i], phylip_sample_names[i], strlen(phylip_sample_names[i])+1);
 	}
 }
 	

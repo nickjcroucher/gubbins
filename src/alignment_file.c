@@ -67,6 +67,7 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
   int l;
   int i = 0;
   int sequence_number = 0;
+	char empty_str[2] = "";
 	
 	gzFile fp;
 	kseq_t *seq;
@@ -77,7 +78,7 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 	// initialise the strings in the array
 	for(i = 0; i < number_of_snps; i++)
 	{
-		strcpy(bases_for_snps[i], "");
+		memcpy(bases_for_snps[i], empty_str, strlen(empty_str)+1);
 	}
   
 	while ((l = kseq_read(seq)) >= 0) 
@@ -105,6 +106,7 @@ void get_bases_for_each_snp_traspose(char filename[], int snp_locations[], char 
   int l;
   int i = 0;
   int sequence_number = 0;
+  char empty_str[2] = "";
 	
 	gzFile fp;
 	kseq_t *seq;
@@ -115,7 +117,7 @@ void get_bases_for_each_snp_traspose(char filename[], int snp_locations[], char 
 	// initialise the strings in the array
 	for(i = 0; i < number_of_snps; i++)
 	{
-		strcpy(bases_for_snps[i], "");
+		memcpy(bases_for_snps[i], empty_str, strlen(empty_str)+1);
 	}
   
 	while ((l = kseq_read(seq)) >= 0) 
@@ -276,6 +278,7 @@ char * read_line(char sequence[], FILE * pFilePtr)
     char *pcRes         = NULL;  
     long   lineLength    = 0; 
 	char current_line_buffer[MAX_READ_BUFFER] = {0};
+	char empty_str[2] = "";
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
@@ -284,7 +287,7 @@ char * read_line(char sequence[], FILE * pFilePtr)
 	    			sequence = realloc(sequence, strlen(sequence) + strlen(current_line_buffer) + 2 );
         }
         strcat(sequence, current_line_buffer);
-        strcpy(current_line_buffer, "");
+        memcpy(current_line_buffer, empty_str, strlen(empty_str)+1);
         lineLength = strlen(sequence) - 1;
         //if end of line character is found then exit from loop
 		

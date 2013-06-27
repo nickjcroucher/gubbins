@@ -1,4 +1,4 @@
-#!/usr/bin/env python-2.7
+#!/usr/bin/env python
 # encoding: utf-8
 #
 # Wellcome Trust Sanger Institute
@@ -18,11 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-
-# fastml
-# disable timestamp by default to allow pipelineing
-# check a file exists before trying to delete it
-
 
 import sys
 import argparse
@@ -460,12 +455,13 @@ def which(program):
 
 def use_bundled_exec(input_executable, bundled_executable):
   (base_directory,script_filename) = os.path.split(os.path.realpath(__file__))
-  executable_and_params = program.split(" ")
   path_to_bundled_exec = os.path.join(base_directory, bundled_executable)
   
   # Pop the first value off the input_executable and replace it with the bundled exec
+  executable_and_params = input_executable.split(" ")
   executable_and_params.pop(0)
-  return path_to_bundled_exec + " " + executable_and_params
+  executable_and_params.insert(0, path_to_bundled_exec)
+  return  ' '.join(executable_and_params)
 
 
 

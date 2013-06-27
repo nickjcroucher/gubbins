@@ -27,6 +27,7 @@
 #include <zlib.h>
 #include <sys/types.h>
 #include "kseq.h"
+#include "string_cat.h"
 
 KSEQ_INIT(gzFile, gzread)
 
@@ -62,7 +63,10 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
     printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
 	  exit(1);
   }
-	memcpy(sequence_bases, sequences[sequence_index], (MAX_SAMPLE_NAME_SIZE)*sizeof(char));
+
+
+
+	memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
 }
 
 
@@ -190,7 +194,7 @@ void get_sample_names_from_parse_phylip(char ** sample_names)
 	for(i = 0; i< num_samples; i++)
 	{
 		sample_names[i] =  (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		memcpy(sample_names[i], phylip_sample_names[i], (MAX_SAMPLE_NAME_SIZE)*sizeof(char));
+		memcpy(sample_names[i], phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 	}
 }
 	
@@ -329,7 +333,7 @@ void initialise_statistics()
 		sample_statistics_placeholder = (sample_statistics *) malloc(sizeof(sample_statistics));
 		
 		sample_statistics_placeholder->sample_name = (char *) malloc( MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], (MAX_SAMPLE_NAME_SIZE)*sizeof(char));
+		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 		
 		statistics_for_samples[i] = sample_statistics_placeholder;
 	}

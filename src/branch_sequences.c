@@ -637,7 +637,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 				int previous_block_snp_count = block_snp_count;
 				int previous_block_genome_size_without_gaps = block_genome_size_without_gaps;
 			  block_snp_count = find_number_of_snps_in_block_with_start_end_index(next_start_position, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
-			  block_genome_size_without_gaps = calculate_block_size_without_gaps_with_start_end_index(child_sequence, snp_locations, next_start_position, current_end, length_of_sequence,start_index,end_index);
+			  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, next_start_position, current_end, length_of_sequence);
 			  
 			  double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 				
@@ -673,7 +673,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 				}
 				
 			  block_snp_count = find_number_of_snps_in_block_with_start_end_index(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
-			  block_genome_size_without_gaps = calculate_block_size_without_gaps_with_start_end_index(child_sequence, snp_locations, current_start, current_end, length_of_sequence,start_index,end_index);
+			  block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
 			  
 			  double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 			  if(next_block_likelihood <= current_block_likelihood)

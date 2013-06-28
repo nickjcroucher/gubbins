@@ -35,8 +35,8 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 	
 	base_filename = (char *) malloc(1024*sizeof(char));
 	memcpy(base_filename, filename, 1024*sizeof(char));
-	
-	concat_strings_created_with_malloc(base_filename,".snp_sites.aln");
+	char extension[16] = {".snp_sites.aln"};
+	concat_strings_created_with_malloc(base_filename,extension);
 	fasta_file_pointer = fopen(base_filename, "w");
 	
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)

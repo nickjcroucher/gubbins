@@ -32,7 +32,8 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	
 	base_filename = (char *) malloc(MAX_FILE_NAME_SIZE*sizeof(char));
 	memcpy(base_filename, filename, 1024*sizeof(char));
-	concat_strings_created_with_malloc(base_filename,".stats");
+	char extension[7] = {".stats"};
+	concat_strings_created_with_malloc(base_filename,extension);
 	file_pointer = fopen(base_filename, "w");
 	fprintf( file_pointer, "Sample name\tNum SNPs in recombinations\tNum of SNPs outside recombinations\tTotal SNPs\tBases in Recombinations\tEstimated Num SNPs if there were no recombinations\tNum Recombination Blocks\tr/m\tb/m\tGenome Length\n");
 

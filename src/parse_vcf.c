@@ -213,8 +213,6 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 	do{
 		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
 		// check the first character of the line to see if its in the header
-		free(szBuffer);
-		szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
 		if(szBuffer[0] == '\0' || szBuffer[0] != '#')

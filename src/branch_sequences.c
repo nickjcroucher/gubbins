@@ -627,7 +627,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		while(current_start < current_end && block_snp_count >= min_snps && block_snp_count >= cutoff_value && block_genome_size_without_gaps > MIN_WINDOW_SIZE)
 		{
 			  next_start_position++;
-			  next_start_position = advance_window_start_to_next_snp(next_start_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps);
+			  next_start_position = advance_window_start_to_next_snp(next_start_position, snp_site_coords, branch_snp_sequence, number_of_branch_snps;
 			
 				if(next_start_position == current_start)
 				{

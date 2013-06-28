@@ -78,7 +78,7 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 	// initialise the strings in the array
 	for(i = 0; i < number_of_snps; i++)
 	{
-		memcpy(bases_for_snps[i], empty_str, strlen(empty_str)+1);
+		memcpy(bases_for_snps[i], empty_str, (strlen(empty_str)+1)*sizeof(char));
 	}
   
 	while ((l = kseq_read(seq)) >= 0) 
@@ -117,7 +117,7 @@ void get_bases_for_each_snp_traspose(char filename[], int snp_locations[], char 
 	// initialise the strings in the array
 	for(i = 0; i < number_of_snps; i++)
 	{
-		memcpy(bases_for_snps[i], empty_str, strlen(empty_str)+1);
+		memcpy(bases_for_snps[i], empty_str, (strlen(empty_str)+1)*sizeof(char));
 	}
   
 	while ((l = kseq_read(seq)) >= 0) 
@@ -286,7 +286,7 @@ char * read_line(char sequence[], FILE * pFilePtr)
 	    			sequence = realloc(sequence, sizeof(char)*(size_of_string(sequence) + size_of_string(current_line_buffer) + 2) );
         }
 				concat_strings_created_with_malloc(sequence,current_line_buffer);
-        memcpy(current_line_buffer, empty_str, strlen(empty_str)+1);
+        memcpy(current_line_buffer, empty_str, (strlen(empty_str)+1)*sizeof(char));
         lineLength = size_of_string(sequence);
         //if end of line character is found then exit from loop
 		

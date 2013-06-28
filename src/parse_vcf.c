@@ -39,7 +39,7 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 	char empty_string[2] = {""};
 	
 	do{
-		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
+		memcpy(szBuffer, empty_string, (strlen(empty_string)+1)*sizeof(char));
  		// check the first character of the line to see if its in the header
   	szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
@@ -70,7 +70,7 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_ba
 	char empty_string[2] = {""};
 		
 	do{
-		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
+		memcpy(szBuffer, empty_string, (strlen(empty_string)+1)*sizeof(char));
 		// check the first character of the line to see if its in the header
 		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
@@ -178,7 +178,7 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	
 	do{
-		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
+		memcpy(szBuffer, empty_string, (strlen(empty_string)+1)*sizeof(char));
 		// check the first character of the line to see if its in the header
 		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		if(szBuffer[0] == '\0' || szBuffer[0] != '#')
@@ -211,7 +211,7 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 	char empty_string[2] = {""};
 	
 	do{
-		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
+		memcpy(szBuffer, empty_string, (strlen(empty_string)+1)*sizeof(char));
 		// check the first character of the line to see if its in the header
 		szBuffer = read_line(szBuffer, vcf_file_pointer);
 		
@@ -227,7 +227,7 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 			for(i = 0; i< number_of_columns; i++)
 			{
 				split_string_and_return_specific_index( result, szBuffer, i,100000);
-				memcpy(column_names[i], result, strlen(result)+1);
+				memcpy(column_names[i], result, (strlen(result)+1)*sizeof(char));
 			}
 		}
 		

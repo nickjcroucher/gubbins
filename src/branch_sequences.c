@@ -94,7 +94,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
  	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks);
  	
 	char * child_sequence = (char *) malloc((length_of_original_genome +1)*sizeof(char));
-	memcpy(child_sequence, empty_str, strlen(empty_str)+1);
+	memcpy(child_sequence, empty_str, (strlen(empty_str)+1)*sizeof(char));
 	
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 
@@ -236,7 +236,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	if (root->childNum == 0)
 	{
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
-		memcpy(leaf_sequence, empty_str, strlen(empty_str)+1);
+		memcpy(leaf_sequence, empty_str, (strlen(empty_str)+1)*sizeof(char));
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
@@ -255,7 +255,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		char * child_sequences[root->childNum];
 		newick_node * child_nodes[root->childNum];
 		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*number_of_columns*sizeof(char));
-    memcpy(root->taxon_names, empty_str, strlen(empty_str)+1);
+    memcpy(root->taxon_names, empty_str, (strlen(empty_str)+1)*sizeof(char));
 
 		// generate pointers for each child seuqn
 
@@ -277,7 +277,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		
 		
 		leaf_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
-		memcpy(leaf_sequence, empty_str, strlen(empty_str)+1);
+		memcpy(leaf_sequence, empty_str, (strlen(empty_str)+1)*sizeof(char));
 		// All child sequneces should be available use them to find the ancestor sequence
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		

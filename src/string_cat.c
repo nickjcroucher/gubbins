@@ -37,5 +37,5 @@ void concat_strings_created_with_malloc(char *input_string, char *string_to_conc
 {
 	int input_str_size = size_of_string(input_string);
 	int to_concat_str_size = size_of_string(string_to_concat);
-	memcpy(input_string + input_str_size, string_to_concat, to_concat_str_size+1);
+	memcpy(input_string + input_str_size, string_to_concat, (to_concat_str_size+1)*sizeof(char));
 }

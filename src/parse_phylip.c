@@ -356,9 +356,9 @@ void load_sequences_from_multifasta_file(char filename[])
 	for(i = 0; i < num_samples; i++)
 	{
 		sequences[i] = (char *) malloc((num_snps+1)*sizeof(char));
-		memcpy(sequences[i] , empty_str, strlen(empty_str)+1);
+		memcpy(sequences[i] , empty_str, (strlen(empty_str)+1)*sizeof(char));
 		phylip_sample_names[i] = (char *) malloc((MAX_SAMPLE_NAME_SIZE+1)*sizeof(char));
-		memcpy(phylip_sample_names[i] , empty_str, strlen(empty_str)+1);
+		memcpy(phylip_sample_names[i] , empty_str, (strlen(empty_str)+1)*sizeof(char));
 	}
 	get_sample_names_for_header(filename, phylip_sample_names, num_samples);
 	

@@ -67,7 +67,7 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
   int l;
   int i = 0;
   int sequence_number = 0;
-	char empty_str[2] = "";
+	char empty_str[2] = {""};
 	
 	gzFile fp;
 	kseq_t *seq;
@@ -106,7 +106,7 @@ void get_bases_for_each_snp_traspose(char filename[], int snp_locations[], char 
   int l;
   int i = 0;
   int sequence_number = 0;
-  char empty_str[2] = "";
+  char empty_str[2] = {""};
 	
 	gzFile fp;
 	kseq_t *seq;
@@ -278,7 +278,7 @@ char * read_line(char sequence[], FILE * pFilePtr)
     char *pcRes         = NULL;  
     long   lineLength    = 0; 
 	char current_line_buffer[MAX_READ_BUFFER] = {0};
-	char empty_str[2] = "";
+	char empty_str[2] = {""};
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){

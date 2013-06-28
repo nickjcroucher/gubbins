@@ -64,8 +64,6 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 	  exit(1);
   }
 
-
-
 	memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
 }
 
@@ -357,7 +355,7 @@ void load_sequences_from_multifasta_file(char filename[])
 	for(i = 0; i < num_samples; i++)
 	{
 		sequences[i] = (char *) malloc((num_snps+1)*sizeof(char));
-		phylip_sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		phylip_sample_names[i] = (char *) malloc((MAX_SAMPLE_NAME_SIZE+1)*sizeof(char));
 	}
 	get_sample_names_for_header(filename, phylip_sample_names, num_samples);
 	

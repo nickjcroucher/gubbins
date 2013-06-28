@@ -36,7 +36,7 @@ void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_valu
 	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	int reference_index = 0;
 	char result[1000] = {0};  
-	char empty_string[2] = "";
+	char empty_string[2] = {""};
 	
 	do{
 		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
@@ -67,7 +67,7 @@ void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_ba
 	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	int reference_index = 0;
 	char result[1000] = {0};  
-	char empty_string[2] = "";
+	char empty_string[2] = {""};
 		
 	do{
 		memcpy(szBuffer, empty_string, strlen(empty_string)+1);
@@ -172,7 +172,7 @@ int get_number_of_columns_from_file(FILE * vcf_file_pointer)
 {
 	rewind(vcf_file_pointer);
 	char result[100] = {0};
-	char empty_string[2] = "";
+	char empty_string[2] = {""};
 	
 	char * szBuffer;
 	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
@@ -208,7 +208,7 @@ void get_column_names(FILE * vcf_file_pointer, char ** column_names, int number_
 	szBuffer = (char *) malloc(MAX_READ_BUFFER*sizeof(char));
 	char result[100] = {0};  
 	int i;
-	char empty_string[2] = "";
+	char empty_string[2] = {""};
 	
 	do{
 		memcpy(szBuffer, empty_string, strlen(empty_string)+1);

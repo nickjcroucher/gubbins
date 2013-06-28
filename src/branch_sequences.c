@@ -79,7 +79,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	newick_child *child;
 	int * current_recombinations;
 	int num_current_recombinations = 0 ;
-	char empty_str[2] = "";
+	char empty_str[2] = {""};
 	
 	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
@@ -231,7 +231,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	int branch_genome_size = 0;
 	int number_of_branch_snps=0;
   root->current_node_id = ++node_counter;
-  char empty_str[2] = "";
+  char empty_str[2] = {""};
 	
 	if (root->childNum == 0)
 	{
@@ -265,7 +265,8 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,  child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer);
 			child_nodes[child_counter] = child->node;
 			
-			concat_strings_created_with_malloc(root->taxon_names, " ");
+			char delimiter_string[3] = {" "};
+			concat_strings_created_with_malloc(root->taxon_names, delimiter_string);
 			concat_strings_created_with_malloc(root->taxon_names, child_nodes[child_counter]->taxon_names);
 			
 			child_counter++;

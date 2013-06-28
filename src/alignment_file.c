@@ -274,11 +274,10 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
 
 char * read_line(char sequence[], FILE * pFilePtr)
 {
-    strcpy(sequence, "");
     char *pcRes         = NULL;  
     long   lineLength    = 0; 
-	char current_line_buffer[MAX_READ_BUFFER] = {0};
-	char empty_str[2] = {""};
+	  char current_line_buffer[MAX_READ_BUFFER] = {0};
+	  char empty_str[2] = {""};
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
@@ -286,7 +285,7 @@ char * read_line(char sequence[], FILE * pFilePtr)
 	      {
 	    			sequence = realloc(sequence, strlen(sequence) + strlen(current_line_buffer) + 2 );
         }
-        strcat(sequence, current_line_buffer);
+				concat_strings_created_with_malloc(sequence,current_line_buffer);
         memcpy(current_line_buffer, empty_str, strlen(empty_str)+1);
         lineLength = strlen(sequence) - 1;
         //if end of line character is found then exit from loop
@@ -313,7 +312,7 @@ void get_sample_names_for_header(char filename[], char ** sequence_names, int nu
 	seq = kseq_init(fp);
   
 	while ((l = kseq_read(seq)) >= 0) {
-	  strcpy(sequence_names[i], seq->name.s);
+		memcpy(sequence_names[i], seq->name.s, size_of_string(seq->name.s)+1);
     i++;
 	}
 	kseq_destroy(seq);

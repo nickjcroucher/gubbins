@@ -728,7 +728,6 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 		snp_site_coords[i] = 0;
 	}
 	
-	snp_site_coords = realloc(snp_site_coords, (number_of_branch_snps_excluding_block+1)*sizeof(int));
 	return number_of_branch_snps_excluding_block;
 }
 

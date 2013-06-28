@@ -305,6 +305,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			free(branch_snp_ancestor_sequence);
 			//free(child_sequences[current_branch]);
 			free(branches_snp_sites);
+			
 		}
 		
 		return leaf_sequence;
@@ -570,7 +571,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		int current_start = block_coordinates[0][i];
 		int current_end = block_coordinates[1][i];
 		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
-    int end_index   = find_starting_index( current_end, snp_locations, start_index, number_of_branch_snps);
+    int end_index   = find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
 		block_coordinates[0][i] = advance_window_start_to_next_snp_with_start_end_index(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
 		block_coordinates[1][i] = rewind_window_end_to_last_snp_with_start_end_index(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
 		
@@ -608,7 +609,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 
 	  int next_start_position = current_start;
 		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
-    int end_index =  find_starting_index( current_end, snp_locations, start_index, number_of_branch_snps);
+    int end_index =  find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
 
 		block_snp_count = find_number_of_snps_in_block_with_start_end_index(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
     
@@ -721,6 +722,10 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 	for(i = 0; i < number_of_branch_snps_excluding_block; i++)
 	{
 	  snp_site_coords[i] = updated_snp_site_coords[i];
+	}
+	for(i=number_of_branch_snps_excluding_block; i< number_of_branch_snps; i++)
+	{
+		snp_site_coords[i] = 0;
 	}
 	
 	snp_site_coords = realloc(snp_site_coords, (number_of_branch_snps_excluding_block+1)*sizeof(int));

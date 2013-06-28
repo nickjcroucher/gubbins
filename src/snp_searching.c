@@ -64,20 +64,19 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 		return end_index;
 	}
 
-	if((snp_locations[start_index] < window_start_coordinate && snp_locations[start_index]> window_start_coordinate ))
+	if( snp_locations[start_index]>= window_start_coordinate)
 	{
 		return start_index;
-	}
-	
-	if((snp_locations[end_index] < window_start_coordinate && snp_locations[end_index]> window_start_coordinate ))
-	{
-		return end_index;
 	}
 	
 	current_index = (int)((end_index-start_index)/2) + start_index;
 	if(current_index >= end_index)
 	{
 		current_index = end_index-1;
+	}
+	if(current_index < start_index)
+	{
+		current_index = start_index+1;
 	}
 	
 	if( snp_locations[current_index] < window_start_coordinate)

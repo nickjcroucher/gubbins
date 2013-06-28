@@ -281,13 +281,13 @@ char * read_line(char sequence[], FILE * pFilePtr)
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
-	      if(strlen(sequence) > 0)
+	      if(size_of_string(sequence) > 0)
 	      {
-	    			sequence = realloc(sequence, strlen(sequence) + strlen(current_line_buffer) + 2 );
+	    			sequence = realloc(sequence, sizeof(char)*(size_of_string(sequence) + size_of_string(current_line_buffer) + 2) );
         }
 				concat_strings_created_with_malloc(sequence,current_line_buffer);
         memcpy(current_line_buffer, empty_str, strlen(empty_str)+1);
-        lineLength = strlen(sequence) - 1;
+        lineLength = size_of_string(sequence);
         //if end of line character is found then exit from loop
 		
         if((sequence)[lineLength] == '\n' || (sequence)[lineLength] == '\0'){

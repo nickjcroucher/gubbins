@@ -88,7 +88,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	for(i = 0; i < number_of_snps; i++)
 	{
-		bases_for_snps[i] = malloc((number_of_samples+1)*sizeof(char));
+		bases_for_snps[i] = calloc((number_of_samples+1),sizeof(char));
 	}
 	
 	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);

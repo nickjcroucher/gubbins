@@ -48,7 +48,6 @@ void scale_branch_distances(newick_node * root_node, int number_of_filtered_snps
 void cleanup_node_memory(newick_node * root_node)
 {
   free(root_node->recombinations);
-	free(root_node->taxon);
 	free(root_node->taxon_names);
 	free(root_node->seq);
 	free(root_node->block_coordinates[0]);

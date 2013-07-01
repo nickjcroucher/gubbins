@@ -23,6 +23,7 @@
 #include <string.h>
 #include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 
 void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples, int internal_nodes[])
@@ -32,10 +33,11 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 	int snp_counter;
 	char * base_filename;
 	
-	base_filename = (char *) malloc(1024*sizeof(char));
-	strcpy(base_filename, filename);
-	
-	fasta_file_pointer = fopen(strcat(base_filename,".phylip"), "w");
+	base_filename = (char *) calloc(1024,sizeof(char));
+	memcpy(base_filename, filename, 1024*sizeof(char));
+	char extension[8] = {".phylip"};
+	concat_strings_created_with_malloc(base_filename,extension);
+	fasta_file_pointer = fopen(base_filename, "w");
 	
 	int number_of_leaves = number_of_samples;
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)

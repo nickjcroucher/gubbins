@@ -27,6 +27,7 @@
 #include "snp_sites.h"
 #include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 
 void build_snp_locations(int snp_locations[], char reference_sequence[])
@@ -55,12 +56,12 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	int i;
 	
 	length_of_genome = genome_length(filename);
-	reference_sequence = (char *) malloc((length_of_genome+1)*sizeof(char));
+	reference_sequence = (char *) calloc((length_of_genome+1),sizeof(char));
 	
 	build_reference_sequence(reference_sequence,filename);
 	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome, exclude_gaps);
 	
-	snp_locations = (int *) malloc((number_of_snps+1)*sizeof(int));
+	snp_locations = (int *) calloc((number_of_snps+1),sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
 	
@@ -71,7 +72,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	sequence_names[number_of_samples-1] = '\0';
 	for(i = 0; i < number_of_samples; i++)
 	{
-		sequence_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		sequence_names[i] = calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 	}
 	
 	get_sample_names_for_header(filename, sequence_names, number_of_samples);
@@ -87,7 +88,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	for(i = 0; i < number_of_snps; i++)
 	{
-		bases_for_snps[i] = malloc((number_of_samples+1)*sizeof(char));
+		bases_for_snps[i] = calloc((number_of_samples+1),sizeof(char));
 	}
 	
 	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
@@ -95,7 +96,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
   char filename_without_directory[MAX_FILENAME_SIZE];
   strip_directory_from_filename(filename, filename_without_directory);
 	
-	strcat(filename_without_directory,suffix);
+	concat_strings_created_with_malloc(filename_without_directory,suffix);
 	
 	create_vcf_file(filename_without_directory, snp_locations, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes,1);
 	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);

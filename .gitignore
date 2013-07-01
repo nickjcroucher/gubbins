@@ -3,7 +3,7 @@ gubbins
 tests/run_all_tests
 src/run_all_tests
 .DS_Store
-Makefile
+src/Makefile
 src/.deps
 autom4te.cache/*
 *.lo
@@ -11,3 +11,17 @@ autom4te.cache/*
 src/.libs/*
 src/libPyGubbins_la-PyGubbins.loT
 src/libgubbins.la
+Makefile.in
+aclocal.m4
+config.*
+configure
+depcomp
+graph
+install-sh
+libtool
+ltmain.sh
+missing
+run_gubbins.pyc
+src/Makefile.in
+stamp-h1
+test-driver

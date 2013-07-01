@@ -27,6 +27,7 @@
 #include <zlib.h>
 #include <sys/types.h>
 #include "kseq.h"
+#include "string_cat.h"
 
 KSEQ_INIT(gzFile, gzread)
 
@@ -62,7 +63,8 @@ void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
     printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
 	  exit(1);
   }
-	strcpy(sequence_bases, sequences[sequence_index]);
+
+	memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
 }
 
 
@@ -189,8 +191,8 @@ void get_sample_names_from_parse_phylip(char ** sample_names)
 	int i;
 	for(i = 0; i< num_samples; i++)
 	{
-		sample_names[i] =  (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		strcpy(sample_names[i], phylip_sample_names[i]);
+		sample_names[i] =  (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
+		memcpy(sample_names[i], phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 	}
 }
 	
@@ -201,7 +203,7 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 	
 	for(j = 0; j < number_of_filtered_snps; j++)
 	{
-		filtered_bases_for_snps[j] = (char *) malloc((num_samples+1)*sizeof(char));
+		filtered_bases_for_snps[j] = (char *) calloc((num_samples+1),sizeof(char));
 	}
 		
 	for(i = 0; i < num_samples; i++)
@@ -312,7 +314,7 @@ int find_sequence_index_from_sample_name( char * sample_name)
 void initialise_internal_node()
 {
 	int i=0;
-	internal_node = (int *) malloc((num_samples+1)*sizeof(int));
+	internal_node = (int *) calloc((num_samples+1),sizeof(int));
 	for(i=0; i< num_samples; i++)
 	{
 		internal_node[i] = 0;
@@ -322,14 +324,14 @@ void initialise_internal_node()
 void initialise_statistics()
 {
 	int i=0;
-	statistics_for_samples = (sample_statistics **) malloc((num_samples+1)*sizeof(sample_statistics *));
+	statistics_for_samples = (sample_statistics **) calloc((num_samples+1),sizeof(sample_statistics *));
 	for(i=0; i< num_samples; i++)
 	{
 		sample_statistics * sample_statistics_placeholder;
-		sample_statistics_placeholder = (sample_statistics *) malloc(sizeof(sample_statistics));
+		sample_statistics_placeholder = (sample_statistics *) calloc(1, sizeof(sample_statistics));
 		
-		sample_statistics_placeholder->sample_name = (char *) malloc( MAX_SAMPLE_NAME_SIZE*sizeof(char));
-		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], MAX_SAMPLE_NAME_SIZE);
+		sample_statistics_placeholder->sample_name = (char *) calloc( MAX_SAMPLE_NAME_SIZE,sizeof(char));
+		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 		
 		statistics_for_samples[i] = sample_statistics_placeholder;
 	}
@@ -347,13 +349,13 @@ void load_sequences_from_multifasta_file(char filename[])
 	num_snps    = genome_length(filename);
 	num_samples = number_of_sequences_in_file(filename);
 	
-	sequences = (char **) malloc((num_samples+1)*sizeof(char *));
-	phylip_sample_names = (char **) malloc((num_samples+1)*sizeof(char *));
+	sequences = (char **) calloc((num_samples+1),sizeof(char *));
+	phylip_sample_names = (char **) calloc((num_samples+1),sizeof(char *));
 	
 	for(i = 0; i < num_samples; i++)
 	{
-		sequences[i] = (char *) malloc((num_snps+1)*sizeof(char));
-		phylip_sample_names[i] = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		sequences[i] = (char *) calloc((num_snps+1),sizeof(char));
+		phylip_sample_names[i] = (char *) calloc((MAX_SAMPLE_NAME_SIZE+1),sizeof(char));
 	}
 	get_sample_names_for_header(filename, phylip_sample_names, num_samples);
 	
@@ -397,5 +399,6 @@ void freeup_memory()
   }
   free(sequences);
 	free(phylip_sample_names);
+	free(internal_node);
 }
 

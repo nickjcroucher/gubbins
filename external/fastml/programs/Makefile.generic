@@ -1,0 +1,244 @@
+#  this looks better in -*- Makefile -*- mode
+#	$Id: Makefile.generic 3917 2008-04-22 08:23:04Z cohenofi $	
+
+DEBUGEXEC = $(EXEC:=.debug)
+
+
+#TEST_EXEC_SUB = 
+TEST_EXEC = $(addprefix tests/,$(TEST_EXEC_SUB))
+
+ifdef LIBNAME
+  ifneq ($(LIBNAME),"")
+	LIB = lib$(LIBNAME).a
+  endif
+endif
+DEBUGLIB = $(LIB:.a=Debug.a)
+DOUBLEREPLIB = $(LIB:.a=DoubleRep.a)
+
+all: lib $(EXEC)
+
+#CC=g++
+CXX=g++
+CC=$(CXX)
+
+libDir=../../libs/phylogeny
+binDir=../../bin
+
+ifndef libEvol
+  libEvol=$(libDir)/libEvolTree.a
+  #libEvol=-lEvolTree
+  libEvolDebug=$(libDir)/libEvolTreeDebug.a
+  libEvolDoubleRep=$(libDir)/libEvolTreedoubleRep.a
+endif
+
+vpath % $(libDir)
+
+
+#CPPFLAGS+= -I/usr/include/g++-v3
+
+LDFLAGS += -L$(libDir)
+
+#LDLIBS = -lEvolTree
+#debug: LDLIBS = -lEvolTreeDebug
+# LOADLIBES = $(LIB)
+
+#LDFLAGS=  
+#CPPFLAGS+= -DLOG -DLOGCLS -DMEMCHK
+
+
+#GENGETOPT=/cs/++/phd/ninio/gengetopt-2.11/src/gengetopt
+#GENGETOPT = /opt/local/bin/gengetopt
+#GENGETOPT = ~privmane/code/gengetopt
+GENGETOPT = gengetopt
+
+.SECONDARY: $(addsuffix _cmdline.c,$(EXEC)) $(addsuffix _cmdline.h,$(EXEC)) $(addsuffix .ggo,$(EXEC))
+
+CPPFLAGS=     -O3 -Wall -Wno-sign-compare -I. -I$(libDir) -DLOG -ftemplate-depth-32
+CPPFLAGSDEBUG= -g -Wall -Wno-sign-compare -I. -I$(libDir) -DLOG -ftemplate-depth-32
+
+LDFLAGSDEBUG := $(LDFLAGS) -g 
+# sources
+sources= $(Libsources) $(LibCsources) $(addsuffix .cpp,$(EXEC) $(TEST_EXEC))
+
+.PHONY: tests lib test debug %.debug DOUBLEREP doubleRep
+
+ifdef DOUBLEREP
+CPPFLAGS+= -DDOUBLEREP
+CPPFLAGSDEBUG += -DDOUBLEREP
+LDFLAGSDEBUG +=  -DDOUBLEREP
+endif
+
+test: all tests
+	+cd tests && make -k 
+
+debug:  $(DEBUGLIB) $(DEBUGEXEC)
+
+debug: CPPFLAGS = $(CPPFLAGSDEBUG)
+#debug: LDLIBS = -lEvolTreeDebug
+debug: LIB = $(DEBUGLIB)
+# debug: CPPFLAGS = -g -Wall -Wno-sign-compare  -I. -I$(libDir) -DLOG
+# debug: all
+
+
+
+
+#$(libEvol) le:
+#	+cd $(libDir);make -f Makefile all
+
+#$(libEvolDebug):
+#	+cd $(libDir);make -f Makefile debug
+
+lib: $(LIB)
+
+#lib$(LIBNAME).a: lib$(LIBNAME).a($(Libsources:.cpp=.o) $(LibCsources:.c=.o))
+lib$(LIBNAME).a: $(Libsources:.cpp=.o) $(LibCsources:.c=.o)
+	ar rv $@ $?
+	ranlib $@
+
+tags: *.cpp *.h
+	etags --members --language=c++ $^ 
+EVOLLIB=-lEvolTree
+libEvolDebug=-lEvolTreeDebug
+libEvolDoubleRep=-lEvolTreeDoubleRep
+
+debug: EVOLLIB=$(libEvolDebug)
+
+ifdef LIBNAME
+#  LocalLib = -l$(LIBNAME)
+  LocalLib = lib$(LIBNAME).a
+endif
+
+#$(EXEC): LDLIBS += $(EVOLLIB)
+#$(EXEC) $(TEST_EXEC): $(LIB) #$(EVOLLIB)
+#$(EXEC) $(TEST_EXEC): $(LIB) $(EVOLLIB)
+$(EXEC) $(TEST_EXEC): $(LocalLib) $(libEvol)
+$(DEBUGEXEC) $(TEST_EXEC): $(DEBUGLIB) $(libEvolDebug)
+
+tests: $(TEST_EXEC) $(EXEC)
+
+-include make.dep
+
+install: $(addprefix $(binDir)/,$(EXEC))
+$(binDir)/%: %
+	cp $< $@
+
+
+
+clean:
+	-rm -f $(LIB) $(DEBUGLIB) $(DOUBLEREPLIB) $(EXEC) $(TEST_EXEC) $(DEBUGEXEC) $(DOUBLEREPEXEC) *.o
+
+
+ifneq ($(wildcard make.dep), make.dep)
+ make.dep: depend
+endif
+
+
+depend makedep: _make.dep
+	@mv -f _make.dep make.dep 
+
+_make.dep: $(sources)
+	@echo making depend
+#	$(SHELL) -ec '$(CC) -MM $(CPPFLAGS) $^ | sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@ ; [ -s $@ ] || rm -f $@' 
+#	@$(SHELL) -ec '$(CC) -MM $(CPPFLAGS) $^ > $@' 
+	@$(SHELL) -ec '$(CC) -MM $(CPPFLAGS) $^ | sed "s/\(^[^.]*\)\.o/\1.o \1.debug.o/g" > $@' 
+
+_fast:
+	+cd fast && make -k all
+
+fast.% _fast.%:
+	+cd fast && make -k $(*)
+
+$(libEvol):
+	+cd $(libDir)&&make -f Makefile all
+
+$(libEvolDebug):
+	+cd $(libDir)&&make -f Makefile debug
+
+define ggo_template
+ifeq ($(wildcard $(1).ggo), $(1).ggo)
+   $(1): $(1)_cmdline.o
+endif
+endef
+
+ $(foreach exec,$(EXEC),$(eval $(call ggo_template,$(exec))))
+
+#$(EXEC): $(addsuffix _cmdline.o,$(EXEC))
+
+define ggo_template_debug
+   $(1).debug: $(1)_cmdline.debug.o
+endef
+
+$(foreach exec,$(EXEC),$(eval $(call ggo_template_debug,$(exec))))
+
+define ggo_template_doublerep
+ifeq ($(wildcard $(1).ggo), $(1).ggo)
+   $(1).doubleRep: $(1)_cmdline.o
+endif
+endef
+
+ $(foreach exec,$(EXEC),$(eval $(call ggo_template_doublerep,$(exec))))
+
+#$(addsuffix .debug,$(EXEC)): $(addsuffix _cmdline.debug.o,$(EXEC))
+
+%.ggo: %.args $(libDir)/evolObjs.args 
+	cat $^ > $@
+
+
+# commandline (gengetopts)
+%_cmdline.h %_cmdline.c: %.ggo
+	$(GENGETOPT)  -i$< -F$(*)_cmdline
+
+
+debug: CPPFLAGS = $(CPPFLAGSDEBUG)
+debug: $(addsuffix .debug,$(EXEC))
+#$(addsuffix .debug,$(EXEC)): $(libEvolDebug)
+pl:
+	echo $(LIB)
+
+
+%.debug: CPPFLAGS = -g -Wall -Wno-sign-compare -I. -I../.. -DLOG -ftemplate-depth-25
+
+%.debug: %.o 
+
+
+
+#debug: LDLIBS = -lEvolTreeDebug
+debug: LIB = $(DEBUGLIB)
+
+%.debug: CPPFLAGS = $(CPPFLAGSDEBUG)
+%.debug: LDFLAGS = $(LDFLAGSDEBUG)
+#%.debug: %
+#	@echo "made \""$(*)"\" in debug mode"
+
+
+%.debug.o: %.c
+	$(CC) -c $(CPPFLAGSDEBUG) $(CFLAGS) $< -o $@
+
+%.debug.o: %.cpp
+	$(CXX) -c $(CPPFLAGSDEBUG) $(CXXFLAGS) $< -o $@
+
+#$(DEBUGLIB): $(Libsources:.cpp=.debug.o) $(LibCsources:.c=.debug.o)
+
+lib$(LIBNAME)Debug.a: $(Libsources:.cpp=.debug.o) $(LibCsources:.c=.debug.o)
+	ar rv $@ $?
+	ranlib $@
+
+DOUBLEREPEXEC = $(EXEC:=.doubleRep)
+
+doubleRep: LOGREP=t
+doubleRep: CPPFLAGS+= -DLOGREP
+doubleRep: $(DOUBLEREPLIB) $(DOUBLEREPEXEC)
+#	echo $@
+$(DOUBLEREPEXEC): $(DOUBLEREPLIB) $(libEvolDoubleRep)
+
+%.doubleRep.o: %.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
+
+%.doubleRep.o: %.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+$(DOUBLEREPLIB): $(Libsources:.cpp=.doubleRep.o) $(LibCsources:.c=.doubleRep.o)
+	ar rv $@ $?
+	ranlib $@
+
+# DO NOT DELETE

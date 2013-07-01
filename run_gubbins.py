@@ -1,4 +1,4 @@
-#!/usr/bin/env python-2.7
+#!/usr/bin/env python
 # encoding: utf-8
 #
 # Wellcome Trust Sanger Institute
@@ -19,11 +19,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-# fastml
-# disable timestamp by default to allow pipelineing
-# check a file exists before trying to delete it
-
-
 import sys
 import argparse
 import subprocess
@@ -40,17 +35,18 @@ from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 
-# config variables
-RAXML_EXEC = 'raxmlHPC -f d  -m GTRGAMMA'
+# Default parameters
+RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
 FASTTREE_EXEC = 'FastTree'
 FASTTREE_PARAMS = '-gtr -gamma -nt'
 GUBBINS_EXEC = 'gubbins'
 FASTML_EXEC = 'fastml -mg -qf -b '
 
-# Todo
-# extract code into modules
-# catch exception errors when shelling out
-
+# Names of the bundled executables to use if the executables arent in the default PATH
+RAXML_BUNDLED_EXEC = 'external/standard-RAxML/raxmlHPC'
+FASTML_BUNDLED_EXEC = 'external/fastml/programs/fastml/fastml'
+GUBBINS_BUNDLED_EXEC = 'src/gubbins'
+FASTTREE_BUNDLED_EXEC = 'external/fasttree/FastTree'
 
 def robinson_foulds_distance(input_tree_name,output_tree_name):
   input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -457,6 +453,16 @@ def which(program):
 
   return None
 
+def use_bundled_exec(input_executable, bundled_executable):
+  (base_directory,script_filename) = os.path.split(os.path.realpath(__file__))
+  path_to_bundled_exec = os.path.join(base_directory, bundled_executable)
+  
+  # Pop the first value off the input_executable and replace it with the bundled exec
+  executable_and_params = input_executable.split(" ")
+  executable_and_params.pop(0)
+  executable_and_params.insert(0, path_to_bundled_exec)
+  return  ' '.join(executable_and_params)
+
 
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
@@ -474,17 +480,25 @@ args = parser.parse_args()
 
 # check that all the external executable dependancies are available
 if which(GUBBINS_EXEC) is None:
-  print "gubbins is not in your path"
-  sys.exit()
+  GUBBINS_EXEC = use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
+  if which(GUBBINS_EXEC) is None:
+    print "gubbins is not in your path"
+    sys.exit()
 if which(FASTML_EXEC) is None:
-  print "fastml is not in your path"
-  sys.exit()
-if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which('raxmlHPC') is None:
-  print "RAxML is not in your path"
-  sys.exit()
+  FASTML_EXEC = use_bundled_exec(FASTML_EXEC, FASTML_BUNDLED_EXEC)
+  if which(FASTML_EXEC) is None:
+    print "fastml is not in your path"
+    sys.exit()
+if (args.tree_builder == "raxml" or args.tree_builder == "hybrid") and which(RAXML_EXEC) is None:
+   RAXML_EXEC = use_bundled_exec(RAXML_EXEC, RAXML_BUNDLED_EXEC)
+   if which(RAXML_EXEC) is None:
+     print "RAxML is not in your path"
+     sys.exit()
 if (args.tree_builder == "fasttree" or args.tree_builder == "hybrid") and which(FASTTREE_EXEC) is None:
-  print "FastTree is not in your path"
-  sys.exit()
+  FASTTREE_EXEC = use_bundled_exec(FASTTREE_EXEC, FASTTREE_BUNDLED_EXEC)
+  if which(FASTTREE_EXEC) is None:
+    print "FastTree is not in your path"
+    sys.exit()
   
 if(not os.path.exists(args.alignment_filename)):
   print "Cannot access the input alignment file. Check its been entered correctly"

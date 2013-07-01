@@ -191,7 +191,7 @@ void get_sample_names_from_parse_phylip(char ** sample_names)
 	int i;
 	for(i = 0; i< num_samples; i++)
 	{
-		sample_names[i] =  (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		sample_names[i] =  (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(sample_names[i], phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 	}
 }
@@ -203,7 +203,7 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 	
 	for(j = 0; j < number_of_filtered_snps; j++)
 	{
-		filtered_bases_for_snps[j] = (char *) malloc((num_samples+1)*sizeof(char));
+		filtered_bases_for_snps[j] = (char *) calloc((num_samples+1),sizeof(char));
 	}
 		
 	for(i = 0; i < num_samples; i++)
@@ -314,7 +314,7 @@ int find_sequence_index_from_sample_name( char * sample_name)
 void initialise_internal_node()
 {
 	int i=0;
-	internal_node = (int *) malloc((num_samples+1)*sizeof(int));
+	internal_node = (int *) calloc((num_samples+1),sizeof(int));
 	for(i=0; i< num_samples; i++)
 	{
 		internal_node[i] = 0;
@@ -324,13 +324,13 @@ void initialise_internal_node()
 void initialise_statistics()
 {
 	int i=0;
-	statistics_for_samples = (sample_statistics **) malloc((num_samples+1)*sizeof(sample_statistics *));
+	statistics_for_samples = (sample_statistics **) calloc((num_samples+1),sizeof(sample_statistics *));
 	for(i=0; i< num_samples; i++)
 	{
 		sample_statistics * sample_statistics_placeholder;
-		sample_statistics_placeholder = (sample_statistics *) malloc(sizeof(sample_statistics));
+		sample_statistics_placeholder = (sample_statistics *) calloc(1, sizeof(sample_statistics));
 		
-		sample_statistics_placeholder->sample_name = (char *) malloc( MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		sample_statistics_placeholder->sample_name = (char *) calloc( MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(sample_statistics_placeholder->sample_name, phylip_sample_names[i], size_of_string(phylip_sample_names[i]) +1);
 		
 		statistics_for_samples[i] = sample_statistics_placeholder;
@@ -349,8 +349,8 @@ void load_sequences_from_multifasta_file(char filename[])
 	num_snps    = genome_length(filename);
 	num_samples = number_of_sequences_in_file(filename);
 	
-	sequences = (char **) malloc((num_samples+1)*sizeof(char *));
-	phylip_sample_names = (char **) malloc((num_samples+1)*sizeof(char *));
+	sequences = (char **) calloc((num_samples+1),sizeof(char *));
+	phylip_sample_names = (char **) calloc((num_samples+1),sizeof(char *));
 	
 	for(i = 0; i < num_samples; i++)
 	{

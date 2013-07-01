@@ -56,12 +56,12 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	int i;
 	
 	length_of_genome = genome_length(filename);
-	reference_sequence = (char *) malloc((length_of_genome+1)*sizeof(char));
+	reference_sequence = (char *) calloc((length_of_genome+1),sizeof(char));
 	
 	build_reference_sequence(reference_sequence,filename);
 	number_of_snps = detect_snps(reference_sequence, filename, length_of_genome, exclude_gaps);
 	
-	snp_locations = (int *) malloc((number_of_snps+1)*sizeof(int));
+	snp_locations = (int *) calloc((number_of_snps+1),sizeof(int));
 	build_snp_locations(snp_locations, reference_sequence);
 	free(reference_sequence);
 	
@@ -72,7 +72,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	sequence_names[number_of_samples-1] = '\0';
 	for(i = 0; i < number_of_samples; i++)
 	{
-		sequence_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		sequence_names[i] = calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 	}
 	
 	get_sample_names_for_header(filename, sequence_names, number_of_samples);

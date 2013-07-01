@@ -33,7 +33,7 @@ void create_fasta_of_snp_sites(char filename[], int number_of_snps, char ** base
 	int snp_counter; 
 	char * base_filename;
 	
-	base_filename = (char *) malloc(1024*sizeof(char));
+	base_filename = (char *) calloc(1024,sizeof(char));
 	memcpy(base_filename, filename, 1024*sizeof(char));
 	char extension[16] = {".snp_sites.aln"};
 	concat_strings_created_with_malloc(base_filename,extension);

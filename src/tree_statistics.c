@@ -30,7 +30,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	int sample_counter;
 	char * base_filename;
 	
-	base_filename = (char *) malloc(MAX_FILE_NAME_SIZE*sizeof(char));
+	base_filename = (char *) calloc(MAX_FILE_NAME_SIZE,sizeof(char));
 	memcpy(base_filename, filename, (1024)*sizeof(char));
 	char extension[7] = {".stats"};
 	concat_strings_created_with_malloc(base_filename,extension);

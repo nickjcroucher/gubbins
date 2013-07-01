@@ -80,7 +80,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	int * current_recombinations;
 	int num_current_recombinations = 0 ;
 	
-	current_recombinations = (int *) malloc((root->num_recombinations+1+parent_num_recombinations)*sizeof(int));
+	current_recombinations = (int *) calloc((root->num_recombinations+1+parent_num_recombinations),sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
 	
  	// overwrite the bases of snps with N's
@@ -117,9 +117,9 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 		{
 			// recursion
 			int ** merged_block_coordinates;
-			merged_block_coordinates = (int **) malloc(3*sizeof(int *));
-			merged_block_coordinates[0] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
-			merged_block_coordinates[1] = (int*) malloc((num_blocks + root->number_of_blocks+1)*sizeof(int ));
+			merged_block_coordinates = (int **) calloc(3,sizeof(int *));
+			merged_block_coordinates[0] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
+			merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
 			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 			fill_in_recombinations_with_gaps(child->node, current_recombinations, num_current_recombinations,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations );
 			child = child->next;
@@ -235,7 +235,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		leaf_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
 		get_sequence_for_sample_name(leaf_sequence, root->taxon);
 		
-		root->taxon_names = (char *) malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		root->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(root->taxon_names, root->taxon, size_of_string(root->taxon)+1);
 
     // Save some statistics about the sequence
@@ -282,11 +282,11 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		for(current_branch = 0 ; current_branch< (root->childNum); current_branch++)
 		{
 			int * branches_snp_sites;
-			branches_snp_sites = (int *) malloc((number_of_snps +1)*sizeof(int));
+			branches_snp_sites = (int *) calloc((number_of_snps +1),sizeof(int));
 			char * branch_snp_sequence;
 			char * branch_snp_ancestor_sequence;
-			branch_snp_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
-			branch_snp_ancestor_sequence = (char *) malloc((number_of_snps +1)*sizeof(char));
+			branch_snp_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+			branch_snp_ancestor_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
 			
 			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
 			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(leaf_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
@@ -347,17 +347,17 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 	int original_branch_genome_size = branch_genome_size;
 
 	// place to store coordinates of recombinations snps
-	current_node->recombinations = (int *) malloc((number_of_branch_snps+1)*sizeof(int));
+	current_node->recombinations = (int *) calloc((number_of_branch_snps+1),sizeof(int));
 	
 	int number_of_windows = (branch_genome_size/MIN_WINDOW_SIZE) + 1;
 	int * block_coordinates[4];
-	block_coordinates[0] = (int *) malloc((number_of_windows+1)*sizeof(int));
-	block_coordinates[1] = (int *) malloc((number_of_windows+1)*sizeof(int));
-	block_coordinates[2] = (int *) malloc((number_of_windows+1)*sizeof(int));
-	block_coordinates[3] = (int *) malloc((number_of_windows+1)*sizeof(int));
+	block_coordinates[0] = (int *) calloc((number_of_windows+1),sizeof(int));
+	block_coordinates[1] = (int *) calloc((number_of_windows+1),sizeof(int));
+	block_coordinates[2] = (int *) calloc((number_of_windows+1),sizeof(int));
+	block_coordinates[3] = (int *) calloc((number_of_windows+1),sizeof(int));
 	
 	double * block_likelihoods;	
-	block_likelihoods = (double *) malloc((number_of_windows+1)*sizeof(double));
+	block_likelihoods = (double *) calloc((number_of_windows+1),sizeof(double));
 
 	while(number_of_branch_snps > min_snps)
 	{
@@ -409,13 +409,13 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 		move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates, min_snps, snp_site_coords, number_of_branch_snps, branch_snp_sequence, snp_locations, branch_genome_size, child_sequence, length_of_sequence,block_likelihoods,cutoff);
 
 		int * candidate_blocks[4];
-		candidate_blocks[0] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-		candidate_blocks[1] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-		candidate_blocks[2] = (int *) malloc((number_of_blocks+1)*sizeof(int));
-		candidate_blocks[3] = (int *) malloc((number_of_blocks+1)*sizeof(int));
+		candidate_blocks[0] = (int *) calloc((number_of_blocks+1),sizeof(int));
+		candidate_blocks[1] = (int *) calloc((number_of_blocks+1),sizeof(int));
+		candidate_blocks[2] = (int *) calloc((number_of_blocks+1),sizeof(int));
+		candidate_blocks[3] = (int *) calloc((number_of_blocks+1),sizeof(int));
 		
 		double * candidate_block_likelihoods;
-		candidate_block_likelihoods = (double *) malloc((number_of_blocks+1)*sizeof(double));
+		candidate_block_likelihoods = (double *) calloc((number_of_blocks+1),sizeof(double));
 		
 		int number_of_candidate_blocks = 0;
 
@@ -489,7 +489,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 {
 	// Set up the window counter with 1 value per base in the branch
  	int * window_count;
-	window_count = (int *) malloc((genome_size+1)*sizeof(int));
+	window_count = (int *) calloc((genome_size+1),sizeof(int));
 	int i;
 	for(i =0; i< genome_size; i++)
 	{

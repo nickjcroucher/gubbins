@@ -33,7 +33,7 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
-	base_filename = (char *) malloc((1024 +1)*sizeof(char));
+	base_filename = (char *) calloc((1024 +1),sizeof(char));
 	memcpy(base_filename, filename, (1024+1)*sizeof(char));
 	char extension[5] = {".vcf"};
 	concat_strings_created_with_malloc(base_filename,extension);

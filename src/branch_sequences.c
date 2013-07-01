@@ -296,7 +296,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
-			//free(child_sequences[current_branch]);
+			free(child_sequences[current_branch]);
 			free(branches_snp_sites);
 			
 		}

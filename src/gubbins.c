@@ -116,22 +116,22 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	
 	
 	// Theres a seg fault in here
-	//for(i = 0; i < number_of_columns; i++)
-	//{
-	//	free(column_names[i] );
-	//}
-	//
-	//for(i=0; i<number_of_samples; i++ )
-	//{
-	//	free(sample_names[i]);
-	//}
-	//
-	//for(i=0; i<number_of_filtered_snps; i++ )
-	//{
-	//	free(filtered_bases_for_snps[i]);
-	//}
-	//cleanup_node_memory(root_node);
-	//free(reference_sequence_bases);
+	for(i = 0; i < number_of_columns; i++)
+	{
+		free(column_names[i] );
+	}
+	
+	for(i=0; i<number_of_samples; i++ )
+	{
+		free(sample_names[i]);
+	}
+	
+	for(i=0; i<number_of_filtered_snps; i++ )
+	{
+		free(filtered_bases_for_snps[i]);
+	}
+	cleanup_node_memory(root_node);
+	free(reference_sequence_bases);
 }
 
 

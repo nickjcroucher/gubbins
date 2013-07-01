@@ -613,7 +613,7 @@ for i in range(1, args.iterations+1):
   
   reroot_tree(str(current_tree_name), args.outgroup)
 
-  if(os.path.exists(latest_file_name)):
+  if(os.path.lexists(latest_file_name)):
     os.remove(latest_file_name)
   os.symlink(str(current_tree_name), latest_file_name)
  

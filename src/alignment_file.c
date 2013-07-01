@@ -74,11 +74,6 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 	fp = gzopen(filename, "r");
 	seq = kseq_init(fp);
 
-	// initialise the strings in the array
-	for(i = 0; i < number_of_snps; i++)
-	{
-		strcpy(bases_for_snps[i], "");
-	}
   
 	while ((l = kseq_read(seq)) >= 0) 
 	{
@@ -98,45 +93,6 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 	kseq_destroy(seq);
 	gzclose(fp);
 }
-
-
-void get_bases_for_each_snp_traspose(char filename[], int snp_locations[], char ** bases_for_snps, int length_of_genome, int number_of_snps)
-{
-  int l;
-  int i = 0;
-  int sequence_number = 0;
-	
-	gzFile fp;
-	kseq_t *seq;
-	
-	fp = gzopen(filename, "r");
-	seq = kseq_init(fp);
-
-	// initialise the strings in the array
-	for(i = 0; i < number_of_snps; i++)
-	{
-		strcpy(bases_for_snps[i], "");
-	}
-  
-	while ((l = kseq_read(seq)) >= 0) 
-	{
-    
-    for(i = 0; i< number_of_snps; i++)
-		{
-			bases_for_snps[i][sequence_number] = toupper(((char *) seq->seq.s)[snp_locations[i]]);
-			// Present gaps and unknowns in the same way to Gubbins
-			if(bases_for_snps[i][sequence_number] == 'N')
-			{
-				bases_for_snps[i][sequence_number]  = '-';
-			}
-		}
-    sequence_number++;
-  }
-
-	kseq_destroy(seq);
-	gzclose(fp);
-}
-
 
 
 int genome_length(char filename[])
@@ -272,20 +228,19 @@ int detect_snps(char reference_sequence[], char filename[], int length_of_genome
 
 char * read_line(char sequence[], FILE * pFilePtr)
 {
-    strcpy(sequence, "");
     char *pcRes         = NULL;  
     long   lineLength    = 0; 
-	char current_line_buffer[MAX_READ_BUFFER] = {0};
+	  char current_line_buffer[MAX_READ_BUFFER] = {0};
 	
 	
     while((pcRes = fgets(current_line_buffer, sizeof(current_line_buffer), pFilePtr))  != NULL){
-	      if(strlen(sequence) > 0)
+	      if(size_of_string(sequence) > 0)
 	      {
-	    			sequence = realloc(sequence, strlen(sequence) + strlen(current_line_buffer) + 2 );
+	    			sequence = realloc(sequence, sizeof(char)*(size_of_string(sequence) + size_of_string(current_line_buffer) + 2) );
         }
-        strcat(sequence, current_line_buffer);
-        strcpy(current_line_buffer, "");
-        lineLength = strlen(sequence) - 1;
+				concat_strings_created_with_malloc(sequence,current_line_buffer);
+				current_line_buffer[0] = '\0';
+        lineLength = size_of_string(sequence);
         //if end of line character is found then exit from loop
 		
         if((sequence)[lineLength] == '\n' || (sequence)[lineLength] == '\0'){
@@ -310,7 +265,7 @@ void get_sample_names_for_header(char filename[], char ** sequence_names, int nu
 	seq = kseq_init(fp);
   
 	while ((l = kseq_read(seq)) >= 0) {
-	  strcpy(sequence_names[i], seq->name.s);
+		memcpy(sequence_names[i], seq->name.s, size_of_string(seq->name.s)+1);
     i++;
 	}
 	kseq_destroy(seq);

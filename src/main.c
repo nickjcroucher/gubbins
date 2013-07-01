@@ -25,6 +25,7 @@
 #include "snp_sites.h"
 #include "gubbins.h"
 #include "../config.h"
+#include "string_cat.h"
 
 #define MAX_FILENAME_SIZE 1024
 const char* program_name;
@@ -69,11 +70,11 @@ void print_usage(FILE* stream, int exit_code)
 int main (argc, argv) int argc; char **argv;
 {
   int c;
-  char multi_fasta_filename[MAX_FILENAME_SIZE];
-  char vcf_filename[MAX_FILENAME_SIZE];
-  char tree_filename[MAX_FILENAME_SIZE];
-  char phylip_filename[MAX_FILENAME_SIZE];
-  char original_multi_fasta_filename[MAX_FILENAME_SIZE];
+  char multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
+  char vcf_filename[MAX_FILENAME_SIZE] = {""};
+  char tree_filename[MAX_FILENAME_SIZE] = {""};
+  char phylip_filename[MAX_FILENAME_SIZE] = {""};
+  char original_multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
 
   int recombination_flag = 0 ;
 	int min_snps = 3;
@@ -116,16 +117,16 @@ int main (argc, argv) int argc; char **argv;
 				  recombination_flag = 1;
 	        break;
 	      case 'f':
-	        strcpy(original_multi_fasta_filename,optarg);
+					memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
 	        break;
         case 'v':
-          strcpy(vcf_filename,optarg);
+					memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
           break;
 	      case 'm':
 	        min_snps = atoi(optarg);
 	        break;
         case 't':
-          strcpy(tree_filename,optarg);
+	        memcpy(tree_filename, optarg, size_of_string(optarg) +1);
           break;
         case '?':
           /* getopt_long already printed an error message. */
@@ -138,7 +139,8 @@ int main (argc, argv) int argc; char **argv;
     /* Print any remaining command line arguments (not options). */
     if (optind < argc)
     {
-        strcpy(multi_fasta_filename,argv[optind++]);
+			memcpy(multi_fasta_filename, argv[optind], size_of_string(argv[optind]) +1);
+			optind++;
     }
 
 	

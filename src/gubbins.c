@@ -64,7 +64,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	char* column_names[number_of_columns];
 	for(i = 0; i < number_of_columns; i++)
 	{
-		column_names[i] = malloc(MAX_SAMPLE_NAME_SIZE*sizeof(char));
+		column_names[i] = calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 	}
 	get_column_names(vcf_file_pointer, column_names, number_of_columns);
 	
@@ -85,7 +85,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
   get_sample_names_from_parse_phylip(sample_names);
 
   char * reference_sequence_bases;
-  reference_sequence_bases = (char *) malloc((number_of_snps+1)*sizeof(char));
+  reference_sequence_bases = (char *) calloc((number_of_snps+1),sizeof(char));
 
 	get_sequence_for_sample_name(reference_sequence_bases, sample_names[0]);
 	int internal_nodes[number_of_samples];
@@ -116,22 +116,23 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	
 	
 	// Theres a seg fault in here
-	//for(i = 0; i < number_of_columns; i++)
-	//{
-	//	free(column_names[i] );
-	//}
-	//
-	//for(i=0; i<number_of_samples; i++ )
-	//{
-	//	free(sample_names[i]);
-	//}
-	//
-	//for(i=0; i<number_of_filtered_snps; i++ )
-	//{
-	//	free(filtered_bases_for_snps[i]);
-	//}
-	//cleanup_node_memory(root_node);
-	//free(reference_sequence_bases);
+	for(i = 0; i < number_of_columns; i++)
+	{
+		free(column_names[i] );
+	}
+	
+	for(i=0; i<number_of_samples; i++ )
+	{
+		free(sample_names[i]);
+	}
+	
+	for(i=0; i<number_of_filtered_snps; i++ )
+	{
+		free(filtered_bases_for_snps[i]);
+	}
+	cleanup_node_memory(root_node);
+	seqFreeAll();
+	free(reference_sequence_bases);
 }
 
 

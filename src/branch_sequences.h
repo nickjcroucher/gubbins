@@ -43,6 +43,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root);
 void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value);
 int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff);
 
+
 #define WINDOW_SNP_MODE_TARGET 10
 #define MIN_WINDOW_SIZE 100
 #define MAX_WINDOW_SIZE 10000

@@ -552,6 +552,12 @@ previous_tree_name    = ""
 current_tree_name     = ""
 max_iteration = 1
 
+
+# cleanup RAxML intermediate files
+if args.no_cleanup == 0 or args.no_cleanup is None:
+  raxml_regex_for_file_deletions = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, args.iterations)
+  delete_files_based_on_list_of_regexes('.', raxml_regex_for_file_deletions, args.verbose)
+
 for i in range(1, args.iterations+1):
   max_iteration += 1
   

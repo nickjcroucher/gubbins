@@ -555,8 +555,8 @@ max_iteration = 1
 
 # cleanup RAxML intermediate files
 if args.no_cleanup == 0 or args.no_cleanup is None:
-  raxml_regex_for_file_deletions = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, args.iterations)
-  delete_files_based_on_list_of_regexes('.', raxml_regex_for_file_deletions, args.verbose)
+  raxml_files_to_delete = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, args.iterations)
+  delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, args.verbose)
 
 for i in range(1, args.iterations+1):
   max_iteration += 1
@@ -647,10 +647,10 @@ for i in range(1, args.iterations+1):
 if args.no_cleanup == 0 or args.no_cleanup is None:
   max_intermediate_iteration  = max_iteration - 1
   
-  raxml_regex_for_file_deletions = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)
-  delete_files_based_on_list_of_regexes('.', raxml_regex_for_file_deletions, args.verbose)
+  raxml_files_to_delete = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)
+  delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, args.verbose)
   
-  fasttree_regex_for_file_deletions = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
-  delete_files_based_on_list_of_regexes('.', fasttree_regex_for_file_deletions, args.verbose)
+  fasttree_files_to_delete = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
+  delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, args.verbose)
   shutil.rmtree(temp_working_dir)
   

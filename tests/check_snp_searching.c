@@ -164,39 +164,41 @@ START_TEST (check_get_window_end_coordinates_excluding_gaps)
 	fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_without_gaps,  1) == 4);
   fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
   fail_unless( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
-  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_without_gaps,  3) == 8);
+
+  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
   fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_without_gaps,  3) == 3);
-  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_without_gaps,  3) == 5);
-  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_without_gaps,  3) == 7);
+
+  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
+  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
   fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_without_gaps,  8) == 4);
   fail_unless( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_without_gaps,  8) == 6);
   fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_without_gaps,  8) == 8);
-  fail_unless( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_without_gaps,  8) == 10);
+  fail_unless( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_without_gaps,  8) == 8);
   fail_unless( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_without_gaps,  8) == 12);
   fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_without_gaps,  8) == 3);
-  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_without_gaps,  8) == 5);
-  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_without_gaps,  8) == 7);
-  fail_unless( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_without_gaps,  8) == 9);
+  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_without_gaps,  8) == 4);
+  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_without_gaps,  8) == 6);
+  fail_unless( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_without_gaps,  8) == 8);
   fail_unless( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_without_gaps,  8) == 11);
            
 	fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_empty,child_sequence_with_gaps,  0) == 3);
   fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_one,  child_sequence_with_gaps,  1) == 4);
 	fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_with_gaps,  1) == 5);
-  fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_with_gaps,  3) == 5);
+  fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
   fail_unless( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
-  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_with_gaps,  3) == 8);
+  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
   fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
-  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_with_gaps,  3) == 5);
-  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_with_gaps,  3) == 7);
-  fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_with_gaps,  8) == 5);
+  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
+  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+  fail_unless( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_with_gaps,  8) == 4);
   fail_unless( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_with_gaps,  8) == 6);
-  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_with_gaps,  8) == 9);
-  fail_unless( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_with_gaps,  8) == 11);
+  fail_unless( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_with_gaps,  8) == 8);
+  fail_unless( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_with_gaps,  8) == 8);
   fail_unless( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_with_gaps,  8) == 12);
   fail_unless( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_with_gaps,  8) == 4);
-  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_with_gaps,  8) == 5);
-  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_with_gaps,  8) == 7);
-  fail_unless( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_with_gaps,  8) == 10);
+  fail_unless( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_with_gaps,  8) == 4);
+  fail_unless( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_with_gaps,  8) == 6);
+  fail_unless( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_with_gaps,  8) == 8);
   fail_unless( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_with_gaps,  8) == 11);
 	
 }

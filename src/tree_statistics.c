@@ -22,6 +22,7 @@
 #include <string.h>
 #include "parse_phylip.h"
 #include "tree_statistics.h"
+#include "string_cat.h"
 
 void create_tree_statistics_file(char filename[], sample_statistics ** statistics_for_samples, int number_of_samples)
 {
@@ -29,10 +30,11 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	int sample_counter;
 	char * base_filename;
 	
-	base_filename = (char *) malloc(MAX_FILE_NAME_SIZE*sizeof(char));
-	strcpy(base_filename, filename);
-	
-	file_pointer = fopen(strcat(base_filename,".stats"), "w");
+	base_filename = (char *) calloc(MAX_FILE_NAME_SIZE,sizeof(char));
+	memcpy(base_filename, filename, (1024)*sizeof(char));
+	char extension[7] = {".stats"};
+	concat_strings_created_with_malloc(base_filename,extension);
+	file_pointer = fopen(base_filename, "w");
 	fprintf( file_pointer, "Sample name\tNum SNPs in recombinations\tNum of SNPs outside recombinations\tTotal SNPs\tBases in Recombinations\tEstimated Num SNPs if there were no recombinations\tNum Recombination Blocks\tr/m\tb/m\tGenome Length\n");
 
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)

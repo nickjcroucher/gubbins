@@ -26,16 +26,18 @@
 #include "alignment_file.h"
 #include "snp_sites.h"
 #include "parse_phylip.h"
+#include "string_cat.h"
 
 
 void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[], int offset)
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
-	base_filename = (char *) malloc(1024*sizeof(char));
-	strcpy(base_filename, filename);
-	
-	vcf_file_pointer=fopen(strcat(base_filename,".vcf"), "w");
+	base_filename = (char *) calloc((1024 +1),sizeof(char));
+	memcpy(base_filename, filename, (1024+1)*sizeof(char));
+	char extension[5] = {".vcf"};
+	concat_strings_created_with_malloc(base_filename,extension);
+	vcf_file_pointer=fopen(base_filename, "w");
 	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples,internal_nodes);
 	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples,internal_nodes,offset);
   fclose(vcf_file_pointer);

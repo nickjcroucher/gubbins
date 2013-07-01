@@ -1,0 +1,715 @@
+AddLog.o AddLog.debug.o: AddLog.cpp AddLog.h
+NNiProp.o NNiProp.debug.o: NNiProp.cpp definitions.h treeIt.h errorMsg.h tree.h \
+ readTree.h logFile.h treeUtil.h NNiProp.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ bblEM.h countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h bblEMProportional.h
+NNiSep.o NNiSep.debug.o: NNiSep.cpp definitions.h treeIt.h errorMsg.h tree.h readTree.h \
+ logFile.h treeUtil.h NNiSep.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h bblEM.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h bblEMSeperate.h
+Nni.o Nni.debug.o: Nni.cpp definitions.h treeUtil.h tree.h readTree.h errorMsg.h \
+ logFile.h treeIt.h Nni.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h bblEM.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h
+aaJC.o aaJC.debug.o: aaJC.cpp aaJC.h replacementModel.h definitions.h errorMsg.h
+allTrees.o allTrees.debug.o: allTrees.cpp definitions.h allTrees.h tree.h readTree.h \
+ errorMsg.h logFile.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h treeUtil.h treeIt.h \
+ bblEM.h countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h
+allTreesSeparateModel.o allTreesSeparateModel.debug.o: allTreesSeparateModel.cpp definitions.h treeIt.h \
+ errorMsg.h tree.h readTree.h logFile.h allTreesSeparateModel.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h bblEMSeperate.h
+alphabet.o alphabet.debug.o: alphabet.cpp alphabet.h
+amino.o amino.debug.o: amino.cpp amino.h definitions.h errorMsg.h alphabet.h \
+ geneticCodeHolder.h codon.h someUtil.h logFile.h
+bestAlpha.o bestAlpha.debug.o: bestAlpha.cpp bestAlpha.h definitions.h \
+ likelihoodComputation.h computePijComponent.h tree.h readTree.h \
+ errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h gammaDistribution.h \
+ generalGammaDistribution.h bblEM.h countTableComponent.h numRec.h \
+ uniformDistribution.h
+bestAlphaManyTrees.o bestAlphaManyTrees.debug.o: bestAlphaManyTrees.cpp bestAlphaManyTrees.h \
+ definitions.h computePijComponent.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h sequenceContainer.h sequence.h alphabet.h mulAlphabet.h \
+ someUtil.h gainLossAlphabet.h bblEM.h countTableComponent.h \
+ suffStatComponent.h unObservableData.h gammaDistribution.h \
+ generalGammaDistribution.h likelihoodComputation.h bestAlpha.h numRec.h \
+ uniformDistribution.h bblEMProportional.h bblEMSeperate.h
+bestHKYparam.o bestHKYparam.debug.o: bestHKYparam.cpp bestHKYparam.h definitions.h \
+ likelihoodComputation.h computePijComponent.h tree.h readTree.h \
+ errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h gammaDistribution.h \
+ generalGammaDistribution.h hky.h bblEM.h countTableComponent.h numRec.h \
+ uniformDistribution.h bestAlpha.h
+bootstrap.o bootstrap.debug.o: bootstrap.cpp definitions.h someUtil.h logFile.h alphabet.h \
+ bootstrap.h split.h splitMap.h tree.h readTree.h errorMsg.h treeUtil.h \
+ splitTreeUtil.h
+bblEM.o bblEM.debug.o: bblEM.cpp bblEM.h definitions.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h sequenceContainer.h sequence.h alphabet.h mulAlphabet.h \
+ someUtil.h gainLossAlphabet.h countTableComponent.h \
+ computePijComponent.h suffStatComponent.h unObservableData.h \
+ likelihoodComputation.h computeUpAlg.h computeDownAlg.h computeCounts.h \
+ treeIt.h fromCountTableComponentToDistance.h
+bblEMfixRoot.o bblEMfixRoot.debug.o: bblEMfixRoot.cpp bblEMfixRoot.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h likelihoodComputation.h computeUpAlg.h \
+ computeDownAlg.h computeCounts.h treeIt.h \
+ fromCountTableComponentToDistancefixRoot.h
+bblEMProprtional.o bblEMProprtional.debug.o: bblEMProprtional.cpp bblEM.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h bblEMProportional.h likelihoodComputation.h \
+ computeUpAlg.h computeDownAlg.h computeCounts.h treeIt.h \
+ fromCountTableComponentToDistance.h \
+ fromCountTableComponentToDistanceProp.h
+bblEMSeperate.o bblEMSeperate.debug.o: bblEMSeperate.cpp bblEM.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h bblEMSeperate.h
+chebyshevAccelerator.o chebyshevAccelerator.debug.o: chebyshevAccelerator.cpp chebyshevAccelerator.h \
+ pijAccelerator.h definitions.h replacementModel.h
+clustalFormat.o clustalFormat.debug.o: clustalFormat.cpp clustalFormat.h sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h codon.h geneticCodeHolder.h
+codon.o codon.debug.o: codon.cpp codon.h definitions.h errorMsg.h someUtil.h logFile.h \
+ alphabet.h geneticCodeHolder.h nucleotide.h amino.h matrixUtils.h \
+ sequenceContainer.h sequence.h mulAlphabet.h gainLossAlphabet.h
+codonJC.o codonJC.debug.o: codonJC.cpp codonJC.h replacementModel.h definitions.h
+computeCounts.o computeCounts.debug.o: computeCounts.cpp computeCounts.h definitions.h \
+ countTableComponent.h sequenceContainer.h sequence.h errorMsg.h \
+ alphabet.h mulAlphabet.h someUtil.h logFile.h gainLossAlphabet.h \
+ computePijComponent.h tree.h readTree.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h suffStatComponent.h
+computeDownAlg.o computeDownAlg.debug.o: computeDownAlg.cpp definitions.h computeDownAlg.h \
+ tree.h readTree.h errorMsg.h logFile.h suffStatComponent.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h computePijComponent.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h treeIt.h
+computeMarginalAlg.o computeMarginalAlg.debug.o: computeMarginalAlg.cpp definitions.h treeIt.h \
+ errorMsg.h tree.h readTree.h logFile.h computeMarginalAlg.h \
+ suffStatComponent.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h computePijComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h
+computePijComponent.o computePijComponent.debug.o: computePijComponent.cpp definitions.h treeIt.h \
+ errorMsg.h tree.h readTree.h logFile.h computePijComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h
+computeUpAlg.o computeUpAlg.debug.o: computeUpAlg.cpp definitions.h computeUpAlg.h tree.h \
+ readTree.h errorMsg.h logFile.h suffStatComponent.h sequenceContainer.h \
+ sequence.h alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ computePijComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h treeIt.h seqContainerTreeMap.h
+computeUpAlgFactors.o computeUpAlgFactors.debug.o: computeUpAlgFactors.cpp definitions.h \
+ computeUpAlg.h tree.h readTree.h errorMsg.h logFile.h \
+ suffStatComponent.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h computePijComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ seqContainerTreeMap.h treeIt.h
+computeSubstitutionCounts.o computeSubstitutionCounts.debug.o: computeSubstitutionCounts.cpp \
+ computeSubstitutionCounts.h definitions.h replacementModel.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h tree.h readTree.h \
+ computePosteriorExpectationOfSubstitutions.h simulateJumps.h \
+ simulateJumpsAbstract.h stochasticProcess.h pijAccelerator.h \
+ distribution.h suffStatComponent.h computePijComponent.h \
+ computePosteriorExpectationOfSubstitutions_nonReversibleSp.h \
+ multipleStochasticProcess.h matrixUtils.h simulateCodonsJumps.h treeIt.h \
+ treeUtil.h
+computePosteriorExpectationOfSubstitutions.o computePosteriorExpectationOfSubstitutions.debug.o: \
+ computePosteriorExpectationOfSubstitutions.cpp \
+ computePosteriorExpectationOfSubstitutions.h definitions.h \
+ simulateJumps.h simulateJumpsAbstract.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h alphabet.h sequenceContainer.h sequence.h mulAlphabet.h \
+ someUtil.h gainLossAlphabet.h suffStatComponent.h computePijComponent.h \
+ computeDownAlg.h computeUpAlg.h matrixUtils.h treeIt.h \
+ likelihoodComputation.h unObservableData.h
+computePosteriorExpectationOfSubstitutions_nonReversibleSp.o computePosteriorExpectationOfSubstitutions_nonReversibleSp.debug.o: \
+ computePosteriorExpectationOfSubstitutions_nonReversibleSp.cpp \
+ definitions.h computeDownAlg.h tree.h readTree.h errorMsg.h logFile.h \
+ suffStatComponent.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h computePijComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ computeUpAlg.h matrixUtils.h treeIt.h likelihoodComputation.h \
+ unObservableData.h \
+ computePosteriorExpectationOfSubstitutions_nonReversibleSp.h \
+ computePosteriorExpectationOfSubstitutions.h simulateJumps.h \
+ simulateJumpsAbstract.h
+ConversionUtils.o ConversionUtils.debug.o: ConversionUtils.cpp ConversionUtils.h definitions.h \
+ someUtil.h logFile.h alphabet.h errorMsg.h
+countTableComponent.o countTableComponent.debug.o: countTableComponent.cpp countTableComponent.h \
+ definitions.h logFile.h
+datMatrixHolder.o datMatrixHolder.debug.o: datMatrixHolder.cpp datMatrixHolder.h cpREV45.dat.q \
+ dayhoff.dat.q jones.dat.q mtREV24.dat.q wag.dat.q HIVb.dat.q HIVw.dat.q \
+ adrianCodon.dat.q LG.dat.q
+distanceTable.o distanceTable.debug.o: distanceTable.cpp definitions.h distanceTable.h \
+ distanceMethod.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h sequenceContainer.h gainLossAlphabet.h
+distribution.o distribution.debug.o: distribution.cpp distribution.h definitions.h errorMsg.h
+errorMsg.o errorMsg.debug.o: errorMsg.cpp definitions.h errorMsg.h logFile.h
+evaluateCharacterFreq.o evaluateCharacterFreq.debug.o: evaluateCharacterFreq.cpp \
+ evaluateCharacterFreq.h sequenceContainer.h definitions.h sequence.h \
+ errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ gainLossAlphabet.h
+fastStartTree.o fastStartTree.debug.o: fastStartTree.cpp definitions.h tree.h readTree.h \
+ errorMsg.h logFile.h treeUtil.h fastStartTree.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h sequenceContainer.h \
+ sequence.h alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ bblEM.h countTableComponent.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h likeDist.h distanceMethod.h jcDistance.h \
+ likelihoodComputation.h getRandomWeights.h distanceTable.h nj.h \
+ njConstrain.h distances2Tree.h
+fastaFormat.o fastaFormat.debug.o: fastaFormat.cpp fastaFormat.h sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h
+findRateOfGene.o findRateOfGene.debug.o: findRateOfGene.cpp definitions.h findRateOfGene.h \
+ numRec.h errorMsg.h uniformDistribution.h distribution.h logFile.h \
+ likelihoodComputation.h computePijComponent.h tree.h readTree.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h suffStatComponent.h unObservableData.h computeUpAlg.h
+fromCountTableComponentToDistance.o fromCountTableComponentToDistance.debug.o: \
+ fromCountTableComponentToDistance.cpp \
+ fromCountTableComponentToDistance.h definitions.h countTableComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ unObservableData.h tree.h readTree.h errorMsg.h logFile.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h computePijComponent.h likeDist.h distanceMethod.h \
+ jcDistance.h
+fromCountTableComponentToDistancefixRoot.o fromCountTableComponentToDistancefixRoot.debug.o: \
+ fromCountTableComponentToDistancefixRoot.cpp \
+ fromCountTableComponentToDistancefixRoot.h definitions.h \
+ countTableComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h unObservableData.h tree.h readTree.h \
+ errorMsg.h logFile.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h computePijComponent.h \
+ likeDistfixRoot.h distanceMethod.h jcDistance.h
+fromCountTableComponentToDistanceProp.o fromCountTableComponentToDistanceProp.debug.o: \
+ fromCountTableComponentToDistanceProp.cpp \
+ fromCountTableComponentToDistanceProp.h definitions.h \
+ countTableComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h likeDistProp.h
+fromQtoPt.o fromQtoPt.debug.o: fromQtoPt.cpp definitions.h fromQtoPt.h replacementModel.h \
+ errorMsg.h numRec.h uniformDistribution.h distribution.h logFile.h \
+ matrixUtils.h
+generalGammaDistributionFixedCategories.o generalGammaDistributionFixedCategories.debug.o: \
+ generalGammaDistributionFixedCategories.cpp \
+ generalGammaDistributionFixedCategories.h definitions.h \
+ generalGammaDistribution.h distribution.h errorMsg.h gammaUtilities.h \
+ numRec.h uniformDistribution.h logFile.h
+gammaDistribution.o gammaDistribution.debug.o: gammaDistribution.cpp definitions.h \
+ gammaDistribution.h generalGammaDistribution.h distribution.h errorMsg.h \
+ gammaUtilities.h numRec.h uniformDistribution.h logFile.h
+gammaUtilities.o gammaUtilities.debug.o: gammaUtilities.cpp gammaUtilities.h definitions.h \
+ numRec.h errorMsg.h uniformDistribution.h distribution.h logFile.h
+generalGammaDistribution.o generalGammaDistribution.debug.o: generalGammaDistribution.cpp \
+ generalGammaDistribution.h definitions.h distribution.h gammaUtilities.h \
+ numRec.h errorMsg.h uniformDistribution.h logFile.h
+getRandomWeights.o getRandomWeights.debug.o: getRandomWeights.cpp getRandomWeights.h definitions.h \
+ talRandom.h logFile.h
+goldmanYangModel.o goldmanYangModel.debug.o: goldmanYangModel.cpp goldmanYangModel.h definitions.h \
+ replacementModel.h fromQtoPt.h granthamChemicalDistances.h codon.h \
+ errorMsg.h someUtil.h logFile.h alphabet.h geneticCodeHolder.h \
+ readDatMatrix.h datMatrixHolder.h
+granthamChemicalDistances.o granthamChemicalDistances.debug.o: granthamChemicalDistances.cpp \
+ granthamChemicalDistances.h definitions.h
+hky.o hky.debug.o: hky.cpp hky.h replacementModel.h definitions.h errorMsg.h
+khTest.o khTest.debug.o: khTest.cpp definitions.h logFile.h errorMsg.h
+likeDist.o likeDist.debug.o: likeDist.cpp likeDist.h definitions.h countTableComponent.h \
+ distanceMethod.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h jcDistance.h unObservableData.h tree.h \
+ readTree.h sequenceContainer.h gainLossAlphabet.h computePijComponent.h \
+ numRec.h uniformDistribution.h
+likeDistfixRoot.o likeDistfixRoot.debug.o: likeDistfixRoot.cpp likeDistfixRoot.h definitions.h \
+ countTableComponent.h distanceMethod.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h jcDistance.h sequenceContainer.h \
+ gainLossAlphabet.h unObservableData.h tree.h readTree.h \
+ computePijComponent.h numRec.h uniformDistribution.h
+likeDistProp.o likeDistProp.debug.o: likeDistProp.cpp likeDistProp.h definitions.h \
+ countTableComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h numRec.h errorMsg.h \
+ uniformDistribution.h logFile.h
+likelihoodComputation.o likelihoodComputation.debug.o: likelihoodComputation.cpp definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h computeUpAlg.h suffStatComponent.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h computePijComponent.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h \
+ likelihoodComputation.h unObservableData.h gammaUtilities.h numRec.h \
+ uniformDistribution.h
+likelihoodComputationFactors.o likelihoodComputationFactors.debug.o: likelihoodComputationFactors.cpp \
+ definitions.h tree.h readTree.h errorMsg.h logFile.h computeUpAlg.h \
+ suffStatComponent.h sequenceContainer.h sequence.h alphabet.h \
+ mulAlphabet.h someUtil.h gainLossAlphabet.h computePijComponent.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ likelihoodComputationFactors.h
+logFile.o logFile.debug.o: logFile.cpp logFile.h errorMsg.h
+maseFormat.o maseFormat.debug.o: maseFormat.cpp maseFormat.h sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h
+molphyFormat.o molphyFormat.debug.o: molphyFormat.cpp molphyFormat.h sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h
+nexusFormat.o nexusFormat.debug.o: nexusFormat.cpp nexusFormat.h sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h
+nj.o nj.debug.o: nj.cpp nj.h definitions.h tree.h readTree.h errorMsg.h logFile.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h njConstrain.h distances2Tree.h treeUtil.h
+njConstrain.o njConstrain.debug.o: njConstrain.cpp definitions.h njConstrain.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h tree.h readTree.h
+nucJC.o nucJC.debug.o: nucJC.cpp nucJC.h replacementModel.h definitions.h
+nucleotide.o nucleotide.debug.o: nucleotide.cpp nucleotide.h definitions.h alphabet.h \
+ errorMsg.h
+numRec.o numRec.debug.o: numRec.cpp numRec.h definitions.h errorMsg.h \
+ uniformDistribution.h distribution.h logFile.h matrixUtils.h
+Parameters.o Parameters.debug.o: Parameters.cpp Parameters.h ConversionUtils.h definitions.h
+phylipFormat.o phylipFormat.debug.o: phylipFormat.cpp phylipFormat.h definitions.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h
+pijAccelerator.o pijAccelerator.debug.o: pijAccelerator.cpp pijAccelerator.h definitions.h \
+ replacementModel.h
+readDatMatrix.o readDatMatrix.debug.o: readDatMatrix.cpp readDatMatrix.h definitions.h \
+ datMatrixHolder.h replacementModel.h errorMsg.h logFile.h fromQtoPt.h
+readTree.o readTree.debug.o: readTree.cpp definitions.h errorMsg.h someUtil.h logFile.h \
+ alphabet.h readTree.h
+recognizeFormat.o recognizeFormat.debug.o: recognizeFormat.cpp recognizeFormat.h \
+ sequenceContainer.h definitions.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h gainLossAlphabet.h maseFormat.h \
+ molphyFormat.h phylipFormat.h nexusFormat.h fastaFormat.h \
+ clustalFormat.h phylipSequentialFormat.h
+replacementModel.o replacementModel.debug.o: replacementModel.cpp replacementModel.h definitions.h
+searchStatus.o searchStatus.debug.o: searchStatus.cpp searchStatus.h definitions.h
+seqContainerTreeMap.o seqContainerTreeMap.debug.o: seqContainerTreeMap.cpp seqContainerTreeMap.h \
+ definitions.h tree.h readTree.h errorMsg.h logFile.h treeIt.h \
+ sequenceContainer.h sequence.h alphabet.h mulAlphabet.h someUtil.h \
+ gainLossAlphabet.h
+sequence.o sequence.debug.o: sequence.cpp sequence.h definitions.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h
+sequenceContainer.o sequenceContainer.debug.o: sequenceContainer.cpp sequenceContainer.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h gainLossAlphabet.h
+simulateTree.o simulateTree.debug.o: simulateTree.cpp definitions.h treeUtil.h tree.h \
+ readTree.h errorMsg.h logFile.h simulateTree.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h sequenceContainer.h \
+ sequence.h alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ talRandom.h gammaDistribution.h generalGammaDistribution.h codon.h \
+ geneticCodeHolder.h
+siteSpecificRate.o siteSpecificRate.debug.o: siteSpecificRate.cpp siteSpecificRate.h definitions.h \
+ tree.h readTree.h errorMsg.h logFile.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ computePijComponent.h unObservableData.h numRec.h uniformDistribution.h \
+ checkcovFanctors.h likelihoodComputation.h suffStatComponent.h
+someUtil.o someUtil.debug.o: someUtil.cpp someUtil.h logFile.h definitions.h alphabet.h \
+ errorMsg.h talRandom.h
+split.o split.debug.o: split.cpp split.h definitions.h
+splitMap.o splitMap.debug.o: splitMap.cpp splitMap.h definitions.h split.h
+splitTreeUtil.o splitTreeUtil.debug.o: splitTreeUtil.cpp splitTreeUtil.h tree.h definitions.h \
+ readTree.h errorMsg.h logFile.h split.h someUtil.h alphabet.h
+stochasticProcess.o stochasticProcess.debug.o: stochasticProcess.cpp stochasticProcess.h \
+ pijAccelerator.h definitions.h replacementModel.h distribution.h \
+ errorMsg.h
+suffStatComponent.o suffStatComponent.debug.o: suffStatComponent.cpp suffStatComponent.h \
+ definitions.h
+talRandom.o talRandom.debug.o: talRandom.cpp talRandom.h definitions.h logFile.h
+tree.o tree.debug.o: tree.cpp definitions.h tree.h readTree.h errorMsg.h logFile.h \
+ treeUtil.h someUtil.h alphabet.h
+treeIt.o treeIt.debug.o: treeIt.cpp definitions.h treeIt.h errorMsg.h tree.h readTree.h \
+ logFile.h
+treeUtil.o treeUtil.debug.o: treeUtil.cpp definitions.h treeUtil.h tree.h readTree.h \
+ errorMsg.h logFile.h treeIt.h
+uniDistribution.o uniDistribution.debug.o: uniDistribution.cpp uniDistribution.h distribution.h \
+ definitions.h errorMsg.h
+uniformDistribution.o uniformDistribution.debug.o: uniformDistribution.cpp uniformDistribution.h \
+ definitions.h distribution.h
+cmdline2EvolObjs.o cmdline2EvolObjs.debug.o: cmdline2EvolObjs.cpp cmdline2EvolObjs.h amino.h \
+ definitions.h errorMsg.h alphabet.h geneticCodeHolder.h codon.h \
+ someUtil.h logFile.h nucleotide.h sequenceContainer.h sequence.h \
+ mulAlphabet.h gainLossAlphabet.h tree.h readTree.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h uniDistribution.h \
+ trivialAccelerator.h alphaTrivialAccelerator.h readDatMatrix.h \
+ datMatrixHolder.h chebyshevAccelerator.h talRandom.h nucJC.h aaJC.h \
+ hky.h tamura92.h gtrModel.h fromQtoPt.h gammaDistribution.h \
+ generalGammaDistribution.h recognizeFormat.h replacementModelSSRV.h \
+ stochasticProcessSSRV.h
+generalGammaDistributionLaguerre.o generalGammaDistributionLaguerre.debug.o: generalGammaDistributionLaguerre.cpp \
+ generalGammaDistributionLaguerre.h definitions.h \
+ generalGammaDistribution.h distribution.h gammaUtilities.h numRec.h \
+ errorMsg.h uniformDistribution.h logFile.h GLaguer.h
+gammaDistributionLaguerre.o gammaDistributionLaguerre.debug.o: gammaDistributionLaguerre.cpp \
+ gammaDistributionLaguerre.h definitions.h \
+ generalGammaDistributionLaguerre.h generalGammaDistribution.h \
+ distribution.h errorMsg.h gammaUtilities.h numRec.h \
+ uniformDistribution.h logFile.h
+GLaguer.o GLaguer.debug.o: GLaguer.cpp definitions.h GLaguer.h errorMsg.h \
+ gammaUtilities.h numRec.h uniformDistribution.h distribution.h logFile.h
+givenRatesMLDistance.o givenRatesMLDistance.debug.o: givenRatesMLDistance.cpp givenRatesMLDistance.h \
+ definitions.h countTableComponent.h likeDist.h distanceMethod.h \
+ sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ jcDistance.h unObservableData.h tree.h readTree.h sequenceContainer.h \
+ gainLossAlphabet.h computePijComponent.h numRec.h uniformDistribution.h
+distanceBasedSeqs2Tree.o distanceBasedSeqs2Tree.debug.o: distanceBasedSeqs2Tree.cpp \
+ distanceBasedSeqs2Tree.h distanceMethod.h definitions.h sequence.h \
+ errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ sequenceContainer.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h likeDist.h \
+ countTableComponent.h jcDistance.h unObservableData.h tree.h readTree.h \
+ computePijComponent.h distances2Tree.h givenRatesMLDistance.h \
+ posteriorDistance.h gammaDistribution.h generalGammaDistribution.h \
+ uniDistribution.h distanceTable.h bestAlpha.h likelihoodComputation.h \
+ suffStatComponent.h siteSpecificRate.h bblEM.h tamura92.h \
+ bestTamura92param.h bestGtrModelParams.h gtrModel.h fromQtoPt.h \
+ replacementModelSSRV.h trivialAccelerator.h
+posteriorDistance.o posteriorDistance.debug.o: posteriorDistance.cpp posteriorDistance.h likeDist.h \
+ definitions.h countTableComponent.h distanceMethod.h sequence.h \
+ errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ stochasticProcess.h pijAccelerator.h replacementModel.h distribution.h \
+ jcDistance.h unObservableData.h tree.h readTree.h sequenceContainer.h \
+ gainLossAlphabet.h computePijComponent.h gammaDistribution.h \
+ generalGammaDistribution.h numRec.h uniformDistribution.h \
+ uniDistribution.h
+pairwiseGammaDistance.o pairwiseGammaDistance.debug.o: pairwiseGammaDistance.cpp \
+ pairwiseGammaDistance.h likeDist.h definitions.h countTableComponent.h \
+ distanceMethod.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h jcDistance.h unObservableData.h tree.h \
+ readTree.h sequenceContainer.h gainLossAlphabet.h computePijComponent.h \
+ gammaDistribution.h generalGammaDistribution.h numRec.h \
+ uniformDistribution.h uniDistribution.h
+doubleRep.o doubleRep.debug.o: doubleRep.cpp
+logRep.o logRep.debug.o: logRep.cpp
+indel.o indel.debug.o: indel.cpp indel.h definitions.h errorMsg.h alphabet.h
+indelModel.o indelModel.debug.o: indelModel.cpp indelModel.h replacementModel.h \
+ definitions.h
+mulAlphabet.o mulAlphabet.debug.o: mulAlphabet.cpp mulAlphabet.h definitions.h alphabet.h \
+ someUtil.h logFile.h distribution.h errorMsg.h
+replacementModelSSRV.o replacementModelSSRV.debug.o: replacementModelSSRV.cpp replacementModelSSRV.h \
+ replacementModel.h definitions.h distribution.h fromQtoPt.h errorMsg.h \
+ logFile.h
+stochasticProcessSSRV.o stochasticProcessSSRV.debug.o: stochasticProcessSSRV.cpp \
+ stochasticProcessSSRV.h stochasticProcess.h pijAccelerator.h \
+ definitions.h replacementModel.h distribution.h replacementModelSSRV.h \
+ fromQtoPt.h errorMsg.h
+bestAlphaAndNu.o bestAlphaAndNu.debug.o: bestAlphaAndNu.cpp bestAlphaAndNu.h definitions.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h gammaDistribution.h \
+ generalGammaDistribution.h tree.h readTree.h replacementModelSSRV.h \
+ fromQtoPt.h tamura92.h stochasticProcessSSRV.h C_evalParamUSSRV.h \
+ likelihoodComputation.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h likelihoodComputation2USSRV.h ussrvModel.h \
+ computeUpAlg.h bestAlpha.h numRec.h uniformDistribution.h bblEM.h \
+ countTableComponent.h
+C_evalParamUSSRV.o C_evalParamUSSRV.debug.o: C_evalParamUSSRV.cpp C_evalParamUSSRV.h definitions.h \
+ likelihoodComputation.h computePijComponent.h tree.h readTree.h \
+ errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h likelihoodComputation2USSRV.h \
+ ussrvModel.h stochasticProcessSSRV.h replacementModelSSRV.h fromQtoPt.h \
+ gammaDistribution.h generalGammaDistribution.h computeUpAlg.h tamura92.h
+matrixUtils.o matrixUtils.debug.o: matrixUtils.cpp matrixUtils.h definitions.h logFile.h \
+ errorMsg.h
+betaOmegaDistribution.o betaOmegaDistribution.debug.o: betaOmegaDistribution.cpp \
+ betaOmegaDistribution.h definitions.h distribution.h betaDistribution.h \
+ logFile.h gammaUtilities.h numRec.h errorMsg.h uniformDistribution.h \
+ betaUtilities.h
+betaUtilities.o betaUtilities.debug.o: betaUtilities.cpp definitions.h betaUtilities.h numRec.h \
+ errorMsg.h uniformDistribution.h distribution.h logFile.h \
+ gammaUtilities.h
+betaDistribution.o betaDistribution.debug.o: betaDistribution.cpp betaDistribution.h definitions.h \
+ distribution.h gammaUtilities.h numRec.h errorMsg.h \
+ uniformDistribution.h logFile.h betaUtilities.h
+geneticCodeHolder.o geneticCodeHolder.debug.o: geneticCodeHolder.cpp geneticCodeHolder.h \
+ replacementMatrixSource/nuclearStandard.code \
+ replacementMatrixSource/nuclearEuplotid.code \
+ replacementMatrixSource/nuclearCiliate.code \
+ replacementMatrixSource/nuclearBlepharisma.code \
+ replacementMatrixSource/mitochondriaYeast.code \
+ replacementMatrixSource/mitochondriaVertebrate.code \
+ replacementMatrixSource/mitochondriaProtozoan.code \
+ replacementMatrixSource/mitochondriaInvertebrate.code \
+ replacementMatrixSource/mitochondriaFlatworm.code \
+ replacementMatrixSource/mitochondriaEchinoderm.code \
+ replacementMatrixSource/mitochondriaAscidian.code
+samplingSequences.o samplingSequences.debug.o: samplingSequences.cpp samplingSequences.h \
+ definitions.h distanceMethod.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h sequenceContainer.h \
+ gainLossAlphabet.h pDistance.h talRandom.h
+bblEM2USSRV.o bblEM2USSRV.debug.o: bblEM2USSRV.cpp bblEM2USSRV.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ ussrvModel.h stochasticProcessSSRV.h replacementModelSSRV.h fromQtoPt.h \
+ gammaDistribution.h generalGammaDistribution.h computeUpAlg.h \
+ computeDownAlg.h computeCounts.h treeIt.h \
+ fromCountTableComponentToDistance2USSRV.h likeDist2USSRV.h \
+ distanceMethod.h likelihoodComputation2USSRV.h likelihoodComputation.h \
+ unObservableData.h
+bestParamUSSRV.o bestParamUSSRV.debug.o: bestParamUSSRV.cpp bestParamUSSRV.h definitions.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h gammaDistribution.h \
+ generalGammaDistribution.h tree.h readTree.h replacementModelSSRV.h \
+ fromQtoPt.h stochasticProcessSSRV.h C_evalParamUSSRV.h \
+ likelihoodComputation.h computePijComponent.h suffStatComponent.h \
+ unObservableData.h likelihoodComputation2USSRV.h ussrvModel.h \
+ computeUpAlg.h tamura92.h bestAlpha.h numRec.h uniformDistribution.h \
+ bblEM.h countTableComponent.h bestAlphaAndNu.h bblEM2USSRV.h \
+ computeDownAlg.h computeCounts.h treeIt.h \
+ fromCountTableComponentToDistance2USSRV.h likeDist2USSRV.h \
+ distanceMethod.h
+likeDist2USSRV.o likeDist2USSRV.debug.o: likeDist2USSRV.cpp likeDist2USSRV.h definitions.h \
+ countTableComponent.h distanceMethod.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h ussrvModel.h stochasticProcessSSRV.h \
+ replacementModelSSRV.h fromQtoPt.h gammaDistribution.h \
+ generalGammaDistribution.h numRec.h uniformDistribution.h
+ussrvModel.o ussrvModel.debug.o: ussrvModel.cpp ussrvModel.h stochasticProcessSSRV.h \
+ stochasticProcess.h pijAccelerator.h definitions.h replacementModel.h \
+ distribution.h replacementModelSSRV.h fromQtoPt.h errorMsg.h \
+ gammaDistribution.h generalGammaDistribution.h logFile.h
+likelihoodComputation2USSRV.o likelihoodComputation2USSRV.debug.o: likelihoodComputation2USSRV.cpp \
+ likelihoodComputation2USSRV.h definitions.h computePijComponent.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h ussrvModel.h stochasticProcessSSRV.h \
+ replacementModelSSRV.h fromQtoPt.h gammaDistribution.h \
+ generalGammaDistribution.h computeUpAlg.h likelihoodComputation.h \
+ unObservableData.h
+fromCountTableComponentToDistance2USSRV.o fromCountTableComponentToDistance2USSRV.debug.o: \
+ fromCountTableComponentToDistance2USSRV.cpp \
+ fromCountTableComponentToDistance2USSRV.h definitions.h \
+ countTableComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h ussrvModel.h stochasticProcessSSRV.h \
+ replacementModelSSRV.h fromQtoPt.h errorMsg.h gammaDistribution.h \
+ generalGammaDistribution.h logFile.h likeDist2USSRV.h distanceMethod.h \
+ sequence.h alphabet.h mulAlphabet.h someUtil.h likeDist.h jcDistance.h \
+ unObservableData.h tree.h readTree.h sequenceContainer.h \
+ gainLossAlphabet.h computePijComponent.h
+normalDist.o normalDist.debug.o: normalDist.cpp normalDist.h definitions.h
+tamura92.o tamura92.debug.o: tamura92.cpp tamura92.h replacementModel.h definitions.h \
+ errorMsg.h
+bestTamura92param.o bestTamura92param.debug.o: bestTamura92param.cpp bestTamura92param.h \
+ definitions.h likelihoodComputation.h computePijComponent.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h gammaDistribution.h \
+ generalGammaDistribution.h tamura92.h bblEM.h countTableComponent.h \
+ numRec.h uniformDistribution.h bestAlpha.h
+phylipSequentialFormat.o phylipSequentialFormat.debug.o: phylipSequentialFormat.cpp \
+ phylipSequentialFormat.h definitions.h sequenceContainer.h sequence.h \
+ errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ gainLossAlphabet.h
+simulateCodonsJumps.o simulateCodonsJumps.debug.o: simulateCodonsJumps.cpp simulateCodonsJumps.h \
+ simulateJumpsAbstract.h definitions.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h alphabet.h talRandom.h someUtil.h codon.h \
+ geneticCodeHolder.h
+simulateJumpsAbstract.o simulateJumpsAbstract.debug.o: simulateJumpsAbstract.cpp \
+ simulateJumpsAbstract.h definitions.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h alphabet.h
+ssrvDistanceSeqs2Tree.o ssrvDistanceSeqs2Tree.debug.o: ssrvDistanceSeqs2Tree.cpp \
+ ssrvDistanceSeqs2Tree.h distanceBasedSeqs2Tree.h distanceMethod.h \
+ definitions.h sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h \
+ logFile.h sequenceContainer.h gainLossAlphabet.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h likeDist.h \
+ countTableComponent.h jcDistance.h unObservableData.h tree.h readTree.h \
+ computePijComponent.h distances2Tree.h givenRatesMLDistance.h \
+ posteriorDistance.h gammaDistribution.h generalGammaDistribution.h \
+ bestParamUSSRV.h replacementModelSSRV.h fromQtoPt.h \
+ stochasticProcessSSRV.h C_evalParamUSSRV.h likelihoodComputation.h \
+ suffStatComponent.h likelihoodComputation2USSRV.h ussrvModel.h \
+ computeUpAlg.h tamura92.h bestAlpha.h numRec.h uniformDistribution.h \
+ bblEM.h bestAlphaAndNu.h bblEM2USSRV.h computeDownAlg.h computeCounts.h \
+ treeIt.h fromCountTableComponentToDistance2USSRV.h likeDist2USSRV.h
+multipleStochasticProcess.o multipleStochasticProcess.debug.o: multipleStochasticProcess.cpp \
+ multipleStochasticProcess.h stochasticProcess.h pijAccelerator.h \
+ definitions.h replacementModel.h distribution.h errorMsg.h
+distributionPlusInvariant.o distributionPlusInvariant.debug.o: distributionPlusInvariant.cpp definitions.h \
+ distributionPlusInvariant.h distribution.h errorMsg.h logFile.h
+gammaDistributionFixedCategories.o gammaDistributionFixedCategories.debug.o: gammaDistributionFixedCategories.cpp \
+ gammaDistributionFixedCategories.h definitions.h \
+ generalGammaDistributionFixedCategories.h generalGammaDistribution.h \
+ distribution.h errorMsg.h gammaUtilities.h numRec.h \
+ uniformDistribution.h logFile.h matrixUtils.h
+generalGammaDistributionPlusInvariant.o generalGammaDistributionPlusInvariant.debug.o: \
+ generalGammaDistributionPlusInvariant.cpp \
+ generalGammaDistributionPlusInvariant.h definitions.h \
+ distributionPlusInvariant.h distribution.h generalGammaDistribution.h \
+ errorMsg.h gammaUtilities.h numRec.h uniformDistribution.h logFile.h
+gammaDistributionPlusInvariant.o gammaDistributionPlusInvariant.debug.o: gammaDistributionPlusInvariant.cpp \
+ gammaDistributionPlusInvariant.h definitions.h \
+ distributionPlusInvariant.h distribution.h gammaDistribution.h \
+ generalGammaDistribution.h errorMsg.h gammaUtilities.h numRec.h \
+ uniformDistribution.h logFile.h
+distributionPlusCategory.o distributionPlusCategory.debug.o: distributionPlusCategory.cpp \
+ distributionPlusCategory.h definitions.h distribution.h logFile.h \
+ errorMsg.h
+simulateJumps.o simulateJumps.debug.o: simulateJumps.cpp simulateJumps.h \
+ simulateJumpsAbstract.h definitions.h tree.h readTree.h errorMsg.h \
+ logFile.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h alphabet.h talRandom.h someUtil.h
+computeJumps.o computeJumps.debug.o: computeJumps.cpp computeJumps.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h alphabet.h talRandom.h someUtil.h \
+ matrixUtils.h
+seqeuncesFilter.o seqeuncesFilter.debug.o: seqeuncesFilter.cpp seqeuncesFilter.h definitions.h \
+ sequenceContainer.h sequence.h errorMsg.h alphabet.h mulAlphabet.h \
+ someUtil.h logFile.h gainLossAlphabet.h codon.h geneticCodeHolder.h \
+ amino.h fastaFormat.h nucleotide.h
+optGammaMixtureLS.o optGammaMixtureLS.debug.o: optGammaMixtureLS.cpp optGammaMixtureLS.h \
+ definitions.h suffStatGammaMixture.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h sequenceContainer.h \
+ sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ gainLossAlphabet.h tree.h readTree.h mixtureDistribution.h \
+ generalGammaDistribution.h computePijComponent.h gammaUtilities.h \
+ numRec.h uniformDistribution.h likelihoodComputation.h \
+ suffStatComponent.h unObservableData.h
+mixtureDistribution.o mixtureDistribution.debug.o: mixtureDistribution.cpp mixtureDistribution.h \
+ definitions.h generalGammaDistribution.h distribution.h \
+ generalGammaDistributionLaguerre.h talRandom.h logFile.h someUtil.h \
+ alphabet.h errorMsg.h
+suffStatGammaMixture.o suffStatGammaMixture.debug.o: suffStatGammaMixture.cpp suffStatGammaMixture.h \
+ definitions.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h sequenceContainer.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h gainLossAlphabet.h tree.h readTree.h \
+ mixtureDistribution.h generalGammaDistribution.h computePijComponent.h \
+ likelihoodComputation.h suffStatComponent.h unObservableData.h \
+ gammaUtilities.h numRec.h uniformDistribution.h uniDistribution.h
+GamMixtureOptimizer.o GamMixtureOptimizer.debug.o: GamMixtureOptimizer.cpp GamMixtureOptimizer.h \
+ definitions.h stochasticProcess.h pijAccelerator.h replacementModel.h \
+ distribution.h sequenceContainer.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h gainLossAlphabet.h tree.h readTree.h \
+ mixtureDistribution.h generalGammaDistribution.h unObservableData.h \
+ computePijComponent.h optGammaMixtureEM.h suffStatGammaMixture.h \
+ gammaUtilities.h numRec.h uniformDistribution.h optGammaMixtureLS.h \
+ likelihoodComputation.h suffStatComponent.h
+optGammaMixtureEM.o optGammaMixtureEM.debug.o: optGammaMixtureEM.cpp optGammaMixtureEM.h \
+ definitions.h suffStatGammaMixture.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h sequenceContainer.h \
+ sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ gainLossAlphabet.h tree.h readTree.h mixtureDistribution.h \
+ generalGammaDistribution.h computePijComponent.h gammaUtilities.h \
+ numRec.h uniformDistribution.h likelihoodComputation.h \
+ suffStatComponent.h unObservableData.h uniDistribution.h
+gainLossAlphabet.o gainLossAlphabet.debug.o: gainLossAlphabet.cpp gainLossAlphabet.h alphabet.h \
+ errorMsg.h
+wYangModel.o wYangModel.debug.o: wYangModel.cpp wYangModel.h replacementModel.h \
+ definitions.h fromQtoPt.h codon.h errorMsg.h someUtil.h logFile.h \
+ alphabet.h geneticCodeHolder.h readDatMatrix.h datMatrixHolder.h
+codonUtils.o codonUtils.debug.o: codonUtils.cpp codonUtils.h nucleotide.h definitions.h \
+ alphabet.h codon.h errorMsg.h someUtil.h logFile.h geneticCodeHolder.h \
+ amino.h fastaFormat.h sequenceContainer.h sequence.h mulAlphabet.h \
+ gainLossAlphabet.h clustalFormat.h recognizeFormat.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h wYangModel.h \
+ fromQtoPt.h evaluateCharacterFreq.h numRec.h uniformDistribution.h
+likelihoodComputation2Codon.o likelihoodComputation2Codon.debug.o: likelihoodComputation2Codon.cpp \
+ likelihoodComputation2Codon.h definitions.h computePijComponent.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h wYangModel.h fromQtoPt.h codon.h geneticCodeHolder.h \
+ computeUpAlg.h likelihoodComputation.h unObservableData.h
+likeDist2Codon.o likeDist2Codon.debug.o: likeDist2Codon.cpp likeDist2Codon.h definitions.h \
+ countTableComponent.h distanceMethod.h sequence.h errorMsg.h alphabet.h \
+ mulAlphabet.h someUtil.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h wYangModel.h fromQtoPt.h codon.h \
+ geneticCodeHolder.h numRec.h uniformDistribution.h
+unObservableData.o unObservableData.debug.o: unObservableData.cpp unObservableData.h definitions.h \
+ tree.h readTree.h errorMsg.h logFile.h stochasticProcess.h \
+ pijAccelerator.h replacementModel.h distribution.h sequenceContainer.h \
+ sequence.h alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ computePijComponent.h likelihoodComputation.h suffStatComponent.h \
+ likelihoodComputationGL.h computeUpAlg.h
+likelihoodComputationGL.o likelihoodComputationGL.debug.o: likelihoodComputationGL.cpp \
+ likelihoodComputationGL.h definitions.h computePijComponent.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h computeUpAlg.h \
+ likelihoodComputation.h
+threeStateModel.o threeStateModel.debug.o: threeStateModel.cpp threeStateModel.h definitions.h \
+ replacementModel.h fromQtoPt.h errorMsg.h matrixUtils.h logFile.h \
+ someUtil.h alphabet.h
+threeStateAlphabet.o threeStateAlphabet.debug.o: threeStateAlphabet.cpp threeStateAlphabet.h \
+ alphabet.h errorMsg.h
+betaDistributionFixedCategories.o betaDistributionFixedCategories.debug.o: betaDistributionFixedCategories.cpp \
+ betaDistributionFixedCategories.h definitions.h betaDistribution.h \
+ distribution.h errorMsg.h gammaUtilities.h numRec.h \
+ uniformDistribution.h logFile.h
+betaDistributionFixedCategoriesWithOmegaUniform.o betaDistributionFixedCategoriesWithOmegaUniform.debug.o: \
+ betaDistributionFixedCategoriesWithOmegaUniform.cpp \
+ betaDistributionFixedCategoriesWithOmegaUniform.h definitions.h \
+ betaDistributionFixedCategories.h betaDistribution.h distribution.h \
+ errorMsg.h uniformDistribution.h gammaUtilities.h numRec.h logFile.h \
+ matrixUtils.h
+bblEM2codon.o bblEM2codon.debug.o: bblEM2codon.cpp bblEM2codon.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ countTableComponent.h computePijComponent.h suffStatComponent.h \
+ likelihoodComputation.h unObservableData.h likelihoodComputation2Codon.h \
+ fromCountTableComponentToDistance2Codon.h computeUpAlg.h \
+ computeDownAlg.h computeCounts.h treeIt.h
+bestAlphaAndK.o bestAlphaAndK.debug.o: bestAlphaAndK.cpp bestAlphaAndK.h definitions.h tree.h \
+ readTree.h errorMsg.h logFile.h likelihoodComputation.h \
+ computePijComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h likelihoodComputation2Codon.h \
+ generalGammaDistribution.h wYangModel.h fromQtoPt.h codon.h \
+ geneticCodeHolder.h bblEM2codon.h countTableComponent.h computeUpAlg.h \
+ numRec.h uniformDistribution.h betaOmegaDistribution.h \
+ betaDistribution.h codonUtils.h nucleotide.h amino.h fastaFormat.h \
+ clustalFormat.h recognizeFormat.h evaluateCharacterFreq.h
+fromCountTableComponentToDistance2Codon.o fromCountTableComponentToDistance2Codon.debug.o: \
+ fromCountTableComponentToDistance2Codon.cpp \
+ fromCountTableComponentToDistance2Codon.h definitions.h \
+ countTableComponent.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h likeDist2Codon.h distanceMethod.h \
+ sequence.h errorMsg.h alphabet.h mulAlphabet.h someUtil.h logFile.h \
+ wYangModel.h fromQtoPt.h codon.h geneticCodeHolder.h likeDist.h \
+ jcDistance.h unObservableData.h tree.h readTree.h sequenceContainer.h \
+ gainLossAlphabet.h computePijComponent.h
+gtrModel.o gtrModel.debug.o: gtrModel.cpp gtrModel.h replacementModel.h definitions.h \
+ fromQtoPt.h readDatMatrix.h datMatrixHolder.h errorMsg.h matrixUtils.h \
+ logFile.h
+bestGtrModelParams.o bestGtrModelParams.debug.o: bestGtrModelParams.cpp bestGtrModelParams.h \
+ definitions.h likelihoodComputation.h computePijComponent.h tree.h \
+ readTree.h errorMsg.h logFile.h stochasticProcess.h pijAccelerator.h \
+ replacementModel.h distribution.h sequenceContainer.h sequence.h \
+ alphabet.h mulAlphabet.h someUtil.h gainLossAlphabet.h \
+ suffStatComponent.h unObservableData.h gammaDistribution.h \
+ generalGammaDistribution.h gtrModel.h fromQtoPt.h bblEM.h \
+ countTableComponent.h numRec.h uniformDistribution.h bestAlpha.h

@@ -1,0 +1,47 @@
+#include <string>
+using namespace std;
+static string usage() {
+	string tmp;
+	tmp +=" |-------------------------------- HELP: -------------------------------------+\n";
+	tmp +=" | VALUES IN [] ARE DEFAULT VALUES                                            |\n";
+	tmp +=" |-h   help                                                                   |\n";
+	tmp +=" |-s sequence input file (for example use -s D:\\mySequences\\seq.txt )       |\n";
+	tmp +=" |-t tree input file                                                          |\n";
+	tmp +=" |   (if tree is not given, a neighbor joining tree is computed).             |\n";
+	tmp +=" |-g Assume among site rate variation model (Gamma) [By default the program   |\n";
+	tmp +=" |   will assume an homogenous model. very fast, but less accurate!]          |\n";
+	tmp += "|-m     model name                                                           |\n";
+	tmp += "|-mj    [JTT]                                                                |\n";
+	tmp += "|-mr    mtREV (for mitochondrial genomes)                                    |\n";
+	tmp += "|-md    DAY                                                                  |\n";
+	tmp += "|-mw    WAG                                                                  |\n";
+	tmp += "|-mc    cpREV (for chloroplasts genomes)                                     |\n";
+	tmp += "|-ma    Jukes and Cantor (JC) for amino acids                                |\n";
+	tmp += "|-mn    Jukes and Cantor (JC) for nucleotides                                |\n";
+	tmp +=" +----------------------------------------------------------------------------+\n";         
+	tmp +=" |Controling the output options:                                              |\n";
+	tmp +=" |-x   tree file output in Newick format [tree.newick.txt]                    |\n";
+	tmp +=" |-y   tree file output in ANCESTOR format [tree.ancestor.txt]                |\n";
+	tmp +=" |-j   joint sequences output file [seq.joint.txt]                            |\n";
+	tmp +=" |-k   marginal sequences output file [seq.marginal.txt]                      |\n";
+	tmp +=" |-d   joint probabilities output file [prob.joint.txt]                       |\n";
+	tmp +=" |-e   marginal probabilities output file [prob.marginal.txt]                 |\n";
+	tmp +=" |-q   ancestral sequences output format.  -qc = [CLUSTAL], -qf = FASTA       |\n";
+	tmp +=" |     -qm = MOLPHY, -qs = MASE, -qp = PHLIYP, -qn = Nexus                    |\n";
+	tmp +=" +----------------------------------------------------------------------------+\n";         
+	tmp +=" |Advances options:                                                           |\n";
+	tmp +=" |-a   Treshold for computing again marginal probabilities [0.9]              |\n";
+	tmp +=" |-b   Do not optimize branch lengths on starting tree                        |\n";
+	tmp +=" |     [by default branches and alpha are ML optimized from the data]         |\n";
+	tmp +=" |-c   number of discrete Gamma categories for the gamma distribution [8]     |\n";
+	tmp +=" |-f   don't compute Joint reconstruction (good if the branch and bound       |\n";
+	tmp +=" |     algorithm takes too much time, and the goal is to compute the          |\n";
+	tmp +=" |     marginal reconstruction with Gamma).                                   |\n";  
+	tmp +=" |-z   The bound used. -zs - bound based on sum. -zm based on max. -zb [both] |\n";
+	tmp +=" |-p   user alpha parameter of the gamma distribution [if alpha is not given, |\n";
+	tmp +=" |     alpha and branches will be evaluated from the data (override -b)       |\n";
+//	tmp +=" |R   report file. Show the choices made by the algorithm                     |\n";
+//	tmp +=" |-u   do not use Chebyshev optimization                                      |\n";
+	tmp +=" +----------------------------------------------------------------------------+\n";         
+	return tmp;
+}

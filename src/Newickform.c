@@ -23,6 +23,7 @@
 #include "Newickform.h"
 #include "branch_sequences.h"
 #include "gff_file.h"
+#include "string_cat.h"
 
 
 #define STR_OUT	"out"
@@ -70,21 +71,27 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	
 	// output tab file
   FILE * block_file_pointer;
-  char block_file_name[MAX_FILENAME_SIZE];
-  strcpy(block_file_name, filename);
-	block_file_pointer = fopen(strcat(block_file_name,".tab"), "w");
+  char block_file_name[MAX_FILENAME_SIZE] = {""};
+  char block_file_extension[5]= {".tab"};
+	memcpy(block_file_name, filename, size_of_string(filename) +1);
+	concat_strings_created_with_malloc(block_file_name,block_file_extension);
+	block_file_pointer = fopen(block_file_name, "w");
 	
 	// output tab file
   FILE * branch_snps_file_pointer;
-  char branch_snps_file_name[MAX_FILENAME_SIZE];
-  strcpy(branch_snps_file_name, filename);
-	branch_snps_file_pointer = fopen(strcat(branch_snps_file_name,".branch_snps.tab"), "w");
+  char branch_snps_file_name[MAX_FILENAME_SIZE]= {""};
+  char branchtab_extension[18]= {".branch_snps.tab"};
+	memcpy(branch_snps_file_name, filename, size_of_string(filename) +1);
+	concat_strings_created_with_malloc(branch_snps_file_name,branchtab_extension);
+	branch_snps_file_pointer = fopen(branch_snps_file_name, "w");
 	
 	// output gff file
 	FILE * gff_file_pointer;
-  char gff_file_name[MAX_FILENAME_SIZE];
-  strcpy(gff_file_name, filename);
-	gff_file_pointer = fopen(strcat(gff_file_name,".gff"), "w");
+  char gff_file_name[MAX_FILENAME_SIZE]= {""};
+  memcpy(gff_file_name, filename, size_of_string(filename) +1);
+  char gff_extension[5]= {".gff"};
+	concat_strings_created_with_malloc(gff_file_name,gff_extension);
+	gff_file_pointer = fopen(gff_file_name, "w");
 	print_gff_header(gff_file_pointer,length_of_original_genome);
 	
 	char * root_sequence;
@@ -105,7 +112,7 @@ char * strip_quotes(char *taxon)
 {
 	int i = 0;
 	int target_i =0;
-	char cleaned_taxon[MAX_FILENAME_SIZE];
+	char cleaned_taxon[MAX_FILENAME_SIZE] = {""};
 	while(taxon[i] != '\0')
 	{
 		if(taxon[i] != '\'')
@@ -116,7 +123,7 @@ char * strip_quotes(char *taxon)
 		i++;
 	}
 	cleaned_taxon[target_i] = '\0';
-	strcpy(taxon,cleaned_taxon);
+	memcpy(taxon, cleaned_taxon, size_of_string(cleaned_taxon) +1);
 	return taxon;
 }
 
@@ -311,9 +318,9 @@ newick_node* parseTree(char *str)
 
 	node->number_of_blocks = 0;
 	node->total_bases_removed_excluding_gaps = 0;
-	node->block_coordinates =  (int **) malloc((3)*sizeof(int *));	
-	node->block_coordinates[0] = (int*) malloc((3)*sizeof(int ));
-	node->block_coordinates[1] = (int*) malloc((3)*sizeof(int ));
+	node->block_coordinates =  (int **) calloc((3),sizeof(int *));	
+	node->block_coordinates[0] = (int*) calloc((3),sizeof(int ));
+	node->block_coordinates[1] = (int*) calloc((3),sizeof(int ));
 
 	return node;
 }

@@ -103,7 +103,7 @@ void inputString(char *input, char **ppcStr, int *iLen, int *iMaxLen)
 {
 	int inputLen;
 	char *temp;
-	inputLen = strlen(input);
+	inputLen = size_of_string(input);
 	if (inputLen == 0)
 	{
 		return;

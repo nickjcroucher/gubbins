@@ -399,5 +399,6 @@ void freeup_memory()
   }
   free(sequences);
 	free(phylip_sample_names);
+	free(internal_node);
 }
 

@@ -506,7 +506,7 @@ int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int g
 		int lower_offset = 0;
 		int snp_sliding_window_counter = initial_min_coord;
 		int j = 0; 
-		for(j = starting_coord; (j > 0) && j > (initial_min_coord - lower_offset) ; j--)
+		for(j = starting_coord; (j >= 0) && j > (initial_min_coord - lower_offset) && (initial_min_coord - lower_offset >= 0); j--)
 		{
 			if(original_sequence[j]  == 'N' || original_sequence[j]  == '-' )
 			{
@@ -564,8 +564,6 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int in_block = 0;
 	int block_lower_bound = 0;
 	// Scan across the pileup and record where blocks are above the cutoff
-	
-	// Skip over gaps
 	
 	for(i = 0; i < genome_size; i++)
 	{

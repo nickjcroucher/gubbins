@@ -293,7 +293,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			
 			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome,leaf_sequence);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(child_sequences[current_branch]);
@@ -333,7 +333,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps)
 }
 
 
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome)
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome, char * original_sequence)
 {
 	int i = 0;
 	int window_size = 0;
@@ -376,7 +376,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
     int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
 
-		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff);
+		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff, original_sequence);
 
 
 		for(i = 0; i < number_of_blocks; i++)
@@ -484,8 +484,41 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
   }
 }
 
+int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, char * original_sequence)
+{
+		int max_snp_sliding_window_counter = initial_max_coord;
+		int upper_offset = 0;
+		int j = 0; 
+		for(j = starting_coord; (j < initial_max_coord + upper_offset) && (j < genome_size); j++)
+		{
+			if(original_sequence[j]  == 'N' || original_sequence[j]  == '-' )
+			{
+				upper_offset++;
+			}
+		}
 
-int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff)
+		max_snp_sliding_window_counter = initial_max_coord + upper_offset;
+		return max_snp_sliding_window_counter;
+}
+
+int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, char * original_sequence)
+{
+		int lower_offset = 0;
+		int snp_sliding_window_counter = initial_min_coord;
+		int j = 0; 
+		for(j = starting_coord; (j > 0) && j > (initial_min_coord - lower_offset) ; j--)
+		{
+			if(original_sequence[j]  == 'N' || original_sequence[j]  == '-' )
+			{
+				lower_offset++;
+			}
+		}
+		snp_sliding_window_counter = snp_sliding_window_counter - lower_offset;
+		return snp_sliding_window_counter;
+}
+
+
+int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence)
 {
 	// Set up the window counter with 1 value per base in the branch
  	int * window_count;
@@ -501,8 +534,12 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int snp_counter = 0;
 	for(snp_counter = 0; snp_counter < number_of_branch_snps; snp_counter++)
 	{
+		int j = 0;
 		// Lower bound of the window around a snp
 		int snp_sliding_window_counter = snp_site_coords[snp_counter]-(window_size/2);
+		
+		snp_sliding_window_counter = extend_lower_part_of_window(snp_site_coords[snp_counter] - 1 , snp_sliding_window_counter, genome_size, original_sequence);
+	
 		if(snp_sliding_window_counter < 0)
 		{
 			snp_sliding_window_counter = 0;
@@ -510,12 +547,13 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 		
 		// Upper bound of the window around a snp
 		int max_snp_sliding_window_counter = snp_site_coords[snp_counter]+(window_size/2);
+		max_snp_sliding_window_counter = extend_upper_part_of_window(snp_site_coords[snp_counter] + 1, max_snp_sliding_window_counter, genome_size, original_sequence);
+		
 		if(max_snp_sliding_window_counter>genome_size)
 		{
 			max_snp_sliding_window_counter = genome_size;
 		}
 		
-		int j = 0;
 		for(j = snp_sliding_window_counter; j < max_snp_sliding_window_counter; j++)
 		{
 			window_count[j] += 1;	
@@ -526,6 +564,9 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int in_block = 0;
 	int block_lower_bound = 0;
 	// Scan across the pileup and record where blocks are above the cutoff
+	
+	// Skip over gaps
+	
 	for(i = 0; i < genome_size; i++)
 	{
 		// Just entered the start of a block

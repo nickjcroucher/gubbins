@@ -41,8 +41,9 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome);
 void carry_unambiguous_gaps_up_tree(newick_node *root);
 void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value);
-int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence);
-
+int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence, int * snp_locations, int number_of_snps);
+int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int * gaps_in_original_genome_space);
+int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int * gaps_in_original_genome_space);
 
 #define WINDOW_SNP_MODE_TARGET 10
 #define MIN_WINDOW_SIZE 100

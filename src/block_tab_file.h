@@ -20,6 +20,6 @@
 #ifndef _BLOCK_TAB_FILE_H_
 #define _BLOCK_TAB_FILE_H_
 
-void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names,int number_of_child_nodes);
+void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names,int number_of_child_nodes, double  neg_log_likelihood);
 void print_branch_snp_details(FILE * branch_snps_file_pointer, char * current_node_id, char * parent_node_id, int * branches_snp_sites, int number_of_branch_snps, char * branch_snp_sequence, char * branch_snp_ancestor_sequence,char * taxon_names);
 #endif

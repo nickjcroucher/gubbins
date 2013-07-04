@@ -790,8 +790,8 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		
 		current_node->num_recombinations = number_of_recombinations;
 
-		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum);
-		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
+		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum, block_likelihooods[smallest_index]);
+		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, block_likelihooods[smallest_index]);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 		
 		current_node->total_bases_removed_excluding_gaps = current_node->total_bases_removed_excluding_gaps  + candidate_blocks[3][smallest_index];

@@ -376,7 +376,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
     int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
 
-		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff, original_sequence,snp_locations,length_of_sequence);
+		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff, child_sequence,snp_locations,length_of_sequence);
 
 
 		for(i = 0; i < number_of_blocks; i++)
@@ -537,7 +537,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	{
 		if(original_sequence[x]  == 'N' || original_sequence[x]  == '-' )
 		{
-		  gaps_in_original_genome_space[snp_locations[x]] = 1;
+		  gaps_in_original_genome_space[snp_locations[x]-1] = 1;
 	  }
 	}
 	
@@ -790,8 +790,8 @@ int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int num
 		
 		current_node->num_recombinations = number_of_recombinations;
 
-		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum);
-		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names);
+		print_block_details(block_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, current_node->childNum, block_likelihooods[smallest_index]);
+		print_gff_line(gff_file_pointer, candidate_blocks[0][smallest_index], candidate_blocks[1][smallest_index],  number_of_recombinations_in_window, current_node->taxon,  root->taxon, current_node->taxon_names, block_likelihooods[smallest_index]);
 		current_node->number_of_blocks = current_node->number_of_blocks + 1;
 		
 		current_node->total_bases_removed_excluding_gaps = current_node->total_bases_removed_excluding_gaps  + candidate_blocks[3][smallest_index];

@@ -22,10 +22,11 @@
 #include <string.h>
 #include "block_tab_file.h"
 
-void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names, int number_of_child_nodes)
+void print_block_details(FILE * block_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names, int number_of_child_nodes, double  neg_log_likelihood)
 {
   fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate, end_coordinate);
   fprintf(block_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
+  fprintf(block_file_pointer, "FT                   /neg_log_likelihood=%f\n",neg_log_likelihood);
 
   if(number_of_child_nodes > 0)
   {

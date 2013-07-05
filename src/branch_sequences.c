@@ -376,7 +376,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 
     int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
 
-		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff, original_sequence,snp_locations,length_of_sequence);
+		number_of_blocks = get_blocks(block_coordinates, length_of_original_genome, snp_site_coords, number_of_branch_snps,  window_size, cutoff, child_sequence,snp_locations,length_of_sequence);
 
 
 		for(i = 0; i < number_of_blocks; i++)

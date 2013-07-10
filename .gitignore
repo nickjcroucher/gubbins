@@ -1,5 +1,5 @@
 *.o
-gubbins
+src/gubbins
 tests/run_all_tests
 src/run_all_tests
 .DS_Store
@@ -25,3 +25,20 @@ run_gubbins.pyc
 src/Makefile.in
 stamp-h1
 test-driver
+external/standard-RAxML/raxmlHPC
+external/standard-RAxML/raxmlHPC-SSE3
+python/build/scripts-2.7/gubbins_drawer.py
+python/build/scripts-2.7/run_gubbins.py
+src/run_all_tests.log
+src/run_all_tests.trs
+src/test-suite.log
+tests/data/one_recombination.tre
+tests/data/one_recombination.tre.branch_snps.tab
+tests/data/one_recombination.tre.gff
+tests/data/one_recombination.tre.phylip
+tests/data/one_recombination.tre.snp_sites.aln
+tests/data/one_recombination.tre.stats
+tests/data/one_recombination.tre.tab
+tests/data/one_recombination.tre.vcf
+python/build/lib/gubbins/__init__.py
+python/build/lib/gubbins/common.py

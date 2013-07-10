@@ -11,7 +11,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#  
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -33,7 +33,7 @@ from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 
-class GubbinsCommon():
+class Common():
   "Methods used by Gubbins"
   def __init__(self, input_args):
     self.args = input_args
@@ -48,10 +48,10 @@ class GubbinsCommon():
     FASTML_EXEC = 'fastml -mg -qf -b '
 
     # Names of the bundled executables to use if the executables arent in the default PATH
-    RAXML_BUNDLED_EXEC = 'external/standard-RAxML/raxmlHPC'
-    FASTML_BUNDLED_EXEC = 'external/fastml/programs/fastml/fastml'
-    GUBBINS_BUNDLED_EXEC = 'src/gubbins'
-    FASTTREE_BUNDLED_EXEC = 'external/fasttree/FastTree'
+    RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
+    FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
+    GUBBINS_BUNDLED_EXEC = '../src/gubbins'
+    FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
     if which(GUBBINS_EXEC) is None:

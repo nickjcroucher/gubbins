@@ -18,6 +18,7 @@ $ ./configure
 $ su -
 $ make
 $ make install
+$ cd python
 $ python setup.py install
 
 == Installing from a released source tarball ==
@@ -28,6 +29,7 @@ $ ./configure
 $ make
 $ su -
 $ make install
+$ cd python
 $ python setup.py install
 
 The main executable should be in ./src/gubbins and in the system-wide directory

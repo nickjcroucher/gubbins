@@ -9,7 +9,8 @@ setup(
     author='Andrew J. Page',
     author_email='ap13@sanger.ac.uk',
     url='https://github.com/andrewjpage/gubbins/',
-    scripts=['run_gubbins.py'],
+    scripts=['scripts/run_gubbins.py','scripts/gubbins_drawer.py'],
+    packages=['gubbins'],
     long_description="""\
       Gubbins is a tool for BioInformaticians that takes in a multi
       fasta alignment and detects recombination regions.  This package provides

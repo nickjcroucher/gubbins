@@ -21,7 +21,7 @@
 
 import sys
 import argparse
-import gubbins_common
+from gubbins import Common
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
@@ -35,5 +35,5 @@ parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations,
 parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
 parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
 
-gubbins_runner  = GubbinsCommon(parser.parse_args())
+gubbins_runner  = Common(parser.parse_args())
 gubbins_runner.parse_and_run()

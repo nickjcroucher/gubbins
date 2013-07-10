@@ -12,7 +12,7 @@ import os
 ###############################################################################
 ## Populate the 'gubbins' namespace
 
-from dendropy import common
+from gubbins import common
 
 
 ###############################################################################
@@ -33,7 +33,6 @@ except OSError:
 except:
     __homedir__ = None
 
-__revision__ = vcsinfo.Revision(repo_path=__homedir__)
 __author__ = "Andrew J. Page, Nicholas Croucher, Aidan Delaney and Simon Harris"
 __copyright__ = "Copyright 2013 Wellcome Trust Sanger Institutue"
 __license__ = """

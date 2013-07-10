@@ -1,3 +1,5 @@
+*egg-info
+*.pyc
 *.o
 src/gubbins
 tests/run_all_tests

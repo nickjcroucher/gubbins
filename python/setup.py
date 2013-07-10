@@ -11,6 +11,7 @@ setup(
     url='https://github.com/andrewjpage/gubbins/',
     scripts=['scripts/run_gubbins.py','scripts/gubbins_drawer.py'],
     packages=['gubbins'],
+    test_suite='nose.collector',
     long_description="""\
       Gubbins is a tool for BioInformaticians that takes in a multi
       fasta alignment and detects recombination regions.  This package provides
@@ -26,7 +27,8 @@ setup(
     install_requires=[
         'Biopython >= 1.59',
         'Dendropy  >= 3.11.1',
-        'Reportlab >= 2.5'
+        'Reportlab >= 2.5',
+        'nose >= 1.3' 
         ],
     license='GPL',
     )

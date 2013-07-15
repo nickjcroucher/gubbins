@@ -617,9 +617,6 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		int current_end = block_coordinates[1][i];
 		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
     int end_index   = find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
-		block_coordinates[0][i] = advance_window_start_to_next_snp_with_start_end_index(current_start, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
-		block_coordinates[1][i] = rewind_window_end_to_last_snp_with_start_end_index(current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
-		
 		if( i == 0)
 		{
 			previous_start = block_coordinates[0][i];

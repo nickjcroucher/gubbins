@@ -647,25 +647,24 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 		
 		int current_start = block_coordinates[0][i];
 		int current_end = block_coordinates[1][i];
-		double current_block_likelihood = block_coordinates[2][i]*1.0;
+		double current_block_likelihood = 0;
 		int block_genome_size_without_gaps = block_coordinates[3][i];
 		int block_snp_count;
 		
-
 	  int next_start_position = current_start;
 		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
     int end_index =  find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
 
 		block_snp_count = find_number_of_snps_in_block_with_start_end_index(current_start, current_end, snp_site_coords, branch_snp_sequence, number_of_branch_snps,start_index,end_index);
     
-		if(current_block_likelihood < 0 || block_genome_size_without_gaps == -1)
+		if(block_genome_size_without_gaps == -1)
 		{
 			
 			block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, current_end, length_of_sequence);
-			current_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 			block_coordinates[2][i] = current_block_likelihood;
 			block_coordinates[3][i] = block_genome_size_without_gaps;
 		}
+		current_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 
 
 		// Move left inwards while the likelihood gets better

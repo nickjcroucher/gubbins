@@ -54,24 +54,24 @@ class GubbinsCommon():
     FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
-    if which(GUBBINS_EXEC) is None:
-      GUBBINS_EXEC = use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
-      if which(GUBBINS_EXEC) is None:
+    if GubbinsCommon.which(GUBBINS_EXEC) is None:
+      GUBBINS_EXEC = GubbinsCommon.use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
+      if GubbinsCommon.which(GUBBINS_EXEC) is None:
         print "gubbins is not in your path"
         sys.exit()
-    if which(FASTML_EXEC) is None:
-      FASTML_EXEC = use_bundled_exec(FASTML_EXEC, FASTML_BUNDLED_EXEC)
-      if which(FASTML_EXEC) is None:
+    if GubbinsCommon.which(FASTML_EXEC) is None:
+      FASTML_EXEC = GubbinsCommon.use_bundled_exec(FASTML_EXEC, FASTML_BUNDLED_EXEC)
+      if GubbinsCommon.which(FASTML_EXEC) is None:
         print "fastml is not in your path"
         sys.exit()
-    if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and which(RAXML_EXEC) is None:
-       RAXML_EXEC = use_bundled_exec(RAXML_EXEC, RAXML_BUNDLED_EXEC)
-       if which(RAXML_EXEC) is None:
+    if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
+       RAXML_EXEC = GubbinsCommon.use_bundled_exec(RAXML_EXEC, RAXML_BUNDLED_EXEC)
+       if GubbinsCommon.which(RAXML_EXEC) is None:
          print "RAxML is not in your path"
          sys.exit()
-    if (self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid") and which(FASTTREE_EXEC) is None:
-      FASTTREE_EXEC = use_bundled_exec(FASTTREE_EXEC, FASTTREE_BUNDLED_EXEC)
-      if which(FASTTREE_EXEC) is None:
+    if (self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(FASTTREE_EXEC) is None:
+      FASTTREE_EXEC = GubbinsCommon.use_bundled_exec(FASTTREE_EXEC, FASTTREE_BUNDLED_EXEC)
+      if GubbinsCommon.which(FASTTREE_EXEC) is None:
         print "FastTree is not in your path"
         sys.exit()
 
@@ -92,11 +92,11 @@ class GubbinsCommon():
 
     # put a filtered copy into a temp directory and work from that
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-    taxa_removed = filter_out_alignments_with_too_much_missing_data(self.args.alignment_filename, temp_working_dir+"/"+starting_base_filename, self.args.filter_percentage, self.args.verbose)
+    taxa_removed = GubbinsCommon.filter_out_alignments_with_too_much_missing_data(self.args.alignment_filename, temp_working_dir+"/"+starting_base_filename, self.args.filter_percentage, self.args.verbose)
     self.args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 
     # If a starting tree has been provided make sure that taxa filtered out in the previous step are removed from the tree
-    self.args.starting_tree = filter_out_removed_taxa_from_tree_and_return_new_file(self.args.starting_tree, temp_working_dir, taxa_removed)
+    self.args.starting_tree = GubbinsCommon.filter_out_removed_taxa_from_tree_and_return_new_file(self.args.starting_tree, temp_working_dir, taxa_removed)
 
     # get the base filename
     (base_directory,base_filename) = os.path.split(self.args.alignment_filename)
@@ -110,12 +110,12 @@ class GubbinsCommon():
     if self.args.verbose > 0:
       print int(time.time())
 
-    reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
+    GubbinsCommon.reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
 
     # Perform pairwise comparison if there are only 2 sequences
-    number_of_sequences = number_of_sequences_in_alignment(self.args.alignment_filename)
+    number_of_sequences = GubbinsCommon.number_of_sequences_in_alignment(self.args.alignment_filename)
     if(number_of_sequences == 2):
-      pairwise_comparison(self.args.alignment_filename,starting_base_filename,GUBBINS_EXEC,self.args.alignment_filename,FASTML_EXEC)
+      GubbinsCommon.pairwise_comparison(self.args.alignment_filename,starting_base_filename,GUBBINS_EXEC,self.args.alignment_filename,FASTML_EXEC)
       sys.exit()
 
     latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+"tre"
@@ -130,49 +130,49 @@ class GubbinsCommon():
 
     # cleanup RAxML intermediate files
     if self.args.no_cleanup == 0 or self.args.no_cleanup is None:
-      raxml_files_to_delete = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
-      delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
+      raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
 
     for i in range(1, self.args.iterations+1):
       max_iteration += 1
 
       if self.args.tree_builder == "hybrid" :
         if i == 1:
-          previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
-          current_tree_name     = fasttree_current_tree_name(base_filename, i)
-          tree_building_command = fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC, FASTTREE_PARAMS )
-          fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
-          gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
+          previous_tree_name    = GubbinsCommon.fasttree_previous_tree_name(base_filename, i)
+          current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
+          tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC, FASTTREE_PARAMS )
+          fastml_command        = GubbinsCommon.fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
+          gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
 
         elif i == 2:
           previous_tree_name    = current_tree_name
-          current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-          tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-          fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
-          gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
+          current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
+          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
+          fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+          gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
         else:
-          previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
-          current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-          tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-          fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
-          gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
+          previous_tree_name    = GubbinsCommon.raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
+          current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
+          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
+          fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+          gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
 
       elif self.args.tree_builder == "raxml":
-        previous_tree_name    = raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
-        current_tree_name     = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-        tree_building_command = raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-        fastml_command        = raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
-        gubbins_command       = raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
+        previous_tree_name    = GubbinsCommon.raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
+        current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
+        tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
+        fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+        gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
 
       elif self.args.tree_builder == "fasttree":
-        previous_tree_name    = fasttree_previous_tree_name(base_filename, i)
+        previous_tree_name    = GubbinsCommon.fasttree_previous_tree_name(base_filename, i)
         if i == 1:
           previous_tree_name  = base_filename
-        current_tree_name     = fasttree_current_tree_name(base_filename, i)
+        current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
 
-        tree_building_command = fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
-        fastml_command        = fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
-        gubbins_command       = fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
+        tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS )
+        fastml_command        = GubbinsCommon.fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
+        gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename)
 
       if self.args.verbose > 0:
         print tree_building_command
@@ -186,7 +186,7 @@ class GubbinsCommon():
       if self.args.verbose > 0:
         print int(time.time())
 
-      reroot_tree(str(current_tree_name), self.args.outgroup)
+      GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
       if(os.path.lexists(latest_file_name)):
         os.remove(latest_file_name)
@@ -200,7 +200,7 @@ class GubbinsCommon():
       subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
       shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
-      reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+      GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
 
       if self.args.verbose > 0:
         print int(time.time())
@@ -213,7 +213,7 @@ class GubbinsCommon():
 
       tree_file_names.append(current_tree_name)
       if i > 2:
-        if has_tree_been_seen_before(tree_file_names):
+        if GubbinsCommon.has_tree_been_seen_before(tree_file_names):
           if self.args.verbose > 0:
             print "Tree observed before so stopping: "+ str(current_tree_name)
           break
@@ -222,11 +222,11 @@ class GubbinsCommon():
     if self.args.no_cleanup == 0 or self.args.no_cleanup is None:
       max_intermediate_iteration  = max_iteration - 1
 
-      raxml_files_to_delete = raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)
-      delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
+      raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration)
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
 
-      fasttree_files_to_delete = fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
-      delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
+      fasttree_files_to_delete = GubbinsCommon.fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
       shutil.rmtree(temp_working_dir)
 
 
@@ -244,7 +244,7 @@ class GubbinsCommon():
 
     for tree_file_name in tree_file_names:
       if tree_file_name is not tree_file_names[-1]:
-        current_rf_distance = robinson_foulds_distance(tree_file_name,tree_file_names[-1])
+        current_rf_distance = GubbinsCommon.robinson_foulds_distance(tree_file_name,tree_file_names[-1])
         if(current_rf_distance == 0.0):
           return 1
 
@@ -253,9 +253,9 @@ class GubbinsCommon():
   @staticmethod
   def reroot_tree(tree_name, outgroup):
     if outgroup:
-      reroot_tree_with_outgroup(tree_name, outgroup)
+      GubbinsCommon.reroot_tree_with_outgroup(tree_name, outgroup)
     else:
-      reroot_tree_at_midpoint(tree_name)
+      GubbinsCommon.reroot_tree_at_midpoint(tree_name)
       
   @staticmethod
   def reroot_tree_with_outgroup(tree_name, outgroup):
@@ -294,10 +294,10 @@ class GubbinsCommon():
     if node.is_leaf():
       return None
     elif len(node.child_nodes()) > 2:
-      split_child_nodes(node)
+      GubbinsCommon.split_child_nodes(node)
 
     for child_node in node.child_nodes():
-      split_all_non_bi_nodes(child_node)
+      GubbinsCommon.split_all_non_bi_nodes(child_node)
 
     return None
 
@@ -317,7 +317,7 @@ class GubbinsCommon():
   def reroot_tree_at_midpoint(tree_name):
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
-    split_all_non_bi_nodes(tree.seed_node)
+    GubbinsCommon.split_all_non_bi_nodes(tree.seed_node)
 
     tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
     tree.deroot()
@@ -350,14 +350,14 @@ class GubbinsCommon():
 
   @staticmethod
   def raxml_current_tree_name(base_filename_without_ext,current_time, i):
-    return "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(i)
+    return "RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(i)
 
   @staticmethod
   def raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i):
     previous_tree_name = base_filename
 
     if i> 1:
-      previous_tree_name = "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+ str(i-1)
+      previous_tree_name = "RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+ str(i-1)
     return previous_tree_name
 
   @staticmethod
@@ -370,7 +370,7 @@ class GubbinsCommon():
 
   @staticmethod
   def raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time, raxml_exec,previous_tree_name, verbose):
-    previous_tree = raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name)
+    previous_tree = GubbinsCommon.raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name)
 
     command_suffix = '> /dev/null 2>&1'
     if verbose > 0:
@@ -380,27 +380,27 @@ class GubbinsCommon():
 
   @staticmethod
   def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps, original_aln):
-    current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
+    current_tree_name = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
     return gubbins_exec+" -r -v "+starting_base_filename+".vcf -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
   @staticmethod
   def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration):
     regex_for_file_deletions = []
     # Can delete all of these files
-    regex_for_file_deletions.append("^RAxML_(bestTree|info|log|parsimonyTree)."+raxml_base_name(base_filename_without_ext,current_time))
+    regex_for_file_deletions.append("^RAxML_(bestTree|info|log|parsimonyTree)."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time))
 
-    regex_for_file_deletions.append(starting_files_regex)
+    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex)
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
-      regex_for_file_deletions.append("^RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
+      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
 
     return regex_for_file_deletions
 
   @staticmethod
   def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
     regex_for_file_deletions = []
-    regex_for_file_deletions.append(starting_files_regex(starting_base_filename))
+    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex(starting_base_filename))
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
@@ -423,7 +423,7 @@ class GubbinsCommon():
 
   @staticmethod
   def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_base_filename, previous_tree_name,fasttree_exec, fasttree_params ):
-    current_tree_name = fasttree_current_tree_name(base_filename, i)
+    current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
 
     input_tree = ""
     if starting_tree is not None:
@@ -435,18 +435,18 @@ class GubbinsCommon():
 
   @staticmethod
   def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,original_aln):
-    current_tree_name = fasttree_current_tree_name(base_filename, i)
+    current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
     return gubbins_exec+" -r -v "+starting_base_filename+".vcf -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
   @staticmethod
   def fasttree_fastml_command(fastml_exec, alignment_filename, base_filename,i):
-    current_tree_name = fasttree_current_tree_name(base_filename, i)
-    return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
+    current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
+    return GubbinsCommon.generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
 
   @staticmethod
   def raxml_fastml_command(fastml_exec, alignment_filename, base_filename_without_ext,current_time, i):
-    current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
-    return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
+    current_tree_name = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
+    return GubbinsCommon.generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
 
   @staticmethod
   def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
@@ -463,7 +463,7 @@ class GubbinsCommon():
 
   @staticmethod
   def number_of_sequences_in_alignment(filename):
-    return len(get_sequence_names_from_alignment(filename))
+    return len(GubbinsCommon.get_sequence_names_from_alignment(filename))
 
   @staticmethod
   def get_sequence_names_from_alignment(filename):
@@ -619,10 +619,10 @@ class GubbinsCommon():
 
   @staticmethod
   def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec):
-    sequence_names = get_sequence_names_from_alignment(filename)
-    create_pairwise_newick_tree(sequence_names, base_filename+".tre")
+    sequence_names = GubbinsCommon.get_sequence_names_from_alignment(filename)
+    GubbinsCommon.create_pairwise_newick_tree(sequence_names, base_filename+".tre")
 
-    subprocess.check_call(generate_fastml_command(fastml_exec, base_filename+".gaps.snp_sites.aln", base_filename+".tre"), shell=True)
+    subprocess.check_call(GubbinsCommon.generate_fastml_command(fastml_exec, base_filename+".gaps.snp_sites.aln", base_filename+".tre"), shell=True)
     shutil.copyfile(base_filename+'.tre.output_tree',base_filename+".tre")
     shutil.copyfile(base_filename+'.tre.seq.joint.txt', base_filename+".snp_sites.aln")
     subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)

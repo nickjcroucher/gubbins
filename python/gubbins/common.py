@@ -389,7 +389,7 @@ class GubbinsCommon():
     # Can delete all of these files
     regex_for_file_deletions.append("^RAxML_(bestTree|info|log|parsimonyTree)."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time))
 
-    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex)
+    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex("^" + starting_base_filename))
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):

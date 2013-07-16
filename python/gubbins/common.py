@@ -33,7 +33,7 @@ from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 
-class Common():
+class GubbinsCommon():
   "Methods used by Gubbins"
   def __init__(self, input_args):
     self.args = input_args
@@ -231,12 +231,13 @@ class Common():
 
 
     
-    
+  @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
     output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
     return input_tree.robinson_foulds_distance(output_tree)
-
+    
+  @staticmethod
   def has_tree_been_seen_before(tree_file_names):
     if len(tree_file_names) <= 2:
       return 0
@@ -249,12 +250,14 @@ class Common():
 
     return 0
 
+  @staticmethod
   def reroot_tree(tree_name, outgroup):
     if outgroup:
       reroot_tree_with_outgroup(tree_name, outgroup)
     else:
       reroot_tree_at_midpoint(tree_name)
-
+      
+  @staticmethod
   def reroot_tree_with_outgroup(tree_name, outgroup):
     tree = Phylo.read(tree_name, 'newick')
     tree.root_with_outgroup({'name': outgroup})
@@ -286,6 +289,7 @@ class Common():
     output_file.write(output_tree_string.replace('\'', ''))
     output_file.closed
 
+  @staticmethod
   def split_all_non_bi_nodes(node):
     if node.is_leaf():
       return None
@@ -297,6 +301,7 @@ class Common():
 
     return None
 
+  @staticmethod
   def split_child_nodes(node):
     all_child_nodes = node.child_nodes()
     #skip over the first node
@@ -308,6 +313,7 @@ class Common():
     # probably not really nessisary
     node.set_child_nodes((first_child,new_child_node))
 
+  @staticmethod
   def reroot_tree_at_midpoint(tree_name):
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
@@ -338,13 +344,15 @@ class Common():
     output_file.write(output_tree_string.replace('\'', ''))
     output_file.closed
 
+  @staticmethod
   def raxml_base_name(base_filename_without_ext,current_time):
     return base_filename_without_ext+"."+str(current_time) +"iteration_"
 
+  @staticmethod
   def raxml_current_tree_name(base_filename_without_ext,current_time, i):
     return "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+str(i)
 
-
+  @staticmethod
   def raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i):
     previous_tree_name = base_filename
 
@@ -352,7 +360,7 @@ class Common():
       previous_tree_name = "RAxML_result."+raxml_base_name(base_filename_without_ext,current_time)+ str(i-1)
     return previous_tree_name
 
-
+  @staticmethod
   def raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name):
     previous_tree = ""
 
@@ -360,7 +368,7 @@ class Common():
       previous_tree = "-t "+ previous_tree_name
     return previous_tree
 
-
+  @staticmethod
   def raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time, raxml_exec,previous_tree_name, verbose):
     previous_tree = raxml_previous_tree(base_filename_without_ext, base_filename, current_time,i,previous_tree_name)
 
@@ -370,11 +378,12 @@ class Common():
 
     return raxml_exec+ " -s "+previous_tree_name+".phylip -n "+base_filename_without_ext+"."+str(current_time)+"iteration_"+str(i)+" "+previous_tree+ command_suffix
 
-
+  @staticmethod
   def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps, original_aln):
     current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     return gubbins_exec+" -r -v "+starting_base_filename+".vcf -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
+  @staticmethod
   def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration):
     regex_for_file_deletions = []
     # Can delete all of these files
@@ -388,6 +397,7 @@ class Common():
 
     return regex_for_file_deletions
 
+  @staticmethod
   def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
     regex_for_file_deletions = []
     regex_for_file_deletions.append(starting_files_regex(starting_base_filename))
@@ -398,16 +408,20 @@ class Common():
 
     return regex_for_file_deletions
 
+  @staticmethod
   def starting_files_regex(starting_base_filename):
     # starting file with gapped and ungapped snps
     return starting_base_filename+".(gaps|vcf|snp_sites|phylip)"
 
+  @staticmethod
   def fasttree_current_tree_name(base_filename, i):
     return base_filename+".iteration_"+str(i)
 
+  @staticmethod
   def fasttree_previous_tree_name(base_filename, i):
     return base_filename+".iteration_"+str(i-1)
 
+  @staticmethod
   def fasttree_tree_building_command(i, starting_tree, current_tree_name,starting_base_filename, previous_tree_name,fasttree_exec, fasttree_params ):
     current_tree_name = fasttree_current_tree_name(base_filename, i)
 
@@ -419,19 +433,22 @@ class Common():
 
     return fasttree_exec+" "+ input_tree+" "+ fasttree_params+" "+ starting_base_filename+".snp_sites.aln   > "+current_tree_name
 
+  @staticmethod
   def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,original_aln):
     current_tree_name = fasttree_current_tree_name(base_filename, i)
     return gubbins_exec+" -r -v "+starting_base_filename+".vcf -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
+  @staticmethod
   def fasttree_fastml_command(fastml_exec, alignment_filename, base_filename,i):
     current_tree_name = fasttree_current_tree_name(base_filename, i)
     return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
 
-
+  @staticmethod
   def raxml_fastml_command(fastml_exec, alignment_filename, base_filename_without_ext,current_time, i):
     current_tree_name = raxml_current_tree_name(base_filename_without_ext,current_time, i)
     return generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
 
+  @staticmethod
   def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
 
     return (fastml_exec 
@@ -444,10 +461,11 @@ class Common():
       + " -d " + tree_filename + ".prob.joint.txt"
       + " -e " + tree_filename + ".prob.marginal.txt")
 
-
+  @staticmethod
   def number_of_sequences_in_alignment(filename):
     return len(get_sequence_names_from_alignment(filename))
 
+  @staticmethod
   def get_sequence_names_from_alignment(filename):
     sequence_names = []
     handle = open(filename, "rU")
@@ -456,7 +474,7 @@ class Common():
     handle.close()
     return sequence_names
 
-
+  @staticmethod
   def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
     input_handle  = open(input_filename, "rU")
     output_handle = open(output_filename, "w+")
@@ -492,7 +510,7 @@ class Common():
     input_handle.close()
     return taxa_removed
 
-
+  @staticmethod
   def filter_out_removed_taxa_from_tree_and_return_new_file(starting_tree, temp_working_dir, taxa_removed):
     if starting_tree is None:
        return None
@@ -529,6 +547,7 @@ class Common():
 
     return temp_starting_tree
 
+  @staticmethod
   def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
     # find out where the gaps are located
     # PyVCF removed for performance reasons
@@ -588,6 +607,7 @@ class Common():
 
 
     # reparsing a fasta file splits the lines which makes fastml work
+  @staticmethod
   def reconvert_fasta_file(input_filename, output_filename):
     input_handle = open(input_filename, "rU")
     output_handle = open(output_filename, "w+")
@@ -597,6 +617,7 @@ class Common():
     input_handle.close()
     return
 
+  @staticmethod
   def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec):
     sequence_names = get_sequence_names_from_alignment(filename)
     create_pairwise_newick_tree(sequence_names, base_filename+".tre")
@@ -606,10 +627,12 @@ class Common():
     shutil.copyfile(base_filename+'.tre.seq.joint.txt', base_filename+".snp_sites.aln")
     subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
 
+  @staticmethod
   def create_pairwise_newick_tree(sequence_names, output_filename):
     tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
     Phylo.write(tree, output_filename, 'newick')
 
+  @staticmethod
   def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_deletions, verbose):
     for dirname, dirnames, filenames in os.walk(directory_to_search):
       for filename in filenames:
@@ -620,6 +643,7 @@ class Common():
               print "Deleting file: "+ os.path.join(directory_to_search, filename)
             os.remove(full_path_of_file_for_deletion)
 
+  @staticmethod
   def which(program):
     executable = program.split(" ")
     program = executable[0]
@@ -637,6 +661,7 @@ class Common():
 
     return None
 
+  @staticmethod
   def use_bundled_exec(input_executable, bundled_executable):
     (base_directory,script_filename) = os.path.split(os.path.realpath(__file__))
     path_to_bundled_exec = os.path.join(base_directory, bundled_executable)

@@ -583,6 +583,7 @@ class GubbinsCommon():
       for record in alignment:
         inserted_gaps = []
         if record.id in sample_names:
+          # only apply to internal nodes
           continue
         gap_index = 0
         for input_base in record.seq:

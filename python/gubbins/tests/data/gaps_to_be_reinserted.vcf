@@ -1,0 +1,21 @@
+##fileformat=VCFv4.1
+##FORMAT=<ID=AB,Number=1,Type=String,Description="Alt Base">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sequence_1	sequence_2	sequence_3	sequence_4	sequence_5	sequence_6	sequence_7	sequence_8	sequence_9	sequence_10	
+1	1	.	A	C,-	.	.	.	AB	A	C	-	-	-	-	-	-	-	A	
+1	6	.	A	-	.	.	.	AB	A	-	C	-	-	-	-	-	-	A	
+1	8	.	C	-	.	.	.	AB	A	-	C	-	-	-	-	-	-	A	
+1	9	.	A	-	.	.	.	AB	A	-	-	C	-	-	-	-	-	A	
+1	11	.	A	-,C	.	.	.	AB	A	-	-	C	-	-	-	-	-	A	
+1	12	.	A	-,C,N	.	.	.	AB	A	-	-	-	C	-	-	-	-	A	
+1	13	.	A	-,N	.	.	.	AB	A	C	-	-	-	-	-	-	-	A	
+1	14	.	A	-,C,N	.	.	.	AB	A	-	-	-	C	-	-	-	-	A	
+1	18	.	N	C	.	.	.	AB	A	A	A	A	A	A	C	A	A	A	
+1	19	.	N	C	.	.	.	AB	A	A	A	A	A	A	C	A	A	A	
+1	20	.	N	C	.	.	.	AB	A	A	A	A	A	A	C	A	A	A	
+1	26	.	N	C	.	.	.	AB	A	A	A	A	C	A	A	A	A	A	
+1	27	.	N	C	.	.	.	AB	A	A	A	A	C	A	A	A	A	A	
+1	28	.	N	C	.	.	.	AB	A	A	A	A	C	A	A	A	A	A	
+1	30	.	N	C	.	.	.	AB	A	A	C	A	A	A	A	A	A	A	
+1	31	.	N	C	.	.	.	AB	A	A	C	A	A	A	A	A	A	A	
+1	32	.	A	C	.	.	.	AB	A	A	C	A	A	A	A	A	A	A	
+1	33	.	C	A	.	.	.	AB	C	A	A	A	A	A	A	A	A	A

@@ -22,6 +22,7 @@ class TestExternalDependancies(unittest.TestCase):
   #def test_parse_and_run(self):
   #  assert 1 == 0
   #
+  
   def test_pairwise_comparison(self):
     common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','../external/fastml/programs/fastml/fastml  -mg -qf -b ')
     # Check the tree file is as expected
@@ -54,14 +55,26 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('gubbins/tests/data/pairwise.aln.tre.vcf')
     os.remove('log.txt')
 
-  #
-  #def test_delete_files_based_on_list_of_regexes(self):
-  #  assert 1 == 0
-  #
-  #def test_use_bundled_exec(self):
-  # this wont work properly if the python script is installed.
-  #  assert 1 == 0
-
+  
+  def test_delete_files_based_on_list_of_regexes(self):
+    open('gubbins/tests/data/AAA', 'w').close()
+    open('gubbins/tests/data/BBB', 'w').close() 
+    open('gubbins/tests/data/BBBAAA', 'w').close() 
+    open('gubbins/tests/data/AAABBB', 'w').close() 
+    
+    common.GubbinsCommon.delete_files_based_on_list_of_regexes('gubbins/tests/data', ['AAA'], 0)
+    assert not os.path.exists('gubbins/tests/data/AAA')
+    assert     os.path.exists('gubbins/tests/data/BBB')
+    assert     os.path.exists('gubbins/tests/data/BBBAAA')
+    assert not os.path.exists('gubbins/tests/data/AAABBB')
+    os.remove('gubbins/tests/data/BBB')
+    os.remove('gubbins/tests/data/BBBAAA')
+  
+  
+  def test_use_bundled_exec(self):
+    assert re.search('../external/standard-RAxML/raxmlHPC -f d -p 1 -m GTRGAMMA',common.GubbinsCommon.use_bundled_exec('raxmlHPC -f d -p 1 -m GTRGAMMA', '../external/standard-RAxML/raxmlHPC')) != None
+    assert re.search('../external/fastml/programs/fastml/fastml -mg -qf -b ',common.GubbinsCommon.use_bundled_exec('fastml -mg -qf -b ', '../external/fastml/programs/fastml/fastml')) != None
+    assert re.search('../src/gubbins',common.GubbinsCommon.use_bundled_exec('gubbins', '../src/gubbins')) != None
 
 if __name__ == "__main__":
   unittest.main()

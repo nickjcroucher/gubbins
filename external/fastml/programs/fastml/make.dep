@@ -1,4 +1,4 @@
-fastml.o fastml.debug.o: fastml.cpp mainbb.h bb_options.h ../../libs/phylogeny/getopt.h \
+fastml.o fastml.debug.o: fastml.cpp mainbb.h bb_options.h   \
   ../../libs/phylogeny/definitions.h bb_options_list.h \
   ../../libs/phylogeny/sequenceContainer.h \
   ../../libs/phylogeny/definitions.h ../../libs/phylogeny/sequence.h \
@@ -83,7 +83,7 @@ bbComputeUpAlg.o bbComputeUpAlg.debug.o: bbComputeUpAlg.cpp bbComputeUpAlg.h \
   ../../libs/phylogeny/seqContainerTreeMap.h \
   ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
 bbEvaluateSpecificAV.o bbEvaluateSpecificAV.debug.o: bbEvaluateSpecificAV.cpp bbEvaluateSpecificAV.h \
-  bb_options.h ../../libs/phylogeny/getopt.h \
+  bb_options.h   \
   ../../libs/phylogeny/definitions.h bb_options_list.h \
   ../../libs/phylogeny/computePijComponent.h \
   ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
@@ -101,7 +101,7 @@ bbEvaluateSpecificAV.o bbEvaluateSpecificAV.debug.o: bbEvaluateSpecificAV.cpp bb
   ../../libs/phylogeny/seqContainerTreeMap.h \
   ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
 bbfindBestAVDynProg.o bbfindBestAVDynProg.debug.o: bbfindBestAVDynProg.cpp bbfindBestAVDynProg.h \
-  bb_options.h ../../libs/phylogeny/getopt.h \
+  bb_options.h   \
   ../../libs/phylogeny/definitions.h bb_options_list.h \
   ../../libs/phylogeny/computePijComponent.h \
   ../../libs/phylogeny/definitions.h ../../libs/phylogeny/tree.h \
@@ -137,7 +137,7 @@ bbNodeOrderAlg.o bbNodeOrderAlg.debug.o: bbNodeOrderAlg.cpp bbNodeOrderAlg.h \
   ../../libs/phylogeny/suffStatComponent.h \
   ../../libs/phylogeny/sequenceContainer.h \
   ../../libs/phylogeny/computePijComponent.h
-bb_options.o bb_options.debug.o: bb_options.cpp bb_options.h ../../libs/phylogeny/getopt.h \
+bb_options.o bb_options.debug.o: bb_options.cpp bb_options.h   \
   ../../libs/phylogeny/definitions.h bb_options_list.h \
   ../../libs/phylogeny/logFile.h ../../libs/phylogeny/errorMsg.h
 bbReport.o bbReport.debug.o: bbReport.cpp bbReport.h ../../libs/phylogeny/definitions.h \
@@ -185,7 +185,7 @@ jointNoGamma.o jointNoGamma.debug.o: jointNoGamma.cpp jointNoGamma.h \
   suffStatComponentJointNoGamma.h ../../libs/phylogeny/treeIt.h \
   ../../libs/phylogeny/seqContainerTreeMap.h \
   ../../libs/phylogeny/treeIt.h ../../libs/phylogeny/sequenceContainer.h
-mainbb.o mainbb.debug.o: mainbb.cpp mainbb.h bb_options.h ../../libs/phylogeny/getopt.h \
+mainbb.o mainbb.debug.o: mainbb.cpp mainbb.h bb_options.h   \
   ../../libs/phylogeny/definitions.h bb_options_list.h \
   ../../libs/phylogeny/sequenceContainer.h \
   ../../libs/phylogeny/definitions.h ../../libs/phylogeny/sequence.h \

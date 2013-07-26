@@ -44,3 +44,5 @@ tests/data/one_recombination.tre.tab
 tests/data/one_recombination.tre.vcf
 python/build/lib/gubbins/__init__.py
 python/build/lib/gubbins/common.py
+external/fastml/programs/fastml/fastml
+external/fasttree/FastTree

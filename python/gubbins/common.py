@@ -38,8 +38,7 @@ class GubbinsCommon():
   def __init__(self, input_args):
     self.args = input_args
     
-  def parse_and_run():
-    
+  def parse_and_run(self):
     # Default parameters
     RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
     FASTTREE_EXEC = 'FastTree'
@@ -48,16 +47,16 @@ class GubbinsCommon():
     FASTML_EXEC = 'fastml -mg -qf -b '
 
     # Names of the bundled executables to use if the executables arent in the default PATH
-    RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
-    FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
-    GUBBINS_BUNDLED_EXEC = '../src/gubbins'
-    FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
+    RAXML_BUNDLED_EXEC = '../../external/standard-RAxML/raxmlHPC'
+    FASTML_BUNDLED_EXEC = '../../external/fastml/programs/fastml/fastml'
+    GUBBINS_BUNDLED_EXEC = '../../src/gubbins'
+    FASTTREE_BUNDLED_EXEC = '../../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
       GUBBINS_EXEC = GubbinsCommon.use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
       if GubbinsCommon.which(GUBBINS_EXEC) is None:
-        print "gubbins is not in your path"
+        print GUBBINS_EXEC+" is not in your path"
         sys.exit()
     if GubbinsCommon.which(FASTML_EXEC) is None:
       FASTML_EXEC = GubbinsCommon.use_bundled_exec(FASTML_EXEC, FASTML_BUNDLED_EXEC)
@@ -228,7 +227,8 @@ class GubbinsCommon():
       fasttree_files_to_delete = GubbinsCommon.fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration)
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
       shutil.rmtree(temp_working_dir)
-
+      
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename)], self.args.verbose)
 
     
   @staticmethod
@@ -389,8 +389,6 @@ class GubbinsCommon():
     # Can delete all of these files
     regex_for_file_deletions.append("^RAxML_(bestTree|info|log|parsimonyTree)."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time))
 
-    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex("^" + starting_base_filename))
-
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
       regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
@@ -400,7 +398,6 @@ class GubbinsCommon():
   @staticmethod
   def fasttree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
     regex_for_file_deletions = []
-    regex_for_file_deletions.append(GubbinsCommon.starting_files_regex(starting_base_filename))
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
@@ -641,7 +638,7 @@ class GubbinsCommon():
           full_path_of_file_for_deletion = os.path.join(directory_to_search, filename)
           if(re.match(str(deletion_regex), filename) != None and os.path.exists(full_path_of_file_for_deletion)):
             if verbose > 0:
-              print "Deleting file: "+ os.path.join(directory_to_search, filename)
+              print "Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex
             os.remove(full_path_of_file_for_deletion)
 
   @staticmethod

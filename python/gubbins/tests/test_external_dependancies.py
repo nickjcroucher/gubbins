@@ -87,6 +87,58 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
     os.remove('RAxML_result.multiple_recombinations.iteration_5')
   
+  def test_parse_and_run_with_ten_iterations(self):
+
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 1)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 10)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 100)
+
+    #  multiple recombinations
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(['gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+    
+    assert os.path.exists('multiple_recombinations.aln.start')
+    assert os.path.exists('log.txt')
+    assert os.path.exists('latest_tree.multiple_recombinations.tre')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.vcf')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.tab')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.stats')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.snp_sites.aln')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.seq.joint.txt')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.prob.joint.txt')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.phylip')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.output_tree')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.gff')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.branch_snps.tab')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10.ancestor.tre')
+    assert os.path.exists('RAxML_result.multiple_recombinations.iteration_10')
+    
+    os.remove('multiple_recombinations.aln.start')
+    os.remove('log.txt')
+    os.remove('latest_tree.multiple_recombinations.tre')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.vcf')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.tab')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.stats')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.snp_sites.aln')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.seq.joint.txt')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.prob.joint.txt')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.phylip')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.output_tree')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.gff')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.branch_snps.tab')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10.ancestor.tre')
+    os.remove('RAxML_result.multiple_recombinations.iteration_10')
+  
+  #def test_running_fasttree(self):
+  #  assert 0 == 1
   
   def test_pairwise_comparison(self):
     common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','../external/fastml/programs/fastml/fastml  -mg -qf -b ')

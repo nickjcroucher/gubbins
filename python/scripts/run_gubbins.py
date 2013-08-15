@@ -20,6 +20,7 @@
 #
 
 import sys
+sys.path.append(".")
 import argparse
 from gubbins import common
 

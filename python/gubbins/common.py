@@ -24,6 +24,7 @@ import os
 import time
 import re
 import tempfile
+from collections import Counter
 from Bio import Phylo
 import dendropy
 from Bio import SeqIO
@@ -33,11 +34,34 @@ from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 
+class GubbinsError(Exception):
+  def __init__(self, value,message):
+      self.value = value
+      self.message = message
+  def __str__(self):
+      return self.message
+
 class GubbinsCommon():
   "Methods used by Gubbins"
   def __init__(self, input_args):
     self.args = input_args
-    
+  
+  @staticmethod
+  def is_starting_tree_valid(starting_tree):
+    try:
+      tree = Phylo.read(starting_tree, 'newick')
+    except:
+      print "Error with the input starting tree: Is it a valid Newick file?"
+      return 0
+    return 1
+
+  @staticmethod
+  def does_file_exist(alignment_filename, file_type_msg):
+    if(not os.path.exists(alignment_filename)):
+      print GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly')
+      return 0
+    return 1
+
   def parse_and_run(self):
     # Default parameters
     RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
@@ -74,9 +98,11 @@ class GubbinsCommon():
         print "FastTree is not in your path"
         sys.exit()
 
-    if(not os.path.exists(self.args.alignment_filename)):
-      print "Cannot access the input alignment file. Check its been entered correctly"
-      sys.exit()
+    if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
+       sys.exit()
+       
+    if(self.args.starting_tree is not None and self.args.starting_tree != "" and (GubbinsCommon.does_file_exist(self.args.starting_tree, 'Starting Tree') == 0 or GubbinsCommon.is_starting_tree_valid(starting_tree) )):
+       sys.exit()
 
     current_time = ''
     if self.args.use_time_stamp > 0:
@@ -391,7 +417,7 @@ class GubbinsCommon():
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
-      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration))
+      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'[$|\.]')
 
     return regex_for_file_deletions
 
@@ -401,7 +427,7 @@ class GubbinsCommon():
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
-      regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration))
+      regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration)+'[$|\.]')
 
     return regex_for_file_deletions
 
@@ -470,6 +496,72 @@ class GubbinsCommon():
       sequence_names.append(record.id)
     handle.close()
     return sequence_names
+
+  @staticmethod
+  def is_input_fasta_file_valid(input_filename):
+    try:
+      if GubbinsCommon.does_each_sequence_have_the_same_length(input_filename) == 0:
+        return 0
+      if GubbinsCommon.are_sequence_names_unique(input_filename) == 0:
+        return 0
+      if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
+        return 0
+    except:
+      return 0
+
+    return 1
+
+  @staticmethod
+  def does_each_sequence_have_a_name_and_genomic_data(input_filename):
+    input_handle  = open(input_filename, "rU")
+    alignments = AlignIO.parse(input_handle, "fasta")
+    for alignment in alignments:
+        for record in alignment:
+            if record.name is None or record.name == "":
+              print "Error with the input FASTA file: One of the sequence names is blank"
+              return 0
+            if record.seq is None or record.seq == "":
+              print "Error with the input FASTA file: One of the sequences is empty"
+              return 0
+            if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
+              print "Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted"
+              return 0
+    input_handle.close()
+    return 1
+    
+    
+  @staticmethod
+  def does_each_sequence_have_the_same_length(input_filename):
+    try:
+      input_handle  = open(input_filename, "rU")
+      alignments = AlignIO.parse(input_handle, "fasta")
+      sequence_length = -1
+      for alignment in alignments:
+          for record in alignment:
+             if sequence_length == -1:
+               sequence_length = len(record.seq)
+             elif sequence_length != len(record.seq):
+               print "Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name
+               return 0
+      input_handle.close()
+    except:
+      print "Error with the input FASTA file: It is in the wrong format so check its an alignment"
+      return 0
+    return 1
+
+  @staticmethod
+  def are_sequence_names_unique(input_filename):
+    input_handle  = open(input_filename, "rU")
+    alignments = AlignIO.parse(input_handle, "fasta")
+    sequence_names = []
+    for alignment in alignments:
+        for record in alignment:
+            sequence_names.append(record.name)
+            
+    if [k for k,v in Counter(sequence_names).items() if v>1] != []:
+      return 0
+    input_handle.close()
+    return 1
 
   @staticmethod
   def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):

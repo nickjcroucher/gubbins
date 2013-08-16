@@ -88,6 +88,12 @@ Biopython (>=1.59)
 DendroPy  (>=3.11.1)
 ReportLab (>= 2.5)
 
+If you get errors from Biopython make sure you have the following packages installed (as named by Ubuntu):
+python-dev
+python-reportlab
+python-numpy
+python-support
+
 == Running the Python wrapper ==
 
 There is a Python wrapper script that automates some of the preparatory work

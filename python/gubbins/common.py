@@ -91,10 +91,10 @@ class GubbinsCommon():
     FASTML_EXEC = 'fastml -mg -qf -b '
 
     # Names of the bundled executables to use if the executables arent in the default PATH
-    RAXML_BUNDLED_EXEC = '../../external/standard-RAxML/raxmlHPC'
-    FASTML_BUNDLED_EXEC = '../../external/fastml/programs/fastml/fastml'
-    GUBBINS_BUNDLED_EXEC = '../../src/gubbins'
-    FASTTREE_BUNDLED_EXEC = '../../external/fasttree/FastTree'
+    RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
+    FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
+    GUBBINS_BUNDLED_EXEC = '../src/gubbins'
+    FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
@@ -788,12 +788,9 @@ class GubbinsCommon():
 
   @staticmethod
   def use_bundled_exec(input_executable, bundled_executable):
-    (base_directory,script_filename) = os.path.split(os.path.realpath(__file__))
-    path_to_bundled_exec = os.path.join(base_directory, bundled_executable)
-
     # Pop the first value off the input_executable and replace it with the bundled exec
     executable_and_params = input_executable.split(" ")
     executable_and_params.pop(0)
-    executable_and_params.insert(0, path_to_bundled_exec)
+    executable_and_params.insert(0, bundled_executable)
     return  ' '.join(executable_and_params)
 

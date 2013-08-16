@@ -1,6 +1,7 @@
 *egg-info
 *.pyc
 *.o
+config.log
 src/gubbins
 tests/run_all_tests
 src/run_all_tests
@@ -17,14 +18,14 @@ src/libgubbins.la
 #aclocal.m4
 #config.*
 #configure
-depcomp
+#depcomp
 graph
-install-sh
+#install-sh
 libtool
-ltmain.sh
-missing
+#ltmain.sh
+#missing
 run_gubbins.pyc
-src/Makefile.in
+#src/Makefile.in
 stamp-h1
 test-driver
 external/standard-RAxML/raxmlHPC

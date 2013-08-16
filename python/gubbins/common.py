@@ -49,10 +49,30 @@ class GubbinsCommon():
   @staticmethod
   def is_starting_tree_valid(starting_tree):
     try:
-      tree = Phylo.read(starting_tree, 'newick')
+      Phylo.read(starting_tree, 'newick')
+      tree  = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
     except:
       print "Error with the input starting tree: Is it a valid Newick file?"
       return 0
+    return 1
+    
+  @staticmethod
+  def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
+    input_handle  = open(alignment_filename, "rU")
+    alignments = AlignIO.parse(input_handle, "fasta")
+    sequence_names = {}
+    for alignment in alignments:
+        for record in alignment:
+            sequence_names[record.name] = 1
+    input_handle.close()
+    
+    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    leaf_nodes = tree.leaf_nodes
+    for node in leaf_nodes:
+      if sequence_names[node.taxon] is None:
+        print "Error: A taxon referenced in the starting tree isnt found in the input fasta file"
+        return 0
+
     return 1
 
   @staticmethod
@@ -101,8 +121,11 @@ class GubbinsCommon():
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
        sys.exit()
        
-    if(self.args.starting_tree is not None and self.args.starting_tree != "" and (GubbinsCommon.does_file_exist(self.args.starting_tree, 'Starting Tree') == 0 or GubbinsCommon.is_starting_tree_valid(starting_tree) )):
+    if(self.args.starting_tree is not None and self.args.starting_tree != "" and (GubbinsCommon.does_file_exist(self.args.starting_tree, 'Starting Tree') == 0 or GubbinsCommon.is_input_starting_tree_valid(starting_tree) )):
        sys.exit()
+       
+    if(self.args.starting_tree is not None and self.args.starting_tree != "" and GubbinsCommon.do_the_names_match_the_fasta_file(self.args.starting_tree,self.args.alignment_filename) == 0):
+      sys.exit()
 
     current_time = ''
     if self.args.use_time_stamp > 0:
@@ -510,6 +533,18 @@ class GubbinsCommon():
       return 0
 
     return 1
+    
+  def is_input_starting_tree_valid(starting_tree):
+    try:
+      if GubbinsCommon.is_starting_tree_valid(starting_tree) ==0:
+        return 0
+      if GubbinsCommon.do_all_leaf_nodes_have_unique_names(starting_tree) == 0:
+        return 0
+    except:
+      return 0
+
+    return 1
+  
 
   @staticmethod
   def does_each_sequence_have_a_name_and_genomic_data(input_filename):

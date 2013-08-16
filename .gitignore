@@ -13,10 +13,10 @@ autom4te.cache/*
 src/.libs/*
 src/libPyGubbins_la-PyGubbins.loT
 src/libgubbins.la
-Makefile.in
-aclocal.m4
-config.*
-configure
+#Makefile.in
+#aclocal.m4
+#config.*
+#configure
 depcomp
 graph
 install-sh

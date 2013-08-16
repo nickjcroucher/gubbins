@@ -1,5 +1,5 @@
 == Prep work ==
-As listed in the dependacies section below, you need
+As listed in the dependancies section below, you need
  * Python 2.7.
 
 == Included external applications ==
@@ -10,7 +10,9 @@ performance increases by choosing makefile which are more appropriate for your s
 * FASTML (2.02) http://fastml.tau.ac.il/,
 * RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html, and
 
-Finally, the raxmlHPC binary should be named "raxmlHPC".
+Finally, the raxmlHPC binary should be named "raxmlHPC".  If you have a modern CPU you 
+can get vastly increased performance by installing RAxML yourself and selecting
+the most appropriate makefile.
 
 == Installing from a git checkout ==
 $ autoreconf -i
@@ -31,6 +33,12 @@ $ su -
 $ make install
 $ cd python
 $ python setup.py install
+
+
+To run the script with all of the default bundled executables.
+$ cd python
+$ scripts/run_gubbins my_alignment.fa
+
 
 The main executable should be in ./src/gubbins and in the system-wide directory
 for locally compiled applications.  On Linux this is /usr/local/bin.

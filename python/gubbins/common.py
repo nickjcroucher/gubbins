@@ -67,9 +67,10 @@ class GubbinsCommon():
     input_handle.close()
     
     tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
-    leaf_nodes = tree.leaf_nodes
-    for node in leaf_nodes:
-      if sequence_names[node.taxon] is None:
+    
+    leaf_nodes = tree.leaf_nodes()
+    for i,lf in enumerate(leaf_nodes):
+      if sequence_names.has_key(leaf_nodes[i].taxon.label) is None:
         print "Error: A taxon referenced in the starting tree isnt found in the input fasta file"
         return 0
 
@@ -440,7 +441,8 @@ class GubbinsCommon():
 
     # loop over previous iterations and delete
     for file_iteration in range(1,max_intermediate_iteration):
-      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'[$|\.]')
+      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'\.')
+      regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'$')
 
     return regex_for_file_deletions
 

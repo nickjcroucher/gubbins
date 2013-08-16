@@ -39,6 +39,13 @@ To run the script with all of the default bundled executables.
 $ cd python
 $ scripts/run_gubbins my_alignment.fa
 
+To run the script anywhere you must first install the external dependances by yourself by copying the executables below into your PATH:
+external/standard-RAxML/raxmlHPC
+external/fastml/programs/fastml/fastml
+external/fasttree/FastTree
+
+Then you can run this from any directory:
+$ run_gubbins my_alignment.fa
 
 The main executable should be in ./src/gubbins and in the system-wide directory
 for locally compiled applications.  On Linux this is /usr/local/bin.

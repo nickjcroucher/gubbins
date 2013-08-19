@@ -1,0 +1,16 @@
+== Installing from a git checkout ==
+$ autoreconf -i
+$ ./configure
+$ su -
+$ make
+$ make install
+
+
+== Installing from a released source tarball ==
+
+$ tar xzvf FastTree-2.1.7.tar.gz
+$ cd FastTree-2.1.7
+$ ./configure
+$ make
+$ su -
+$ make install

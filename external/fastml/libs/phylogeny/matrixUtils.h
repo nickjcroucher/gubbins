@@ -27,6 +27,18 @@ MDOUBLE getMatrixNorm(const VVdouble &mat);
 
 
 template<typename _T>
+void resizeMatrix(vector<vector< _T> > &mat, int rows, int columns){
+	mat.resize(rows);
+	for (int i=0; i<rows;i++){
+		mat[i].resize(columns);
+		for (int j=0;j<columns;j++){ // initializing all values as zero
+			mat[i][j] = 0.0;
+		}
+	}
+}
+
+
+template<typename _T>
 void unitMatrix(vector<vector< _T> > &m, int n){
 	resizeMatrix(m,n,n);
 	for (int i=0; i<n; i++){
@@ -82,16 +94,6 @@ vector<vector< _T> > multiplyMatrixByScalar(const vector<vector< _T> > &mat, MDO
 	return mat_copy;
 }
 
-template<typename _T>
-void resizeMatrix(vector<vector< _T> > &mat, int rows, int columns){
-	mat.resize(rows);
-	for (int i=0; i<rows;i++){
-		mat[i].resize(columns);
-		for (int j=0;j<columns;j++){ // initializing all values as zero
-			mat[i][j] = 0.0;
-		}
-	}
-}
 
 template<typename _T>
 vector<vector< _T> > add(const vector<vector< _T> >  &mat1,const vector<vector< _T> >  &mat2){

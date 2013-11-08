@@ -536,6 +536,7 @@ class GubbinsCommon():
 
     return 1
     
+  @staticmethod
   def is_input_starting_tree_valid(starting_tree):
     try:
       if GubbinsCommon.is_starting_tree_valid(starting_tree) ==0:

@@ -596,6 +596,30 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 		}
 		
 	}
+
+  // Move blocks inwards to next SNP
+	for(i = 0; i < number_of_blocks; i++)
+	{		
+		for(snp_counter = 0; snp_counter < number_of_branch_snps; snp_counter++)
+		{
+			if(snp_site_coords[snp_counter] >= block_coordinates[0][i] )
+			{
+				block_coordinates[0][i] = snp_site_coords[snp_counter];
+				break;
+			}
+		}
+		
+		for(snp_counter = number_of_branch_snps-1; snp_counter >= 0 ; snp_counter--)
+		{
+			if(snp_site_coords[snp_counter] <= block_coordinates[1][i] )
+			{
+				block_coordinates[1][i] = snp_site_coords[snp_counter];
+				break;
+			}
+		}
+	}
+
+
 	free(gaps_in_original_genome_space);
 	free(window_count);
 	return number_of_blocks;

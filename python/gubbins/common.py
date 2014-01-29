@@ -87,7 +87,7 @@ class GubbinsCommon():
     # Default parameters
     RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
     FASTTREE_EXEC = 'FastTree'
-    FASTTREE_PARAMS = '-gtr -gamma -nt'
+    FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
     FASTML_EXEC = 'fastml -mg -qf -b '
 

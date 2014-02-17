@@ -87,6 +87,10 @@ int estimate_snps_genome_would_have_without_recombinations(int number_of_snps_ou
 	{
 		return 0;
 	}
+	if(bases_in_recombinations == 0)
+	{
+		return number_of_snps_outside_recomb;
+	}
 	return (int) (number_of_snps_outside_recomb*genome_length_without_gaps)/(genome_length_without_gaps - bases_in_recombinations);
 }
 

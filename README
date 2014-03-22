@@ -1,19 +1,6 @@
 This piece of software is not the version that was used in Croucher et. al. "Rapid Pneumococcal Evolution in Response to Clinical Interventions", Science 2011, 331 (6016): 430-434.
 It is a work in progress and as such is not yet recommended for use by the community. We expect to make an official release of the software soon.
 
-## Building ##
+== Building ==
 
-The build system is used GNU Autotools.  From git you need to
-
-```bash
-$ autoreconf -i
-$ ./configure
-$ make
-```
-
-If you are building from a source release tarball, then the first step is unnecessary and the following will suffice:
-
-```bash
-$ ./configure
-$ make
-```
+The build system is used GNU Autotools.  See the included INSTALL file for more information.

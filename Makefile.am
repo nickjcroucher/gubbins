@@ -1,1 +1,1 @@
-SUBDIRS=src external
+SUBDIRS=src

@@ -32,4 +32,4 @@ run_all_tests_SOURCES = \
 	../tests/helper_methods.c \
 	../tests/run_all_tests.c
 run_all_tests_CFLAGS = -I../tests
-run_all_tests_LDADD = -lcheck libgubbins.la -lz -lm
+run_all_tests_LDADD = -lcheck libgubbins.la -lz -lm -lrt

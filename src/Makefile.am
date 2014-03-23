@@ -11,7 +11,7 @@ gubbins_LDADD=libgubbins.la -lz -lm
 lib_LTLIBRARIES = libgubbins.la
 libgubbins_la_SOURCES = Newickform.c alignment_file.c block_tab_file.c branch_sequences.c string_cat.c fasta_of_snp_sites.c gff_file.c gubbins.c parse_phylip.c parse_vcf.c phylip_of_snp_sites.c seqUtil.c snp_searching.c snp_sites.c tree_statistics.c tree_scaling.c vcf.c
 libgubbins_la_LDFLAGS= -version-info 0:1
-
+libgubbins_la_LIBADD = -lm
 
 #libPyGubbins_la_SOURCES = PyGubbins.cpp
 #libPyGubbins_la_LDFLAGS = -version-info 0:1

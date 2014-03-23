@@ -5,12 +5,12 @@
 
 release: ubuntu-release
 
-# copy gubbins using scp rather than puppet, to avail of automake substitution.
+# copy gubbins using /vagrant default mount rather than puppet, to avail of automake substitution.
 ubuntu-release:
 	vagrant up
 	vagrant provision
-	sshpass -p "vagrant" scp -P 2222 ../${PACKAGE}-${VERSION}.tar.gz vagrant@localhost:~
-	vagrant ssh -c "tar xzvf ${PACKAGE}-${VERSION}.tar.gz"
+	cp ../${PACKAGE}-${VERSION}.tar.gz .
+	vagrant ssh -c "tar xzvf /vagrant/${PACKAGE}-${VERSION}.tar.gz"
 	vagrant ssh -c "cd ${PACKAGE}-${VERSION} && dpkg-buildpackage -rfakeroot"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.deb /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.changes /vagrant"

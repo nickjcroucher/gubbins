@@ -1,0 +1,14 @@
+Source: gubbins
+Section: misc
+Priority: extra
+Maintainer: Aidan Delaney <a.j.delaney@brighton.ac.uk>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Standards-Version: 3.9.4
+Vcs-Git: https://github.com/andrewjpage/gubbins.git
+Vcs-Browser: https://github.com/andrewjpage/gubbins
+
+Package: gubbins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Phylogenetic analysis of genome sequences
+  Gubbins supports rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences.

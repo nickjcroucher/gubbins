@@ -1,4 +1,4 @@
-AC_INIT([Gubbins], [0.1])
+AC_INIT([gubbins], [0.1.1], [a.j.delaney@brighton.ac.uk], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins]) # bug reports to Aidan
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
@@ -24,7 +24,7 @@ AM_PATH_PYTHON([2.0],
 # Define a new recursive target. In our case it produces a .deb installable.
 AM_EXTRA_RECURSIVE_TARGETS([release])
 
-AC_CONFIG_FILES([Makefile src/Makefile release/Makefile python/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile release/Makefile python/Makefile debian/changelog debian/copyright])
 AC_OUTPUT
 
 AC_CHECK_HEADERS([zlib.h math.h])

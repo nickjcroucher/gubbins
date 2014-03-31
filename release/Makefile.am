@@ -11,7 +11,7 @@ ubuntu-release:
 	vagrant provision
 	cp ../${PACKAGE}-${VERSION}.tar.gz .
 	vagrant ssh -c "tar xzvf /vagrant/${PACKAGE}-${VERSION}.tar.gz"
-	vagrant ssh -c "cd ${PACKAGE}-${VERSION} && dpkg-buildpackage -rfakeroot"
+	vagrant ssh -c "cd ${PACKAGE}-${VERSION} && dpkg-buildpackage -uc -us -rfakeroot"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.deb /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.changes /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}.dsc /vagrant"

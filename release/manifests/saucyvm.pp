@@ -17,3 +17,11 @@ package {"zlib1g-dev":
 package {"check":
     ensure => "installed"
     }
+
+package {"python-setuptools":
+    ensure => "installed"
+    }
+
+package {"cdbs":
+    ensure => "installed"
+    }

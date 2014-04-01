@@ -14,7 +14,6 @@ ubuntu-release:
 	vagrant ssh -c "cd ${PACKAGE}-${VERSION} && dpkg-buildpackage -uc -us -rfakeroot"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.deb /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.changes /vagrant"
-	vagrant ssh -c "cp ${PACKAGE}_${VERSION}.dsc /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}.tar.gz /vagrant"
 	vagrant halt
 

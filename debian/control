@@ -9,6 +9,7 @@ Vcs-Browser: https://github.com/andrewjpage/gubbins
 
 Package: gubbins
 Architecture: any
-Depends: raxml, python-biopython, python-reportlab, python-nose, ${shlibs:Depends}, ${misc:Depends}
+Recommends: raxml
+Depends: python-biopython, python-reportlab, python-nose, ${shlibs:Depends}, ${misc:Depends}
 Description: Phylogenetic analysis of genome sequences
   Gubbins supports rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences.

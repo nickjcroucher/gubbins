@@ -29,6 +29,6 @@ setup(
         'Dendropy  >= 3.11.1',
         'Reportlab >= 2.5',
         'nose >= 1.3' 
-        ],
+    ],
     license='GPL',
     )

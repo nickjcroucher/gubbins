@@ -34,8 +34,8 @@ $ python setup.py install
 == Installing from a released source tarball ==
 
 ``` bash
-$ tar xzvf gubbins-0.1.2.tar.gz
-$ cd gubbins-0.1
+$ tar xzvf gubbins-0.1.3.tar.gz
+$ cd gubbins-0.1.3
 $ ./configure
 $ make
 $ su -

@@ -3,7 +3,7 @@
 
 # Requires the use of Vagrant and reasonable bandwidth/time.
 
-release: ubuntu-release
+release-local: ubuntu-release
 
 # copy gubbins using /vagrant default mount rather than puppet, to avail of automake substitution.
 ubuntu-release:
@@ -16,6 +16,3 @@ ubuntu-release:
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.changes /vagrant"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}.tar.gz /vagrant"
 	vagrant halt
-
-
-.PHONY: release

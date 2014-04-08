@@ -3,18 +3,25 @@ As listed in the dependancies section below, you need
  * Python 2.7.
 
 == Included external applications ==
-The following applications are included and will compile and be used automatically, 
-however you should try installing them yourself because you can get substantial
-performance increases by choosing makefile which are more appropriate for your system.
+The following applications should be installed before building gubbins:
+
 * FastTree (>=2.1.4) http://www.microbesonline.org/fasttree/,
-* FASTML (2.02) http://fastml.tau.ac.il/,
-* RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html, and
+* a modified version of FASTML (3.0.1) http://fastml.tau.ac.il/, and
+* RAxML (>=7.2.8, the full version) http://sco.h-its.org/exelixis/software.html,
+
+On Ubuntu Saucy systems these dependencies can be installed as follows:
+
+``` bash
+$ sudo apt-get-repository ppa:a-j-delaney/gubbins-ppa
+$ apt-get install fasttree raxml fastml
+```
 
 Finally, the raxmlHPC binary should be named "raxmlHPC".  If you have a modern CPU you 
 can get vastly increased performance by installing RAxML yourself and selecting
 the most appropriate makefile.
 
 == Installing from a git checkout ==
+``` bash
 $ autoreconf -i
 $ ./configure
 $ su -
@@ -22,10 +29,12 @@ $ make
 $ make install
 $ cd python
 $ python setup.py install
+```
 
 == Installing from a released source tarball ==
 
-$ tar xzvf gubbins-0.1.tar.gz
+``` bash
+$ tar xzvf gubbins-0.1.2.tar.gz
 $ cd gubbins-0.1
 $ ./configure
 $ make
@@ -33,16 +42,22 @@ $ su -
 $ make install
 $ cd python
 $ python setup.py install
+```
 
 
 To run the script with all of the default bundled executables.
+```bash
 $ cd python
 $ scripts/run_gubbins my_alignment.fa
+```
 
-To run the script anywhere you must first install the external dependances by yourself by copying the executables below into your PATH:
-external/standard-RAxML/raxmlHPC
-external/fastml/programs/fastml/fastml
-external/fasttree/FastTree
+To run the script anywhere you must first install the external dependances must be available in your PATH:
+
+```bash
+$ which raxmlHPC
+$ which fastml
+$ which fastTree
+```
 
 Then you can run this from any directory:
 $ run_gubbins my_alignment.fa

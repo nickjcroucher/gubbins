@@ -2,7 +2,8 @@ Source: gubbins
 Section: misc
 Priority: extra
 Maintainer: Aidan Delaney <a.j.delaney@brighton.ac.uk>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev, python-setuptools
+# fastml, fasttree and raxml are required for the build in order to run the gubbins system tests.
+Build-Depends: fastml, fasttree, raxml, debhelper (>= 8.0.0), autotools-dev, python-setuptools, zlib1g-dev, check
 Standards-Version: 3.9.4
 Vcs-Git: https://github.com/andrewjpage/gubbins.git
 Vcs-Browser: https://github.com/andrewjpage/gubbins
@@ -10,6 +11,6 @@ Vcs-Browser: https://github.com/andrewjpage/gubbins
 Package: gubbins
 Architecture: any
 Recommends: raxml
-Depends: python-biopython, python-reportlab, python-nose, ${shlibs:Depends}, ${misc:Depends}
+Depends: fastml, fasttree, python-biopython, python-reportlab, python-nose, ${shlibs:Depends}, ${misc:Depends}
 Description: Phylogenetic analysis of genome sequences
   Gubbins supports rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences.

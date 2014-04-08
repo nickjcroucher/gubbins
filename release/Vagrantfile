@@ -77,6 +77,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # #               Managed by Puppet.\n"
   # # }
   #
+
+  # Install the module for handling apt
+  config.vm.provision :shell do |shell|
+      shell.inline = "if [ ! -d /etc/puppet/modules/apt ]; then
+                  mkdir -p /etc/puppet/modules;
+                  puppet module install puppetlabs/apt;
+                  fi"
+  end
+
   config.vm.provision "puppet" do |puppet|
      puppet.manifests_path = "manifests"
      puppet.manifest_file  = "saucyvm.pp"

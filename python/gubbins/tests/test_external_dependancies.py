@@ -91,7 +91,7 @@ class TestExternalDependancies(unittest.TestCase):
   #  assert 0 == 1
   
   def test_pairwise_comparison(self):
-    common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','../external/fastml/programs/fastml/fastml  -mg -qf -b ')
+    common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ')
     # Check the tree file is as expected
     actual_file_content   = open('gubbins/tests/data/pairwise.aln.tre',   'U').readlines()
     expected_file_content = open('gubbins/tests/data/pairwise_expected.tre', 'U').readlines()
@@ -139,8 +139,8 @@ class TestExternalDependancies(unittest.TestCase):
   
   
   def test_use_bundled_exec(self):
-    assert re.search('../external/standard-RAxML/raxmlHPC -f d -p 1 -m GTRGAMMA',common.GubbinsCommon.use_bundled_exec('raxmlHPC -f d -p 1 -m GTRGAMMA', '../external/standard-RAxML/raxmlHPC')) != None
-    assert re.search('../external/fastml/programs/fastml/fastml -mg -qf -b ',common.GubbinsCommon.use_bundled_exec('fastml -mg -qf -b ', '../external/fastml/programs/fastml/fastml')) != None
+    assert re.search('raxmlHPC -f d -p 1 -m GTRGAMMA',common.GubbinsCommon.use_bundled_exec('raxmlHPC -f d -p 1 -m GTRGAMMA', 'raxmlHPC')) != None
+    assert re.search('fastml -mg -qf -b ',common.GubbinsCommon.use_bundled_exec('fastml -mg -qf -b ', 'fastml')) != None
     assert re.search('../src/gubbins',common.GubbinsCommon.use_bundled_exec('gubbins', '../src/gubbins')) != None
 
 if __name__ == "__main__":

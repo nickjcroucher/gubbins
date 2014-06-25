@@ -2,7 +2,7 @@ package { "dh-make":
     ensure => "installed"
     }
 
-package { "gcc":
+package { ["gcc", "build-essential", "pkg-config"]:
     ensure => "installed"
     }
 
@@ -61,5 +61,6 @@ include apt
 apt::ppa { 'ppa:a-j-delaney/gubbins-ppa': }
 
 package {"fastml2":
-        ensure => "installed"
-        }
+  ensure => "installed",
+  require => Apt::Ppa['ppa:a-j-delaney/gubbins-ppa']
+}

@@ -14,7 +14,7 @@ AC_PROG_CXX
 AX_PTHREAD
 
 # Ensure zlib is available
-PKG_CHECK_EXISTS([zlib])
+PKG_CHECK_MODULES([zlib], [zlib])
 
 # Check for Python
 AM_PATH_PYTHON([2.0],
@@ -24,7 +24,7 @@ AM_PATH_PYTHON([2.0],
 # Define a new recursive target. In our case it produces a .deb installable.
 AM_EXTRA_RECURSIVE_TARGETS([release])
 
-AC_CONFIG_FILES([Makefile src/Makefile release/Makefile python/Makefile debian/changelog debian/copyright])
+AC_CONFIG_FILES([Makefile src/Makefile release/Makefile python/Makefile])
 AC_OUTPUT
 
 AC_CHECK_HEADERS([zlib.h math.h])

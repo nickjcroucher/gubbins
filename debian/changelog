@@ -1,4 +1,4 @@
-@PACKAGE_NAME@ (@PACKAGE_VERSION@) saucy; urgency=low
+gubbins (0.1.4) saucy; urgency=low
 
   * Updated Debian packages such that the build version is taken from Automake.
 

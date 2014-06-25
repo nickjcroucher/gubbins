@@ -60,6 +60,6 @@ include apt
 # Supplied by Aidan Delaney <aidan@ontologyengineering.org>, so blame him.
 apt::ppa { 'ppa:a-j-delaney/gubbins-ppa': }
 
-package {"fastml":
+package {"fastml2":
         ensure => "installed"
         }

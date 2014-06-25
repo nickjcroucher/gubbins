@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Aidan Delaney <a.j.delaney@brighton.ac.uk>
 # fastml, fasttree and raxml are required for the build in order to run the gubbins system tests.
 # There are a lot of build dependencies in order to run the system tests.
-Build-Depends: fastml2, fasttree, raxml, debhelper (>= 8.0.0), autotools-dev, python-setuptools, zlib1g-dev, check, python-biopython, python-reportlab, python-nose
+Build-Depends: fastml2, fasttree, raxml, debhelper (>= 8.0.0), autotools-dev, python-setuptools, zlib1g-dev, check, python-biopython, python-reportlab, python-nose, pkg-config
 Standards-Version: 3.9.4
 Vcs-Git: https://github.com/andrewjpage/gubbins.git
 Vcs-Browser: https://github.com/andrewjpage/gubbins

@@ -1,3 +1,9 @@
+gubbins (0.1.5) saucy; urgency=low
+
+  * Updated build system and removed some tests
+
+-- Aidan Delaney (Packaging Key) <aidan@ontologyengineering.org>  Wed, 25 Jun 2014 14:46:07 +0000
+
 gubbins (0.1.4) saucy; urgency=low
 
   * Updated Debian packages such that the build version is taken from Automake.

@@ -1,3 +1,8 @@
+This piece of software is not the version that was used in Croucher et. al. "Rapid Pneumococcal Evolution in Response to Clinical Interventions", Science 2011, 331 (6016): 430-434.
+It is a work in progress and as such is not yet recommended for use by the community. We expect to make an official release of the software soon.
+
+# Install #
+
 == Prep work ==
 As listed in the dependancies section below, you need
  * Python 2.7.
@@ -11,9 +16,20 @@ The following applications should be installed before building gubbins:
 
 On Ubuntu Saucy systems these dependencies can be installed as follows:
 
+Install the DendroPy dependancy:
+
+``` bash
+$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
+$ tar xzvf DendroPy-3.12.0.tar.gz
+$ cd DendroPy-3.12.0
+$ sudo python setup.py install
+```
+
+Then install gubbins
 ``` bash
 $ sudo apt-get-repository ppa:a-j-delaney/gubbins-ppa
-$ apt-get install fasttree raxml fastml
+$ sudo apt-get update
+$ sudo apt-get install fasttree raxml fastml2
 ```
 
 Finally, the raxmlHPC binary should be named "raxmlHPC".  If you have a modern CPU you 

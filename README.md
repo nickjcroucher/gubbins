@@ -77,8 +77,10 @@ Source the .bashrc file
 You must first enssure that the dependencies are installed.
 
 On a Debian/Ubuntu system
-> sudo apt-get install python-biopython python-setuptools
-> easy_install -U dendropy
+``` bash
+$ sudo apt-get install python-biopython python-setuptools
+$ easy_install -U dendropy
+```
 
 Alternatively, if you need to install the dependencies from source:
 ``` bash

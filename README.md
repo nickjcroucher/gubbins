@@ -116,9 +116,13 @@ $ make install
 ```
 
 Ensure that
+
 > LD_LIBRARY_PATH=~/.local/lib
+
 and
+
 > PATH=~/.local/bin:$PATH
+
 This is best achieved by adding them to ~/.bashrc in the usual manner.
 
 ## Running Gubbins ##

@@ -86,16 +86,20 @@ class GubbinsCommon():
   def parse_and_run(self):
     # Default parameters
     RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
-    FASTTREE_EXEC = 'FastTree'
+    FASTTREE_EXEC = 'fasttree'
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
     FASTML_EXEC = 'fastml -mg -qf -b '
 
+    # Use GUBBINS_BUNDLED_EXEC during test target of the build process,
+    # otherwise insist on installed versions of RaXML, fastml and
+    # fasttree.  No longer bundle external executables.
+    #
     # Names of the bundled executables to use if the executables arent in the default PATH
-    RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
-    FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
+    #RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
+    #FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
-    FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
+    #FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
@@ -104,20 +108,14 @@ class GubbinsCommon():
         print GUBBINS_EXEC+" is not in your path"
         sys.exit()
     if GubbinsCommon.which(FASTML_EXEC) is None:
-      FASTML_EXEC = GubbinsCommon.use_bundled_exec(FASTML_EXEC, FASTML_BUNDLED_EXEC)
-      if GubbinsCommon.which(FASTML_EXEC) is None:
-        print "fastml is not in your path"
-        sys.exit()
+      print "fastml is not in your path"
+      sys.exit()
     if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
-       RAXML_EXEC = GubbinsCommon.use_bundled_exec(RAXML_EXEC, RAXML_BUNDLED_EXEC)
-       if GubbinsCommon.which(RAXML_EXEC) is None:
-         print "RAxML is not in your path"
-         sys.exit()
+      print "RAxML is not in your path"
+      sys.exit()
     if (self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(FASTTREE_EXEC) is None:
-      FASTTREE_EXEC = GubbinsCommon.use_bundled_exec(FASTTREE_EXEC, FASTTREE_BUNDLED_EXEC)
-      if GubbinsCommon.which(FASTTREE_EXEC) is None:
-        print "FastTree is not in your path"
-        sys.exit()
+      print "FastTree is not in your path"
+      sys.exit()
 
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
        sys.exit()

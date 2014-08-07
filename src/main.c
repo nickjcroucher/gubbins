@@ -36,16 +36,6 @@ const char* program_name;
 // The first sequence is chosen as the reference sequence
 // If there is an indel in the reference sequence, the first normal base found in another strain is used.
 
-int check_file_exists_or_exit(char * filename)
-{
-  if( access( filename, F_OK ) != -1 ) {
-		return 1;
-  } else {
-		printf("Error: File '%s' doesnt exist\n",filename);
-		print_usage(stderr, EXIT_FAILURE);
-  }
-}
-
 void print_usage(FILE* stream, int exit_code)
 {
   fprintf (stream, "This program is not supposed to be directly run. Use run_gubbins.py instead\n");
@@ -65,6 +55,16 @@ void print_usage(FILE* stream, int exit_code)
   fprintf (stream, "Step 2: Detect recombinations\n");
   fprintf (stream, "gubbins -r -v vcf_file -t newick_tree -f original.aln -m 10 alignment_file\n\n", program_name);
   exit (exit_code);
+}
+
+int check_file_exists_or_exit(char * filename)
+{
+  if( access( filename, F_OK ) != -1 ) {
+		return 1;
+  } else {
+		printf("Error: File '%s' doesnt exist\n",filename);
+		print_usage(stderr, EXIT_FAILURE);
+  }
 }
 
 int main (argc, argv) int argc; char **argv;

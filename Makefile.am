@@ -1,1 +1,3 @@
-SUBDIRS=src external
+EXTRA_DIST=debian/* tests/*.h tests/data/*
+SUBDIRS=src release python
+ACLOCAL_AMFLAGS=-I m4

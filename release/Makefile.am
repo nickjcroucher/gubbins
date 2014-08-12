@@ -8,6 +8,7 @@ release-local: ubuntu-release
 # copy gubbins using /vagrant default mount rather than puppet, to avail of automake substitution.
 ubuntu-release:
 	vagrant up
+	vagrant reload
 	vagrant provision
 	cp ../${PACKAGE}-${VERSION}.tar.gz .
 	vagrant ssh -c "tar xzvf /vagrant/${PACKAGE}-${VERSION}.tar.gz"

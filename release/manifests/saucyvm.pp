@@ -17,6 +17,9 @@ package {"zlib1g-dev":
 package {"check":
     ensure => "installed"
     }
+package {"language-pack-en":
+    ensure => "installed"
+    }
 
 package {"python-setuptools":
     ensure => "installed"

@@ -3,7 +3,7 @@ Upstream-Name: gubbins
 Source: https://github.com/sanger-pathogens/gubbins
 
 Files: *
-Copyright: 2012-2014 Nicholas Croucher <croucher@hsph.harvard.edu>
+Copyright: 2012-2014 Nicholas Croucher <n.croucher@imperial.ac.uk>
            2012-2014 Aidan Delaney <a.j.delaney@brighton.ac.uk>
            2012-2014 Simon Harris <sh16@sanger.ac.uk>
            2012-2014 Andrew J. Page <ap13@sanger.ac.uk>

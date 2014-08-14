@@ -1,3 +1,10 @@
+gubbins (0.1.7~trusty2) trusty; urgency=low
+
+  * Package for trusty
+  * Move blocks further inwards
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 14 Aug 2014 09:56:00 +0000
+
 gubbins (0.1.6) saucy; urgency=low
 
   * Changed build depends

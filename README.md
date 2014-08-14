@@ -49,7 +49,7 @@ $ sudo python setup.py install
 Then install gubbins
 
 ``` bash
-$ sudo apt-get-repository ppa:ap13/gubbins
+$ sudo add-apt-repository ppa:ap13/gubbins
 $ sudo apt-get update
 $ sudo apt-get install fasttree raxml fastml2 gubbins
 ```

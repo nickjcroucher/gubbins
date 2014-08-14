@@ -10,7 +10,7 @@ Vcs-Git: https://github.com/andrewjpage/gubbins.git
 Vcs-Browser: https://github.com/andrewjpage/gubbins
 
 Package: gubbins
-Architecture: any
+Architecture: amd64
 Recommends: raxml
 Depends: fastml2, fasttree, python-biopython, python-reportlab, python-nose, ${shlibs:Depends}, ${misc:Depends}
 Description: Phylogenetic analysis of genome sequences

@@ -4,11 +4,11 @@ from setuptools import setup
 
 setup(
     name='gubbins',
-    version='0.1',
+    version='0.1.7',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     author_email='ap13@sanger.ac.uk',
-    url='https://github.com/andrewjpage/gubbins/',
+    url='https://github.com/sanger-pathogens/gubbins/',
     scripts=['scripts/run_gubbins.py','scripts/gubbins_drawer.py'],
     packages=['gubbins'],
     test_suite='nose.collector',
@@ -26,7 +26,7 @@ setup(
         ],
     install_requires=[
         'Biopython >= 1.59',
-        'Dendropy  >= 3.11.1',
+        'DendroPy  >= 3.12.0',
         'Reportlab >= 2.5',
         'nose >= 1.3' 
     ],

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This setup script installs gubbins and dependencies on Ubuntu 13.10 x86_64.
+# This setup script installs gubbins and dependencies on Ubuntu 14.04 x86_64.
 # In particular, we set things up in the users' home directory in ~/.local (as
 # per the XDG spec).  We also add ~/.local/bin to PATH and ~/.local/lib to
 # LD_LIBRARY_PATH.
@@ -13,18 +13,18 @@
 #
 
 py_pkgs=( "biopython" "dendropy" )
-deb_urls=( "http://uk.archive.ubuntu.com/ubuntu/pool/universe/r/raxml/raxml_7.2.8-2_amd64.deb" "https://launchpad.net/~a-j-delaney/+archive/gubbins-ppa/+files/fastml2_2.2_amd64.deb" "https://launchpad.net/~a-j-delaney/+archive/gubbins-ppa/+files/gubbins_0.1.6-ppa1_amd64.deb" )
+deb_urls=( "http://uk.archive.ubuntu.com/ubuntu/pool/universe/r/raxml/raxml_7.2.8-2_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/fastml2_2.2~trusty1_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/gubbins_0.1.7~trusty2_amd64.deb" )
 
 function check_platform {
-    # Ubuntu 13.10
+    # Ubuntu 14.04
     echo -n "Checking Platform "
     source /etc/lsb-release
     case $DISTRIB_DESCRIPTION in
-        "Ubuntu 13.10")
+        "Ubuntu 14.04")
             echo "pass"
             ;;
         *)
-            echo "This setup script has only been tested on Ubunti 13.10 but will continue with the installation process."
+            echo "This setup script has only been tested on Ubuntu 14.04 but will continue with the installation process."
             ;;
     esac
 

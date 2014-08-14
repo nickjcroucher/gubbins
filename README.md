@@ -35,7 +35,7 @@ Each of the system-wide cases assumes you have permissions to _sudo_.  The per-u
 
 ### System-wide from binaries ###
 
-We currently only support Ubuntu 13.10 x86_64 as a system-wide binary install.  Other architectures will be added on request.
+We currently only support Ubuntu 14.04 x86_64 as a system-wide binary install.  Other architectures will be added on request.
 
 Install the DendroPy dependancy:
 
@@ -49,16 +49,40 @@ $ sudo python setup.py install
 Then install gubbins
 
 ``` bash
-$ sudo apt-get-repository ppa:a-j-delaney/gubbins-ppa
+$ sudo add-apt-repository ppa:ap13/gubbins
 $ sudo apt-get update
-$ sudo apt-get install fasttree raxml fastml2
+$ sudo apt-get install fasttree raxml fastml2 gubbins
 ```
 
 If you have your own version of the raxml binary, then you can omit it from the list of packages to install.  Many users have reported vastly increased performance by installing RAxML from source by selecting the most appropriate makefile.
 
+
+### System-wide from binaries for other debian based systems ###
+This might work on other Debian based systems and other versions of Ubuntu, but is untested.
+
+Install the DendroPy dependancy:
+
+``` bash
+$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
+$ tar xzvf DendroPy-3.12.0.tar.gz
+$ cd DendroPy-3.12.0
+$ sudo python setup.py install
+```
+
+Then install gubbins
+
+
+```bash
+echo "deb http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
+echo "deb-src http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
+
+sudo apt-get update
+sudo apt-get install fasttree raxml fastml2 gubbins
+```
+
 ### Per-user from binaries  ###
 
-Again, we currently only support Ubuntu 13.10 x86_64 as a binary install option
+Again, we currently only support Ubuntu 14.04 x86_64 as a binary install option
 
 Check out a version of the repository from GitHub
 

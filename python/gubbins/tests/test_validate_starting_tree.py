@@ -20,7 +20,7 @@ class TestValidationOfStartingTree(unittest.TestCase):
     assert common.GubbinsCommon.is_starting_tree_valid('gubbins/tests/data/valid_newick_tree.tre')  == 1
 
   def test_do_the_names_match_the_fasta_file(self):
-    assert common.GubbinsCommon.do_the_names_match_the_fasta_file('gubbins/tests/data/valid_newick_tree.tre', 'gubbins/tests/data/valid_newick_tree.tre' ) == 1
+    assert common.GubbinsCommon.do_the_names_match_the_fasta_file('gubbins/tests/data/valid_newick_tree.tre', 'gubbins/tests/data/valid_newick_tree.aln' ) == 1
 
 
 if __name__ == "__main__":

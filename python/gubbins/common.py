@@ -70,7 +70,7 @@ class GubbinsCommon():
     
     leaf_nodes = tree.leaf_nodes()
     for i,lf in enumerate(leaf_nodes):
-      if sequence_names.has_key(leaf_nodes[i].taxon.label) is None:
+      if not leaf_nodes[i].taxon.label in sequence_names:
         print "Error: A taxon referenced in the starting tree isnt found in the input fasta file"
         return 0
 
@@ -86,20 +86,12 @@ class GubbinsCommon():
   def parse_and_run(self):
     # Default parameters
     RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
-    FASTTREE_EXEC = 'fasttree'
+    FASTTREE_EXEC = 'FastTree'
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
     FASTML_EXEC = 'fastml -mg -qf -b '
 
-    # Use GUBBINS_BUNDLED_EXEC during test target of the build process,
-    # otherwise insist on installed versions of RaXML, fastml and
-    # fasttree.  No longer bundle external executables.
-    #
-    # Names of the bundled executables to use if the executables arent in the default PATH
-    #RAXML_BUNDLED_EXEC = '../external/standard-RAxML/raxmlHPC'
-    #FASTML_BUNDLED_EXEC = '../external/fastml/programs/fastml/fastml'
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
-    #FASTTREE_BUNDLED_EXEC = '../external/fasttree/FastTree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:

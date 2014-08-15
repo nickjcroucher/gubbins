@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='gubbins',
-    version='0.1.7',
+    version='0.1.8',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     author_email='ap13@sanger.ac.uk',

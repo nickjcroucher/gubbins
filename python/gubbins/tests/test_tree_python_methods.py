@@ -76,6 +76,16 @@ class TestTreePythonMethods(unittest.TestCase):
     os.remove(temp_working_dir + '/robinson_foulds_distance_tree1.tre')
     os.removedirs(temp_working_dir)
     
+  def test_internal_node_taxons_removed_when_used_as_starting_tree(self):
+    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
+    common.GubbinsCommon.filter_out_removed_taxa_from_tree_and_return_new_file('gubbins/tests/data/tree_with_internal_nodes.tre', temp_working_dir, [])    
+    actual_file_content = open(temp_working_dir + '/tree_with_internal_nodes.tre', 'U').readlines()
+    expected_file_content = open('gubbins/tests/data/tree_with_internal_nodes.tre_expected', 'U').readlines()
+    assert actual_file_content == expected_file_content
+    os.remove(temp_working_dir + '/tree_with_internal_nodes.tre')
+    os.removedirs(temp_working_dir)
+    
+    
   def test_create_pairwise_newick_tree(self):
     common.GubbinsCommon.create_pairwise_newick_tree(['sequence_2','sequence_3'], 'gubbins/tests/data/pairwise_newick_tree.actual')
     actual_file_content = open('gubbins/tests/data/pairwise_newick_tree.actual', 'U').readlines()

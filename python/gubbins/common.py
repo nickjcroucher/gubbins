@@ -634,6 +634,7 @@ class GubbinsCommon():
 
     tree  = dendropy.Tree.get_from_path(starting_tree, 'newick',
               preserve_underscores=True)
+
     tree.prune_taxa_with_labels(taxa_removed, update_splits=True, delete_outdegree_one=False)          
     tree.prune_leaves_without_taxa(update_splits=True, delete_outdegree_one=False)
     tree.deroot()
@@ -642,8 +643,8 @@ class GubbinsCommon():
       taxon_set=None,
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
-      suppress_internal_taxon_labels=False,
-      suppress_internal_node_labels=False,
+      suppress_internal_taxon_labels=True,
+      suppress_internal_node_labels=True,
       suppress_rooting=True,
       suppress_edge_lengths=False,
       unquoted_underscores=True,

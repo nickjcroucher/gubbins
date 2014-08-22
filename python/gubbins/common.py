@@ -608,15 +608,13 @@ class GubbinsCommon():
 
           if sequence_length == 0:
             taxa_removed.append(record.id)
-            if verbose > 0:
-              print "Excluded sequence " + record.id + " because there werent enough bases in it"
+            print "Excluded sequence " + record.id + " because there werent enough bases in it"
           elif((number_of_gaps*100/sequence_length) <= filter_percentage):
             output_alignments.append(record)
             number_of_included_alignments += 1
           else:
             taxa_removed.append(record.id)
-            if verbose > 0:
-              print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
+            print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
 
     if number_of_included_alignments <= 1:
       sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")

@@ -1,3 +1,9 @@
+gubbins (0.1.9~trusty1) trusty; urgency=low
+
+  * Python prints error messages for invalid sequence files and sends exit code 1
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 22 Aug 2014 10:37:00 +0000
+
 gubbins (0.1.8~trusty1) trusty; urgency=low
 
   * Python fastml exec fix

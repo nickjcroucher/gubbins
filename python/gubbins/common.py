@@ -97,26 +97,22 @@ class GubbinsCommon():
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
       GUBBINS_EXEC = GubbinsCommon.use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
       if GubbinsCommon.which(GUBBINS_EXEC) is None:
-        print GUBBINS_EXEC+" is not in your path"
-        sys.exit()
+        sys.exit(GUBBINS_EXEC+" is not in your path")
     if GubbinsCommon.which(FASTML_EXEC) is None:
-      print "fastml is not in your path"
-      sys.exit()
+      sys.exit("fastml is not in your path")
     if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
-      print "RAxML is not in your path"
-      sys.exit()
+      sys.exit("RAxML is not in your path")
     if (self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(FASTTREE_EXEC) is None:
-      print "FastTree is not in your path"
-      sys.exit()
+      sys.exit("FastTree is not in your path")
 
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
-       sys.exit()
+       sys.exit("There is a problem with your input fasta file so nothing can be done until you fix it")
        
     if(self.args.starting_tree is not None and self.args.starting_tree != "" and (GubbinsCommon.does_file_exist(self.args.starting_tree, 'Starting Tree') == 0 or GubbinsCommon.is_input_starting_tree_valid(self.args.starting_tree) )):
-       sys.exit()
+       sys.exit( "The starting tree is invalid")
        
     if(self.args.starting_tree is not None and self.args.starting_tree != "" and GubbinsCommon.do_the_names_match_the_fasta_file(self.args.starting_tree,self.args.alignment_filename) == 0):
-      sys.exit()
+      sys.exit("The names in the starting tree dont match the names in the fasta file")
 
     current_time = ''
     if self.args.use_time_stamp > 0:
@@ -516,10 +512,13 @@ class GubbinsCommon():
   def is_input_fasta_file_valid(input_filename):
     try:
       if GubbinsCommon.does_each_sequence_have_the_same_length(input_filename) == 0:
+        print "Each sequence must be the same length"
         return 0
       if GubbinsCommon.are_sequence_names_unique(input_filename) == 0:
+        print "All sequence names in the fasta file must be unique"
         return 0
       if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
+        print "Each sequence must have a name and some genomic data"
         return 0
     except:
       return 0

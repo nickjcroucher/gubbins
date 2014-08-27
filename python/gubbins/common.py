@@ -542,8 +542,10 @@ class GubbinsCommon():
   def does_each_sequence_have_a_name_and_genomic_data(input_filename):
     input_handle  = open(input_filename, "rU")
     alignments = AlignIO.parse(input_handle, "fasta")
+    number_of_sequences = 0
     for alignment in alignments:
         for record in alignment:
+            number_of_sequences +=1
             if record.name is None or record.name == "":
               print "Error with the input FASTA file: One of the sequence names is blank"
               return 0
@@ -553,6 +555,9 @@ class GubbinsCommon():
             if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
               print "Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted"
               return 0
+    if number_of_sequences <= 3:
+      print "Error with input FASTA file: you need more than 3 sequences to build a meaningful tree"
+      return 0
     input_handle.close()
     return 1
     

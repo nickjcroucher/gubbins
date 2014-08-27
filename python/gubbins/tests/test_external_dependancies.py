@@ -87,9 +87,6 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
     os.remove('RAxML_result.multiple_recombinations.iteration_5')
   
-  #def test_running_fasttree(self):
-  #  assert 0 == 1
-  
   def test_pairwise_comparison(self):
     common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ')
     # Check the tree file is as expected

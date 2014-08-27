@@ -30,7 +30,10 @@ class TestValidateInputFastaFile(unittest.TestCase):
   def test_are_all_sequence_names_unique(self):
     assert common.GubbinsCommon.are_sequence_names_unique('gubbins/tests/data/all_unique_sequence_names.fa') == 1
     assert common.GubbinsCommon.are_sequence_names_unique('gubbins/tests/data/non_unique_sequence_names.fa') == 0
-
+    
+  def test_are_there_enough_sequences_to_build_a_tree(self):
+    assert common.GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data('gubbins/tests/data/alignment_with_3_sequences.aln') == 0
+  
 if __name__ == "__main__":
   unittest.main()
 

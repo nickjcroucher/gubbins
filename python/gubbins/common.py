@@ -448,6 +448,28 @@ class GubbinsCommon():
     return starting_base_filename+".(gaps|vcf|snp_sites|phylip|aln.start)"
 
   @staticmethod
+  def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):
+    return GubbinsCommon.translation_of_filenames_to_final_filenames(starting_base_filename+".iteration_"+str(max_intermediate_iteration), output_prefix)
+    
+  @staticmethod
+  def translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext,current_time, max_intermediate_iteration, output_prefix):
+    return GubbinsCommon.translation_of_filenames_to_final_filenames("RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration), output_prefix)
+  
+  @staticmethod
+  def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
+    input_names_to_output_names = {  
+      str(input_prefix)+".vcf":             str(output_prefix)+".summary_of_snp_distribution.vcf"  ,
+      str(input_prefix)+".branch_snps.tab": str(output_prefix)+".branch_base_reconstruction.embl"  ,
+      str(input_prefix)+".tab":             str(output_prefix)+".recombination_predictions.embl"   ,
+      str(input_prefix)+".gff":             str(output_prefix)+".recombination_predictions.gff"    ,
+      str(input_prefix)+".stats":           str(output_prefix)+".per_branch_statistics.csv"        ,
+      str(input_prefix)+".snp_sites.aln":   str(output_prefix)+".filtered_polymorphic_sites.fasta" ,
+      str(input_prefix)+".phylip":          str(output_prefix)+".filtered_polymorphic_sites.phylip",
+      str(input_prefix):                    str(output_prefix)+".final_tree.tre"
+    }
+    return input_names_to_output_names
+
+  @staticmethod
   def fasttree_current_tree_name(base_filename, i):
     return base_filename+".iteration_"+str(i)
 

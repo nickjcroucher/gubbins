@@ -232,7 +232,6 @@ class TestExternalDependancies(unittest.TestCase):
     assert actual_file_content4 == expected_file_content4
     assert actual_file_content5 == expected_file_content5
     assert actual_file_content6 == expected_file_content6
-    assert actual_file_content7 == expected_file_content7
     assert actual_file_content8 == expected_file_content8
     assert actual_file_content9 == expected_file_content9
     assert actual_file_content10 == expected_file_content10

@@ -7,6 +7,8 @@ Tests the construction of file names and commands with no dependancies on extern
 
 import unittest
 import re
+import os
+import subprocess
 from gubbins import common
 
 class TestStringConstruction(unittest.TestCase):
@@ -46,9 +48,9 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.fasttree_regex_for_file_deletions('AAA', 5) == ['^AAA.iteration_1[$|\\.]', '^AAA.iteration_2[$|\\.]', '^AAA.iteration_3[$|\\.]', '^AAA.iteration_4[$|\\.]']
 
   def test_starting_files_regex(self):
-    assert common.GubbinsCommon.starting_files_regex('AAA') == 'AAA.(gaps|vcf|snp_sites|phylip|aln.start)'
-    assert common.GubbinsCommon.starting_files_regex('^')   == '^.(gaps|vcf|snp_sites|phylip|aln.start)'
-    assert common.GubbinsCommon.starting_files_regex('')    == '.(gaps|vcf|snp_sites|phylip|aln.start)'
+    assert common.GubbinsCommon.starting_files_regex('AAA') == 'AAA.(gaps|vcf|snp_sites|phylip|start)'
+    assert common.GubbinsCommon.starting_files_regex('^')   == '^.(gaps|vcf|snp_sites|phylip|start)'
+    assert common.GubbinsCommon.starting_files_regex('')    == '.(gaps|vcf|snp_sites|phylip|start)'
 
   def test_translation_of_fasttree_filenames_to_final_filenames(self):
     assert common.GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames('AAA', 5, 'test') == {
@@ -71,6 +73,14 @@ class TestStringConstruction(unittest.TestCase):
     'RAxML_result.AAA.1234iteration_10.phylip':          'test.filtered_polymorphic_sites.phylip',
     'RAxML_result.AAA.1234iteration_10.stats':           'test.per_branch_statistics.csv',
     'RAxML_result.AAA.1234iteration_10.vcf':             'test.summary_of_snp_distribution.vcf'}
+
+  def test_rename_files(self):
+    subprocess.check_call('touch temp_file; touch  another_file', shell=True)
+    common.GubbinsCommon.rename_files({'temp_file': 'output_file', 'another_file': 'another_output_file'})
+    assert os.path.exists('output_file')
+    assert os.path.exists('another_output_file')
+    os.remove('output_file')
+    os.remove('another_output_file')
 
   def test_fasttree_current_tree_name(self):
     assert common.GubbinsCommon.fasttree_current_tree_name('AAA', 1)  == 'AAA.iteration_1'

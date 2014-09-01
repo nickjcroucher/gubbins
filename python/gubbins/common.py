@@ -261,7 +261,15 @@ class GubbinsCommon():
       shutil.rmtree(temp_working_dir)
       
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename),"^log.txt"], self.args.verbose)
-  
+      
+    output_filenames_to_final_filenames = {}
+    if self.args.prefix is None:
+      self.args.prefix = base_filename_without_ext
+    if self.args.tree_builder == "hybrid" or self.args.tree_builder == "raxml":
+      output_filenames_to_final_filenames = GubbinsCommon.translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext,current_time, max_iteration - 1, self.args.prefix)
+    else:
+      output_filenames_to_final_filenames = GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_iteration - 1,  self.args.prefix)
+    GubbinsCommon.rename_files(output_filenames_to_final_filenames)
   
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
@@ -441,11 +449,16 @@ class GubbinsCommon():
       regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration)+'[$|\.]')
 
     return regex_for_file_deletions
+  
+  @staticmethod
+  def rename_files(input_to_output_filenames):
+    for input_file in input_to_output_filenames:
+      shutil.move(input_file, input_to_output_filenames[input_file])
 
   @staticmethod
   def starting_files_regex(starting_base_filename):
     # starting file with gapped and ungapped snps
-    return starting_base_filename+".(gaps|vcf|snp_sites|phylip|aln.start)"
+    return starting_base_filename+".(gaps|vcf|snp_sites|phylip|start)"
 
   @staticmethod
   def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):

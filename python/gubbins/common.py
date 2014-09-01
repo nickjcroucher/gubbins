@@ -223,10 +223,6 @@ class GubbinsCommon():
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
-      if(os.path.lexists(latest_file_name)):
-        os.remove(latest_file_name)
-      os.symlink(str(current_tree_name), latest_file_name)
-
       fastml_command_suffix = ' > /dev/null 2>&1'
       if self.args.verbose > 0:
         print fastml_command
@@ -264,9 +260,9 @@ class GubbinsCommon():
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
       shutil.rmtree(temp_working_dir)
       
-      GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename)], self.args.verbose)
-
-    
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename),"^log.txt"], self.args.verbose)
+  
+  
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -430,6 +426,10 @@ class GubbinsCommon():
       regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'\.')
       regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'$')
 
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.ancestor.tre')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.seq.joint.txt')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.prob.joint.txt')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.output_tree')    
     return regex_for_file_deletions
 
   @staticmethod
@@ -445,7 +445,7 @@ class GubbinsCommon():
   @staticmethod
   def starting_files_regex(starting_base_filename):
     # starting file with gapped and ungapped snps
-    return starting_base_filename+".(gaps|vcf|snp_sites|phylip)"
+    return starting_base_filename+".(gaps|vcf|snp_sites|phylip|aln.start)"
 
   @staticmethod
   def fasttree_current_tree_name(base_filename, i):

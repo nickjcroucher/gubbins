@@ -37,18 +37,18 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.raxml_gubbins_command('base_filename_without_ext','starting_base_filename',1234, 5,'alignment_filename','gubbins_exec',3, 'original_aln') == 'gubbins_exec -r -v starting_base_filename.vcf -f original_aln -t RAxML_result.base_filename_without_ext.1234iteration_5 -m 3 starting_base_filename.snp_sites.aln'
     
   def test_raxml_regex_for_file_deletions(self):
-    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 5) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$']
+    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 5) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5.ancestor.tre', '^RAxML_result.AAA.1234iteration_5.seq.joint.txt', '^RAxML_result.AAA.1234iteration_5.prob.joint.txt', '^RAxML_result.AAA.1234iteration_5.output_tree']
 
   def test_raxml_regex_for_file_deletions_10(self):
-    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 10) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5\\.', '^RAxML_result.AAA.1234iteration_5$', '^RAxML_result.AAA.1234iteration_6\\.', '^RAxML_result.AAA.1234iteration_6$', '^RAxML_result.AAA.1234iteration_7\\.', '^RAxML_result.AAA.1234iteration_7$', '^RAxML_result.AAA.1234iteration_8\\.', '^RAxML_result.AAA.1234iteration_8$', '^RAxML_result.AAA.1234iteration_9\\.', '^RAxML_result.AAA.1234iteration_9$']
+    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 10) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5\\.', '^RAxML_result.AAA.1234iteration_5$', '^RAxML_result.AAA.1234iteration_6\\.', '^RAxML_result.AAA.1234iteration_6$', '^RAxML_result.AAA.1234iteration_7\\.', '^RAxML_result.AAA.1234iteration_7$', '^RAxML_result.AAA.1234iteration_8\\.', '^RAxML_result.AAA.1234iteration_8$', '^RAxML_result.AAA.1234iteration_9\\.', '^RAxML_result.AAA.1234iteration_9$', '^RAxML_result.AAA.1234iteration_10.ancestor.tre', '^RAxML_result.AAA.1234iteration_10.seq.joint.txt', '^RAxML_result.AAA.1234iteration_10.prob.joint.txt', '^RAxML_result.AAA.1234iteration_10.output_tree']
 
   def test_fasttree_regex_for_file_deletions(self):
     assert common.GubbinsCommon.fasttree_regex_for_file_deletions('AAA', 5) == ['^AAA.iteration_1[$|\\.]', '^AAA.iteration_2[$|\\.]', '^AAA.iteration_3[$|\\.]', '^AAA.iteration_4[$|\\.]']
 
   def test_starting_files_regex(self):
-    assert common.GubbinsCommon.starting_files_regex('AAA') == 'AAA.(gaps|vcf|snp_sites|phylip)'
-    assert common.GubbinsCommon.starting_files_regex('^')   == '^.(gaps|vcf|snp_sites|phylip)'
-    assert common.GubbinsCommon.starting_files_regex('')    == '.(gaps|vcf|snp_sites|phylip)'
+    assert common.GubbinsCommon.starting_files_regex('AAA') == 'AAA.(gaps|vcf|snp_sites|phylip|aln.start)'
+    assert common.GubbinsCommon.starting_files_regex('^')   == '^.(gaps|vcf|snp_sites|phylip|aln.start)'
+    assert common.GubbinsCommon.starting_files_regex('')    == '.(gaps|vcf|snp_sites|phylip|aln.start)'
 
   def test_fasttree_current_tree_name(self):
     assert common.GubbinsCommon.fasttree_current_tree_name('AAA', 1)  == 'AAA.iteration_1'

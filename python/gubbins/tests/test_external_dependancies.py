@@ -19,6 +19,176 @@ class TestExternalDependancies(unittest.TestCase):
     # Strip parameters
     assert re.match('.*/ls$', common.GubbinsCommon.which('ls -alrt')) != None
     assert common.GubbinsCommon.which('non_existant_program') == None
+  
+  def test_rename_final_output(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "different_prefix",'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+    
+    assert os.path.exists('different_prefix.summary_of_snp_distribution.vcf')
+    assert os.path.exists('different_prefix.recombination_predictions.embl')
+    assert os.path.exists('different_prefix.per_branch_statistics.csv')
+    assert os.path.exists('different_prefix.filtered_polymorphic_sites.fasta')
+    assert os.path.exists('different_prefix.filtered_polymorphic_sites.phylip')
+    assert os.path.exists('different_prefix.recombination_predictions.gff')
+    assert os.path.exists('different_prefix.branch_base_reconstruction.embl')
+    assert os.path.exists('different_prefix.final_tree.tre')
+
+    os.remove('different_prefix.summary_of_snp_distribution.vcf')
+    os.remove('different_prefix.recombination_predictions.embl')
+    os.remove('different_prefix.per_branch_statistics.csv')
+    os.remove('different_prefix.filtered_polymorphic_sites.fasta')
+    os.remove('different_prefix.filtered_polymorphic_sites.phylip')
+    os.remove('different_prefix.recombination_predictions.gff')
+    os.remove('different_prefix.branch_base_reconstruction.embl')
+    os.remove('different_prefix.final_tree.tre')
+    
+  def test_rename_final_output_fasttree(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "ft_prefix","--tree_builder", "fasttree",'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+
+    assert os.path.exists('ft_prefix.summary_of_snp_distribution.vcf')
+    assert os.path.exists('ft_prefix.recombination_predictions.embl')
+    assert os.path.exists('ft_prefix.per_branch_statistics.csv')
+    assert os.path.exists('ft_prefix.filtered_polymorphic_sites.fasta')
+    assert os.path.exists('ft_prefix.filtered_polymorphic_sites.phylip')
+    assert os.path.exists('ft_prefix.recombination_predictions.gff')
+    assert os.path.exists('ft_prefix.branch_base_reconstruction.embl')
+    assert os.path.exists('ft_prefix.final_tree.tre')
+
+    os.remove('ft_prefix.summary_of_snp_distribution.vcf')
+    os.remove('ft_prefix.recombination_predictions.embl')
+    os.remove('ft_prefix.per_branch_statistics.csv')
+    os.remove('ft_prefix.filtered_polymorphic_sites.fasta')
+    os.remove('ft_prefix.filtered_polymorphic_sites.phylip')
+    os.remove('ft_prefix.recombination_predictions.gff')
+    os.remove('ft_prefix.branch_base_reconstruction.embl')
+    os.remove('ft_prefix.final_tree.tre')
+    
+  def test_rename_final_output_hybrid(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "hybrid_prefix","--tree_builder", "hybrid",'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+ 
+    assert os.path.exists('hybrid_prefix.summary_of_snp_distribution.vcf')
+    assert os.path.exists('hybrid_prefix.recombination_predictions.embl')
+    assert os.path.exists('hybrid_prefix.per_branch_statistics.csv')
+    assert os.path.exists('hybrid_prefix.filtered_polymorphic_sites.fasta')
+    assert os.path.exists('hybrid_prefix.filtered_polymorphic_sites.phylip')
+    assert os.path.exists('hybrid_prefix.recombination_predictions.gff')
+    assert os.path.exists('hybrid_prefix.branch_base_reconstruction.embl')
+    assert os.path.exists('hybrid_prefix.final_tree.tre')
+ 
+    os.remove('hybrid_prefix.summary_of_snp_distribution.vcf')
+    os.remove('hybrid_prefix.recombination_predictions.embl')
+    os.remove('hybrid_prefix.per_branch_statistics.csv')
+    os.remove('hybrid_prefix.filtered_polymorphic_sites.fasta')
+    os.remove('hybrid_prefix.filtered_polymorphic_sites.phylip')
+    os.remove('hybrid_prefix.recombination_predictions.gff')
+    os.remove('hybrid_prefix.branch_base_reconstruction.embl')
+    os.remove('hybrid_prefix.final_tree.tre')
+    
+  def test_fasttree_default_output_names(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--tree_builder", "fasttree",'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+
+    assert os.path.exists('multiple_recombinations.summary_of_snp_distribution.vcf')
+    assert os.path.exists('multiple_recombinations.recombination_predictions.embl')
+    assert os.path.exists('multiple_recombinations.per_branch_statistics.csv')
+    assert os.path.exists('multiple_recombinations.filtered_polymorphic_sites.fasta')
+    assert os.path.exists('multiple_recombinations.filtered_polymorphic_sites.phylip')
+    assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
+    assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
+    assert os.path.exists('multiple_recombinations.final_tree.tre')
+
+    os.remove('multiple_recombinations.summary_of_snp_distribution.vcf')
+    os.remove('multiple_recombinations.recombination_predictions.embl')
+    os.remove('multiple_recombinations.per_branch_statistics.csv')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.fasta')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.phylip')
+    os.remove('multiple_recombinations.recombination_predictions.gff')
+    os.remove('multiple_recombinations.branch_base_reconstruction.embl')
+    os.remove('multiple_recombinations.final_tree.tre')
+
+  def test_hybrid_default_output_names(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--tree_builder", "hybrid",'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+
+    assert os.path.exists('multiple_recombinations.summary_of_snp_distribution.vcf')
+    assert os.path.exists('multiple_recombinations.recombination_predictions.embl')
+    assert os.path.exists('multiple_recombinations.per_branch_statistics.csv')
+    assert os.path.exists('multiple_recombinations.filtered_polymorphic_sites.fasta')
+    assert os.path.exists('multiple_recombinations.filtered_polymorphic_sites.phylip')
+    assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
+    assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
+    assert os.path.exists('multiple_recombinations.final_tree.tre')
+
+    os.remove('multiple_recombinations.summary_of_snp_distribution.vcf')
+    os.remove('multiple_recombinations.recombination_predictions.embl')
+    os.remove('multiple_recombinations.per_branch_statistics.csv')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.fasta')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.phylip')
+    os.remove('multiple_recombinations.recombination_predictions.gff')
+    os.remove('multiple_recombinations.branch_base_reconstruction.embl')
+    os.remove('multiple_recombinations.final_tree.tre')
 
   def test_parse_and_run(self):
 
@@ -27,68 +197,63 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
     parser.add_argument('--starting_tree',    '-s', help='Starting tree')
     parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
-    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 1)
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
     parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
     parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
     parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
     parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     
     #  multiple recombinations
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(['gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
 
-    actual_file_content1    = open('multiple_recombinations.aln.start',   'U').readlines()
-    actual_file_content2    = open('RAxML_result.multiple_recombinations.iteration_5.vcf',   'U').readlines()
-    actual_file_content3    = open('RAxML_result.multiple_recombinations.iteration_5.tab',   'U').readlines()
-    actual_file_content4    = open('RAxML_result.multiple_recombinations.iteration_5.stats',   'U').readlines()
-    actual_file_content5    = open('RAxML_result.multiple_recombinations.iteration_5.snp_sites.aln',   'U').readlines()
-    actual_file_content6    = open('RAxML_result.multiple_recombinations.iteration_5.phylip',   'U').readlines()
-    actual_file_content7    = open('RAxML_result.multiple_recombinations.iteration_5.output_tree',   'U').readlines()
-    actual_file_content8   = open('RAxML_result.multiple_recombinations.iteration_5.gff',   'U').readlines()
-    actual_file_content9   = open('RAxML_result.multiple_recombinations.iteration_5.branch_snps.tab',   'U').readlines()
-    actual_file_content10   = open('RAxML_result.multiple_recombinations.iteration_5',   'U').readlines()
+    actual_file_content2    = open('multiple_recombinations.summary_of_snp_distribution.vcf',   'U').readlines()
+    actual_file_content3    = open('multiple_recombinations.recombination_predictions.embl',   'U').readlines()
+    actual_file_content4    = open('multiple_recombinations.per_branch_statistics.csv',   'U').readlines()
+    actual_file_content5    = open('multiple_recombinations.filtered_polymorphic_sites.fasta',   'U').readlines()
+    actual_file_content6    = open('multiple_recombinations.filtered_polymorphic_sites.phylip',   'U').readlines()
+    actual_file_content8    = open('multiple_recombinations.recombination_predictions.gff',   'U').readlines()
+    actual_file_content9    = open('multiple_recombinations.branch_base_reconstruction.embl',   'U').readlines()
+    actual_file_content10   = open('multiple_recombinations.final_tree.tre',   'U').readlines()
     
-    expected_file_content1  = open('gubbins/tests/data/expected_multiple_recombinations.aln.start',   'U').readlines()
     expected_file_content2  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.vcf',   'U').readlines()
     expected_file_content3  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.tab',   'U').readlines()
     expected_file_content4  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.stats',   'U').readlines()
     expected_file_content5  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.snp_sites.aln',   'U').readlines()
     expected_file_content6  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.phylip',   'U').readlines()
-    expected_file_content7  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.output_tree',   'U').readlines()
-    expected_file_content8 = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.gff',   'U').readlines()
-    expected_file_content9 = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.branch_snps.tab',   'U').readlines()
+    expected_file_content8  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.gff',   'U').readlines()
+    expected_file_content9  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.branch_snps.tab',   'U').readlines()
     expected_file_content10 = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5',   'U').readlines()
     
-    assert actual_file_content1 == expected_file_content1
-#FIXME    assert actual_file_content2 == expected_file_content2
-#    assert actual_file_content3 == expected_file_content3
-#    assert actual_file_content4 == expected_file_content4
-#    assert actual_file_content5 == expected_file_content5
-#    assert actual_file_content6 == expected_file_content6
-#    assert actual_file_content7 == expected_file_content7
-#    assert actual_file_content8 == expected_file_content8
-#    assert actual_file_content9 == expected_file_content9
-#    assert actual_file_content10 == expected_file_content10
+    assert actual_file_content2 == expected_file_content2
+    assert actual_file_content3 == expected_file_content3
+    assert actual_file_content4 == expected_file_content4
+    assert actual_file_content5 == expected_file_content5
+    assert actual_file_content6 == expected_file_content6
+    assert actual_file_content8 == expected_file_content8
+    assert actual_file_content9 == expected_file_content9
+    assert actual_file_content10 == expected_file_content10
     
-    os.remove('multiple_recombinations.aln.start')
-    os.remove('log.txt')
-    os.remove('latest_tree.multiple_recombinations.tre')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.vcf')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.tab')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.stats')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.snp_sites.aln')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.seq.joint.txt')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.prob.joint.txt')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.phylip')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.output_tree')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.gff')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.branch_snps.tab')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
-    os.remove('RAxML_result.multiple_recombinations.iteration_5')
+    assert not os.path.exists('multiple_recombinations.aln.start')
+    assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
+    assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.seq.joint.txt')
+    assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.prob.joint.txt')
+    assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.output_tree')
+    assert not os.path.exists('log.txt')
+    assert not os.path.exists('latest_tree.multiple_recombinations.tre')
   
-  #def test_running_fasttree(self):
-  #  assert 0 == 1
+    os.remove('multiple_recombinations.summary_of_snp_distribution.vcf')
+    os.remove('multiple_recombinations.recombination_predictions.embl')
+    os.remove('multiple_recombinations.per_branch_statistics.csv')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.fasta')
+    os.remove('multiple_recombinations.filtered_polymorphic_sites.phylip')
+    os.remove('multiple_recombinations.recombination_predictions.gff')
+    os.remove('multiple_recombinations.branch_base_reconstruction.embl')
+    os.remove('multiple_recombinations.final_tree.tre')
+  
+  
   
   def test_pairwise_comparison(self):
     common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ')
@@ -106,7 +271,7 @@ class TestExternalDependancies(unittest.TestCase):
     actual_file_content   = open('gubbins/tests/data/pairwise.aln.snp_sites.aln',   'U').readlines()
     expected_file_content = open('gubbins/tests/data/pairwise.aln.snp_sites.aln_expected', 'U').readlines()
     assert actual_file_content == expected_file_content
-    
+
     os.remove('gubbins/tests/data/pairwise.aln.snp_sites.aln')
     os.remove('gubbins/tests/data/pairwise.aln.tre')
     os.remove('gubbins/tests/data/pairwise.aln.tre.ancestor.tre')
@@ -120,7 +285,6 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('gubbins/tests/data/pairwise.aln.tre.stats')
     os.remove('gubbins/tests/data/pairwise.aln.tre.tab')
     os.remove('gubbins/tests/data/pairwise.aln.tre.vcf')
-    os.remove('log.txt')
 
   
   def test_delete_files_based_on_list_of_regexes(self):

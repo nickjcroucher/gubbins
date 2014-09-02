@@ -223,10 +223,6 @@ class GubbinsCommon():
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
-      if(os.path.lexists(latest_file_name)):
-        os.remove(latest_file_name)
-      os.symlink(str(current_tree_name), latest_file_name)
-
       fastml_command_suffix = ' > /dev/null 2>&1'
       if self.args.verbose > 0:
         print fastml_command
@@ -264,9 +260,17 @@ class GubbinsCommon():
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
       shutil.rmtree(temp_working_dir)
       
-      GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename)], self.args.verbose)
-
-    
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', [GubbinsCommon.starting_files_regex("^" + starting_base_filename),"^log.txt"], self.args.verbose)
+      
+    output_filenames_to_final_filenames = {}
+    if self.args.prefix is None:
+      self.args.prefix = base_filename_without_ext
+    if self.args.tree_builder == "hybrid" or self.args.tree_builder == "raxml":
+      output_filenames_to_final_filenames = GubbinsCommon.translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext,current_time, max_iteration - 1, self.args.prefix)
+    else:
+      output_filenames_to_final_filenames = GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_iteration - 1,  self.args.prefix)
+    GubbinsCommon.rename_files(output_filenames_to_final_filenames)
+  
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -430,6 +434,10 @@ class GubbinsCommon():
       regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'\.')
       regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(file_iteration)+'$')
 
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.ancestor.tre')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.seq.joint.txt')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.prob.joint.txt')
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.output_tree')    
     return regex_for_file_deletions
 
   @staticmethod
@@ -441,11 +449,38 @@ class GubbinsCommon():
       regex_for_file_deletions.append("^"+starting_base_filename+".iteration_"+str(file_iteration)+'[$|\.]')
 
     return regex_for_file_deletions
+  
+  @staticmethod
+  def rename_files(input_to_output_filenames):
+    for input_file in input_to_output_filenames:
+      shutil.move(input_file, input_to_output_filenames[input_file])
 
   @staticmethod
   def starting_files_regex(starting_base_filename):
     # starting file with gapped and ungapped snps
-    return starting_base_filename+".(gaps|vcf|snp_sites|phylip)"
+    return starting_base_filename+".(gaps|vcf|snp_sites|phylip|start)"
+
+  @staticmethod
+  def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):
+    return GubbinsCommon.translation_of_filenames_to_final_filenames(starting_base_filename+".iteration_"+str(max_intermediate_iteration), output_prefix)
+    
+  @staticmethod
+  def translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext,current_time, max_intermediate_iteration, output_prefix):
+    return GubbinsCommon.translation_of_filenames_to_final_filenames("RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration), output_prefix)
+  
+  @staticmethod
+  def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
+    input_names_to_output_names = {  
+      str(input_prefix)+".vcf":             str(output_prefix)+".summary_of_snp_distribution.vcf"  ,
+      str(input_prefix)+".branch_snps.tab": str(output_prefix)+".branch_base_reconstruction.embl"  ,
+      str(input_prefix)+".tab":             str(output_prefix)+".recombination_predictions.embl"   ,
+      str(input_prefix)+".gff":             str(output_prefix)+".recombination_predictions.gff"    ,
+      str(input_prefix)+".stats":           str(output_prefix)+".per_branch_statistics.csv"        ,
+      str(input_prefix)+".snp_sites.aln":   str(output_prefix)+".filtered_polymorphic_sites.fasta" ,
+      str(input_prefix)+".phylip":          str(output_prefix)+".filtered_polymorphic_sites.phylip",
+      str(input_prefix):                    str(output_prefix)+".final_tree.tre"
+    }
+    return input_names_to_output_names
 
   @staticmethod
   def fasttree_current_tree_name(base_filename, i):
@@ -542,8 +577,10 @@ class GubbinsCommon():
   def does_each_sequence_have_a_name_and_genomic_data(input_filename):
     input_handle  = open(input_filename, "rU")
     alignments = AlignIO.parse(input_handle, "fasta")
+    number_of_sequences = 0
     for alignment in alignments:
         for record in alignment:
+            number_of_sequences +=1
             if record.name is None or record.name == "":
               print "Error with the input FASTA file: One of the sequence names is blank"
               return 0
@@ -553,6 +590,9 @@ class GubbinsCommon():
             if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
               print "Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted"
               return 0
+    if number_of_sequences <= 3:
+      print "Error with input FASTA file: you need more than 3 sequences to build a meaningful tree"
+      return 0
     input_handle.close()
     return 1
     

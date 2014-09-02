@@ -35,6 +35,7 @@ parser.add_argument('--tree_builder',     '-t', help='Application to use for tre
 parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
 parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
 parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())
 gubbins_runner.parse_and_run()

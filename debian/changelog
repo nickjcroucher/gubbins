@@ -1,3 +1,9 @@
+gubbins (0.2~trusty1) trusty; urgency=low
+
+  * Rename final output files
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 1 Sep 2014 16:44:00 +0000
+
 gubbins (0.1.11~trusty1) trusty; urgency=low
 
   * Python remove internal node names if passed in as a starting tree

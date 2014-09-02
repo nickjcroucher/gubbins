@@ -1,4 +1,4 @@
-AC_INIT([gubbins], [0.1.11], [aidan@ontologyengineering.org], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins]) # bug reports to Aidan
+AC_INIT([gubbins], [0.2], [aidan@ontologyengineering.org], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins]) # bug reports to Aidan
 AM_INIT_AUTOMAKE([foreign tar-pax])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
@@ -22,7 +22,7 @@ AM_PATH_PYTHON([2.0],
                [AC_MSG_WARN([Python not found. Python is required to build presage python binding. Python can be obtained from http://www.python.org])])
 
 # Define a new recursive target. In our case it produces a .deb installable.
-AM_EXTRA_RECURSIVE_TARGETS([release])
+#AM_EXTRA_RECURSIVE_TARGETS([release])
 
 AC_CONFIG_FILES([Makefile src/Makefile release/Makefile python/Makefile])
 AC_OUTPUT

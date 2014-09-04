@@ -39,10 +39,10 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.raxml_gubbins_command('base_filename_without_ext','starting_base_filename',1234, 5,'alignment_filename','gubbins_exec',3, 'original_aln') == 'gubbins_exec -r -v starting_base_filename.vcf -f original_aln -t RAxML_result.base_filename_without_ext.1234iteration_5 -m 3 starting_base_filename.snp_sites.aln'
 
   def test_raxml_regex_for_file_deletions(self):
-    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 5) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5.ancestor.tre', '^RAxML_result.AAA.1234iteration_5.seq.joint.txt', '^RAxML_result.AAA.1234iteration_5.prob.joint.txt', '^RAxML_result.AAA.1234iteration_5.output_tree']
+    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 5) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5.ancestor.tre', '^RAxML_result.AAA.1234iteration_5.seq.joint.txt', '^RAxML_result.AAA.1234iteration_5.prob.joint.txt']
 
   def test_raxml_regex_for_file_deletions_10(self):
-    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 10) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5\\.', '^RAxML_result.AAA.1234iteration_5$', '^RAxML_result.AAA.1234iteration_6\\.', '^RAxML_result.AAA.1234iteration_6$', '^RAxML_result.AAA.1234iteration_7\\.', '^RAxML_result.AAA.1234iteration_7$', '^RAxML_result.AAA.1234iteration_8\\.', '^RAxML_result.AAA.1234iteration_8$', '^RAxML_result.AAA.1234iteration_9\\.', '^RAxML_result.AAA.1234iteration_9$', '^RAxML_result.AAA.1234iteration_10.ancestor.tre', '^RAxML_result.AAA.1234iteration_10.seq.joint.txt', '^RAxML_result.AAA.1234iteration_10.prob.joint.txt', '^RAxML_result.AAA.1234iteration_10.output_tree']
+    assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 10) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5\\.', '^RAxML_result.AAA.1234iteration_5$', '^RAxML_result.AAA.1234iteration_6\\.', '^RAxML_result.AAA.1234iteration_6$', '^RAxML_result.AAA.1234iteration_7\\.', '^RAxML_result.AAA.1234iteration_7$', '^RAxML_result.AAA.1234iteration_8\\.', '^RAxML_result.AAA.1234iteration_8$', '^RAxML_result.AAA.1234iteration_9\\.', '^RAxML_result.AAA.1234iteration_9$', '^RAxML_result.AAA.1234iteration_10.ancestor.tre', '^RAxML_result.AAA.1234iteration_10.seq.joint.txt', '^RAxML_result.AAA.1234iteration_10.prob.joint.txt']
 
   def test_fasttree_regex_for_file_deletions(self):
     assert common.GubbinsCommon.fasttree_regex_for_file_deletions('AAA', 5) == ['^AAA.iteration_1[$|\\.]', '^AAA.iteration_2[$|\\.]', '^AAA.iteration_3[$|\\.]', '^AAA.iteration_4[$|\\.]']
@@ -61,6 +61,7 @@ class TestStringConstruction(unittest.TestCase):
      'AAA.iteration_5.snp_sites.aln':   'test.filtered_polymorphic_sites.fasta',
      'AAA.iteration_5.phylip':          'test.filtered_polymorphic_sites.phylip',
      'AAA.iteration_5.stats':           'test.per_branch_statistics.csv',
+     'AAA.iteration_5.output_tree':     'test.node_labelled.tre',
      'AAA.iteration_5':                 'test.final_tree.tre'}
 
   def test_translation_of_raxml_filenames_to_final_filenames(self):
@@ -72,6 +73,7 @@ class TestStringConstruction(unittest.TestCase):
     'RAxML_result.AAA.1234iteration_10':                 'test.final_tree.tre',
     'RAxML_result.AAA.1234iteration_10.phylip':          'test.filtered_polymorphic_sites.phylip',
     'RAxML_result.AAA.1234iteration_10.stats':           'test.per_branch_statistics.csv',
+    'RAxML_result.AAA.1234iteration_10.output_tree':     'test.node_labelled.tre',
     'RAxML_result.AAA.1234iteration_10.vcf':             'test.summary_of_snp_distribution.vcf'}
 
   def test_rename_files(self):

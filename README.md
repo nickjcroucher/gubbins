@@ -1,164 +1,111 @@
-Gubbins Install
+Gubbins
 =======
 This piece of software is not the version that was used in Croucher et. al. "Rapid Pneumococcal Evolution in Response to Clinical Interventions", Science 2011, 331 (6016): 430-434.
-It is a work in progress and as such is not yet recommended for use by the community. We expect to make an official release of the software soon.
 
-## Prep work ##
-As listed in the dependancies section below, you need
- * Python 2.7.
- * Python development headers (the python-dev package on Debian/Ubuntu).
+Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous increase in the size of datasets being used for estimating bacterial population phylodynamics. Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used for mitigating the effect of mechanisms of horizontal sequence transfer on phylogenetic reconstructions cannot cope with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.
 
-You will also need the following python packages installed, if they are not then they will be downloaded and installed automatically during the Gubbins installation process:
+Install
+=======
+Please see the INSTALL file for detailed instructions.
 
- * Biopython ( >=1.59 )
- * DendroPy ( >=3.11.1 )
- * ReportLab ( >= 2.5 )
+Running Gubbins
+===============
+To run Gubbins with default settings:
 
-Gubbins also depends on the following pieces of software.  Depending on your installation choice these may be downloaded and installed automatically during the Gubbins installation process. 
+    run_gubbins.py [FASTA alignment]
+    
+Input options:
 
-* [FastTree](http://www.microbesonline.org/fasttree/) ( >=2.1.4 )
-* [RAxML](http://sco.h-its.org/exelixis/software.html) ( >=7.2.8, the full version )
-* [FASTML](http://fastml.tau.ac.il/) ( 2.02 )
+    --outgroup, -o	
 
-If you choose to install from source, you should follow the FastTree and RAxML instructions to do so.  In the case of installing FASTML from source, we recommend using our slight modifications to the FASTML build system available at https://github.com/AidanDelaney/fastml2.
+The name of a sequence in the alignment on which to root the tree
 
-## Install ##
+    --starting_tree, -s	
 
-There are multiple ways to install gubbins depending on your requirements
+A Newick-format starting tree on which to perform the first iteration analysis. The default is to compute a starting tree using RAxML
 
-1. install system-wide from binaries,
-2. install per-user from binaries,
-3. install system-wied from source, and
-4. install per-user from source.
+    --filter_percentage -f	
 
-Each of the system-wide cases assumes you have permissions to _sudo_.  The per-user cases do not make that assumption.
+Filter out taxa with more than this percentage of missing data. Default is 25%
+    
+Processing options:
 
-### System-wide from binaries ###
+    --tree_builder, -t	
+    
+The algorithm to use in the construction of phylogenies in the analysis; can be ‘raxml’, to use RAxML, ‘fasttree’, to use Fasttree, or ‘hybrid’, to use Fasttree for the first iteration and RAxML in all subsequent iterations. Default is raxml
 
-We currently only support Ubuntu 14.04 x86_64 as a system-wide binary install.  Other architectures will be added on request.
+    --iterations, -i	
+    
+The maximum number of iterations to perform; the algorithm will stop earlier than this if it converges on the same tree in two successive iterations. Default is 5.
 
-Install the DendroPy dependancy:
+    --min_snps, -m	
+The minimum number of base substitutions required to identify a recombination. Default is 3.
+    
+Output options:
 
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
-```
+    --use_time_stamp, -u	
+    
+Include a time stamp in the name of output files to avoid overwriting previous runs on the same input file. Default is to not include a time stamp.
 
-Then install gubbins
+    --prefix, -p	
+    
+Specifiy a prefix for output files. If none is provided it defaults to the name of the input FASTA alignment
 
-``` bash
-$ sudo add-apt-repository ppa:ap13/gubbins
-$ sudo apt-get update
-$ sudo apt-get install fasttree raxml fastml2 gubbins
-```
+    --verbose, -v	
+    
+Print debugging messages. Default is off.
 
-If you have your own version of the raxml binary, then you can omit it from the list of packages to install.  Many users have reported vastly increased performance by installing RAxML from source by selecting the most appropriate makefile.
+    --no_cleanup, -n
+    
+Do not remove files from intermediate iterations. This option will also keep other files created by RAxML, fastml and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.
+    
+Output files    
+==========
 
+Prefix
+------
 
-### System-wide from binaries for other debian based systems ###
-This might work on other Debian based systems and other versions of Ubuntu, but is untested.
+If a prefix is not defined with the –prefix option, the default prefix of the output files is:
+X.Y
 
-Install the DendroPy dependancy:
-
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
-```
-
-Then install gubbins
+where:
+X = Prefix taken from the input fasta file
+Y = Time stamp. NOTE: This will only be included in the output file prefix if the –u flag has been selected
 
 
-```bash
-echo "deb http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
-echo "deb-src http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
 
-sudo apt-get update
-sudo apt-get install fasttree raxml fastml2 gubbins
-```
+Output file suffices:
+---------------------
 
-### Per-user from binaries  ###
+    .recombination_predictions.embl
 
-Again, we currently only support Ubuntu 14.04 x86_64 as a binary install option
+Recombination predictions in EMBL tab file format.
 
-Check out a version of the repository from GitHub
+    .recombination_predictions.gff	
 
-> $ git clone https://github.com/sanger-pathogens/gubbins
+Recombination predictions in GFF3 format
 
-Run the installation script to install it in your home directory, spectifically into ~/.local.  The installation script ensures that the Python dependencies are also installed locally.
+    .branch_base_reconstruction.embl	
 
-> $ ./install-userspace.sh
+Base substitution reconstruction in EMBL tab format.
 
-Source the .bashrc file
+    .summary_of_snp_distribution.vcf	
 
-> $ source ~/.bashrc
+VCF file summarising the distribution of SNPs
 
-### System-wide from source ###
+    .per_branch_statistics.csv	
 
-You must first enssure that the dependencies are installed.
+Per branch reporting of the base substitutions inside and outside recombinations events.
 
-On a Debian/Ubuntu system
-``` bash
-$ sudo apt-get install python-biopython python-setuptools
-$ easy_install -U dendropy
-```
+    .filtered_polymorphic_sites.fasta	
 
-Alternatively, if you need to install the dependencies from source:
-``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python -
-$ sudo easy_install -U biopython
-$ sudo easy_install -U dendropy
-```
+FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration.
 
-Check out a version of the repository from github and
+    .filtered_polymorphic_sites.phylip	
 
-> $ git clone https://github.com/sanger-pathogens/gubbins
+Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration.
 
-Run the following commands to compile and install the software:
+    .final_tree.tre	
 
-``` bash
-$ autoreconf -i
-$ ./configure
-$ make
-$ sudo make install
-```
+Final phylogenetic tree in newick format.
 
-### Per-user from source ###
-
-If you do not have permission to install the software as root and instead want to install it in a local user directory then the following commands can be used instead:
-
-``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | python - --user
-$ ~/.local/bin/easy_install -U --user biopython
-$ ~/.local/bin/easy_install -U --user dendropy
-$ ./configure --prefix=~/.local
-$ make
-$ make install
-```
-
-Ensure that
-
-> LD_LIBRARY_PATH=~/.local/lib
-
-and
-
-> PATH=~/.local/bin:$PATH
-
-This is best achieved by adding them to ~/.bashrc in the usual manner.
-
-## Running Gubbins ##
-
-For bash users ensure you run
-
-> $ source ~/.bashrc
-
-To run the Gubbins application use:
-
-> $ run_gubbins my_alignment.fa
-
-To see full usage of this script run:
-
-> $ run_gubbins -h

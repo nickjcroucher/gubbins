@@ -436,8 +436,7 @@ class GubbinsCommon():
 
     regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.ancestor.tre')
     regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.seq.joint.txt')
-    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.prob.joint.txt')
-    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.output_tree')    
+    regex_for_file_deletions.append("^RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+'.prob.joint.txt') 
     return regex_for_file_deletions
 
   @staticmethod
@@ -478,6 +477,7 @@ class GubbinsCommon():
       str(input_prefix)+".stats":           str(output_prefix)+".per_branch_statistics.csv"        ,
       str(input_prefix)+".snp_sites.aln":   str(output_prefix)+".filtered_polymorphic_sites.fasta" ,
       str(input_prefix)+".phylip":          str(output_prefix)+".filtered_polymorphic_sites.phylip",
+      str(input_prefix)+".output_tree":     str(output_prefix)+".node_labelled.tre",
       str(input_prefix):                    str(output_prefix)+".final_tree.tre"
     }
     return input_names_to_output_names

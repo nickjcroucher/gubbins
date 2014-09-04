@@ -46,6 +46,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('different_prefix.final_tree.tre')
 
     os.remove('different_prefix.summary_of_snp_distribution.vcf')
+    os.remove('different_prefix.node_labelled.tre')
     os.remove('different_prefix.recombination_predictions.embl')
     os.remove('different_prefix.per_branch_statistics.csv')
     os.remove('different_prefix.filtered_polymorphic_sites.fasta')
@@ -114,6 +115,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('hybrid_prefix.final_tree.tre')
  
     os.remove('hybrid_prefix.summary_of_snp_distribution.vcf')
+    os.remove('hybrid_prefix.node_labelled.tre')
     os.remove('hybrid_prefix.recombination_predictions.embl')
     os.remove('hybrid_prefix.per_branch_statistics.csv')
     os.remove('hybrid_prefix.filtered_polymorphic_sites.fasta')
@@ -146,7 +148,9 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
     assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
     assert os.path.exists('multiple_recombinations.final_tree.tre')
+    assert os.path.exists('multiple_recombinations.node_labelled.tre')
 
+    os.remove('multiple_recombinations.node_labelled.tre')
     os.remove('multiple_recombinations.summary_of_snp_distribution.vcf')
     os.remove('multiple_recombinations.recombination_predictions.embl')
     os.remove('multiple_recombinations.per_branch_statistics.csv')
@@ -240,7 +244,6 @@ class TestExternalDependancies(unittest.TestCase):
     assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
     assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.seq.joint.txt')
     assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.prob.joint.txt')
-    assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.output_tree')
     assert not os.path.exists('log.txt')
     assert not os.path.exists('latest_tree.multiple_recombinations.tre')
   

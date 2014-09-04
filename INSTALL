@@ -18,7 +18,7 @@ Gubbins also depends on the following pieces of software.  Depending on your ins
 * [RAxML](http://sco.h-its.org/exelixis/software.html) ( >=7.2.8, the full version )
 * [FASTML](http://fastml.tau.ac.il/) ( 2.02 )
 
-If you choose to install from source, you should follow the FastTree and RAxML instructions to do so.  In the case of installing FASTML from source, we recommend using our slight modifications to the FASTML build system available at https://github.com/AidanDelaney/fastml2.
+If you choose to install from source, you should follow the FastTree and RAxML instructions to do so.  In the case of installing FASTML from source, we recommend using our slight modifications to the FASTML build system available at https://github.com/sanger-pathogens/fastml.
 
 ## Install ##
 

@@ -150,7 +150,7 @@ class GubbinsCommon():
     # Perform pairwise comparison if there are only 2 sequences
     number_of_sequences = GubbinsCommon.number_of_sequences_in_alignment(self.args.alignment_filename)
     if(number_of_sequences == 2):
-      GubbinsCommon.pairwise_comparison(self.args.alignment_filename,starting_base_filename,GUBBINS_EXEC,self.args.alignment_filename,FASTML_EXEC)
+      GubbinsCommon.pairwise_comparison(self.args.alignment_filename,starting_base_filename,GUBBINS_EXEC,self.args.alignment_filename,FASTML_EXEC,base_filename_without_ext)
       sys.exit()
 
     latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+"tre"
@@ -452,7 +452,8 @@ class GubbinsCommon():
   @staticmethod
   def rename_files(input_to_output_filenames):
     for input_file in input_to_output_filenames:
-      shutil.move(input_file, input_to_output_filenames[input_file])
+      if os.path.exists(input_file):
+        shutil.move(input_file, input_to_output_filenames[input_file])
 
   @staticmethod
   def starting_files_regex(starting_base_filename):
@@ -466,6 +467,21 @@ class GubbinsCommon():
   @staticmethod
   def translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext,current_time, max_intermediate_iteration, output_prefix):
     return GubbinsCommon.translation_of_filenames_to_final_filenames("RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration), output_prefix)
+
+  @staticmethod
+  def translation_of_filenames_to_final_filenames_pairwise(input_prefix, output_prefix):
+    input_names_to_output_names = {  
+      str(input_prefix)+".vcf":             str(output_prefix)+".summary_of_snp_distribution.vcf"  ,
+      str(input_prefix)+".branch_snps.tab": str(output_prefix)+".branch_base_reconstruction.embl"  ,
+      str(input_prefix)+".tab":             str(output_prefix)+".recombination_predictions.embl"   ,
+      str(input_prefix)+".gff":             str(output_prefix)+".recombination_predictions.gff"    ,
+      str(input_prefix)+".stats":           str(output_prefix)+".per_branch_statistics.csv"        ,
+      str(input_prefix)+".snp_sites.aln":   str(output_prefix)+".filtered_polymorphic_sites.fasta" ,
+      str(input_prefix)+".phylip":          str(output_prefix)+".filtered_polymorphic_sites.phylip",
+      str(input_prefix)+".output_tree":     str(output_prefix)+".node_labelled.tre",
+      str(input_prefix)+".tre":             str(output_prefix)+".final_tree.tre"
+    }
+    return input_names_to_output_names
   
   @staticmethod
   def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
@@ -774,7 +790,7 @@ class GubbinsCommon():
     return
 
   @staticmethod
-  def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec):
+  def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec,base_filename_without_ext):
     sequence_names = GubbinsCommon.get_sequence_names_from_alignment(filename)
     GubbinsCommon.create_pairwise_newick_tree(sequence_names, base_filename+".tre")
 
@@ -782,6 +798,7 @@ class GubbinsCommon():
     shutil.copyfile(base_filename+'.tre.output_tree',base_filename+".tre")
     shutil.copyfile(base_filename+'.tre.seq.joint.txt', base_filename+".snp_sites.aln")
     subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
+    GubbinsCommon.rename_files(GubbinsCommon.translation_of_filenames_to_final_filenames_pairwise(base_filename, base_filename_without_ext))
 
   @staticmethod
   def create_pairwise_newick_tree(sequence_names, output_filename):

@@ -7,6 +7,8 @@ Integration testing of external dependancies. Likely to be the most brittle test
 
 import unittest
 import re
+import shutil
+
 import os
 import argparse
 from gubbins import common
@@ -193,6 +195,7 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('multiple_recombinations.recombination_predictions.gff')
     os.remove('multiple_recombinations.branch_base_reconstruction.embl')
     os.remove('multiple_recombinations.final_tree.tre')
+    os.remove('multiple_recombinations.node_labelled.tre')
 
   def test_parse_and_run(self):
 
@@ -255,40 +258,35 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('multiple_recombinations.recombination_predictions.gff')
     os.remove('multiple_recombinations.branch_base_reconstruction.embl')
     os.remove('multiple_recombinations.final_tree.tre')
+    os.remove('multiple_recombinations.node_labelled.tre')
   
   
   
   def test_pairwise_comparison(self):
-    common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ')
+    shutil.copyfile('gubbins/tests/data/input_pairwise.aln.vcf','gubbins/tests/data/pairwise.aln.vcf' )
+    shutil.copyfile('gubbins/tests/data/input_pairwise.aln.phylip','gubbins/tests/data/pairwise.aln.phylip' )
+    common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ','pairwise')
     # Check the tree file is as expected
-    actual_file_content   = open('gubbins/tests/data/pairwise.aln.tre',   'U').readlines()
+    actual_file_content   = open('pairwise.final_tree.tre',   'U').readlines()
     expected_file_content = open('gubbins/tests/data/pairwise_expected.tre', 'U').readlines()
     assert actual_file_content == expected_file_content
     
     # Check the VCF file is as expected
-    actual_file_content   = open('gubbins/tests/data/pairwise.aln.tre.vcf',   'U').readlines()
+    actual_file_content   = open('pairwise.summary_of_snp_distribution.vcf',   'U').readlines()
     expected_file_content = open('gubbins/tests/data/pairwise.aln.tre.vcf_expected', 'U').readlines()
     assert actual_file_content == expected_file_content
     
     # Check the reconstruction of internal nodes
-    actual_file_content   = open('gubbins/tests/data/pairwise.aln.snp_sites.aln',   'U').readlines()
+    actual_file_content   = open('pairwise.filtered_polymorphic_sites.fasta',   'U').readlines()
     expected_file_content = open('gubbins/tests/data/pairwise.aln.snp_sites.aln_expected', 'U').readlines()
     assert actual_file_content == expected_file_content
-
-    os.remove('gubbins/tests/data/pairwise.aln.snp_sites.aln')
-    os.remove('gubbins/tests/data/pairwise.aln.tre')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.ancestor.tre')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.branch_snps.tab')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.gff')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.output_tree')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.phylip')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.prob.joint.txt')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.seq.joint.txt')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.snp_sites.aln')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.stats')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.tab')
-    os.remove('gubbins/tests/data/pairwise.aln.tre.vcf')
-
+    
+    
+    os.remove('pairwise.summary_of_snp_distribution.vcf')
+    os.remove('pairwise.filtered_polymorphic_sites.fasta')
+    os.remove('pairwise.filtered_polymorphic_sites.phylip')
+    os.remove('pairwise.final_tree.tre')
+    
   
   def test_delete_files_based_on_list_of_regexes(self):
     open('gubbins/tests/data/AAA', 'w').close()

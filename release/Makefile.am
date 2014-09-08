@@ -14,6 +14,7 @@ ubuntu-release:
 	vagrant reload
 	vagrant provision
 	cp ../${PACKAGE}-${VERSION}.tar.gz .
+	vagrant ssh -c "sudo ln -fs /usr/bin/fasttree /usr/bin/FastTree"
 	vagrant ssh -c "tar xzvf /vagrant/${PACKAGE}-${VERSION}.tar.gz"
 	vagrant ssh -c "cd ${PACKAGE}-${VERSION} && dpkg-buildpackage -uc -us -rfakeroot"
 	vagrant ssh -c "cp ${PACKAGE}_${VERSION}_amd64.deb /vagrant"
@@ -25,6 +26,7 @@ source:
 	vagrant up
 	vagrant provision
 	cp ../${PACKAGE}-${VERSION}.tar.gz .
+	vagrant ssh -c "sudo ln -fs /usr/bin/fasttree /usr/bin/FastTree"
 	vagrant ssh -c "tar xzvf /vagrant/${PACKAGE}-${VERSION}.tar.gz"
 	vagrant ssh -c "mv ${PACKAGE}-${VERSION} ${PACKAGE}-${PACKAGE_VERSION}"
 	vagrant ssh -c "cd ${PACKAGE}-${PACKAGE_VERSION} && dpkg-buildpackage -uc -us -rfakeroot"

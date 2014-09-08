@@ -92,6 +92,7 @@ class GubbinsCommon():
     FASTML_EXEC = 'fastml -mg -qf -b '
 
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
+    FASTTREE_EXEC_ALT = 'fasttree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
@@ -102,8 +103,11 @@ class GubbinsCommon():
       sys.exit("fastml is not in your path")
     if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
       sys.exit("RAxML is not in your path")
-    if (self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(FASTTREE_EXEC) is None:
-      sys.exit("FastTree is not in your path")
+      
+    if self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid": 
+      FASTTREE_EXEC = GubbinsCommon.use_bundled_exec(FASTTREE_EXEC, FASTTREE_EXEC_ALT)
+      if GubbinsCommon.which(FASTTREE_EXEC) is None:
+        sys.exit("FastTree is not in your path")
 
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
        sys.exit("There is a problem with your input fasta file so nothing can be done until you fix it")

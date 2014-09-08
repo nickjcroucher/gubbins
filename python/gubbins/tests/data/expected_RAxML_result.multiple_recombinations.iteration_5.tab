@@ -1,30 +1,24 @@
 FT   misc_feature    29..49
-FT                   /node="N3->sequence_6"
+FT                   /node="N7->sequence_6"
 FT                   /neg_log_likelihood=4.955311
 FT                   /colour=4
 FT                   /taxa="sequence_6"
 FT                   /SNP_count=21
-FT   misc_feature    51..84
-FT                   /node="N6->N7"
-FT                   /neg_log_likelihood=10.195830
-FT                   /colour=2
-FT                   /taxa=" sequence_2  sequence_4 sequence_3"
-FT                   /SNP_count=30
-FT   misc_feature    51..84
-FT                   /node="N5->N6"
-FT                   /neg_log_likelihood=10.195830
-FT                   /colour=2
-FT                   /taxa=" sequence_1  sequence_2  sequence_4 sequence_3"
-FT                   /SNP_count=30
 FT   misc_feature    29..84
-FT                   /node="N4->N5"
+FT                   /node="N5->N6"
 FT                   /neg_log_likelihood=12.082148
 FT                   /colour=2
-FT                   /taxa=" sequence_5  sequence_1  sequence_2  sequence_4 sequence_3"
+FT                   /taxa=" sequence_9  sequence_6  sequence_8 sequence_7"
 FT                   /SNP_count=51
-FT   misc_feature    117..208
-FT                   /node="N1->sequence_10"
-FT                   /neg_log_likelihood=40.933692
-FT                   /colour=4
-FT                   /taxa="sequence_10"
-FT                   /SNP_count=92
+FT   misc_feature    51..84
+FT                   /node="N4->N5"
+FT                   /neg_log_likelihood=10.195830
+FT                   /colour=2
+FT                   /taxa=" sequence_5  sequence_9  sequence_6  sequence_8 sequence_7"
+FT                   /SNP_count=30
+FT   misc_feature    51..84
+FT                   /node="N1->N4"
+FT                   /neg_log_likelihood=10.195830
+FT                   /colour=2
+FT                   /taxa=" sequence_1  sequence_5  sequence_9  sequence_6  sequence_8 sequence_7"
+FT                   /SNP_count=30

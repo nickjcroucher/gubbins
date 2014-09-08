@@ -3,7 +3,7 @@
 
 # Requires the use of Vagrant and reasonable bandwidth/time.
 
-PACKAGE_VERSION=$(VERSION)~trusty2
+PACKAGE_VERSION=$(VERSION)~trusty1
 
 release-local: ubuntu-release
 

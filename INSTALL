@@ -160,3 +160,29 @@ To run the Gubbins application use:
 To see full usage of this script run:
 
 > $ run_gubbins -h
+
+
+### OSX ###
+Download the precompiled binary and unpack it.
+
+```
+> wget ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_0.4.1_osx_10.8.tar.gz
+> cd /
+> tar xvfz gubbins_0.4.1_osx_10.8.tar.gz
+```
+
+Install the modified version of fastml
+```
+wget ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/fastml.2.0.2.tar.gz
+tar xvfz fastml.2.0.2.tar.gz
+cp fastml/fastml /usr/local/bin
+```
+
+Get the python setup script and install the dependancies
+```
+> git clone https://github.com/sanger-pathogens/gubbins
+> cd gubbins/python
+> python setup.py install
+```
+
+

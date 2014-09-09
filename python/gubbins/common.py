@@ -82,10 +82,24 @@ class GubbinsCommon():
       print GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly')
       return 0
     return 1
+ 
+  @staticmethod
+  def choose_raxml_executable(list_of_executables):
+    for executable in list_of_executables:
+      if GubbinsCommon.which(executable) != None:
+        return executable
+        
+    return list_of_executables[-1]
 
   def parse_and_run(self):
     # Default parameters
-    RAXML_EXEC = 'raxmlHPC -f d -p 1 -m GTRGAMMA'
+    raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
+    raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+    
+    RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
+    if re.search('PTHREADS', str(RAXML_EXEC)) != None:
+      RAXML_EXEC = RAXML_EXEC+" -T " +str(self.args.threads)
+    
     FASTTREE_EXEC = 'FastTree'
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'

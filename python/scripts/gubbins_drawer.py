@@ -166,8 +166,7 @@ def get_text_width(font, size, text):
 #####################################################################################
 
 def add_ordered_embl_to_diagram(record, incfeatures=["CDS", "feature"], emblfile=True):
-	
-	incfeatures=map(string.lower,incfeatures)
+	incfeatures= [x.lower() for x in incfeatures]
 	
 	new_tracks={}
 	
@@ -682,7 +681,7 @@ if __name__ == "__main__":
 			continue
 		if arg.split('.')[-1].lower() in ["plot", "hist", "heat", "bar", "line", "graph", "area","embl", "gb", "tab", "bam", "fas", "fasta", "mfa", "dna", "fst", "phylip", "phy", "nexus", "nxs"]:
 			
-			if arg.split('.')[-1].lower() =="tab":
+			if arg.split('.')[-1].lower() =="embl":
 				 new_tracks=add_ordered_tab_to_diagram(arg)
 				 
 				 for track in new_tracks:

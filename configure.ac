@@ -1,4 +1,5 @@
-AC_INIT([gubbins], [0.5], [aidan@ontologyengineering.org], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins]) # bug reports to Aidan
+AC_INIT([gubbins], m4_esyscmd([tr -d '\n' < VERSION]), [aidan@ontologyengineering.org], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins])
+
 AM_INIT_AUTOMAKE([foreign tar-pax])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])

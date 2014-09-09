@@ -1,6 +1,15 @@
 Gubbins Install
 =======
 
+There are a few ways to Install/Use Gubbins, with detailed instructions below:
+
+1. OSX - using homebrew
+2. Ubuntu Trusty - using apt-get
+3. Linux - using precompiled binaries or compiling from source
+4. Windows - using our virtual machine
+
+
+
 ## Prep work ##
 As listed in the dependancies section below, you need
  * Python 2.7.
@@ -163,26 +172,10 @@ To see full usage of this script run:
 
 
 ### OSX ###
-Download the precompiled binary and unpack it.
-
-```
-> wget ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_0.4.1_osx_10.8.tar.gz
-> cd /
-> tar xvfz gubbins_0.4.1_osx_10.8.tar.gz
-```
+Install homebrew http://brew.sh/
 
 Install the modified version of fastml
-```
-wget ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/fastml.2.0.2.tar.gz
-tar xvfz fastml.2.0.2.tar.gz
-cp fastml/fastml /usr/local/bin
-```
+> brew install https://raw.githubusercontent.com/andrewjpage/fastml/master/homebrew/fastml.rb
 
-Get the python setup script and install the dependancies
-```
-> git clone https://github.com/sanger-pathogens/gubbins
-> cd gubbins/python
-> python setup.py install
-```
 
 

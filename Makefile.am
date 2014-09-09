@@ -6,15 +6,13 @@ source: dist
 	cd release && make source
 
 release: dist
-	cd release && make source
 	cd release && make ubuntu-binary
-	cd release && make ubuntu-release
+	cd release && make source
 
 osx-package:
 	rm -rf ${PACKAGE}_${VERSION}_osx_10.8.tar.gz
 	rm -rf ${HOME}/files.lst
 	rm -rf ${HOME}/${PACKAGE}-${VERSION}-inst
-
 	./configure --prefix /usr
 	make
 	make DESTDIR=${HOME}/${PACKAGE}-${VERSION}-inst install

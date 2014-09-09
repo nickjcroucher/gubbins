@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+import os
+
+version = 'x'
+if os.path.exists('../VERSION'):
+  version = open('../VERSION').read().strip()
 
 setup(
     name='gubbins',
-    version='0.5',
+    version=version,
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     author_email='ap13@sanger.ac.uk',

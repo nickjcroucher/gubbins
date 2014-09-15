@@ -37,31 +37,82 @@
 <p>Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous increase in the size of datasets being used for estimating bacterial population phylodynamics. Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used for mitigating the effect of mechanisms of horizontal sequence transfer on phylogenetic reconstructions cannot cope with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.</p>
 
 
-<h2>Contacting us</h2>
+<h2>Contact us</h2>
+<p>If you need help or have any queries, please contact us using the details below. Our normal office hours are 8:30-17:00 (GMT) Monday to Friday.</p>
 <ul>
-  <li><a href="mailto:gubbins@sanger.ac.uk">Email gubbins@sanger.ac.uk</a> if you have any queries.</li>
+  <li>Email <a href="mailto:gubbins@sanger.ac.uk">gubbins@sanger.ac.uk</a></li>
+  <li>Phone Pathogen Informatics on +44 (0)1223 834244 extension 8736</li>
 </ul>
 <p></p>
+
+<h2>Citing Gubbins</h2>
+<p><em>Nicholas J. Croucher, Andrew J. Page, Thomas R. Connor, Aidan J. Delaney, Stephen D. Bentley, Julian Parkhill, and Simon R. Harris</em>, "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins", In submission, 2014</p>
+
 
 <h2>
 <a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Downloading and installing</h2>
 <p>There are a number of options for installing Gubbins. We provide a few pre built downloads which vary depending on what system your running.</p>
 <ul>
   <li><a href="#virtual-machine">Virtual machine</a> - For Windows, OSX, Linux</li>
-  <li><a href="#virtual-machine">Prebuilt Debian/Ubuntu package</a> - For Ubuntu Trusty</li>
-  <li><a href="#virtual-machine">Binary package</a> - For 64 bit Linux</li>
-  <li><a href="#virtual-machine">Homebrew recipes</a> - OSX</li>
-  </ul>
-
+  <li><a href="#trusty">Prebuilt Debian/Ubuntu package</a> - For Ubuntu Trusty</li>
+  <li><a href="#linux_binary">Binary package</a> - For 64 bit Linux</li>
+  <li><a href="#homebrew">Homebrew recipes</a> - OSX</li>
+  <li><a href="#compiling">Compiling from source</a> - OSX, Linux</li>
+</ul>
 
 <h3>
 <a name="virtual-machine" class="anchor" href="#virtual-machine"><span class="octicon octicon-link"></span></a>Virtual machine</h3>
 
-<p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'Import Appliance' option. The root password is 'manager'.</p>
+<p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'File -> Import Appliance' menu option. The root password is 'manager'.</p>
 
 <ul>
 <li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_0.6.ova">Virtual Machine with Gubbins installed</a></li>
 </ul>
+
+
+
+<h3>
+<a name="virtual-machine" class="anchor" href="#trusty"><span class="octicon octicon-link"></span></a>Ubuntu Trusty</h3>
+<p>
+  We have precompiled packages for Ubuntu (Trusty). You dont need to download anything, just copy and past the commands into a terminal. You need to first install DendroPy:
+</p>
+<ul>
+  <li>wget http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
+  </li>
+  <li>tar xzvf DendroPy-3.12.0.tar.gz
+  </li>
+  <li>cd DendroPy-3.12.0
+  </li>
+  <li>sudo python setup.py install
+  </li>
+</ul>
+<p>
+  Then install gubbins
+</p>
+<ul>
+  <li>sudo add-apt-repository ppa:ap13/gubbins
+  </li>
+  <li>sudo apt-get update
+  </li>
+  <li>sudo apt-get install fasttree raxml fastml2 gubbins
+  </li>
+</ul>
+
+<h3>
+<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Compiling from source</h3>
+<p>
+  Download the latest version of the <a href="https://github.com/sanger-pathogens/gubbins/tarball/master">Gubbins source code</a>, then follow the compile instructions in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL">INSTALL file</a>.
+</p>
+
+
+
+
+
+
+
+
+
+
       </section>
     </div>
 

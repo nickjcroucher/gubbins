@@ -16,14 +16,14 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/sanger-pathogens/gubbins">View on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/sanger-pathogens/gubbins">View source code on GitHub</a>
 
           <h1 id="project_title">Gubbins</h1>
           <h2 id="project_tagline">Genealogies Unbiased By recomBinations In Nucleotide Sequences</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/sanger-pathogens/gubbins/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/sanger-pathogens/gubbins/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/sanger-pathogens/gubbins/zipball/master">Download source code as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/sanger-pathogens/gubbins/tarball/master">Download source code as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -36,8 +36,23 @@
 
 <p>Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous increase in the size of datasets being used for estimating bacterial population phylodynamics. Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used for mitigating the effect of mechanisms of horizontal sequence transfer on phylogenetic reconstructions cannot cope with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.</p>
 
+
+<h2>Contacting us</h2>
+<ul>
+  <li><a href="mailto:gubbins@sanger.ac.uk">Email gubbins@sanger.ac.uk</a> if you have any queries.</li>
+</ul>
+<p></p>
+
 <h2>
-<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Downloads</h2>
+<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Downloading and installing</h2>
+<p>There are a number of options for installing Gubbins. We provide a few pre built downloads which vary depending on what system your running.</p>
+<ul>
+  <li><a href="#virtual-machine">Virtual machine</a> - For Windows, OSX, Linux</li>
+  <li><a href="#virtual-machine">Prebuilt Debian/Ubuntu package</a> - For Ubuntu Trusty</li>
+  <li><a href="#virtual-machine">Binary package</a> - For 64 bit Linux</li>
+  <li><a href="#virtual-machine">Homebrew recipes</a> - OSX</li>
+  </ul>
+
 
 <h3>
 <a name="virtual-machine" class="anchor" href="#virtual-machine"><span class="octicon octicon-link"></span></a>Virtual machine</h3>
@@ -45,7 +60,7 @@
 <p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'Import Appliance' option. The root password is 'manager'.</p>
 
 <ul>
-<li>Virtual Machine with Gubbins installed</li>
+<li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_0.6.ova">Virtual Machine with Gubbins installed</a></li>
 </ul>
       </section>
     </div>

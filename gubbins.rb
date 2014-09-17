@@ -25,7 +25,11 @@ class Gubbins < Formula
            "--disable-dependency-tracking",
            "--prefix=#{prefix}"
 
-    system "make","DESTDIR=#{prefix}", "install"    
+    system "make","DESTDIR=#{prefix}", "install"
+    
+    cd "python" do
+      system "python", "setup.py", "install"
+    end
   end
 
   test do

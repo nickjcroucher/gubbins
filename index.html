@@ -119,7 +119,13 @@
 
 <h3>
 <a name="homebrew" class="anchor" href="#homebrew"><span class="octicon octicon-link"></span></a>Using Homebrew recipes</h3>
-<p>If you are running OSX, you can use the homebrew package manager.</p>
+<p>If you are running OSX, you can use the homebrew package manager.  First of all you need to install the Python dependancies.</p>
+
+<ul><li>curl https://bootstrap.pypa.io/ez_setup.py  | python - --user</li>
+<li>~/bin/easy_install -U --user biopython</li>
+<li>~/bin/easy_install -U --user dendropy</li>
+<li>~/bin/easy_install -U --user reportlab</li>
+</ul>
 
 <ul><li><a href="http://brew.sh/">Install homebrew from brew.sh</a></li>
   <li>Open a terminal and enter these commands</li>

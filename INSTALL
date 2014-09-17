@@ -172,10 +172,17 @@ To see full usage of this script run:
 
 
 ### OSX ###
-Install homebrew http://brew.sh/
+Install the python dependancies:
 
-Install the modified version of fastml
-> brew install https://raw.githubusercontent.com/andrewjpage/fastml/master/homebrew/fastml.rb
+> curl https://bootstrap.pypa.io/ez_setup.py  | python - --user
+> ~/bin/easy_install -U --user biopython
+> ~/bin/easy_install -U --user dendropy
+> ~/bin/easy_install -U --user reportlab
 
+Go to the [homebrew website](http://brew.sh/) and install the homebrew package manager.
 
+Install fastml and gubbins from the following recipes.
 
+> brew tap homebrew/science
+> brew install http://sanger-pathogens.github.io/gubbins/fastml.rb
+> brew install http://sanger-pathogens.github.io/gubbins/gubbins.rb

@@ -18,6 +18,7 @@ class Gubbins < Formula
   
   def install
     inreplace "src/Makefile.am", "-lrt", "" if OS.mac? # no librt for osx
+    inreplace "configure.ac", "PKG_CHECK_MODULES([zlib], [zlib])", "AC_CHECK_LIB(zlib, zlib)" if OS.mac?
 
     system "autoreconf -i"
     system "./configure",

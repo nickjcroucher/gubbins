@@ -11,7 +11,7 @@ class Fastml < Formula
   depends_on :libtool
 
   def install
-    system "make"
+    system "make 2>/dev/null"
     bin.install 'programs/fastml/fastml'
   end
   

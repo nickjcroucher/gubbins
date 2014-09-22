@@ -119,18 +119,17 @@
 
 <h3>
 <a name="homebrew" class="anchor" href="#homebrew"><span class="octicon octicon-link"></span></a>Using Homebrew recipes</h3>
-<p>If you are running OSX, you can use the homebrew package manager.  These instructions were created on a fresh install of OSX 10.9.4 (Mavericks). First of all you need to install the Python dependancies.</p>
+<p>If you are running OSX, you can use the homebrew package manager.  These instructions are for OSX 10.9.4 (Mavericks). First of all you need to install homebrew, which involves also installing Xcode with command line tools. Then install the python modules, and finally the gubbins recipes.</p>
 
-<ul><li>curl https://bootstrap.pypa.io/ez_setup.py  | python - --user</li>
-  <li>export PATH=~/Library/Python/2.7/bin:${PATH}</li>
-<li>easy_install pip</li>
-<li>pip install --user dendropy</li>
-<li>pip install --user biopython</li>
-<li>pip install --user reportlab</li>
-</ul>
-
-<ul><li><a href="http://brew.sh/">Install homebrew from brew.sh</a></li>
+<ul>
+  <li><a href="http://brew.sh/">Install homebrew from brew.sh</a></li>
   <li>Open a terminal and enter these commands</li>
+  <li>curl https://bootstrap.pypa.io/ez_setup.py  | python - --user</li>
+  <li>export PATH=~/Library/Python/2.7/bin:${PATH}</li>
+  <li>easy_install pip</li>
+  <li>pip install --user dendropy</li>
+  <li>pip install --user biopython</li>
+  <li>pip install --user reportlab</li>
   <li>brew tap homebrew/science</li>
   <li>brew install http://sanger-pathogens.github.io/gubbins/fastml.rb</li>
   <li>brew install http://sanger-pathogens.github.io/gubbins/gubbins.rb</li>  

@@ -19,7 +19,9 @@ class Gubbins < Formula
   def install
     inreplace "src/Makefile.am", "-lrt", "" if OS.mac? # no librt for osx
     inreplace "configure.ac", "PKG_CHECK_MODULES([zlib], [zlib])", "AC_CHECK_LIB(zlib, zlib)" if OS.mac?
-
+    inreplace "python/Makefile.am", "--root=$(DESTDIR)", "--root=#{prefix}" if OS.mac?
+    
+    system "cat python/Makefile.am"
     system "autoreconf -i"
     system "./configure",
            "--disable-debug",
@@ -27,10 +29,6 @@ class Gubbins < Formula
            "--prefix=#{prefix}"
 
     system "make","install"
-        
-    cd "python" do
-      system "python", "setup.py", "install"
-    end
   end
 
   test do
@@ -38,3 +36,4 @@ class Gubbins < Formula
     system "run_gubbins.py"
   end
 end
+

@@ -231,6 +231,19 @@ X.Y</p>
 <ul><li>.final_tree.tre	</li></ul>
 
 
+<h3>
+<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running on LSF</h3>
+<p>The command to run the script using LSF with 8GB of RAM and 16 cores looks like:</p>
+<ul><li>
+bsub -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
+</li></ul>
+
+<p>If you are using the Sanger cluster (farm3), you need an additional option (-R "avx") which selects only hardware which supports the AVX version of RAxML:</p>
+<ul><li>
+bsub -R "avx" -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
+</li></ul>
+
+
       </section>
     </div>
 

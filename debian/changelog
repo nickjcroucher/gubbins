@@ -1,4 +1,4 @@
-gubbins (1.0~trusty1) trusty; urgency=low
+gubbins (1.0.1~trusty1) trusty; urgency=low
 
   * Fixed unstable python test
 

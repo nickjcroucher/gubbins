@@ -1,5 +1,11 @@
 gubbins (1.0~trusty1) trusty; urgency=low
 
+  * Fixed unstable python test
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 14 Oct 2014 14:16:00 +0000
+
+gubbins (1.0~trusty1) trusty; urgency=low
+
   * Strict convergence option
 
  -- Andrew Page <ap13@sanger.ac.uk>  Tue, 14 Oct 2014 14:16:00 +0000

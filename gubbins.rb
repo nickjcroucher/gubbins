@@ -2,7 +2,7 @@ require 'formula'
 
 class Gubbins < Formula
   homepage 'https://github.com/sanger-pathogens/gubbins'
-  url 'https://github.com/sanger-pathogens/gubbins/archive/v0.6.tar.gz'
+  url 'https://github.com/sanger-pathogens/gubbins/archive/v1.0.1.tar.gz'
   sha1 '0a4e75fb511de2270f4ad16390fb090d6ddb6ad7'
   head 'https://github.com/sanger-pathogens/gubbins.git'
 

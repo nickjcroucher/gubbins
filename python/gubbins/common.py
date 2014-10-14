@@ -859,4 +859,31 @@ class GubbinsCommon():
     executable_and_params.pop(0)
     executable_and_params.insert(0, bundled_executable)
     return  ' '.join(executable_and_params)
+  
+  @staticmethod
+  def extract_recombinations_from_embl(filename):
+    fh = open(filename, "rU")
+    sequences_to_coords = {}
+    start_coord = -1
+    end_coord = -1
+    for line in fh:
+      searchObj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
+      if searchObj != None:
+        start_coord = int(searchObj.group(1))
+        end_coord = int(searchObj.group(2))
+        next
 
+      if start_coord >= 0 and end_coord >= 0:
+        searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
+        if searchTaxa != None:
+          taxa_names = searchTaxa.group(1).strip().split(' ')
+          for taxa_name in taxa_names:
+            if taxa_name in sequences_to_coords:
+              sequences_to_coords[taxa_name].append([start_coord,end_coord])
+            else:
+              sequences_to_coords[taxa_name] = [[start_coord,end_coord]]
+            
+          start_coord = -1
+          end_coord   = -1
+        next
+    return sequences_to_coords

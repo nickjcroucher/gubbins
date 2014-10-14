@@ -1,0 +1,18 @@
+FT   misc_feature    1..3
+FT                   /node="N1->N2"
+FT                   /neg_log_likelihood=1.0
+FT                   /colour=2
+FT                   /taxa=" sequence1 sequence2 sequence3"
+FT                   /SNP_count=6
+FT   misc_feature    5..7
+FT                   /node="N3->sequence1"
+FT                   /neg_log_likelihood=1.0
+FT                   /colour=4
+FT                   /taxa="sequence1"
+FT                   /SNP_count=1
+FT   misc_feature    9..11
+FT                   /node="N4->N5"
+FT                   /neg_log_likelihood=1.0
+FT                   /colour=2
+FT                   /taxa=" sequence1 sequence2"
+FT                   /SNP_count=2

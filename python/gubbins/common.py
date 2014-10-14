@@ -122,6 +122,10 @@ class GubbinsCommon():
       FASTTREE_EXEC = GubbinsCommon.use_bundled_exec(FASTTREE_EXEC, FASTTREE_EXEC_ALT)
       if GubbinsCommon.which(FASTTREE_EXEC) is None:
         sys.exit("FastTree is not in your path")
+        
+    if self.args.converge_method not in ['relaxed','strict']:
+      sys.exit("Please choose relaxed or strict for the --converge_method option")
+
 
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
        sys.exit("There is a problem with your input fasta file so nothing can be done until you fix it")
@@ -262,10 +266,18 @@ class GubbinsCommon():
 
       tree_file_names.append(current_tree_name)
       if i > 2:
-        if GubbinsCommon.has_tree_been_seen_before(tree_file_names):
-          if self.args.verbose > 0:
-            print "Tree observed before so stopping: "+ str(current_tree_name)
-          break
+        if self.args.converge_method == 'strict':
+          current_recomb_file, previous_recomb_files =  GubbinsCommon.get_recombination_files(base_filename_without_ext, current_time, max_iteration - 1, starting_base_filename, self.args.tree_builder)
+          
+          if GubbinsCommon.have_recombinations_been_seen_before(current_recomb_file,previous_recomb_files):
+            if self.args.verbose > 0:
+              print "Recombinations observed before so stopping: "+ str(current_tree_name)
+            break
+        else:
+          if GubbinsCommon.has_tree_been_seen_before(tree_file_names):
+            if self.args.verbose > 0:
+              print "Tree observed before so stopping: "+ str(current_tree_name)
+            break
 
     # cleanup intermediate files
     if self.args.no_cleanup == 0 or self.args.no_cleanup is None:
@@ -886,4 +898,35 @@ class GubbinsCommon():
           start_coord = -1
           end_coord   = -1
         next
+    fh.close()
     return sequences_to_coords
+    
+  @staticmethod
+  def have_recombinations_been_seen_before(current_file, previous_files = []):
+    if not os.path.exists(current_file):
+      return 0
+    current_file_recombinations = GubbinsCommon.extract_recombinations_from_embl(current_file)
+
+    for previous_file in previous_files:
+      if not os.path.exists(previous_file):
+        next
+      previous_file_recombinations = GubbinsCommon.extract_recombinations_from_embl(previous_file)
+      if current_file_recombinations == previous_file_recombinations:
+        return 1
+    return 0
+  
+  @staticmethod
+  def get_recombination_files(base_filename_without_ext, current_time, max_intermediate_iteration, starting_base_filename, tree_builder):
+    if tree_builder == "raxml" or tree_builder == "hybrid":
+       current_file = "RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration)+".tab"
+       previous_files = []
+       for i in range(1,max_intermediate_iteration):
+         previous_files.append("RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(i)+".tab")
+       return current_file, previous_files
+    else:
+       current_file = starting_base_filename+".iteration_"+str(max_intermediate_iteration)+".tab"
+       previous_files = []
+       for i in range(1,max_intermediate_iteration):
+         previous_files.append(starting_base_filename+".iteration_"+str(i)+".tab")
+       return current_file, previous_files
+

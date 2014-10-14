@@ -53,7 +53,7 @@
 <h3>User manual</h3>
 <ul>
   <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManualv0.6.pdf">User manual</a>
+    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManual_v1.0.1.pdf">User manual</a>
   </li>
 </ul>
 
@@ -174,6 +174,9 @@
 
     <ul><li>--min_snps, -m</li></ul>
 <p>The minimum number of base substitutions required to identify a recombination. Default is 3.</p>
+ 
+    <ul><li>--converge_method, -z</li></ul>
+<p>Convergence criteria. 'relaxed' convergence halts when the RF distance is 0 between the current tree and any previous tree. 'strict' convergence halts when the same recombination block are observed between the current iteration and any previous iteration. Default is 'relaxed'.</p> 
     
 <p>Output options:</p>
 

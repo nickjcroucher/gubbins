@@ -78,12 +78,7 @@ class TestExternalDependancies(unittest.TestCase):
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--converge_method", "strict", "--iterations", '15','--no_cleanup', 'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
     
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_1.tab']) == 0
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_2.tab']) == 0
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_3.tab']) == 1
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_4.tab']) == 0
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_5.tab']) == 0
-    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_6.tab']) == 0
+    assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_1.tab','RAxML_result.multiple_recombinations.iteration_2.tab','RAxML_result.multiple_recombinations.iteration_3.tab','RAxML_result.multiple_recombinations.iteration_4.tab','RAxML_result.multiple_recombinations.iteration_5.tab','RAxML_result.multiple_recombinations.iteration_6.tab','RAxML_result.multiple_recombinations.iteration_7.tab','RAxML_result.multiple_recombinations.iteration_8.tab']) == 1
     
     os.remove('log.txt')
     r = glob.glob("RAxML_*")

@@ -123,9 +123,8 @@ class GubbinsCommon():
       if GubbinsCommon.which(FASTTREE_EXEC) is None:
         sys.exit("FastTree is not in your path")
         
-    if self.args.converge_method not in ['relaxed','strict']:
-      sys.exit("Please choose relaxed or strict for the --converge_method option")
-
+    if self.args.converge_method not in ['weighted_robinson_foulds','robinson_foulds','recombination']:
+      sys.exit("Please choose weighted_robinson_foulds, robinson_foulds or recombination for the --converge_method option")
 
     if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
        sys.exit("There is a problem with your input fasta file so nothing can be done until you fix it")
@@ -266,7 +265,7 @@ class GubbinsCommon():
 
       tree_file_names.append(current_tree_name)
       if i > 2:
-        if self.args.converge_method == 'strict':
+        if self.args.converge_method == 'recombination':
           current_recomb_file, previous_recomb_files =  GubbinsCommon.get_recombination_files(base_filename_without_ext, current_time, max_iteration - 1, starting_base_filename, self.args.tree_builder)
           
           if GubbinsCommon.have_recombinations_been_seen_before(current_recomb_file,previous_recomb_files):
@@ -274,7 +273,7 @@ class GubbinsCommon():
               print "Recombinations observed before so stopping: "+ str(current_tree_name)
             break
         else:
-          if GubbinsCommon.has_tree_been_seen_before(tree_file_names):
+          if GubbinsCommon.has_tree_been_seen_before(tree_file_names,self.args.converge_method):
             if self.args.verbose > 0:
               print "Tree observed before so stopping: "+ str(current_tree_name)
             break
@@ -308,15 +307,31 @@ class GubbinsCommon():
     return input_tree.robinson_foulds_distance(output_tree)
     
   @staticmethod
-  def has_tree_been_seen_before(tree_file_names):
+  def symmetric_difference(input_tree_name,output_tree_name):
+    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
+    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
+    return input_tree.symmetric_difference(output_tree)
+    
+  @staticmethod
+  def has_tree_been_seen_before(tree_file_names,converge_method):
     if len(tree_file_names) <= 2:
       return 0
-
+    
+    tree_files_which_exist = []
     for tree_file_name in tree_file_names:
-      if tree_file_name is not tree_file_names[-1]:
-        current_rf_distance = GubbinsCommon.robinson_foulds_distance(tree_file_name,tree_file_names[-1])
-        if(current_rf_distance == 0.0):
-          return 1
+      if os.path.exists(tree_file_name):
+        tree_files_which_exist.append(tree_file_name)
+
+    for tree_file_name in tree_files_which_exist:
+      if tree_file_name is not tree_files_which_exist[-1]:
+        if converge_method == 'weighted_robinson_foulds':
+          current_rf_distance = GubbinsCommon.robinson_foulds_distance(tree_file_name,tree_files_which_exist[-1])
+          if(current_rf_distance == 0.0):
+            return 1
+        else:
+          current_rf_distance = GubbinsCommon.symmetric_difference(tree_file_name,tree_files_which_exist[-1])
+          if(current_rf_distance == 0.0):
+            return 1
 
     return 0
 

@@ -37,7 +37,7 @@ parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a rec
 parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
 parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
 parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
 
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())

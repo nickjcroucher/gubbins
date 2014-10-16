@@ -37,7 +37,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "different_prefix",'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
     
@@ -60,7 +60,7 @@ class TestExternalDependancies(unittest.TestCase):
     os.remove('different_prefix.branch_base_reconstruction.embl')
     os.remove('different_prefix.final_tree.tre')
     
-  def test_strict_convergence(self):
+  def test_recombination_convergence(self):
     parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
     parser.add_argument('alignment_filename',       help='Multifasta alignment file')
     parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
@@ -74,12 +74,41 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
-    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--converge_method", "strict", "--iterations", '15','--no_cleanup', 'gubbins/tests/data/multiple_recombinations.aln']))
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--converge_method", "recombination", "--iterations", '15','--no_cleanup', 'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
     
     assert common.GubbinsCommon.have_recombinations_been_seen_before('multiple_recombinations.recombination_predictions.embl', ['RAxML_result.multiple_recombinations.iteration_1.tab','RAxML_result.multiple_recombinations.iteration_2.tab','RAxML_result.multiple_recombinations.iteration_3.tab','RAxML_result.multiple_recombinations.iteration_4.tab','RAxML_result.multiple_recombinations.iteration_5.tab','RAxML_result.multiple_recombinations.iteration_6.tab','RAxML_result.multiple_recombinations.iteration_7.tab','RAxML_result.multiple_recombinations.iteration_8.tab']) == 1
     
+    os.remove('log.txt')
+    r = glob.glob("RAxML_*")
+    for i in r:
+       os.remove(i)
+    r = glob.glob("multiple_recombinations.aln.*")
+    for i in r:
+       os.remove(i)
+       
+       
+  def test_robinson_foulds_convergence(self):
+    parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+    parser.add_argument('alignment_filename',       help='Multifasta alignment file')
+    parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+    parser.add_argument('--starting_tree',    '-s', help='Starting tree')
+    parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
+    parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging',default = 0)
+    parser.add_argument('--no_cleanup',       '-n', action='count', help='Dont cleanup intermediate files')
+    parser.add_argument('--tree_builder',     '-t', help='Application to use for tree building (raxml, fasttree, hybrid), default RAxML', default = "raxml")
+    parser.add_argument('--iterations',       '-i', help='Maximum No. of iterations, default is 5', type=int,  default = 5)
+    parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a recombination block, default is 3', type=int,  default = 3)
+    parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
+    parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
+    parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
+    gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--converge_method", "robinson_foulds", "--iterations", '15','--no_cleanup', 'gubbins/tests/data/multiple_recombinations.aln']))
+    gubbins_runner.parse_and_run()
+
+    assert common.GubbinsCommon.has_tree_been_seen_before(['RAxML_result.multiple_recombinations.iteration_1','RAxML_result.multiple_recombinations.iteration_2','RAxML_result.multiple_recombinations.iteration_3','RAxML_result.multiple_recombinations.iteration_4','RAxML_result.multiple_recombinations.iteration_5','RAxML_result.multiple_recombinations.iteration_6','RAxML_result.multiple_recombinations.iteration_7','RAxML_result.multiple_recombinations.iteration_8','RAxML_result.multiple_recombinations.iteration_9','RAxML_result.multiple_recombinations.iteration_10','multiple_recombinations.final_tree.tre'],'robinson_foulds') == 1
+
     os.remove('log.txt')
     r = glob.glob("RAxML_*")
     for i in r:
@@ -102,7 +131,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "ft_prefix","--tree_builder", "fasttree",'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
 
@@ -139,7 +168,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--prefix", "hybrid_prefix","--tree_builder", "hybrid",'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
  
@@ -176,7 +205,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--tree_builder", "fasttree",'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
 
@@ -214,7 +243,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(["--tree_builder", "hybrid",'gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
 
@@ -252,7 +281,7 @@ class TestExternalDependancies(unittest.TestCase):
     parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps, default is 25', type=int,  default = 25)
     parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
     parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 2)
-    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [strict|relaxed]',  default = 'relaxed')
+    parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
     
     #  multiple recombinations
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(['gubbins/tests/data/multiple_recombinations.aln']))

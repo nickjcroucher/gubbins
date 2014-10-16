@@ -53,7 +53,7 @@
 <h3>User manual</h3>
 <ul>
   <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManual_v1.0.1.pdf">User manual</a>
+    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManual_v1.0.2.pdf">User manual</a>
   </li>
 </ul>
 
@@ -75,7 +75,7 @@
 <p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'File -> Import Appliance' menu option. The root password is 'manager'.</p>
 
 <ul>
-<li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.1.ova">Virtual Machine with Gubbins installed</a></li>
+<li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.2.ova">Virtual Machine with Gubbins installed</a></li>
 </ul>
 
 
@@ -113,7 +113,7 @@
 <p>We have prepared a binary package for amd 64 Linux. It was compiled on Ubuntu Trusty.  The dependancies will need to be manually installed following the instructions in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL">INSTALL file</a>.</p> 
 <ul>
   <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.1_amd64.tar.gz">Precompiled 64 bit Linux binary package</a>
+    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.2_amd64.tar.gz">Precompiled 64 bit Linux binary package</a>
   </li>
 </ul>
 
@@ -176,7 +176,7 @@
 <p>The minimum number of base substitutions required to identify a recombination. Default is 3.</p>
  
     <ul><li>--converge_method, -z</li></ul>
-<p>Convergence criteria. 'relaxed' convergence halts when the RF distance is 0 between the current tree and any previous tree. 'strict' convergence halts when the same recombination block are observed between the current iteration and any previous iteration. Default is 'relaxed'.</p> 
+<p>Convergence criteria. Criteria to use to know when to halt iterations (weighted_robinson_foulds, robinson_foulds, recombination). Default is 'weighted_robinson_foulds'.</p> 
     
 <p>Output options:</p>
 

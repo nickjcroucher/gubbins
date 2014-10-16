@@ -41,6 +41,9 @@ The maximum number of iterations to perform; the algorithm will stop earlier tha
 
     --min_snps, -m	
 The minimum number of base substitutions required to identify a recombination. Default is 3.
+
+    --converge_method, -z
+Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]. Default is weighted_robinson_foulds.
     
 Output options:
 

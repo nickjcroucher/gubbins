@@ -102,8 +102,8 @@ class GubbinsCommon():
     if self.args.threads == 1 and raxml_executable == "":
       self.args.threads = 2
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
+      print "Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n"
       raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
-      
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
     if re.search('PTHREADS', str(RAXML_EXEC)) != None:

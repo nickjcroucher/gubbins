@@ -89,12 +89,21 @@ class GubbinsCommon():
       if GubbinsCommon.which(executable) != None:
         return executable
         
-    return list_of_executables[-1]
+    return ""
 
   def parse_and_run(self):
     # Default parameters
-    raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
+    raxml_executables = ['raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
+    if self.args.threads > 1:
+      raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
     raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+    
+    # raxml PTHREADS needs 2 or more threads, however some systems dont come with the single threaded exec
+    if self.args.threads == 1 and raxml_executable == "":
+      self.args.threads = 2
+      raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
+      raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+      
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
     if re.search('PTHREADS', str(RAXML_EXEC)) != None:

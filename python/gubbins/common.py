@@ -84,7 +84,7 @@ class GubbinsCommon():
     return 1
  
   @staticmethod
-  def choose_raxml_executable(list_of_executables):
+  def choose_executable(list_of_executables):
     for executable in list_of_executables:
       if GubbinsCommon.which(executable) != None:
         return executable
@@ -96,7 +96,7 @@ class GubbinsCommon():
     raxml_executables = ['raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
     if self.args.threads > 1:
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
-    raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+    raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
     
     # raxml PTHREADS needs 2 or more threads, however some systems dont come with the single threaded exec
     if self.args.threads == 1 and raxml_executable == "":
@@ -109,13 +109,14 @@ class GubbinsCommon():
     if re.search('PTHREADS', str(RAXML_EXEC)) != None:
       RAXML_EXEC = RAXML_EXEC+" -T " +str(self.args.threads)
     
-    FASTTREE_EXEC = 'FastTree'
+    fasttree_executables = ['FastTree','fasttree']
+    FASTTREE_EXEC = GubbinsCommon.choose_executable(fasttree_executables)
+    
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
     FASTML_EXEC = 'fastml -mg -qf -b '
 
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
-    FASTTREE_EXEC_ALT = 'fasttree'
 
     # check that all the external executable dependancies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
@@ -127,8 +128,7 @@ class GubbinsCommon():
     if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
       sys.exit("RAxML is not in your path")
       
-    if self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid": 
-      FASTTREE_EXEC = GubbinsCommon.use_bundled_exec(FASTTREE_EXEC, FASTTREE_EXEC_ALT)
+    if self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid":
       if GubbinsCommon.which(FASTTREE_EXEC) is None:
         sys.exit("FastTree is not in your path")
         

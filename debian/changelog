@@ -1,3 +1,27 @@
+gubbins (1.0.6~trusty1) trusty; urgency=low
+
+  * Drawer allow for variation tag
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Wed, 3 Dec 2014 11:32:00 +0000
+
+gubbins (1.0.5~trusty1) trusty; urgency=low
+
+  * Fasttree executables with upper and lower case
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Wed, 19 Nov 2014 14:16:00 +0000
+
+gubbins (1.0.4~trusty1) trusty; urgency=low
+
+  * Warning when number of threads changed for raxml
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 14 Nov 2014 14:16:00 +0000
+
+gubbins (1.0.3~trusty1) trusty; urgency=low
+
+  * Dont use multiple threads for raxml if not requested
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 14 Nov 2014 14:16:00 +0000
+
 gubbins (1.0.2~trusty1) trusty; urgency=low
 
   * Allow for more convergence methods

@@ -247,7 +247,7 @@ def add_ordered_tab_to_diagram(filename):
 		print "Cannot find file", filename
 		sys.exit()
 	record.name=filename
-	new_tracks=add_ordered_embl_to_diagram(record, incfeatures=["i", "d", "li", "del", "snp", "misc_feature", "core", "cds", "insertion", "deletion", "recombination", "feature", "blastn_hit", "fasta_record"], emblfile=False)
+	new_tracks=add_ordered_embl_to_diagram(record, incfeatures=["i", "d", "li", "del", "snp", "misc_feature", "core", "cds", "insertion", "deletion", "recombination", "feature", "blastn_hit", "fasta_record", "variation"], emblfile=False)
 	return new_tracks
 
 def add_empty_track(existing_tracks, track_name):
@@ -801,7 +801,7 @@ if __name__ == "__main__":
 	
 	for track in output_order:
 		
-		if not track in my_tracks or (my_tracks[track].is_key and fragment!=1):
+		if not track in my_tracks or (my_tracks[track].is_key and fragment!=1) or my_tracks[track].track_length==0:
 			continue
 		
 		my_tracks[track].beginning=beginning

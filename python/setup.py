@@ -33,7 +33,8 @@ setup(
         'Biopython >= 1.59',
         'DendroPy  >= 3.12.0',
         'Reportlab >= 2.5',
-        'nose >= 1.3' 
+        'nose >= 1.3',
+        'py-cpuinfo >= 0.1.2'
     ],
     license='GPL',
     )

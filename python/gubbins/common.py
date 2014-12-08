@@ -32,6 +32,7 @@ from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from cStringIO import StringIO
+from cpuinfo import cpuinfo
 import shutil
 
 class GubbinsError(Exception):
@@ -85,7 +86,14 @@ class GubbinsCommon():
  
   @staticmethod
   def choose_executable(list_of_executables):
+    processorinfo = cpuinfo.get_cpu_info()
+    
     for executable in list_of_executables:
+      if re.search('AVX', executable) and 'avx' not in processorinfo['flags']:
+        next
+      elif re.search('SSE3', executable) and 'ssse3' not in processorinfo['flags']:
+        next
+      
       if GubbinsCommon.which(executable) != None:
         return executable
         
@@ -103,7 +111,7 @@ class GubbinsCommon():
       self.args.threads = 2
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
       print "Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n"
-      raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+      raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
     if re.search('PTHREADS', str(RAXML_EXEC)) != None:

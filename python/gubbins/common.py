@@ -32,6 +32,7 @@ from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from cStringIO import StringIO
+from cpuinfo import cpuinfo
 import shutil
 
 class GubbinsError(Exception):
@@ -85,7 +86,14 @@ class GubbinsCommon():
  
   @staticmethod
   def choose_executable(list_of_executables):
+    processorinfo = cpuinfo.get_cpu_info()
+    
     for executable in list_of_executables:
+      if re.search('AVX', executable) and 'avx' not in processorinfo['flags']:
+        continue
+      elif re.search('SSE3', executable) and 'ssse3'  not in processorinfo['flags']:
+        continue
+      
       if GubbinsCommon.which(executable) != None:
         return executable
         
@@ -103,7 +111,7 @@ class GubbinsCommon():
       self.args.threads = 2
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
       print "Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n"
-      raxml_executable = GubbinsCommon.choose_raxml_executable(raxml_executables)
+      raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
     if re.search('PTHREADS', str(RAXML_EXEC)) != None:
@@ -907,7 +915,7 @@ class GubbinsCommon():
       if searchObj != None:
         start_coord = int(searchObj.group(1))
         end_coord = int(searchObj.group(2))
-        next
+        continue
 
       if start_coord >= 0 and end_coord >= 0:
         searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
@@ -921,7 +929,7 @@ class GubbinsCommon():
             
           start_coord = -1
           end_coord   = -1
-        next
+        continue
     fh.close()
     return sequences_to_coords
     
@@ -933,7 +941,7 @@ class GubbinsCommon():
 
     for previous_file in previous_files:
       if not os.path.exists(previous_file):
-        next
+        continue
       previous_file_recombinations = GubbinsCommon.extract_recombinations_from_embl(previous_file)
       if current_file_recombinations == previous_file_recombinations:
         return 1

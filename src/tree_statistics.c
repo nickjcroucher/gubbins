@@ -47,7 +47,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
     fprintf( file_pointer, "%i\t", sample_details->number_of_blocks);
     fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations);
     fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
-		fprintf( file_pointer, "%f\t", recombination_blocks_to_mutation_ratio(sample_details->number_of_blocks,estimate_snps_genome_would_have_without_recombinations(sample_details->number_of_snps, sample_details->genome_length_without_gaps,sample_details->bases_in_recombinations)));
+		fprintf( file_pointer, "%f\t", rho_theta(sample_details->number_of_blocks,sample_details->number_of_snps));
     fprintf( file_pointer, "%i", sample_details->genome_length_without_gaps);
 		
 		fprintf( file_pointer, "\n");
@@ -71,7 +71,7 @@ float recombination_to_mutation_ratio(int number_of_recombinations, int number_o
 	return (number_of_recombinations*1.0)/(number_of_snps*1.0);
 }
 
-float recombination_blocks_to_mutation_ratio(int number_of_blocks, int number_of_snps)
+float rho_theta(int number_of_blocks, int number_of_snps)
 {
 	if(number_of_snps == 0 || number_of_blocks == 0)
 	{
@@ -79,19 +79,5 @@ float recombination_blocks_to_mutation_ratio(int number_of_blocks, int number_of
 	}
 	return (number_of_blocks*1.0)/(number_of_snps*1.0);
 }
-
-int estimate_snps_genome_would_have_without_recombinations(int number_of_snps_outside_recomb, int genome_length_without_gaps,int bases_in_recombinations )
-{
-	if(genome_length_without_gaps == 0 || genome_length_without_gaps - bases_in_recombinations == 0)
-	{
-		return 0;
-	}
-	if(bases_in_recombinations == 0)
-	{
-		return number_of_snps_outside_recomb;
-	}
-	return (int) (number_of_snps_outside_recomb*genome_length_without_gaps)/(genome_length_without_gaps - bases_in_recombinations);
-}
-
 
 

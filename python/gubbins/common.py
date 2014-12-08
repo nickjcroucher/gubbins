@@ -88,8 +88,8 @@ class GubbinsCommon():
   def choose_executable(list_of_executables):
     flags = []
     if os.path.exists('/proc/cpuinfo'):
-      output = run_and_get_stdout(['cat', '/proc/cpuinfo'])
-      flags = _get_field(output, 'flags', 'Features').split()
+      output = cpuinfo.run_and_get_stdout(['cat', '/proc/cpuinfo'])
+      flags =  cpuinfo._get_field(output, 'flags', 'Features').split()
       flags.sort()
     
     for executable in list_of_executables:

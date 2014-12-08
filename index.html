@@ -56,7 +56,7 @@ The paper is available on Nucleic Acids Research (open access):
 <h3>User manual</h3>
 <ul>
   <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManual_v1.0.6.pdf">User manual</a>
+    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/GubbinsManual_v1.0.7.pdf">User manual</a>
   </li>
 </ul>
 
@@ -78,7 +78,7 @@ The paper is available on Nucleic Acids Research (open access):
 <p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'File -> Import Appliance' menu option. The root password is 'manager'.</p>
 
 <ul>
-<li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.6.ova">Virtual Machine with Gubbins installed</a></li>
+<li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.7.ova">Virtual Machine with Gubbins installed</a></li>
 </ul>
 
 
@@ -116,7 +116,7 @@ The paper is available on Nucleic Acids Research (open access):
 <p>We have prepared a binary package for amd 64 Linux. It was compiled on Ubuntu Trusty.  The dependancies will need to be manually installed following the instructions in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL">INSTALL file</a>.</p> 
 <ul>
   <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.6_amd64.tar.gz">Precompiled 64 bit Linux binary package</a>
+    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_1.0.7_amd64.tar.gz">Precompiled 64 bit Linux binary package</a>
   </li>
 </ul>
 
@@ -244,7 +244,7 @@ X.Y</p>
 bsub -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
 </li></ul>
 
-<p>If you are using the Sanger cluster (farm3), you need an additional option (-R "avx") which selects only hardware which supports the AVX version of RAxML:</p>
+<p>If you are using the Sanger cluster (farm3), the avx option (-R "avx") will guarantee your analysis will run on the fastest processors using the AVX version of raxml:</p>
 <ul><li>
 bsub -R "avx" -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
 </li></ul>

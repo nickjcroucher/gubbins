@@ -86,13 +86,18 @@ class GubbinsCommon():
  
   @staticmethod
   def choose_executable(list_of_executables):
-    processorinfo = cpuinfo.get_cpu_info()
+    flags = []
+    if os.path.exists('/proc/cpuinfo'):
+      output = run_and_get_stdout(['cat', '/proc/cpuinfo'])
+      flags = _get_field(output, 'flags', 'Features').split()
+      flags.sort()
     
     for executable in list_of_executables:
-      if re.search('AVX', executable) and 'avx' not in processorinfo['flags']:
-        continue
-      elif re.search('SSE3', executable) and 'ssse3'  not in processorinfo['flags']:
-        continue
+      if os.path.exists('/proc/cpuinfo'):
+        if re.search('AVX', executable) and 'avx' not in flags:
+          continue
+        elif re.search('SSE3', executable) and 'ssse3'  not in flags:
+          continue
       
       if GubbinsCommon.which(executable) != None:
         return executable

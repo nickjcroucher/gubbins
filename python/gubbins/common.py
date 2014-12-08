@@ -90,9 +90,9 @@ class GubbinsCommon():
     
     for executable in list_of_executables:
       if re.search('AVX', executable) and 'avx' not in processorinfo['flags']:
-        next
-      elif re.search('SSE3', executable) and 'ssse3' not in processorinfo['flags']:
-        next
+        continue
+      elif re.search('SSE3', executable) and 'ssse3'  not in processorinfo['flags']:
+        continue
       
       if GubbinsCommon.which(executable) != None:
         return executable
@@ -915,7 +915,7 @@ class GubbinsCommon():
       if searchObj != None:
         start_coord = int(searchObj.group(1))
         end_coord = int(searchObj.group(2))
-        next
+        continue
 
       if start_coord >= 0 and end_coord >= 0:
         searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
@@ -929,7 +929,7 @@ class GubbinsCommon():
             
           start_coord = -1
           end_coord   = -1
-        next
+        continue
     fh.close()
     return sequences_to_coords
     
@@ -941,7 +941,7 @@ class GubbinsCommon():
 
     for previous_file in previous_files:
       if not os.path.exists(previous_file):
-        next
+        continue
       previous_file_recombinations = GubbinsCommon.extract_recombinations_from_embl(previous_file)
       if current_file_recombinations == previous_file_recombinations:
         return 1

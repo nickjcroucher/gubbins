@@ -32,8 +32,8 @@ from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from cStringIO import StringIO
-from cpuinfo import cpuinfo
 import shutil
+import subprocess
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -88,9 +88,8 @@ class GubbinsCommon():
   def choose_executable(list_of_executables):
     flags = []
     if os.path.exists('/proc/cpuinfo'):
-      output = cpuinfo.run_and_get_stdout(['cat', '/proc/cpuinfo'])
-      flags =  cpuinfo._get_field(output, 'flags', 'Features').split()
-      flags.sort()
+      output = subprocess.Popen('grep flags /proc/cpuinfo', stdout = subprocess.PIPE, shell=True).communicate()[0]
+      flags =  output.split()
     
     for executable in list_of_executables:
       if os.path.exists('/proc/cpuinfo'):

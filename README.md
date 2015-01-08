@@ -120,5 +120,5 @@ Final phylogenetic tree in newick format.
 
 Data from the paper
 ===================
-* [PMEN1 dataset](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz)
-* [ST239 dataset](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz)
+* ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz
+* ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz

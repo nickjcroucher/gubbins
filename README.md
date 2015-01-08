@@ -1,5 +1,8 @@
-Please see our website for more information on [Gubbins](http://sanger-pathogens.github.io/gubbins/).
+Please see our website for more information on [Gubbins](http://sanger-pathogens.github.io/gubbins/) or read our paper:
 
+[Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R.
+"Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". doi:10.1093/nar/gku1196, Nucleic Acids Research, 2014.]
+(http://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1196.abstract)
 
 Gubbins
 =======
@@ -113,3 +116,9 @@ Phylip format alignment of filtered polymorphic sites used to generate the phylo
 
 Final phylogenetic tree in newick format.
 
+
+
+Data from the paper
+===================
+* [PMEN1 dataset](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz)
+* [ST239 dataset](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz)

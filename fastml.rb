@@ -2,8 +2,8 @@ require 'formula'
 
 class Fastml < Formula
   homepage 'https://github.com/sanger-pathogens/fastml'
-  url 'https://github.com/sanger-pathogens/fastml/archive/v2.0.3.tar.gz'
-  sha1 '1b6afc4debfd52d6de09bc70e425d6871eb8e90c'
+  url 'https://github.com/sanger-pathogens/fastml/archive/v2.3.tar.gz'
+  sha1 'e70b2c83a321ae1664e1ab2a1d16b6bff70fdb01'
   head 'https://github.com/sanger-pathogens/fastml.git'
 
   depends_on :autoconf

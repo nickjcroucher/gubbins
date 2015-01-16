@@ -34,6 +34,10 @@ class TestValidateInputFastaFile(unittest.TestCase):
   def test_are_there_enough_sequences_to_build_a_tree(self):
     assert common.GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data('gubbins/tests/data/alignment_with_3_sequences.aln') == 0
   
+  def test_there_is_variation_in_the_fasta(self):
+    assert common.GubbinsCommon.does_fasta_contain_variation('gubbins/tests/data/alignment_with_no_variation.aln') == 0
+    assert common.GubbinsCommon.does_fasta_contain_variation('gubbins/tests/data/multiple_recombinations.aln') == 1
+  
 if __name__ == "__main__":
   unittest.main()
 

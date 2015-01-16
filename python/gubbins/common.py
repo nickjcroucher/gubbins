@@ -77,6 +77,27 @@ class GubbinsCommon():
 
     return 1
 
+
+  @staticmethod
+  def does_fasta_contain_variation(alignment_filename):
+    input_handle  = open(alignment_filename, "rU")
+    alignments = AlignIO.parse(input_handle, "fasta")
+    first_sequence = ""
+
+    for index, alignment in enumerate(alignments):
+      for record_index, record in enumerate(alignment):
+
+        if record_index == 0:
+          first_sequence = record.seq
+
+        if str(record.seq) != str(first_sequence):
+          input_handle.close()
+          return 1
+          
+    input_handle.close()
+    return 0
+
+
   @staticmethod
   def does_file_exist(alignment_filename, file_type_msg):
     if(not os.path.exists(alignment_filename)):
@@ -636,6 +657,9 @@ class GubbinsCommon():
         return 0
       if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
         print "Each sequence must have a name and some genomic data"
+        return 0
+      if GubbinsCommon.does_fasta_contain_variation(input_filename) == 0:
+        print "All of the input sequences contain the same data"
         return 0
     except:
       return 0

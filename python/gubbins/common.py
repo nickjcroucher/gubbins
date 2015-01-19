@@ -291,10 +291,15 @@ class GubbinsCommon():
         print fastml_command
         fastml_command_suffix = ''
 
+
       subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
       shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
       GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+
+      if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(starting_base_filename+".gaps.snp_sites.aln") == 0 ):
+         sys.exit("There is a problem with your FASTA file after running FASTML. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")
+
 
       if self.args.verbose > 0:
         print int(time.time())

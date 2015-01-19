@@ -1,6 +1,12 @@
-gubbins (1.0.10~trusty1) trusty; urgency=low
+gubbins (1.0.11~trusty1) trusty; urgency=low
 
   * Test inputs contain variation
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 19 Jan 2015 09:01:00 +0000
+
+gubbins (1.0.10~trusty1) trusty; urgency=low
+
+  * Upload failed on ubuntu
 
  -- Andrew Page <ap13@sanger.ac.uk>  Mon, 19 Jan 2015 09:01:00 +0000
 

@@ -225,11 +225,13 @@ class GubbinsCommon():
     current_tree_name     = ""
     max_iteration = 1
 
-
+    raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
     # cleanup RAxML intermediate files
     if self.args.no_cleanup == 0 or self.args.no_cleanup is None:
-      raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
+    
+    if GubbinsCommon.check_file_exist_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose) == 1:
+      sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
     for i in range(1, self.args.iterations+1):
       max_iteration += 1
@@ -910,6 +912,18 @@ class GubbinsCommon():
             if verbose > 0:
               print "Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex
             os.remove(full_path_of_file_for_deletion)
+            
+  @staticmethod
+  def check_file_exist_based_on_list_of_regexes(directory_to_search, regex_for_file_finds, verbose):
+    for dirname, dirnames, filenames in os.walk(directory_to_search):
+      for filename in filenames:
+        for find_regex in regex_for_file_finds:
+          full_path_of_file_for_find = os.path.join(directory_to_search, filename)
+          if(re.match(str(find_regex), filename) != None and os.path.exists(full_path_of_file_for_find)):
+            if verbose > 0:
+              print "File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex
+            return 1
+    return 0
 
   @staticmethod
   def which(program):

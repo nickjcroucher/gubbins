@@ -77,6 +77,27 @@ class GubbinsCommon():
 
     return 1
 
+
+  @staticmethod
+  def does_fasta_contain_variation(alignment_filename):
+    input_handle  = open(alignment_filename, "rU")
+    alignments = AlignIO.parse(input_handle, "fasta")
+    first_sequence = ""
+
+    for index, alignment in enumerate(alignments):
+      for record_index, record in enumerate(alignment):
+
+        if record_index == 0:
+          first_sequence = record.seq
+
+        if str(record.seq) != str(first_sequence):
+          input_handle.close()
+          return 1
+          
+    input_handle.close()
+    return 0
+
+
   @staticmethod
   def does_file_exist(alignment_filename, file_type_msg):
     if(not os.path.exists(alignment_filename)):
@@ -204,11 +225,13 @@ class GubbinsCommon():
     current_tree_name     = ""
     max_iteration = 1
 
-
+    raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
     # cleanup RAxML intermediate files
     if self.args.no_cleanup == 0 or self.args.no_cleanup is None:
-      raxml_files_to_delete = GubbinsCommon.raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, self.args.iterations)
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose)
+    
+    if GubbinsCommon.check_file_exist_based_on_list_of_regexes('.', raxml_files_to_delete, self.args.verbose) == 1:
+      sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
     for i in range(1, self.args.iterations+1):
       max_iteration += 1
@@ -270,10 +293,15 @@ class GubbinsCommon():
         print fastml_command
         fastml_command_suffix = ''
 
+
       subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
       shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
       GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+
+      if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(starting_base_filename+".gaps.snp_sites.aln") == 0 ):
+         sys.exit("There is a problem with your FASTA file after running FASTML. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")
+
 
       if self.args.verbose > 0:
         print int(time.time())
@@ -637,6 +665,9 @@ class GubbinsCommon():
       if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
         print "Each sequence must have a name and some genomic data"
         return 0
+      if GubbinsCommon.does_fasta_contain_variation(input_filename) == 0:
+        print "All of the input sequences contain the same data"
+        return 0
     except:
       return 0
 
@@ -881,6 +912,18 @@ class GubbinsCommon():
             if verbose > 0:
               print "Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex
             os.remove(full_path_of_file_for_deletion)
+            
+  @staticmethod
+  def check_file_exist_based_on_list_of_regexes(directory_to_search, regex_for_file_finds, verbose):
+    for dirname, dirnames, filenames in os.walk(directory_to_search):
+      for filename in filenames:
+        for find_regex in regex_for_file_finds:
+          full_path_of_file_for_find = os.path.join(directory_to_search, filename)
+          if(re.match(str(find_regex), filename) != None and os.path.exists(full_path_of_file_for_find)):
+            if verbose > 0:
+              print "File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex
+            return 1
+    return 0
 
   @staticmethod
   def which(program):

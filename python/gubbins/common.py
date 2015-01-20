@@ -348,7 +348,9 @@ class GubbinsCommon():
     else:
       output_filenames_to_final_filenames = GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_iteration - 1,  self.args.prefix)
     GubbinsCommon.rename_files(output_filenames_to_final_filenames)
-  
+    GubbinsCommon.remove_internal_node_labels_from_tree(str(self.args.prefix)+".final_tree.tre", str(self.args.prefix)+".no_internal_labels.final_tree.tre")
+    shutil.move(str(self.args.prefix)+".no_internal_labels.final_tree.tre", str(self.args.prefix)+".final_tree.tre")
+    
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -555,6 +557,32 @@ class GubbinsCommon():
     return starting_base_filename+".(gaps|vcf|snp_sites|phylip|start)"
 
   @staticmethod
+  def remove_internal_node_labels_from_tree(input_filename, output_filename):
+    tree  = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
+
+    output_tree_string = tree.as_string(
+      'newick',
+      taxon_set=None,
+      suppress_leaf_taxon_labels=False,
+      suppress_leaf_node_labels=True,
+      suppress_internal_taxon_labels=True,
+      suppress_internal_node_labels=True,
+      suppress_rooting=True,
+      suppress_edge_lengths=False,
+      unquoted_underscores=True,
+      preserve_spaces=False,
+      store_tree_weights=False,
+      suppress_annotations=True,
+      annotations_as_nhx=False,
+      suppress_item_comments=True,
+      node_label_element_separator=' ',
+      node_label_compose_func=None
+      )
+    output_file = open(output_filename, 'w+')
+    output_file.write(output_tree_string.replace('\'', ''))
+    output_file.closed
+
+  @staticmethod
   def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):
     return GubbinsCommon.translation_of_filenames_to_final_filenames(starting_base_filename+".iteration_"+str(max_intermediate_iteration), output_prefix)
     
@@ -576,7 +604,7 @@ class GubbinsCommon():
       str(input_prefix)+".tre":             str(output_prefix)+".final_tree.tre"
     }
     return input_names_to_output_names
-  
+
   @staticmethod
   def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {  

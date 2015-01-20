@@ -2,8 +2,8 @@ require 'formula'
 
 class Gubbins < Formula
   homepage 'https://github.com/sanger-pathogens/gubbins'
-  url 'https://github.com/sanger-pathogens/gubbins/archive/v1.0.11.tar.gz'
-  sha1 'c7598b2ea571611022dcd7565aabc009d4327aca'
+  url 'https://github.com/sanger-pathogens/gubbins/archive/v1.0.12.tar.gz'
+  sha1 'adf26b0790bcc46101b5c9a37976ff50fae095f0'
   head 'https://github.com/sanger-pathogens/gubbins.git'
 
   depends_on :autoconf

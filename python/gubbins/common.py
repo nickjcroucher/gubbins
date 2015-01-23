@@ -399,6 +399,7 @@ class GubbinsCommon():
     
     for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
       if leaf_node.taxon.label not in outgroups:
+        print "Your outgroups do not form a clade.\n  Using the first taxon "+str(outgroups[0])+" as the outgroup.\n  Taxon "+str(leaf_node.taxon.label)+" is in the clade but not in your list of outgroups."
         return [outgroups[0]]
     
     return outgroups

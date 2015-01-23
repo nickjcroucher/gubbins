@@ -29,7 +29,7 @@ class TestTreePythonMethods(unittest.TestCase):
 
   def test_reroot_tree(self):
     shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
-    common.GubbinsCommon.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', ['sequence_4'])
+    common.GubbinsCommon.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', 'sequence_4')
     actual_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', 'U').readlines()
     expected_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4', 'U').readlines()
     assert actual_file_content == expected_file_content

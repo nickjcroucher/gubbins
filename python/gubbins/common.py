@@ -287,7 +287,7 @@ class GubbinsCommon():
       if self.args.verbose > 0:
         print int(time.time())
 
-      GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup.split(','))
+      GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
       fastml_command_suffix = ' > /dev/null 2>&1'
       if self.args.verbose > 0:
@@ -407,7 +407,7 @@ class GubbinsCommon():
   @staticmethod
   def reroot_tree(tree_name, outgroups):
     if outgroups:
-      GubbinsCommon.reroot_tree_with_outgroup(tree_name, outgroups)
+      GubbinsCommon.reroot_tree_with_outgroup(tree_name, outgroups.split(','))
     else:
       GubbinsCommon.reroot_tree_at_midpoint(tree_name)
       

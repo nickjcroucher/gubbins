@@ -26,7 +26,7 @@ from gubbins import common
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
-parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting')
+parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting. A list of comma separated names can be used if they form a clade')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
 parser.add_argument('--use_time_stamp',   '-u', action='count', help='Use a time stamp in file names')
 parser.add_argument('--verbose',          '-v', action='count', help='Turn on debugging')

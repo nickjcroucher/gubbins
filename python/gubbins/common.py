@@ -34,6 +34,7 @@ from Bio.Seq import Seq
 from cStringIO import StringIO
 import shutil
 import subprocess
+import math
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -387,16 +388,36 @@ class GubbinsCommon():
     return 0
 
   @staticmethod
-  def reroot_tree(tree_name, outgroup):
-    if outgroup:
-      GubbinsCommon.reroot_tree_with_outgroup(tree_name, outgroup)
+  def get_monophyletic_outgroup(tree_name, outgroups):
+    if len(outgroups) == 1:
+      return outgroups
+
+    tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
+              preserve_underscores=True)
+    tree.deroot()
+    tree.update_splits()
+    
+    for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
+      if leaf_node.taxon.label not in outgroups:
+        return [outgroups[0]]
+    
+    return outgroups
+    
+
+  @staticmethod
+  def reroot_tree(tree_name, outgroups):
+    if outgroups:
+      GubbinsCommon.reroot_tree_with_outgroup(tree_name, outgroups.split(','))
     else:
       GubbinsCommon.reroot_tree_at_midpoint(tree_name)
       
   @staticmethod
-  def reroot_tree_with_outgroup(tree_name, outgroup):
+  def reroot_tree_with_outgroup(tree_name, outgroups):
+    clade_outgroups = GubbinsCommon.get_monophyletic_outgroup(tree_name, outgroups)
+    outgroups = [{'name': taxon_name} for taxon_name in clade_outgroups]
+
     tree = Phylo.read(tree_name, 'newick')
-    tree.root_with_outgroup({'name': outgroup})
+    tree.root_with_outgroup(*outgroups)
     Phylo.write(tree, tree_name, 'newick')
 
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',

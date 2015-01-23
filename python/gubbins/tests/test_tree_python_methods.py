@@ -44,11 +44,53 @@ class TestTreePythonMethods(unittest.TestCase):
     
   def test_reroot_tree_with_outgroup(self):
     shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
-    common.GubbinsCommon.reroot_tree_with_outgroup('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', 'sequence_4')
+    common.GubbinsCommon.reroot_tree_with_outgroup('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', ['sequence_4'])
     actual_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', 'U').readlines()
     expected_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4', 'U').readlines()
     assert actual_file_content == expected_file_content
     os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+    
+  def test_reroot_tree_with_outgroups(self):
+    shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+    common.GubbinsCommon.reroot_tree_with_outgroup('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', ['sequence_4','sequence_2'])
+    actual_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', 'U').readlines()
+    expected_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2', 'U').readlines()
+    assert actual_file_content == expected_file_content
+    os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+    
+  def test_reroot_tree_with_outgroups_all_in_one_clade(self):
+    outgroups = ['A','B']
+    expected_monophyletic_outgroup =  ['A','B']
+    expected_output_file = 'gubbins/tests/data/expected_reroot_tree_with_outgroups_all_in_one_clade.tre'
+    self.reroot_tree_check(outgroups,expected_output_file,expected_monophyletic_outgroup)
+    
+  def test_reroot_tree_with_outgroups_all_in_one_clade_large(self):
+    outgroups = ['A','B','C']
+    expected_monophyletic_outgroup =  ['A','B','C']
+    expected_output_file = 'gubbins/tests/data/expected_test_reroot_tree_with_outgroups_all_in_one_clade_large.tre'
+    self.reroot_tree_check(outgroups,expected_output_file,expected_monophyletic_outgroup)
+    
+  def test_reroot_tree_with_outgroups_all_in_different_clade(self):
+    outgroups = ['A','D']
+    expected_monophyletic_outgroup = ['A']
+    expected_output_file = 'gubbins/tests/data/expected_reroot_tree_with_outgroups_all_in_different_clade.tre'
+    self.reroot_tree_check(outgroups,expected_output_file,expected_monophyletic_outgroup)
+    
+  def test_reroot_tree_with_outgroups_with_two_mixed_clades(self):
+    outgroups = ['A','B','C', 'D']
+    expected_monophyletic_outgroup =  ['A']
+    expected_output_file = 'gubbins/tests/data/expected_reroot_tree_with_outgroups_with_two_mixed_clades.tre'
+    self.reroot_tree_check(outgroups,expected_output_file,expected_monophyletic_outgroup)
+    
+  def reroot_tree_check(self, outgroups,expected_output_file,expected_monophyletic_outgroup):
+    shutil.copyfile('gubbins/tests/data/outgroups_input.tre','.tmp.outgroups_input.tre')
+    
+    assert expected_monophyletic_outgroup == common.GubbinsCommon.get_monophyletic_outgroup('.tmp.outgroups_input.tre', outgroups)
+    common.GubbinsCommon.reroot_tree_with_outgroup('.tmp.outgroups_input.tre', outgroups)
+    actual_file_content = open('.tmp.outgroups_input.tre', 'U').readlines()
+    expected_file_content = open(expected_output_file, 'U').readlines()
+    assert actual_file_content == expected_file_content
+    os.remove('.tmp.outgroups_input.tre')
     
   def test_split_all_non_bi_nodes(self):
     # best way to access it is via reroot_tree_at_midpoint because it outputs to a file

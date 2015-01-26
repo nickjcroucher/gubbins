@@ -2,7 +2,7 @@ gubbins (1.1.1~trusty1) trusty; urgency=low
 
   * Message to tell user theres a problem with outgroups not a clade
 
- -- Andrew Page <ap13@sanger.ac.uk>  Fri, 23 Jan 2015 16:02	gubbins (1.1.0~trusty1) trusty; urgency=low
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 23 Jan 2015 16:02:00 +0000
 
 gubbins (1.1.0~trusty1) trusty; urgency=low
 

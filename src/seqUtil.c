@@ -1,6 +1,7 @@
 #define __SEQUTIL_C__
 
 #include "seqUtil.h"
+#include "string_cat.h"
 
 /*
  *  Yu-Wei Wu  http://yuweibioinfo.blogspot.com/2008/10/newick-tree-parser-in-c-make-use-of.html

@@ -28,6 +28,7 @@
 #include "vcf.h"
 #include "alignment_file.h"
 #include "snp_sites.h"
+#include "string_cat.h"
 
 KSEQ_INIT(gzFile, gzread)
 

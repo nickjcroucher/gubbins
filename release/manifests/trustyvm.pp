@@ -2,7 +2,7 @@ package { "dh-make":
     ensure => "installed"
     }
 
-package { ["gcc", "build-essential", "pkg-config"]:
+package { ["gcc", "build-essential", "pkg-config","ntp"]:
     ensure => "installed"
     }
 

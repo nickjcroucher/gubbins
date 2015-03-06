@@ -28,6 +28,7 @@
 #include "phylip_of_snp_sites.h"
 #include "parse_phylip.h"
 #include "string_cat.h"
+#include "fasta_of_snp_sites.h"
 
 
 void build_snp_locations(int snp_locations[], char reference_sequence[])

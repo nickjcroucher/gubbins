@@ -17,24 +17,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-import sys
-import argparse
-import subprocess
-import os
-import time
-import re
-import tempfile
-from collections import Counter
-from Bio import Phylo
-import dendropy
-from Bio import SeqIO
 from Bio import AlignIO
+from Bio import Phylo
+from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from cStringIO import StringIO
+from collections import Counter
+import argparse
+import dendropy
+import math
+import os
+import re
 import shutil
 import subprocess
-import math
+import sys
+import tempfile
+import time
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -205,7 +204,11 @@ class GubbinsCommon():
     # find all snp sites
     if self.args.verbose > 0:
       print GUBBINS_EXEC +" "+ self.args.alignment_filename
-    subprocess.check_call([GUBBINS_EXEC, self.args.alignment_filename])
+    try:
+      subprocess.check_call([GUBBINS_EXEC, self.args.alignment_filename])
+    except:
+      sys.exit("Gubbins crashed, please ensure you have enough free memory")
+      
     if self.args.verbose > 0:
       print int(time.time())
 
@@ -282,7 +285,10 @@ class GubbinsCommon():
       if self.args.starting_tree is not None and i == 1:
         shutil.copyfile(self.args.starting_tree, current_tree_name)
       else:
-        subprocess.check_call(tree_building_command, shell=True)
+        try:
+          subprocess.check_call(tree_building_command, shell=True)
+        except:
+          sys.exit("Failed while building the tree.")
 
       if self.args.verbose > 0:
         print int(time.time())
@@ -295,7 +301,11 @@ class GubbinsCommon():
         fastml_command_suffix = ''
 
 
-      subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
+      try:
+        subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
+      except:
+        sys.exit("Failed while running FastML")
+        
       shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
       GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
@@ -309,7 +319,10 @@ class GubbinsCommon():
 
       if self.args.verbose > 0:
         print gubbins_command
-      subprocess.check_call(gubbins_command, shell=True)
+      try:
+        subprocess.check_call(gubbins_command, shell=True)
+      except:
+        sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
       if self.args.verbose > 0:
         print int(time.time())
 
@@ -941,10 +954,16 @@ class GubbinsCommon():
     sequence_names = GubbinsCommon.get_sequence_names_from_alignment(filename)
     GubbinsCommon.create_pairwise_newick_tree(sequence_names, base_filename+".tre")
 
-    subprocess.check_call(GubbinsCommon.generate_fastml_command(fastml_exec, base_filename+".gaps.snp_sites.aln", base_filename+".tre"), shell=True)
+    try:
+      subprocess.check_call(GubbinsCommon.generate_fastml_command(fastml_exec, base_filename+".gaps.snp_sites.aln", base_filename+".tre"), shell=True)
+    except:
+      sys.exit("Failed while running fastML")
     shutil.copyfile(base_filename+'.tre.output_tree',base_filename+".tre")
     shutil.copyfile(base_filename+'.tre.seq.joint.txt', base_filename+".snp_sites.aln")
-    subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
+    try:
+      subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
+    except:
+      sys.exit("Failed while running Gubbins")
     GubbinsCommon.rename_files(GubbinsCommon.translation_of_filenames_to_final_filenames_pairwise(base_filename, base_filename_without_ext))
 
   @staticmethod

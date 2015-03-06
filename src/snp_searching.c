@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "snp_searching.h"
 
 // Most of the methods in this file look the same, so should be DRYed out.

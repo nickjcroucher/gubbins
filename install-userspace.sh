@@ -13,7 +13,7 @@
 #
 
 py_pkgs=( "biopython" "dendropy" )
-deb_urls=( "http://uk.archive.ubuntu.com/ubuntu/pool/universe/r/raxml/raxml_7.2.8-2_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/fastml2_2.2~trusty1_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/gubbins_0.1.7~trusty2_amd64.deb" )
+deb_urls=( "http://uk.archive.ubuntu.com/ubuntu/pool/universe/r/raxml/raxml_7.2.8-2_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/fastml2_2.3~trusty1_amd64.deb" "https://launchpad.net/~ap13/+archive/ubuntu/gubbins/+files/gubbins_1.1.1~trusty1_amd64.deb" )
 
 function check_platform {
     # Ubuntu 14.04

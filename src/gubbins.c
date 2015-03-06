@@ -31,7 +31,8 @@
 #include "tree_scaling.h"
 #include "seqUtil.h"
 #include "Newickform.h"
-
+#include "tree_statistics.h"
+#include "fasta_of_snp_sites.h"
 
 
 // get reference sequence from VCF, and store snp locations

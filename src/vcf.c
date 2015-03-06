@@ -168,7 +168,7 @@ void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, 
 		{
 			continue;
 		}
-		if((bases_for_snp[i] == reference_base))
+		if(bases_for_snp[i] == reference_base)
 		{
 			fprintf( vcf_file_pointer, "%c", (char) reference_base );	
 		}

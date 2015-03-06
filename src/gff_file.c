@@ -37,9 +37,9 @@ void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coord
 	fprintf(gff_file_pointer, "0.000\t.\t0\t");
 	
 	fprintf(gff_file_pointer, "node=\"%s->%s\";", parent_node_id, current_node_id );
-	fprintf(gff_file_pointer, "neg_log_likelihood=\"%f\"", neg_log_likelihood);
+	fprintf(gff_file_pointer, "neg_log_likelihood=\"%f\";", neg_log_likelihood);
 	fprintf(gff_file_pointer, "taxa=\"%s\";", taxon_names);
-	fprintf(gff_file_pointer, "snp_count=\"%d\"", number_of_snps);
+	fprintf(gff_file_pointer, "snp_count=\"%d\";", number_of_snps);
 	fprintf(gff_file_pointer, "\n");
 	
   fflush(gff_file_pointer);

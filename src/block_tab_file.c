@@ -26,18 +26,18 @@ void print_block_details(FILE * block_file_pointer, int start_coordinate, int en
 {
   fprintf(block_file_pointer, "FT   misc_feature    %d..%d\n", start_coordinate, end_coordinate);
   fprintf(block_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
-  fprintf(block_file_pointer, "FT                   /neg_log_likelihood=%f\n",neg_log_likelihood);
+  fprintf(block_file_pointer, "FT                   /neg_log_likelihood=\"%f\"\n",neg_log_likelihood);
 
   if(number_of_child_nodes > 0)
   {
-  	fprintf(block_file_pointer, "FT                   /colour=2\n");
+  	fprintf(block_file_pointer, "FT                   /colour=\"2\"\n");
 	}
 	else
 	{
-		fprintf(block_file_pointer, "FT                   /colour=4\n");
+		fprintf(block_file_pointer, "FT                   /colour=\"4\"\n");
 	}
   fprintf(block_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);
-  fprintf(block_file_pointer, "FT                   /SNP_count=%d\n",number_of_snps);
+  fprintf(block_file_pointer, "FT                   /SNP_count=\"%d\"\n",number_of_snps);
   fflush(block_file_pointer);
 }
 
@@ -49,7 +49,7 @@ void print_branch_snp_details(FILE * branch_snps_file_pointer, char * current_no
 	{
 	  fprintf(branch_snps_file_pointer, "FT   variation       %d\n", branches_snp_sites[i]);
     fprintf(branch_snps_file_pointer, "FT                   /node=\"%s->%s\"\n",parent_node_id,current_node_id);
-    fprintf(branch_snps_file_pointer, "FT                   /colour=4\n");
+    fprintf(branch_snps_file_pointer, "FT                   /colour=\"4\"\n");
     fprintf(branch_snps_file_pointer, "FT                   /taxa=\"%s\"\n",taxon_names);
     fprintf(branch_snps_file_pointer, "FT                   /parent_base=\"%c\"\n",branch_snp_ancestor_sequence[i]);
     fprintf(branch_snps_file_pointer, "FT                   /replace=\"%c\"\n",branch_snp_sequence[i]);

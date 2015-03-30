@@ -1,6 +1,7 @@
-##fileformat=VCFv4.1
+##fileformat=VCFv4.2
+##contig=<ID=1,length=2000>
 ##FORMAT=<ID=AB,Number=1,Type=String,Description="Alt Base">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	ABC_1	EFG_2	
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	ABC_1	EFG_2
 1	27	.	T	A	.	.	.	AB	T	A
 1	28	.	A	T	.	.	.	AB	A	T
 1	29	.	T	A	.	.	.	AB	T	A

@@ -29,7 +29,7 @@
 #include "string_cat.h"
 
 
-void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[], int offset)
+void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples,int internal_nodes[], int offset, int length_of_original_genome)
 {
 	FILE *vcf_file_pointer;
 	char * base_filename;
@@ -40,7 +40,7 @@ void create_vcf_file(char filename[], int snp_locations[],int number_of_snps, ch
 	vcf_file_pointer=fopen(base_filename, "w");
 	output_vcf_header(vcf_file_pointer,sequence_names, number_of_samples,internal_nodes);
 	output_vcf_snps(vcf_file_pointer, bases_for_snps, snp_locations, number_of_snps, number_of_samples,internal_nodes,offset);
-  fclose(vcf_file_pointer);
+    fclose(vcf_file_pointer);
 	free(base_filename);
 }
 
@@ -53,21 +53,23 @@ void output_vcf_snps(FILE * vcf_file_pointer, char ** bases_for_snps, int * snp_
 	}
 }
 
-void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int number_of_samples,int internal_nodes[])
+void output_vcf_header( FILE * vcf_file_pointer, char ** sequence_names, int number_of_samples,int internal_nodes[], int length_of_original_genome)
 {
 	int i;
-	fprintf( vcf_file_pointer, "##fileformat=VCFv4.1\n" );	
+	fprintf( vcf_file_pointer, "##fileformat=VCFv4.2\n" );
+	fprintf( vcf_file_pointer, "##contig=<ID=1,length=%d>\n",length_of_original_genome );
 	fprintf( vcf_file_pointer, "##FORMAT=<ID=AB,Number=1,Type=String,Description=\"Alt Base\">\n" );
 	
-	fprintf( vcf_file_pointer, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" );
+	fprintf( vcf_file_pointer, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT" );
 	
 	for(i=0; i<number_of_samples; i++)
 	{
+		fprintf( vcf_file_pointer, "\t");
 		if(internal_nodes[i] == 1)
 		{
 			continue;
 		}
-		fprintf( vcf_file_pointer, "%s\t",  sequence_names[i]);
+		fprintf( vcf_file_pointer, "%s",  sequence_names[i]);
 	}
 	fprintf( vcf_file_pointer, "\n");
 }

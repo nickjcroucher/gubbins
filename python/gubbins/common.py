@@ -890,7 +890,7 @@ class GubbinsCommon():
 
     for vcf_line in vcf_file:
       if re.match('^#CHROM', vcf_line)  != None :
-         sample_names = vcf_line.split('\t' )[9:-1]
+         sample_names = vcf_line.rstrip().split('\t' )[9:]
       elif re.match('^\d', vcf_line)  != None :
         # If the alternate is only a gap it wont have a base in this column
         if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:

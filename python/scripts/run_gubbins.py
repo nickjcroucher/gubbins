@@ -22,6 +22,7 @@
 import sys
 sys.path.append(".")
 import argparse
+import pkg_resources
 from gubbins import common
 
 parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
@@ -38,7 +39,7 @@ parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more 
 parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
 parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 1)
 parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
-
+parser.add_argument('--version',                action='version', version=str(pkg_resources.get_distribution("gubbins").version))
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())
 gubbins_runner.parse_and_run()

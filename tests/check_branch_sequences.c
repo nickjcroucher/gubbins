@@ -143,23 +143,22 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
 	block_coords[1][2] = 25;
 	block_coords[0][3] = 7;
 	block_coords[1][3] = 15;
-	
 	int snp_locations[16] = {1,4,5,6,7,10,11,15,19,20,29,30,35,36,40,50};
 	
-    int * snps_in_recombinations;  
+    int * snps_in_recombinations = (int *) calloc((16 +1),sizeof(int));
 	int num_snps_in_recombinations = 0;
     num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(block_coords,4,snp_locations,16, snps_in_recombinations);
     fail_unless(num_snps_in_recombinations == 9);
 	
-	fail_unless(snps_in_recombinations[0] == 5);
-	fail_unless(snps_in_recombinations[1] == 6);
-	fail_unless(snps_in_recombinations[2] == 7);
-	fail_unless(snps_in_recombinations[3] == 10);
-	fail_unless(snps_in_recombinations[4] == 11);
-	fail_unless(snps_in_recombinations[5] == 15);
-	fail_unless(snps_in_recombinations[6] == 20);
-	fail_unless(snps_in_recombinations[7] == 30);
-	fail_unless(snps_in_recombinations[8] == 35);
+	fail_unless(snps_in_recombinations[0] == 2);
+	fail_unless(snps_in_recombinations[1] == 3);
+	fail_unless(snps_in_recombinations[2] == 4);
+	fail_unless(snps_in_recombinations[3] == 5);
+	fail_unless(snps_in_recombinations[4] == 6);
+	fail_unless(snps_in_recombinations[5] == 7);
+	fail_unless(snps_in_recombinations[6] == 9);
+	fail_unless(snps_in_recombinations[7] == 11);
+	fail_unless(snps_in_recombinations[8] == 12);
 	
 }
 END_TEST

@@ -76,8 +76,6 @@ int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** a
 // Loop over all recombination blocks and return a list of all snp indices that fall within those blocks.
 int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** current_block_coordinates,int num_blocks, int * snp_locations,int current_total_snps, int * snps_in_recombinations)
 {
-	snps_in_recombinations = (int *) calloc((current_total_snps +1),sizeof(int));
-	
 	int num_snps_in_recombinations =0;
 	int i = 0;
 	for(i = 0; i<num_blocks; i++ )
@@ -147,7 +145,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 
 
     // TODO: The stats for the number of snps in recombinations will need to be updated.
-	int * snps_in_recombinations;
+	int * snps_in_recombinations = (int *) calloc((current_total_snps +1),sizeof(int));
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(current_block_coordinates, num_blocks,snp_locations, current_total_snps, snps_in_recombinations);
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{

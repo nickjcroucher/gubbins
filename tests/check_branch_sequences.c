@@ -139,8 +139,8 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
 	block_coords[1][0] = 10;
 	block_coords[0][1] = 30;
 	block_coords[1][1] = 35;
-	block_coords[0][2] = 15;
-	block_coords[1][2] = 20;
+	block_coords[0][2] = 20;
+	block_coords[1][2] = 25;
 	block_coords[0][3] = 7;
 	block_coords[1][3] = 15;
 	

@@ -129,8 +129,42 @@ START_TEST (check_calculate_number_of_bases_in_recombations)
 }
 END_TEST
 
+START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombinations)
+{
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
+	block_coords[0][1] = 30;
+	block_coords[1][1] = 35;
+	block_coords[0][2] = 15;
+	block_coords[1][2] = 20;
+	block_coords[0][3] = 7;
+	block_coords[1][3] = 15;
+	
+	int snp_locations[16] = {1,4,5,6,7,10,11,15,19,20,29,30,35,36,40,50};
+	
+    int * snps_in_recombinations;  
+	int num_snps_in_recombinations = 0;
+    num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(block_coords,4,snp_locations,16, snps_in_recombinations);
+    fail_unless(num_snps_in_recombinations == 9);
+	
+	fail_unless(snps_in_recombinations[0] == 5);
+	fail_unless(snps_in_recombinations[1] == 6);
+	fail_unless(snps_in_recombinations[2] == 7);
+	fail_unless(snps_in_recombinations[3] == 10);
+	fail_unless(snps_in_recombinations[4] == 11);
+	fail_unless(snps_in_recombinations[5] == 15);
+	fail_unless(snps_in_recombinations[6] == 20);
+	fail_unless(snps_in_recombinations[7] == 30);
+	fail_unless(snps_in_recombinations[8] == 35);
+	
+}
+END_TEST
 
-
+	
 
 Suite * check_branch_sequences_suite (void)
 {
@@ -140,6 +174,7 @@ Suite * check_branch_sequences_suite (void)
 	tcase_add_test (tc_branch_sequences, check_exclude_snp_sites_in_block);
 	tcase_add_test (tc_branch_sequences, check_copy_and_concat_2d_integer_arrays);
 	tcase_add_test (tc_branch_sequences, check_calculate_number_of_bases_in_recombations);
+	tcase_add_test (tc_branch_sequences, check_get_list_of_snp_indices_which_fall_in_downstream_recombinations);
   suite_add_tcase (s, tc_branch_sequences);
 
   return s;

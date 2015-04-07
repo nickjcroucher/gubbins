@@ -90,9 +90,25 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 		{
 			if(snp_locations[j] >= current_block_coordinates[0][i] && snp_locations[j] <= current_block_coordinates[1][i])
 			{
+				printf("block: %d, %d\nsnp: %d,%d\nindex: %d\nnum_snps_recomb: %d\n\n", current_block_coordinates[0][i],current_block_coordinates[1][i],snp_locations[j], j,i,num_snps_in_recombinations);
 				// This snp should be blanked out.
-				snps_in_recombinations[num_snps_in_recombinations] = j;
-				num_snps_in_recombinations++;
+				
+				int k = 0;
+				int seen_before = 0;
+				// has this snp index been flagged before?
+				for(k =0; k < num_snps_in_recombinations; k++)
+				{
+					if(snps_in_recombinations[k] == j)
+					{
+						seen_before = 1;
+						break;
+					}
+				}
+				if(seen_before == 0)
+				{
+					snps_in_recombinations[num_snps_in_recombinations] = j;
+					num_snps_in_recombinations++;
+    			}
 			}
 		}
 	}

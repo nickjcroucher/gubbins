@@ -154,12 +154,11 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
 	fail_unless(snps_in_recombinations[1] == 3);
 	fail_unless(snps_in_recombinations[2] == 4);
 	fail_unless(snps_in_recombinations[3] == 5);
-	fail_unless(snps_in_recombinations[4] == 6);
-	fail_unless(snps_in_recombinations[5] == 7);
+	fail_unless(snps_in_recombinations[4] == 11);
+	fail_unless(snps_in_recombinations[5] == 12);
 	fail_unless(snps_in_recombinations[6] == 9);
-	fail_unless(snps_in_recombinations[7] == 11);
-	fail_unless(snps_in_recombinations[8] == 12);
-	
+	fail_unless(snps_in_recombinations[7] == 6);
+	fail_unless(snps_in_recombinations[8] == 7);
 }
 END_TEST
 

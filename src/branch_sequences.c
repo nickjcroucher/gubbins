@@ -153,10 +153,12 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
     // TODO: The stats for the number of snps in recombinations will need to be updated.
 	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates, (num_blocks + root->number_of_blocks),snp_locations, number_of_snps, snps_in_recombinations);
+    int num_snps_updated_from_downstream_recombintations=0;
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{
- 		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
+ 		num_snps_updated_from_downstream_recombintations += update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
  	}
+	set_number_of_recombinations_for_sample(root->taxon,root->num_recombinations + num_snps_updated_from_downstream_recombintations);
 	free(snps_in_recombinations); 	
 
 	if (root->childNum > 0)

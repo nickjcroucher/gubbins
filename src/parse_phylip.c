@@ -39,9 +39,14 @@ int * internal_node;
 sample_statistics ** statistics_for_samples;
 
 
-void update_sequence_base(char new_sequence_base, int sequence_index, int base_index)
+int update_sequence_base(char new_sequence_base, int sequence_index, int base_index)
 {
-	sequences[sequence_index][base_index] = new_sequence_base;	
+	if(sequences[sequence_index][base_index] != new_sequence_base)
+	{
+	   sequences[sequence_index][base_index] = new_sequence_base;	
+	   return 1;
+    }
+	return 0;
 }
 
 void set_internal_node(int internal_node_value,int sequence_index)

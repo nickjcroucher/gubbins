@@ -32,7 +32,7 @@
 
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name);
 int find_sequence_index_from_sample_name( char * sample_name);
-void update_sequence_base(char new_sequence_base, int sequence_index, int base_index);
+int update_sequence_base(char new_sequence_base, int sequence_index, int base_index);
 int does_column_contain_snps(int snp_column, char reference_base);
 int number_of_samples_from_parse_phylip();
 void get_sample_names_from_parse_phylip(char ** sample_names);

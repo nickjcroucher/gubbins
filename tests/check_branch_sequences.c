@@ -132,9 +132,9 @@ END_TEST
 START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombinations_single_block)
 {
 	int ** block_coords;  
-	block_coords  = (int **) malloc(2*sizeof(int*));
-	block_coords[0] = (int*) malloc((1)*sizeof(int ));
-	block_coords[1] = (int*) malloc((1)*sizeof(int ));
+	block_coords  = (int **) malloc((3)*sizeof(int*));
+	block_coords[0] = (int*) malloc((2)*sizeof(int ));
+	block_coords[1] = (int*) malloc((2)*sizeof(int ));
 	block_coords[0][0] = 3;
 	block_coords[1][0] = 6;
 	int snp_locations[16] = {2,4,6,8};
@@ -143,8 +143,8 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
 	int num_snps_in_recombinations = 0;
     num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(block_coords,1,snp_locations,4, snps_in_recombinations);
     fail_unless(num_snps_in_recombinations == 2);
-	fail_unless(snps_in_recombinations[0] == 4);
-	fail_unless(snps_in_recombinations[1] == 6);
+	fail_unless(snps_in_recombinations[0] == 1);
+	fail_unless(snps_in_recombinations[1] == 2);
 }
 END_TEST
 	

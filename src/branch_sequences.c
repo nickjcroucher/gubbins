@@ -135,7 +135,13 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 
- 	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(root->block_coordinates, root->number_of_blocks, child_sequence, snp_locations,current_total_snps));
+	int ** merged_block_coordinates;
+	merged_block_coordinates = (int **) calloc(3,sizeof(int *));
+	merged_block_coordinates[0] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
+	merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
+	copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
+	
+ 	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates, (num_blocks + root->number_of_blocks), child_sequence, snp_locations,current_total_snps));
 	free(child_sequence); 	
 
  	for(i = 0; i < num_current_recombinations; i++)
@@ -160,18 +166,9 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 
 		while (child != NULL)
 		{
-			// recursion
-			int ** merged_block_coordinates;
-			merged_block_coordinates = (int **) calloc(3,sizeof(int *));
-			merged_block_coordinates[0] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
-			merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
-			copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 			fill_in_recombinations_with_gaps(child->node, current_recombinations, num_current_recombinations,(current_total_snps + root->number_of_snps),(num_blocks + root->number_of_blocks),merged_block_coordinates,length_of_original_genome, snp_locations, number_of_snps );
 			child = child->next;
-			
-			free(merged_block_coordinates[0]);
-			free(merged_block_coordinates[1]);
-			free(merged_block_coordinates);
+
 		}
 	}
 	else
@@ -179,6 +176,9 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	set_internal_node(0,sequence_index);	
 	}
 	free(current_recombinations);
+	free(merged_block_coordinates[0]);
+	free(merged_block_coordinates[1]);
+	free(merged_block_coordinates);
 }
 
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome)

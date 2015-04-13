@@ -129,7 +129,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
  	
  	set_number_of_recombinations_for_sample(root->taxon,root->num_recombinations);
  	set_number_of_snps_for_sample(root->taxon,root->number_of_snps);
- 	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks);
+ 	
  	
 	char * child_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
 	
@@ -141,6 +141,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
 	copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 	
+	set_number_of_blocks_for_sample(root->taxon, (num_blocks + root->number_of_blocks));
  	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates, (num_blocks + root->number_of_blocks), child_sequence, snp_locations,current_total_snps));
 	free(child_sequence); 	
 

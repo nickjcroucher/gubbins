@@ -141,7 +141,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
 	copy_and_concat_2d_integer_arrays(current_block_coordinates,num_blocks,root->block_coordinates, root->number_of_blocks,merged_block_coordinates );
 	
-	set_number_of_blocks_for_sample(root->taxon, (num_blocks + root->number_of_blocks));
+	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks	);
  	set_number_of_bases_in_recombinations(root->taxon, calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates, (num_blocks + root->number_of_blocks), child_sequence, snp_locations,current_total_snps));
 	free(child_sequence); 	
 
@@ -157,9 +157,8 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
     int num_snps_updated_from_downstream_recombintations=0;
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{
- 		num_snps_updated_from_downstream_recombintations += update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
+ 		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
  	}
-	set_number_of_recombinations_for_sample(root->taxon,root->num_recombinations + num_snps_updated_from_downstream_recombintations);
 	free(snps_in_recombinations); 	
 
 	if (root->childNum > 0)

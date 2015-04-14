@@ -177,6 +177,8 @@ class GubbinsCommon():
     if(self.args.starting_tree is not None and self.args.starting_tree != "" and GubbinsCommon.do_the_names_match_the_fasta_file(self.args.starting_tree,self.args.alignment_filename) == 0):
       sys.exit("The names in the starting tree dont match the names in the fasta file")
 
+    GubbinsCommon.check_and_fix_window_size()
+
     current_time = ''
     if self.args.use_time_stamp > 0:
       current_time = str(int(time.time()))+'.'
@@ -365,6 +367,18 @@ class GubbinsCommon():
     GubbinsCommon.remove_internal_node_labels_from_tree(str(self.args.prefix)+".final_tree.tre", str(self.args.prefix)+".no_internal_labels.final_tree.tre")
     shutil.move(str(self.args.prefix)+".no_internal_labels.final_tree.tre", str(self.args.prefix)+".final_tree.tre")
     
+    
+  @staticmethod
+  def check_and_fix_window_size():
+      if self.args.min_window_size < 3:
+         self.args.min_window_size = 3
+      if self.args.max_window_size > 1000000:
+         self.args.max_window_size = 1000000
+      if self.args.min_window_size > self.args.max_window_size:
+         min_size = self.args.min_window_size
+         self.args.min_window_size = self.args.max_window_size
+         self.args.max_window_size = min_size
+  
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
@@ -552,7 +566,7 @@ class GubbinsCommon():
   @staticmethod
   def raxml_gubbins_command(base_filename_without_ext,starting_base_filename,current_time, i,alignment_filename,gubbins_exec,min_snps, original_aln,min_window_size,max_window_size):
     current_tree_name = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
-    return gubbins_exec+" -r -v "+starting_base_filename+".vcf " +" -a "+str(min_window_size)+" -b "+str(max_window_size) + " -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
+    return gubbins_exec+" -r -v "+starting_base_filename+".vcf" +" -a "+str(min_window_size)+" -b "+str(max_window_size) + " -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
   @staticmethod
   def raxml_regex_for_file_deletions(base_filename_without_ext,current_time,starting_base_filename, max_intermediate_iteration):
@@ -678,7 +692,7 @@ class GubbinsCommon():
   @staticmethod
   def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,original_aln,min_window_size,max_window_size):
     current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
-    return gubbins_exec+" -r -v "+starting_base_filename+".vcf "+" -a "+str(min_window_size)+" -b "+str(max_window_size) + " -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
+    return gubbins_exec+" -r -v "+starting_base_filename+".vcf"+" -a "+str(min_window_size)+" -b "+str(max_window_size) + " -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
 
   @staticmethod
   def fasttree_fastml_command(fastml_exec, alignment_filename, base_filename,i):

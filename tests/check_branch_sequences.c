@@ -182,7 +182,82 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
 }
 END_TEST
 
+
+START_TEST (check_calculate_genome_length_clonal_frame_single_recomb)
+{
+	char *sequence = "AAAAACCCCCGGGGGTTTTT";
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
 	
+	fail_unless(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 14);
+}
+END_TEST
+	
+START_TEST (check_calculate_genome_length_clonal_frame_only_gaps)
+{
+	char *sequence = "A-AAANNNNNGGNGGT--TT";
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+
+	fail_unless(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 0) == 11);
+}
+END_TEST
+	
+START_TEST (check_calculate_genome_length_clonal_frame_overlapping_blocks)
+{
+	char *sequence = "AAAAACCCCCGGGGGTTTTT";
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 10;
+	block_coords[0][1] = 7;
+	block_coords[1][1] = 15;
+
+	fail_unless(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 2) == 9);
+}
+END_TEST
+	
+START_TEST (check_calculate_genome_length_clonal_frame_gaps_within_block)
+{
+	char *sequence = "AAAAACCCNNNNNGGTTTTT";
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((4)*sizeof(int ));
+	block_coords[1] = (int*) malloc((4)*sizeof(int ));
+	block_coords[0][0] = 5;
+	block_coords[1][0] = 15;
+
+	fail_unless(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 9);
+}
+END_TEST
+
+START_TEST (check_calculate_genome_length_clonal_frame_complex)
+{
+	char *sequence = "AAAAACCCCCGGNGGTNNTT";
+	int ** block_coords;  
+	block_coords  = (int **) malloc(2*sizeof(int*));
+	block_coords[0] = (int*) malloc((5)*sizeof(int ));
+	block_coords[1] = (int*) malloc((5)*sizeof(int ));
+	block_coords[0][0] = 1;
+	block_coords[1][0] = 3;
+	block_coords[0][1] = 7;
+	block_coords[1][1] = 10;
+	block_coords[0][2] = 9;
+	block_coords[1][2] = 12;
+	block_coords[0][3] = 16;
+	block_coords[1][3] = 20;
+	
+	fail_unless(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 4) == 5);
+}
+END_TEST
 
 Suite * check_branch_sequences_suite (void)
 {
@@ -194,6 +269,10 @@ Suite * check_branch_sequences_suite (void)
 	tcase_add_test (tc_branch_sequences, check_calculate_number_of_bases_in_recombations);
 	tcase_add_test (tc_branch_sequences, check_get_list_of_snp_indices_which_fall_in_downstream_recombinations);
 	tcase_add_test (tc_branch_sequences, check_get_list_of_snp_indices_which_fall_in_downstream_recombinations_single_block);
+	tcase_add_test (tc_branch_sequences, check_calculate_genome_length_clonal_frame_single_recomb);
+	tcase_add_test (tc_branch_sequences, check_calculate_genome_length_clonal_frame_only_gaps);
+	tcase_add_test (tc_branch_sequences, check_calculate_genome_length_clonal_frame_complex);
+	tcase_add_test (tc_branch_sequences, check_calculate_genome_length_clonal_frame_gaps_within_block);
   suite_add_tcase (s, tc_branch_sequences);
 
   return s;

@@ -21,13 +21,12 @@
 #define _BRANCH_SEQUENCES_H_
 #include "seqUtil.h"
 #include "Newickform.h"
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer);
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer, int window_min, int window_max);
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites,int length_of_original_genome);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence);
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max);
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps);
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps);
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max);
 double calculate_threshold(int branch_genome_size, int window_size);
 int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps);
 double reduce_factorial(int l, int i);
@@ -48,8 +47,6 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 
 
 #define WINDOW_SNP_MODE_TARGET 10
-#define MIN_WINDOW_SIZE 100
-#define MAX_WINDOW_SIZE 10000
 #define RANDOMNESS_DAMPNER 0.05
 #define MAX_SAMPLE_NAME_SIZE 1024
 

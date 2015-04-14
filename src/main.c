@@ -45,8 +45,10 @@ void print_usage(FILE* stream, int exit_code)
            "  -r    detect recombinations mode\n"
            "  -t    Newick tree file\n"
            "  -v    VCF file\n"
-           "  -f    Original Multifasta file"
+           "  -f    Original Multifasta file\n"
            "  -m    Min SNPs for identifying a recombination block\n"
+		   "  -a    Min window size\n"
+		   "  -b    Max window size\n"
            "  -h    Display this usage information.\n\n"
 );
   exit (exit_code);
@@ -73,7 +75,9 @@ int main (argc, argv) int argc; char **argv;
   char original_multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
 
   int recombination_flag = 0 ;
-	int min_snps = 3;
+  int min_snps = 3;
+  int window_min = 100;
+  int window_max = 10000;
   program_name = argv[0];
   
   while (1)
@@ -86,11 +90,14 @@ int main (argc, argv) int argc; char **argv;
           {"tree",                required_argument, 0, 't'},
           {"original_multifasta", required_argument, 0, 'f'},
           {"min_snps",            required_argument, 0, 'm'},
+		  {"window_min",                 required_argument, 0, 'a'},
+		  {"window_max",                 required_argument, 0, 'b'},
+		  
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
-      c = getopt_long (argc, argv, "hrv:f:t:m:",
+      c = getopt_long (argc, argv, "hrv:f:t:m:a:b:",
                        long_options, &option_index);
       /* Detect the end of the options. */
       if (c == -1)
@@ -115,19 +122,25 @@ int main (argc, argv) int argc; char **argv;
 	      case 'f':
 					memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
 	        break;
-        case 'v':
-					memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
-          break;
+          case 'v':
+		  			memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
+            break;
 	      case 'm':
-	        min_snps = atoi(optarg);
-	        break;
-        case 't':
-	        memcpy(tree_filename, optarg, size_of_string(optarg) +1);
-          break;
-        case '?':
-          /* getopt_long already printed an error message. */
-          break;
-        default:
+	          min_snps = atoi(optarg);
+	          break;
+  	      case 'a':
+  	          window_min = atoi(optarg);
+  	          break;
+	  	  case 'b':
+	  	      window_max = atoi(optarg);
+	  	      break;
+          case 't':
+	          memcpy(tree_filename, optarg, size_of_string(optarg) +1);
+            break;
+          case '?':
+            /* getopt_long already printed an error message. */
+            break;
+          default:
           abort ();
         }
     }
@@ -146,7 +159,7 @@ int main (argc, argv) int argc; char **argv;
 			check_file_exists_or_exit(vcf_filename);
 			check_file_exists_or_exit(tree_filename);
 			check_file_exists_or_exit(original_multi_fasta_filename);
-      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename);
+      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max);
     }
     else
     {

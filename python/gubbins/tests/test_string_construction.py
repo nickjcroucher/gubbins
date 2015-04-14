@@ -35,8 +35,8 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.raxml_tree_building_command(2,'AAA','BBB','', 'raxml_exec','CCC', 1) == 'raxml_exec -s CCC.phylip -n AAA.iteration_2 -t CCC'
 
   def test_raxml_gubbins_command(self):
-    assert common.GubbinsCommon.raxml_gubbins_command('AAA','BBB','', 5,'CCC','DDD',3, 'EEE') == 'DDD -r -v BBB.vcf -f EEE -t RAxML_result.AAA.iteration_5 -m 3 BBB.snp_sites.aln'
-    assert common.GubbinsCommon.raxml_gubbins_command('base_filename_without_ext','starting_base_filename',1234, 5,'alignment_filename','gubbins_exec',3, 'original_aln') == 'gubbins_exec -r -v starting_base_filename.vcf -f original_aln -t RAxML_result.base_filename_without_ext.1234iteration_5 -m 3 starting_base_filename.snp_sites.aln'
+    assert common.GubbinsCommon.raxml_gubbins_command('AAA','BBB','', 5,'CCC','DDD',3, 'EEE',10, 100) == 'DDD -r -v BBB.vcf -a 10 -b 100 -f EEE -t RAxML_result.AAA.iteration_5 -m 3 BBB.snp_sites.aln'
+    assert common.GubbinsCommon.raxml_gubbins_command('base_filename_without_ext','starting_base_filename',1234, 5,'alignment_filename','gubbins_exec',3, 'original_aln',10,100) == 'gubbins_exec -r -v starting_base_filename.vcf -a 10 -b 100 -f original_aln -t RAxML_result.base_filename_without_ext.1234iteration_5 -m 3 starting_base_filename.snp_sites.aln'
 
   def test_raxml_regex_for_file_deletions(self):
     assert common.GubbinsCommon.raxml_regex_for_file_deletions('AAA',1234,'BBB', 5) == ['^RAxML_(bestTree|info|log|parsimonyTree).AAA.1234iteration_', '^RAxML_result.AAA.1234iteration_1\\.', '^RAxML_result.AAA.1234iteration_1$', '^RAxML_result.AAA.1234iteration_2\\.', '^RAxML_result.AAA.1234iteration_2$', '^RAxML_result.AAA.1234iteration_3\\.', '^RAxML_result.AAA.1234iteration_3$', '^RAxML_result.AAA.1234iteration_4\\.', '^RAxML_result.AAA.1234iteration_4$', '^RAxML_result.AAA.1234iteration_5.ancestor.tre', '^RAxML_result.AAA.1234iteration_5.seq.joint.txt', '^RAxML_result.AAA.1234iteration_5.prob.joint.txt']
@@ -96,7 +96,7 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.fasttree_tree_building_command(5, 'AAA', 'BBB','CCC', 'EEE','FFF', 'GGG','HHH' ) == 'FFF  -intree AAA GGG CCC.snp_sites.aln   > HHH.iteration_5'
 
   def test_fasttree_gubbins_command(self):
-    assert common.GubbinsCommon.fasttree_gubbins_command('AAA','BBB', 5,'CCC','DDD',3,'EEE') == 'DDD -r -v BBB.vcf -f EEE -t AAA.iteration_5 -m 3 BBB.snp_sites.aln'
+    assert common.GubbinsCommon.fasttree_gubbins_command('AAA','BBB', 5,'CCC','DDD',3,'EEE', 10,100) == 'DDD -r -v BBB.vcf -a 10 -b 100 -f EEE -t AAA.iteration_5 -m 3 BBB.snp_sites.aln'
 
   def test_fasttree_fastml_command(self):
     assert common.GubbinsCommon.fasttree_fastml_command('AAA', 'BBB', 'CCC',2) == 'AAA -s BBB -t CCC.iteration_2 -x CCC.iteration_2.output_tree -y CCC.iteration_2.ancestor.tre -j CCC.iteration_2.seq.joint.txt -k CCC.iteration_2.seq.marginal.txt -d CCC.iteration_2.prob.joint.txt -e CCC.iteration_2.prob.marginal.txt'

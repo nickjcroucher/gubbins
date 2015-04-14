@@ -25,7 +25,9 @@ import argparse
 import pkg_resources
 from gubbins import common
 
-parser = argparse.ArgumentParser(description='Iteratively detect recombinations')
+
+
+parser = argparse.ArgumentParser(description='Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R. "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". Nucleic Acids Res. 2015 Feb 18;43(3):e15. doi: 10.1093/nar/gku1196.')
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting. A list of comma separated names can be used if they form a clade')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')
@@ -40,6 +42,8 @@ parser.add_argument('--prefix',           '-p', help='Add a prefix to the final 
 parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 1)
 parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
 parser.add_argument('--version',                action='version', version=str(pkg_resources.get_distribution("gubbins").version))
+parser.add_argument('--min_window_size',  '-a', help='Minimum window size, default 100', type=int,  default = 100)
+parser.add_argument('--max_window_size',  '-b', help='Maximum window size, default 10000', type=int,  default = 10000)
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())
 gubbins_runner.parse_and_run()

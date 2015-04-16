@@ -177,7 +177,7 @@ class GubbinsCommon():
     if(self.args.starting_tree is not None and self.args.starting_tree != "" and GubbinsCommon.do_the_names_match_the_fasta_file(self.args.starting_tree,self.args.alignment_filename) == 0):
       sys.exit("The names in the starting tree dont match the names in the fasta file")
 
-    GubbinsCommon.check_and_fix_window_size()
+    GubbinsCommon.check_and_fix_window_size(self)
 
     current_time = ''
     if self.args.use_time_stamp > 0:
@@ -369,7 +369,7 @@ class GubbinsCommon():
     
     
   @staticmethod
-  def check_and_fix_window_size():
+  def check_and_fix_window_size(self):
       if self.args.min_window_size < 3:
          self.args.min_window_size = 3
       if self.args.max_window_size > 1000000:

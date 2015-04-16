@@ -1,5 +1,11 @@
 gubbins (1.3.0~trusty1) trusty; urgency=low
 
+  * Calculate bases used for clonal frame
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+gubbins (1.3.0~trusty1) trusty; urgency=low
+
   * Apply filtering to leaf nodes
 
  -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000

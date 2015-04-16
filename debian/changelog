@@ -1,3 +1,9 @@
+gubbins (1.3.3~trusty1) trusty; urgency=low
+
+  * Max window size arg bug
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 16 Apr 2015 16:09:00 +0000
+
 gubbins (1.3.2~trusty1) trusty; urgency=low
 
   * pass in self to window size check

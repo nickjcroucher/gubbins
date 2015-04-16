@@ -118,6 +118,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	newick_child *child;
 	int * current_recombinations;
 	int num_current_recombinations = 0 ;
+	char * child_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
 	
 	current_recombinations = (int *) calloc((root->num_recombinations+1+parent_num_recombinations),sizeof(int));
 	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations, root->num_recombinations,parent_recombinations, parent_num_recombinations, current_recombinations);
@@ -129,12 +130,12 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
  	
  	set_number_of_recombinations_for_sample(root->taxon,root->num_recombinations);
  	set_number_of_snps_for_sample(root->taxon,root->number_of_snps);
- 	
- 	
-	char * child_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
 	
 	get_sequence_for_sample_name(child_sequence, root->taxon);
-
+	int genome_length_excluding_blocks_and_gaps = calculate_genome_length_excluding_blocks_and_gaps(child_sequence, length_of_original_genome, current_block_coordinates, num_blocks);
+	
+	set_genome_length_excluding_blocks_and_gaps_for_sample(root->taxon,genome_length_excluding_blocks_and_gaps);
+	
 	int ** merged_block_coordinates;
 	merged_block_coordinates = (int **) calloc(3,sizeof(int *));
 	merged_block_coordinates[0] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
@@ -1036,5 +1037,68 @@ double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, i
 	
 	return (part1+part2+part3+part4)*-1;
 }
+
+int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks)
+{
+	int * bases_to_be_excluded;  
+	bases_to_be_excluded = (int*) calloc((length_of_sequence + 1),sizeof(int));
+	
+	int i = 0;
+	for(i = 0; i<length_of_sequence; i++)
+	{
+		if(sequence[i] == 'N' || sequence[i] == '-' )
+		{
+			bases_to_be_excluded[i] = 1;
+		}
+	}
+	
+	int j = 0;
+	for(j = 0; j<num_blocks; j++)
+	{
+		if(block_coordinates[0][j] == -1)
+		{
+			continue;
+		}
+		
+		// Coordinates of blocks start at 1 and the index of the array starts at 0
+		int block_index = 0;
+		for(block_index = block_coordinates[0][j]; block_index <= block_coordinates[1][j]; block_index++ )
+		{
+			bases_to_be_excluded[block_index-1] = 1;
+		}
+	}
+	
+    int genome_length = 0;
+	for(i = 0; i<length_of_sequence; i++)
+	{
+		if(bases_to_be_excluded[i] == 0 )
+		{
+			genome_length++;
+		}
+	}
+	return genome_length;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

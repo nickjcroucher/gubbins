@@ -134,7 +134,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 	int genome_length_excluding_blocks_and_gaps = calculate_genome_length_excluding_blocks_and_gaps(child_sequence, length_of_original_genome, current_block_coordinates, num_blocks);
 	
-	set_genome_length_without_gaps_for_sample(root->taxon,genome_length_excluding_blocks_and_gaps);
+	set_genome_length_excluding_blocks_and_gaps_for_sample(root->taxon,genome_length_excluding_blocks_and_gaps);
 	
 	int ** merged_block_coordinates;
 	merged_block_coordinates = (int **) calloc(3,sizeof(int *));

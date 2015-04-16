@@ -28,6 +28,7 @@
    int genome_length_without_gaps;
    int number_of_blocks;
    int bases_in_recombinations;
+   int genome_length_excluding_blocks_and_gaps;
  } sample_statistics;
 
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name);
@@ -52,6 +53,7 @@ void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index,
 void freeup_memory();
 void set_number_of_bases_in_recombinations(char * sample_name, int bases_in_recombinations);
 void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_bases_for_snps, int number_of_filtered_snps);
+void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, int genome_length_excluding_blocks_and_gaps);
 
 #define MAX_READ_BUFFER 65536
 #define MAX_SAMPLE_NAME_SIZE 1024

@@ -637,7 +637,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
     }
 
 		// Just left a block
-		if(window_count[i] <= cutoff && in_block == 1)
+		if((window_count[i] <= cutoff || i+1 == genome_size ) && in_block == 1)
 		{
 			block_coordinates[0][number_of_blocks] = block_lower_bound;
 			block_coordinates[1][number_of_blocks] = i-1;

@@ -146,6 +146,7 @@ If you do not have permission to install the software as root and instead want t
 $ wget https://bootstrap.pypa.io/ez_setup.py -O - | python - --user
 $ ~/.local/bin/easy_install -U --user biopython
 $ ~/.local/bin/easy_install -U --user dendropy
+$ autoreconf -i
 $ ./configure --prefix=~/.local
 $ make
 $ make install

@@ -67,6 +67,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 {
 	remove("../tests/data/multiple_recombinations.tre");
 	cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
+
 	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.aln.snp_sites.aln",3,"../tests/data/multiple_recombinations.aln.snp_sites.aln",100,10000);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	fail_unless(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
@@ -90,15 +91,43 @@ START_TEST (check_gubbins_multiple_recombinations)
 }
 END_TEST
 
+START_TEST (check_recombination_at_root)
+{
+	remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1");
+	cp("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1", "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.original.tre");
+
+    
+	run_gubbins("../tests/data/recombination_at_root/recombination_at_root.aln.gaps.vcf", "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1", "../tests/data/recombination_at_root/recombination_at_root.aln.gaps.snp_sites.aln",3,"../tests/data/recombination_at_root/recombination_at_root.aln",100,10000);
+    
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.vcf")             == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab")             == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.stats")           == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.snp_sites.aln")   == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.phylip")          == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.gff")             == 1);
+    fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.branch_snps.tab") == 1);
+    
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.vcf");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.stats");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.snp_sites.aln");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.phylip");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.gff");
+    remove("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.branch_snps.tab");
+
+}
+END_TEST
+
 
 
 Suite * run_gubbins_suite(void)
 {
   Suite *s = suite_create ("Checking the gubbins functionality");
   TCase *tc_gubbins = tcase_create ("check_gubbins_produces_files");
-	tcase_add_test (tc_gubbins, check_gubbins_no_recombinations);
-	//tcase_add_test (tc_gubbins, check_gubbins_one_recombination);
-	tcase_add_test (tc_gubbins, check_gubbins_multiple_recombinations);
+  tcase_add_test (tc_gubbins, check_gubbins_no_recombinations);
+  //tcase_add_test (tc_gubbins, check_gubbins_one_recombination);
+  tcase_add_test (tc_gubbins, check_gubbins_multiple_recombinations);
+  tcase_add_test (tc_gubbins, check_recombination_at_root);
   suite_add_tcase (s, tc_gubbins);
   return s;
 }

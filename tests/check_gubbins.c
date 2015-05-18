@@ -99,6 +99,8 @@ START_TEST (check_recombination_at_root)
     
 	run_gubbins("../tests/data/recombination_at_root/recombination_at_root.aln.gaps.vcf", "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1", "../tests/data/recombination_at_root/recombination_at_root.aln.gaps.snp_sites.aln",3,"../tests/data/recombination_at_root/recombination_at_root.aln",100,10000);
     
+    fail_unless(compare_files("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab","../tests/data/recombination_at_root/expected_RAxML_result.recombination_at_root.iteration_1.tab") == 1);
+    
     fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.vcf")             == 1);
     fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab")             == 1);
     fail_unless(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.stats")           == 1);

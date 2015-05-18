@@ -1,0 +1,12 @@
+FT   misc_feature    25..978
+FT                   /node="N2->sequence_two"
+FT                   /neg_log_likelihood="81.250897"
+FT                   /colour="4"
+FT                   /taxa="sequence_two"
+FT                   /SNP_count="34"
+FT   misc_feature    11421..12388
+FT                   /node="N1->N2"
+FT                   /neg_log_likelihood="271.826391"
+FT                   /colour="2"
+FT                   /taxa=" sequence_three sequence_two"
+FT                   /SNP_count="210"

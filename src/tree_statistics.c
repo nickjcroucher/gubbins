@@ -48,7 +48,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
     	fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations);
     	fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
 		fprintf( file_pointer, "%f\t", rho_theta(sample_details->number_of_blocks,sample_details->number_of_snps));
-    	fprintf( file_pointer, "%i", sample_details->genome_length_without_gaps);
+    	fprintf( file_pointer, "%i\t", sample_details->genome_length_without_gaps);
 		fprintf( file_pointer, "%i", sample_details->genome_length_excluding_blocks_and_gaps);
 		fprintf( file_pointer, "\n");
 

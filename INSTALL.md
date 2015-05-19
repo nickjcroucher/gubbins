@@ -190,5 +190,5 @@ Go to the [homebrew website](http://brew.sh/) and install the homebrew package m
 Install fastml and gubbins from the following recipes.
 
 > brew tap homebrew/science
-> brew install http://sanger-pathogens.github.io/gubbins/fastml.rb
+> brew install http://sanger-pathogens.github.io/gubbins/fastml2.rb
 > brew install http://sanger-pathogens.github.io/gubbins/gubbins.rb

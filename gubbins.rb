@@ -11,7 +11,7 @@ class Gubbins < Formula
   depends_on :libtool
   depends_on 'raxml'
   depends_on 'fasttree'
-  depends_on 'fastml'
+  depends_on 'fastml2'
   depends_on :python
   
   depends_on LanguageModuleDependency.new :python, "biopython", "Bio"

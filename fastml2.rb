@@ -1,6 +1,6 @@
 require 'formula'
 
-class Fastml < Formula
+class Fastml2 < Formula
   homepage 'https://github.com/sanger-pathogens/fastml'
   url 'https://github.com/sanger-pathogens/fastml/archive/v2.3.tar.gz'
   sha1 'e70b2c83a321ae1664e1ab2a1d16b6bff70fdb01'
@@ -19,3 +19,4 @@ class Fastml < Formula
     system 'fastml 2>&1'
   end
 end
+

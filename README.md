@@ -2,7 +2,7 @@ Please see our website for more information on [Gubbins](http://sanger-pathogens
 
 [Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R.
 "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". doi:10.1093/nar/gku1196, Nucleic Acids Research, 2014.]
-(http://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1196.abstract)
+(http://nar.oxfordjournals.org/content/43/3/e15)
 
 Gubbins
 =======

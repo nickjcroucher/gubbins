@@ -1,0 +1,22 @@
+language: python
+addons:
+  apt:
+    packages:
+    - autoconf
+    - check
+    - g++
+    - libtool
+    - pkg-config
+    - python-dev
+cache:
+  directories:
+  - "build"
+  - "$HOME/.cache/pip"
+python:
+  - "2.7"
+sudo: false
+install:
+  - "source ./install_dependencies.sh"
+  - "autoreconf -i"
+  - "./configure"
+script: "make check"

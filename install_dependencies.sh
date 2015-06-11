@@ -5,7 +5,7 @@ set -e
 
 start_dir=$(pwd)
 
-RAXML_VERSION="8.1.20"
+RAXML_VERSION="8.1.21"
 FASTML_VERSION="2.3"
 FASTTREE_VERSION="2.1.8"
 

@@ -429,7 +429,7 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     
     for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
       if leaf_node.taxon.label not in outgroups:
@@ -458,7 +458,7 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     output_tree_string = tree.as_string(
       schema='newick',
       suppress_leaf_taxon_labels=False,
@@ -511,7 +511,7 @@ class GubbinsCommon():
 
     tree.update_bipartitions()
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     output_tree_string = tree.as_string(
       schema='newick',
       suppress_leaf_taxon_labels=False,
@@ -867,8 +867,8 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(starting_tree, 'newick',
               preserve_underscores=True)
 
-    tree.prune_taxa_with_labels(taxa_removed, update_splits=True, delete_outdegree_one=False)          
-    tree.prune_leaves_without_taxa(update_splits=True, delete_outdegree_one=False)
+    tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True, delete_outdegree_one=False)          
+    tree.prune_leaves_without_taxa(update_bipartitions=True, delete_outdegree_one=False)
     tree.deroot()
     output_tree_string = tree.as_string(
       schema='newick',

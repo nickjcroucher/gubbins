@@ -36,8 +36,6 @@ class TestTreePythonMethods(unittest.TestCase):
     
     shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual')
     common.GubbinsCommon.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual','')
-    actual_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual',  encoding='utf-8').readlines()
-    expected_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_expected',  encoding='utf-8').readlines()
     assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual', 'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_expected')
     os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual')
     
@@ -50,8 +48,6 @@ class TestTreePythonMethods(unittest.TestCase):
   def test_reroot_tree_with_outgroups(self):
     shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
     common.GubbinsCommon.reroot_tree_with_outgroup('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', ['sequence_4','sequence_2'])
-    actual_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',  encoding='utf-8').readlines()
-    expected_file_content = open('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2',  encoding='utf-8').readlines()
     assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual','gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2')
     os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
     

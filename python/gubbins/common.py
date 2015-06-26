@@ -60,7 +60,7 @@ class GubbinsCommon():
     
   @staticmethod
   def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
-    with open(alignment_filename, "rU") as input_handle:
+    with open(alignment_filename, "r") as input_handle:
       alignments = AlignIO.parse(input_handle, "fasta")
       sequence_names = {}
       for alignment in alignments:
@@ -81,7 +81,7 @@ class GubbinsCommon():
 
   @staticmethod
   def does_fasta_contain_variation(alignment_filename):
-    with open(alignment_filename, "rU") as input_handle:
+    with open(alignment_filename, "r") as input_handle:
       alignments = AlignIO.parse(input_handle, "fasta")
       first_sequence = ""
       
@@ -725,10 +725,10 @@ class GubbinsCommon():
   @staticmethod
   def get_sequence_names_from_alignment(filename):
     sequence_names = []
-    handle = open(filename, "rU")
-    for record in SeqIO.parse(handle, "fasta") :
-      sequence_names.append(record.id)
-    handle.close()
+    with open(filename, "r") as handle:
+      for record in SeqIO.parse(handle, "fasta") :
+        sequence_names.append(record.id)
+      handle.close()
     return sequence_names
 
   @staticmethod
@@ -766,25 +766,25 @@ class GubbinsCommon():
 
   @staticmethod
   def does_each_sequence_have_a_name_and_genomic_data(input_filename):
-    input_handle  = open(input_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    number_of_sequences = 0
-    for alignment in alignments:
-        for record in alignment:
-            number_of_sequences +=1
-            if record.name is None or record.name == "":
-              print("Error with the input FASTA file: One of the sequence names is blank")
-              return 0
-            if record.seq is None or record.seq == "":
-              print("Error with the input FASTA file: One of the sequences is empty")
-              return 0
-            if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
-              print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
-              return 0
-    if number_of_sequences <= 3:
-      print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
-      return 0
-    input_handle.close()
+    with  open(input_filename, "r") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      number_of_sequences = 0
+      for alignment in alignments:
+          for record in alignment:
+              number_of_sequences +=1
+              if record.name is None or record.name == "":
+                print("Error with the input FASTA file: One of the sequence names is blank")
+                return 0
+              if record.seq is None or record.seq == "":
+                print("Error with the input FASTA file: One of the sequences is empty")
+                return 0
+              if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
+                print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
+                return 0
+      if number_of_sequences <= 3:
+        print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
+        return 0
+      input_handle.close()
     return 1
     
     
@@ -922,7 +922,7 @@ class GubbinsCommon():
      
       gapped_alignments = []
       # interleave gap only and snp bases
-      with open(input_fasta_filename, "rU") as input_handle:
+      with open(input_fasta_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
         for alignment in alignments:
           for record in alignment:
@@ -955,12 +955,12 @@ class GubbinsCommon():
     # reparsing a fasta file splits the lines which makes fastml work
   @staticmethod
   def reconvert_fasta_file(input_filename, output_filename):
-    input_handle = open(input_filename, "rU")
-    output_handle = open(output_filename, "w+")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    AlignIO.write(alignments, output_handle, "fasta")
-    output_handle.close()
-    input_handle.close()
+    with open(input_filename, "r") as input_handle:
+      output_handle = open(output_filename, "w+")
+      alignments = AlignIO.parse(input_handle, "fasta")
+      AlignIO.write(alignments, output_handle, "fasta")
+      output_handle.close()
+      input_handle.close()
     return
 
   @staticmethod
@@ -1037,31 +1037,31 @@ class GubbinsCommon():
   
   @staticmethod
   def extract_recombinations_from_embl(filename):
-    fh = open(filename, "rU")
-    sequences_to_coords = {}
-    start_coord = -1
-    end_coord = -1
-    for line in fh:
-      searchObj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
-      if searchObj != None:
-        start_coord = int(searchObj.group(1))
-        end_coord = int(searchObj.group(2))
-        continue
-
-      if start_coord >= 0 and end_coord >= 0:
-        searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
-        if searchTaxa != None:
-          taxa_names = searchTaxa.group(1).strip().split(' ')
-          for taxa_name in taxa_names:
-            if taxa_name in sequences_to_coords:
-              sequences_to_coords[taxa_name].append([start_coord,end_coord])
-            else:
-              sequences_to_coords[taxa_name] = [[start_coord,end_coord]]
-            
-          start_coord = -1
-          end_coord   = -1
-        continue
-    fh.close()
+    with open(filename, "r") as fh:
+      sequences_to_coords = {}
+      start_coord = -1
+      end_coord = -1
+      for line in fh:
+        searchObj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
+        if searchObj != None:
+          start_coord = int(searchObj.group(1))
+          end_coord = int(searchObj.group(2))
+          continue
+      
+        if start_coord >= 0 and end_coord >= 0:
+          searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
+          if searchTaxa != None:
+            taxa_names = searchTaxa.group(1).strip().split(' ')
+            for taxa_name in taxa_names:
+              if taxa_name in sequences_to_coords:
+                sequences_to_coords[taxa_name].append([start_coord,end_coord])
+              else:
+                sequences_to_coords[taxa_name] = [[start_coord,end_coord]]
+              
+            start_coord = -1
+            end_coord   = -1
+          continue
+      fh.close()
     return sequences_to_coords
     
   @staticmethod

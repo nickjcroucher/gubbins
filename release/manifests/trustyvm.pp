@@ -49,6 +49,11 @@ package {"python-nose":
   ensure => "installed"
 }
 
+package {"python3-pip":
+  ensure => "installed"
+}
+
+
 # The Debian/Ubuntu system biopython library has no egg-info associated with it
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=743927
 # so setuptools will pull down an egg and needs Python.h available to make it

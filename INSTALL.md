@@ -17,13 +17,13 @@ There are a few ways to Install/Use Gubbins, with detailed instructions below:
 
 ## Prep work ##
 As listed in the dependancies section below, you need
- * Python 2.7.
+ * Python 3
  * Python development headers (the python-dev package on Debian/Ubuntu).
 
 You will also need the following python packages installed, if they are not then they will be downloaded and installed automatically during the Gubbins installation process:
 
  * Biopython ( >=1.59 )
- * DendroPy ( >=3.11.1 )
+ * DendroPy ( >=4.0.0 )
  * ReportLab ( >= 2.5 )
 
 Gubbins also depends on the following pieces of software.  Depending on your installation choice these may be downloaded and installed automatically during the Gubbins installation process. 
@@ -49,17 +49,6 @@ Each of the system-wide cases assumes you have permissions to _sudo_.  The per-u
 
 We currently only support Ubuntu 14.04 x86_64 as a system-wide binary install.  Other architectures will be added on request.
 
-Install the DendroPy dependancy:
-
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
-```
-
-Then install gubbins
-
 ``` bash
 $ sudo add-apt-repository ppa:ap13/gubbins
 $ sudo apt-get update
@@ -71,18 +60,6 @@ If you have your own version of the raxml binary, then you can omit it from the 
 
 ### System-wide from binaries for other debian based systems ###
 This might work on other Debian based systems and other versions of Ubuntu, but is untested.
-
-Install the DendroPy dependancy:
-
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
-```
-
-Then install gubbins
-
 
 ```bash
 echo "deb http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
@@ -120,7 +97,7 @@ $ easy_install -U dendropy
 
 Alternatively, if you need to install the dependencies from source:
 ``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python -
+$ wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python3 -
 $ sudo easy_install -U biopython
 $ sudo easy_install -U dendropy
 ```
@@ -143,7 +120,7 @@ $ sudo make install
 If you do not have permission to install the software as root and instead want to install it in a local user directory then the following commands can be used instead:
 
 ``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | python - --user
+$ wget https://bootstrap.pypa.io/ez_setup.py -O - | python3 - --user
 $ ~/.local/bin/easy_install -U --user biopython
 $ ~/.local/bin/easy_install -U --user dendropy
 $ autoreconf -i
@@ -180,7 +157,7 @@ To see full usage of this script run:
 ### OSX ###
 Install the python dependancies:
 
-> curl https://bootstrap.pypa.io/ez_setup.py  | python - --user
+> curl https://bootstrap.pypa.io/ez_setup.py  | python3 - --user
 > ~/bin/easy_install -U --user biopython
 > ~/bin/easy_install -U --user dendropy
 > ~/bin/easy_install -U --user reportlab

@@ -32,7 +32,7 @@ setup(
         ],
     install_requires=[
         'Biopython >= 1.59',
-        'DendroPy  <= 3.12.0',
+        'DendroPy  >= 4.0.2',
         'Reportlab >= 2.5',
         'nose >= 1.3'
     ],

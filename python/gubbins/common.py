@@ -475,9 +475,9 @@ class GubbinsCommon():
       suppress_item_comments=True,
       node_label_element_separator=' '
       )
-    output_file = open(tree_name, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(tree_name, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def split_all_non_bi_nodes(node):
@@ -528,9 +528,9 @@ class GubbinsCommon():
       suppress_item_comments=True,
       node_label_element_separator=' '
       )
-    output_file = open(tree_name, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(tree_name, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def raxml_base_name(base_filename_without_ext,current_time):
@@ -628,9 +628,9 @@ class GubbinsCommon():
       suppress_item_comments=True,
       node_label_element_separator=' '
       )
-    output_file = open(output_filename, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(output_filename, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):
@@ -825,34 +825,34 @@ class GubbinsCommon():
   @staticmethod
   def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
     with open(input_filename) as input_handle:
-      output_handle = open(output_filename, "w+")
-      alignments = AlignIO.parse(input_handle, "fasta")
-      output_alignments = []
-      taxa_removed = []
-      number_of_included_alignments = 0
-      for alignment in alignments:
-          for record in alignment:
-            number_of_gaps = 0
-            number_of_gaps += record.seq.count('n')
-            number_of_gaps += record.seq.count('N')
-            number_of_gaps += record.seq.count('-')
-            sequence_length = len(record.seq)
-      
-            if sequence_length == 0:
-              taxa_removed.append(record.id)
-              print("Excluded sequence " + record.id + " because there werent enough bases in it")
-            elif((number_of_gaps*100/sequence_length) <= filter_percentage):
-              output_alignments.append(record)
-              number_of_included_alignments += 1
-            else:
-              taxa_removed.append(record.id)
-              print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
-      
-      if number_of_included_alignments <= 1:
-        sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
-      
-      AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
-      output_handle.close()
+      with open(output_filename, "w+") as output_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        output_alignments = []
+        taxa_removed = []
+        number_of_included_alignments = 0
+        for alignment in alignments:
+            for record in alignment:
+              number_of_gaps = 0
+              number_of_gaps += record.seq.count('n')
+              number_of_gaps += record.seq.count('N')
+              number_of_gaps += record.seq.count('-')
+              sequence_length = len(record.seq)
+        
+              if sequence_length == 0:
+                taxa_removed.append(record.id)
+                print("Excluded sequence " + record.id + " because there werent enough bases in it")
+              elif((number_of_gaps*100/sequence_length) <= filter_percentage):
+                output_alignments.append(record)
+                number_of_included_alignments += 1
+              else:
+                taxa_removed.append(record.id)
+                print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
+        
+        if number_of_included_alignments <= 1:
+          sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
+        
+        AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
+        output_handle.close()
       input_handle.close()
     return taxa_removed
 
@@ -886,9 +886,9 @@ class GubbinsCommon():
       suppress_item_comments=True,
       node_label_element_separator=' '
       )
-    output_file = open(temp_starting_tree, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(temp_starting_tree, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
     return temp_starting_tree
 
@@ -946,9 +946,9 @@ class GubbinsCommon():
             record.seq = Seq(''.join(inserted_gaps))
             gapped_alignments.append(record)
         
-      output_handle = open(output_fasta_filename, "a")
-      AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
-      output_handle.close()
+      with open(output_fasta_filename, "a") as output_handle:
+        AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
+        output_handle.close()
     return
 
 
@@ -956,10 +956,10 @@ class GubbinsCommon():
   @staticmethod
   def reconvert_fasta_file(input_filename, output_filename):
     with open(input_filename, "r") as input_handle:
-      output_handle = open(output_filename, "w+")
-      alignments = AlignIO.parse(input_handle, "fasta")
-      AlignIO.write(alignments, output_handle, "fasta")
-      output_handle.close()
+      with open(output_filename, "w+") as output_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        AlignIO.write(alignments, output_handle, "fasta")
+        output_handle.close()
       input_handle.close()
     return
 

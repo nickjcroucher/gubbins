@@ -867,8 +867,8 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(starting_tree, 'newick',
               preserve_underscores=True)
 
-    tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True, delete_outdegree_one=False)          
-    tree.prune_leaves_without_taxa(update_bipartitions=True, delete_outdegree_one=False)
+    tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)          
+    tree.prune_leaves_without_taxa(update_bipartitions=True)
     tree.deroot()
     output_tree_string = tree.as_string(
       schema='newick',

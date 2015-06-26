@@ -383,7 +383,7 @@ class GubbinsCommon():
   def robinson_foulds_distance(input_tree_name,output_tree_name):
     input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
     output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-    return input_tree.robinson_foulds_distance(output_tree)
+    return input_tree.weighted_robinson_foulds_distance(output_tree)
     
   @staticmethod
   def symmetric_difference(input_tree_name,output_tree_name):
@@ -453,8 +453,7 @@ class GubbinsCommon():
     tree.deroot()
     tree.update_splits()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=False,
@@ -504,12 +503,11 @@ class GubbinsCommon():
               preserve_underscores=True)
     GubbinsCommon.split_all_non_bi_nodes(tree.seed_node)
 
-    tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
+    tree.update_bipartitions()
     tree.deroot()
     tree.update_splits()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=False,
@@ -522,8 +520,7 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
     output_file = open(tree_name, 'w+')
     output_file.write(output_tree_string.replace('\'', ''))
@@ -610,8 +607,7 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
 
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=True,
@@ -869,8 +865,7 @@ class GubbinsCommon():
     tree.prune_leaves_without_taxa(update_splits=True, delete_outdegree_one=False)
     tree.deroot()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=True,

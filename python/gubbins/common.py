@@ -60,42 +60,42 @@ class GubbinsCommon():
     
   @staticmethod
   def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
-    input_handle  = open(alignment_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    sequence_names = {}
-    for alignment in alignments:
-        for record in alignment:
-            sequence_names[record.name] = 1
-    input_handle.close()
-    
-    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
-    
-    leaf_nodes = tree.leaf_nodes()
-    for i,lf in enumerate(leaf_nodes):
-      if not leaf_nodes[i].taxon.label in sequence_names:
-        print("Error: A taxon referenced in the starting tree isnt found in the input fasta file")
-        return 0
-
+    with open(alignment_filename, "rU") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      sequence_names = {}
+      for alignment in alignments:
+          for record in alignment:
+              sequence_names[record.name] = 1
+      input_handle.close()
+      
+      tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+      
+      leaf_nodes = tree.leaf_nodes()
+      for i,lf in enumerate(leaf_nodes):
+        if not leaf_nodes[i].taxon.label in sequence_names:
+          print("Error: A taxon referenced in the starting tree isnt found in the input fasta file")
+          return 0
+      
     return 1
 
 
   @staticmethod
   def does_fasta_contain_variation(alignment_filename):
-    input_handle  = open(alignment_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    first_sequence = ""
-
-    for index, alignment in enumerate(alignments):
-      for record_index, record in enumerate(alignment):
-
-        if record_index == 0:
-          first_sequence = record.seq
-
-        if str(record.seq) != str(first_sequence):
-          input_handle.close()
-          return 1
-          
-    input_handle.close()
+    with open(alignment_filename, "rU") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      first_sequence = ""
+      
+      for index, alignment in enumerate(alignments):
+        for record_index, record in enumerate(alignment):
+      
+          if record_index == 0:
+            first_sequence = record.seq
+      
+          if str(record.seq) != str(first_sequence):
+            input_handle.close()
+            return 1
+            
+      input_handle.close()
     return 0
 
 
@@ -791,17 +791,18 @@ class GubbinsCommon():
   @staticmethod
   def does_each_sequence_have_the_same_length(input_filename):
     try:
-      input_handle  = open(input_filename, "rU")
-      alignments = AlignIO.parse(input_handle, "fasta")
-      sequence_length = -1
-      for alignment in alignments:
-          for record in alignment:
-             if sequence_length == -1:
-               sequence_length = len(record.seq)
-             elif sequence_length != len(record.seq):
-               print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
-               return 0
-      input_handle.close()
+      with open(input_filename) as input_handle:
+      
+        alignments = AlignIO.parse(input_handle, "fasta")
+        sequence_length = -1
+        for alignment in alignments:
+            for record in alignment:
+               if sequence_length == -1:
+                 sequence_length = len(record.seq)
+               elif sequence_length != len(record.seq):
+                 print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
+                 return 0
+        input_handle.close()
     except:
       print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
       return 0
@@ -809,50 +810,50 @@ class GubbinsCommon():
 
   @staticmethod
   def are_sequence_names_unique(input_filename):
-    input_handle  = open(input_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    sequence_names = []
-    for alignment in alignments:
-        for record in alignment:
-            sequence_names.append(record.name)
-            
-    if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
-      return 0
-    input_handle.close()
+    with open(input_filename) as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      sequence_names = []
+      for alignment in alignments:
+          for record in alignment:
+              sequence_names.append(record.name)
+              
+      if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
+        return 0
+      input_handle.close()
     return 1
 
   @staticmethod
   def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
-    input_handle  = open(input_filename, "rU")
-    output_handle = open(output_filename, "w+")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    output_alignments = []
-    taxa_removed = []
-    number_of_included_alignments = 0
-    for alignment in alignments:
-        for record in alignment:
-          number_of_gaps = 0
-          number_of_gaps += record.seq.count('n')
-          number_of_gaps += record.seq.count('N')
-          number_of_gaps += record.seq.count('-')
-          sequence_length = len(record.seq)
-
-          if sequence_length == 0:
-            taxa_removed.append(record.id)
-            print("Excluded sequence " + record.id + " because there werent enough bases in it")
-          elif((number_of_gaps*100/sequence_length) <= filter_percentage):
-            output_alignments.append(record)
-            number_of_included_alignments += 1
-          else:
-            taxa_removed.append(record.id)
-            print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
-
-    if number_of_included_alignments <= 1:
-      sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
-
-    AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
-    output_handle.close()
-    input_handle.close()
+    with open(input_filename) as input_handle:
+      output_handle = open(output_filename, "w+")
+      alignments = AlignIO.parse(input_handle, "fasta")
+      output_alignments = []
+      taxa_removed = []
+      number_of_included_alignments = 0
+      for alignment in alignments:
+          for record in alignment:
+            number_of_gaps = 0
+            number_of_gaps += record.seq.count('n')
+            number_of_gaps += record.seq.count('N')
+            number_of_gaps += record.seq.count('-')
+            sequence_length = len(record.seq)
+      
+            if sequence_length == 0:
+              taxa_removed.append(record.id)
+              print("Excluded sequence " + record.id + " because there werent enough bases in it")
+            elif((number_of_gaps*100/sequence_length) <= filter_percentage):
+              output_alignments.append(record)
+              number_of_included_alignments += 1
+            else:
+              taxa_removed.append(record.id)
+              print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
+      
+      if number_of_included_alignments <= 1:
+        sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
+      
+      AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
+      output_handle.close()
+      input_handle.close()
     return taxa_removed
 
   @staticmethod
@@ -895,59 +896,59 @@ class GubbinsCommon():
   def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
     # find out where the gaps are located
     # PyVCF removed for performance reasons
-    vcf_file = open(input_vcf_file, 'r')
-
-    sample_names  = []
-    gap_position = []
-    gap_alt_base = []
-
-    for vcf_line in vcf_file:
-      if re.match('^#CHROM', vcf_line)  != None :
-         sample_names = vcf_line.rstrip().split('\t' )[9:]
-      elif re.match('^\d', vcf_line)  != None :
-        # If the alternate is only a gap it wont have a base in this column
-        if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:
-          m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) 
-          gap_position.append(1)
-          gap_alt_base.append(m.group(2))
-        elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
-          # sometimes the ref can be a gap only 
-          m = re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line) 
-          gap_position.append(1)
-          gap_alt_base.append(m.group(3))
-        else:
-          gap_position.append(0)
-          gap_alt_base.append('-')
-
-    gapped_alignments = []
-    # interleave gap only and snp bases
-    input_handle = open(input_fasta_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    for alignment in alignments:
-      for record in alignment:
-        inserted_gaps = []
-        if record.id in sample_names:
-          # only apply to internal nodes
-          continue
-        gap_index = 0
-        for input_base in record.seq:
-          while gap_index < len(gap_position) and gap_position[gap_index] == 1:
-            inserted_gaps.append(gap_alt_base[gap_index])
-            gap_index+=1
-          if gap_index < len(gap_position):
-            inserted_gaps.append(input_base)
-            gap_index+=1
-
-        while gap_index < len(gap_position):
-          inserted_gaps.append(gap_alt_base[gap_index])
-          gap_index+=1
-
-        record.seq = Seq(''.join(inserted_gaps))
-        gapped_alignments.append(record)
-
-    output_handle = open(output_fasta_filename, "a")
-    AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
-
+    with open(input_vcf_file) as vcf_file:
+     
+      sample_names  = []
+      gap_position = []
+      gap_alt_base = []
+     
+      for vcf_line in vcf_file:
+        if re.match('^#CHROM', vcf_line)  != None :
+           sample_names = vcf_line.rstrip().split('\t' )[9:]
+        elif re.match('^\d', vcf_line)  != None :
+          # If the alternate is only a gap it wont have a base in this column
+          if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:
+            m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) 
+            gap_position.append(1)
+            gap_alt_base.append(m.group(2))
+          elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
+            # sometimes the ref can be a gap only 
+            m = re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line) 
+            gap_position.append(1)
+            gap_alt_base.append(m.group(3))
+          else:
+            gap_position.append(0)
+            gap_alt_base.append('-')
+     
+      gapped_alignments = []
+      # interleave gap only and snp bases
+      with open(input_fasta_filename, "rU") as input_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        for alignment in alignments:
+          for record in alignment:
+            inserted_gaps = []
+            if record.id in sample_names:
+              # only apply to internal nodes
+              continue
+            gap_index = 0
+            for input_base in record.seq:
+              while gap_index < len(gap_position) and gap_position[gap_index] == 1:
+                inserted_gaps.append(gap_alt_base[gap_index])
+                gap_index+=1
+              if gap_index < len(gap_position):
+                inserted_gaps.append(input_base)
+                gap_index+=1
+        
+            while gap_index < len(gap_position):
+              inserted_gaps.append(gap_alt_base[gap_index])
+              gap_index+=1
+        
+            record.seq = Seq(''.join(inserted_gaps))
+            gapped_alignments.append(record)
+        
+      output_handle = open(output_fasta_filename, "a")
+      AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
+      output_handle.close()
     return
 
 

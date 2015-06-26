@@ -26,6 +26,7 @@ from io import StringIO
 from collections import Counter
 import argparse
 import dendropy
+from dendropy.calculate import treecompare
 import math
 import os
 import re
@@ -381,15 +382,21 @@ class GubbinsCommon():
   
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
-    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-    return input_tree.weighted_robinson_foulds_distance(output_tree)
+    tns = dendropy.TaxonNamespace()
+    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick',taxon_namespace=tns)
+    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick',taxon_namespace=tns)
+    input_tree.encode_bipartitions()
+    output_tree.encode_bipartitions()
+    return dendropy.calculate.treecompare.weighted_robinson_foulds_distance(input_tree, output_tree)
     
   @staticmethod
   def symmetric_difference(input_tree_name,output_tree_name):
-    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-    return input_tree.symmetric_difference(output_tree)
+    tns = dendropy.TaxonNamespace()
+    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick',taxon_namespace=tns)
+    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick',taxon_namespace=tns)
+    input_tree.encode_bipartitions()
+    output_tree.encode_bipartitions()
+    return dendropy.calculate.treecompare.symmetric_difference(input_tree,output_tree)
     
   @staticmethod
   def has_tree_been_seen_before(tree_file_names,converge_method):
@@ -466,8 +473,7 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
     output_file = open(tree_name, 'w+')
     output_file.write(output_tree_string.replace('\'', ''))
@@ -620,8 +626,7 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
     output_file = open(output_filename, 'w+')
     output_file.write(output_tree_string.replace('\'', ''))
@@ -878,8 +883,7 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
     output_file = open(temp_starting_tree, 'w+')
     output_file.write(output_tree_string.replace('\'', ''))

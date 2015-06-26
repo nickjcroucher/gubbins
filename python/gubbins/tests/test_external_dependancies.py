@@ -12,6 +12,7 @@ import sys
 import os
 import glob
 import argparse
+import filecmp
 import pkg_resources
 from gubbins import common
 
@@ -353,34 +354,6 @@ class TestExternalDependancies(unittest.TestCase):
     gubbins_runner  = common.GubbinsCommon(parser.parse_args(['gubbins/tests/data/multiple_recombinations.aln']))
     gubbins_runner.parse_and_run()
 
-    actual_file_content2    = open('multiple_recombinations.summary_of_snp_distribution.vcf',    encoding='utf-8').readlines()
-    actual_file_content3    = open('multiple_recombinations.recombination_predictions.embl',    encoding='utf-8').readlines()
-    actual_file_content4    = open('multiple_recombinations.per_branch_statistics.csv',    encoding='utf-8').readlines()
-    actual_file_content5    = open('multiple_recombinations.filtered_polymorphic_sites.fasta',    encoding='utf-8').readlines()
-    actual_file_content6    = open('multiple_recombinations.filtered_polymorphic_sites.phylip',    encoding='utf-8').readlines()
-    actual_file_content8    = open('multiple_recombinations.recombination_predictions.gff',    encoding='utf-8').readlines()
-    actual_file_content9    = open('multiple_recombinations.branch_base_reconstruction.embl',    encoding='utf-8').readlines()
-    actual_file_content10   = open('multiple_recombinations.final_tree.tre',    encoding='utf-8').readlines()
-    
-    expected_file_content2  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.vcf',    encoding='utf-8').readlines()
-    expected_file_content3  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.tab',    encoding='utf-8').readlines()
-    expected_file_content4  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.stats',    encoding='utf-8').readlines()
-    expected_file_content5  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.snp_sites.aln',    encoding='utf-8').readlines()
-    expected_file_content6  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.phylip',    encoding='utf-8').readlines()
-    expected_file_content8  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.gff',    encoding='utf-8').readlines()
-    expected_file_content9  = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5.branch_snps.tab',    encoding='utf-8').readlines()
-    expected_file_content10 = open('gubbins/tests/data/expected_RAxML_result.multiple_recombinations.iteration_5',    encoding='utf-8').readlines()
-    
-    # Slightly different values of internal nodes if run on fastml on linux and osx
-    #assert actual_file_content2 == expected_file_content2
-    #assert actual_file_content3 == expected_file_content3
-    #assert actual_file_content4 == expected_file_content4
-    #assert actual_file_content5 == expected_file_content5
-    #assert actual_file_content6 == expected_file_content6
-    #assert actual_file_content8 == expected_file_content8
-    #assert actual_file_content9 == expected_file_content9
-    #assert actual_file_content10 == expected_file_content10
-    
     assert not os.path.exists('multiple_recombinations.aln.start')
     assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.ancestor.tre')
     assert not os.path.exists('RAxML_result.multiple_recombinations.iteration_5.seq.joint.txt')
@@ -408,14 +381,10 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('pairwise.final_tree.tre')
     
     # Check the VCF file is as expected
-    actual_file_content   = open('pairwise.summary_of_snp_distribution.vcf',    encoding='utf-8').readlines()
-    expected_file_content = open('gubbins/tests/data/pairwise.aln.tre.vcf_expected',  encoding='utf-8').readlines()
-    assert actual_file_content == expected_file_content
+    assert filecmp.cmp('pairwise.summary_of_snp_distribution.vcf','gubbins/tests/data/pairwise.aln.tre.vcf_expected')
     
     # Check the reconstruction of internal nodes
-    actual_file_content   = open('pairwise.filtered_polymorphic_sites.fasta',    encoding='utf-8').readlines()
-    expected_file_content = open('gubbins/tests/data/pairwise.aln.snp_sites.aln_expected',  encoding='utf-8').readlines()
-    assert actual_file_content == expected_file_content
+    assert filecmp.cmp('pairwise.filtered_polymorphic_sites.fasta','gubbins/tests/data/pairwise.aln.snp_sites.aln_expected');
     
     
     os.remove('pairwise.summary_of_snp_distribution.vcf')

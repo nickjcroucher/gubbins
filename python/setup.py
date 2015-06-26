@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup
 import multiprocessing
@@ -25,14 +25,14 @@ setup(
       """,
     classifiers=[
         "License :: OSI Approved :: GNU General Public License (GPL)",
-        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         ],
     install_requires=[
         'Biopython >= 1.59',
-        'DendroPy  >= 3.12.0',
+        'DendroPy  <= 3.12.0',
         'Reportlab >= 2.5',
         'nose >= 1.3'
     ],

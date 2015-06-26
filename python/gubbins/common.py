@@ -22,7 +22,7 @@ from Bio import Phylo
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
-from cStringIO import StringIO
+from io import StringIO
 from collections import Counter
 import argparse
 import dendropy
@@ -53,7 +53,7 @@ class GubbinsCommon():
       Phylo.read(starting_tree, 'newick')
       tree  = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
     except:
-      print "Error with the input starting tree: Is it a valid Newick file?"
+      print("Error with the input starting tree: Is it a valid Newick file?")
       return 0
     return 1
     
@@ -72,7 +72,7 @@ class GubbinsCommon():
     leaf_nodes = tree.leaf_nodes()
     for i,lf in enumerate(leaf_nodes):
       if not leaf_nodes[i].taxon.label in sequence_names:
-        print "Error: A taxon referenced in the starting tree isnt found in the input fasta file"
+        print("Error: A taxon referenced in the starting tree isnt found in the input fasta file")
         return 0
 
     return 1
@@ -101,7 +101,7 @@ class GubbinsCommon():
   @staticmethod
   def does_file_exist(alignment_filename, file_type_msg):
     if(not os.path.exists(alignment_filename)):
-      print GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly')
+      print(GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly'))
       return 0
     return 1
  
@@ -135,7 +135,7 @@ class GubbinsCommon():
     if self.args.threads == 1 and raxml_executable == "":
       self.args.threads = 2
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
-      print "Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n"
+      print("Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n")
       raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
@@ -183,7 +183,7 @@ class GubbinsCommon():
     if self.args.use_time_stamp > 0:
       current_time = str(int(time.time()))+'.'
       if self.args.verbose > 0:
-        print current_time
+        print(current_time)
 
     # get the base filename
     (base_directory,base_filename) = os.path.split(self.args.alignment_filename)
@@ -205,14 +205,14 @@ class GubbinsCommon():
 
     # find all snp sites
     if self.args.verbose > 0:
-      print GUBBINS_EXEC +" "+ self.args.alignment_filename
+      print(GUBBINS_EXEC +" "+ self.args.alignment_filename)
     try:
       subprocess.check_call([GUBBINS_EXEC, self.args.alignment_filename])
     except:
       sys.exit("Gubbins crashed, please ensure you have enough free memory")
       
     if self.args.verbose > 0:
-      print int(time.time())
+      print(int(time.time()))
 
     GubbinsCommon.reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
 
@@ -281,7 +281,7 @@ class GubbinsCommon():
         gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
       if self.args.verbose > 0:
-        print tree_building_command
+        print(tree_building_command)
 
 
       if self.args.starting_tree is not None and i == 1:
@@ -293,13 +293,13 @@ class GubbinsCommon():
           sys.exit("Failed while building the tree.")
 
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
       fastml_command_suffix = ' > /dev/null 2>&1'
       if self.args.verbose > 0:
-        print fastml_command
+        print(fastml_command)
         fastml_command_suffix = ''
 
 
@@ -317,16 +317,16 @@ class GubbinsCommon():
 
 
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       if self.args.verbose > 0:
-        print gubbins_command
+        print(gubbins_command)
       try:
         subprocess.check_call(gubbins_command, shell=True)
       except:
         sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       tree_file_names.append(current_tree_name)
       if i > 2:
@@ -335,12 +335,12 @@ class GubbinsCommon():
           
           if GubbinsCommon.have_recombinations_been_seen_before(current_recomb_file,previous_recomb_files):
             if self.args.verbose > 0:
-              print "Recombinations observed before so stopping: "+ str(current_tree_name)
+              print("Recombinations observed before so stopping: "+ str(current_tree_name))
             break
         else:
           if GubbinsCommon.has_tree_been_seen_before(tree_file_names,self.args.converge_method):
             if self.args.verbose > 0:
-              print "Tree observed before so stopping: "+ str(current_tree_name)
+              print("Tree observed before so stopping: "+ str(current_tree_name))
             break
 
     # cleanup intermediate files
@@ -426,7 +426,7 @@ class GubbinsCommon():
     
     for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
       if leaf_node.taxon.label not in outgroups:
-        print "Your outgroups do not form a clade.\n  Using the first taxon "+str(outgroups[0])+" as the outgroup.\n  Taxon "+str(leaf_node.taxon.label)+" is in the clade but not in your list of outgroups."
+        print("Your outgroups do not form a clade.\n  Using the first taxon "+str(outgroups[0])+" as the outgroup.\n  Taxon "+str(leaf_node.taxon.label)+" is in the clade but not in your list of outgroups.")
         return [outgroups[0]]
     
     return outgroups
@@ -734,16 +734,16 @@ class GubbinsCommon():
   def is_input_fasta_file_valid(input_filename):
     try:
       if GubbinsCommon.does_each_sequence_have_the_same_length(input_filename) == 0:
-        print "Each sequence must be the same length"
+        print("Each sequence must be the same length")
         return 0
       if GubbinsCommon.are_sequence_names_unique(input_filename) == 0:
-        print "All sequence names in the fasta file must be unique"
+        print("All sequence names in the fasta file must be unique")
         return 0
       if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
-        print "Each sequence must have a name and some genomic data"
+        print("Each sequence must have a name and some genomic data")
         return 0
       if GubbinsCommon.does_fasta_contain_variation(input_filename) == 0:
-        print "All of the input sequences contain the same data"
+        print("All of the input sequences contain the same data")
         return 0
     except:
       return 0
@@ -772,16 +772,16 @@ class GubbinsCommon():
         for record in alignment:
             number_of_sequences +=1
             if record.name is None or record.name == "":
-              print "Error with the input FASTA file: One of the sequence names is blank"
+              print("Error with the input FASTA file: One of the sequence names is blank")
               return 0
             if record.seq is None or record.seq == "":
-              print "Error with the input FASTA file: One of the sequences is empty"
+              print("Error with the input FASTA file: One of the sequences is empty")
               return 0
             if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
-              print "Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted"
+              print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
               return 0
     if number_of_sequences <= 3:
-      print "Error with input FASTA file: you need more than 3 sequences to build a meaningful tree"
+      print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
       return 0
     input_handle.close()
     return 1
@@ -798,11 +798,11 @@ class GubbinsCommon():
              if sequence_length == -1:
                sequence_length = len(record.seq)
              elif sequence_length != len(record.seq):
-               print "Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name
+               print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
                return 0
       input_handle.close()
     except:
-      print "Error with the input FASTA file: It is in the wrong format so check its an alignment"
+      print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
       return 0
     return 1
 
@@ -815,7 +815,7 @@ class GubbinsCommon():
         for record in alignment:
             sequence_names.append(record.name)
             
-    if [k for k,v in Counter(sequence_names).items() if v>1] != []:
+    if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
       return 0
     input_handle.close()
     return 1
@@ -838,13 +838,13 @@ class GubbinsCommon():
 
           if sequence_length == 0:
             taxa_removed.append(record.id)
-            print "Excluded sequence " + record.id + " because there werent enough bases in it"
+            print("Excluded sequence " + record.id + " because there werent enough bases in it")
           elif((number_of_gaps*100/sequence_length) <= filter_percentage):
             output_alignments.append(record)
             number_of_included_alignments += 1
           else:
             taxa_removed.append(record.id)
-            print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
+            print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
 
     if number_of_included_alignments <= 1:
       sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
@@ -982,7 +982,8 @@ class GubbinsCommon():
 
   @staticmethod
   def create_pairwise_newick_tree(sequence_names, output_filename):
-    tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
+    stringio = StringIO("".join(('(',sequence_names[0], ',', sequence_names[1],')')))
+    tree = Phylo.read(stringio, "newick")
     Phylo.write(tree, output_filename, 'newick')
 
   @staticmethod
@@ -993,7 +994,7 @@ class GubbinsCommon():
           full_path_of_file_for_deletion = os.path.join(directory_to_search, filename)
           if(re.match(str(deletion_regex), filename) != None and os.path.exists(full_path_of_file_for_deletion)):
             if verbose > 0:
-              print "Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex
+              print("Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex)
             os.remove(full_path_of_file_for_deletion)
             
   @staticmethod
@@ -1004,7 +1005,7 @@ class GubbinsCommon():
           full_path_of_file_for_find = os.path.join(directory_to_search, filename)
           if(re.match(str(find_regex), filename) != None and os.path.exists(full_path_of_file_for_find)):
             if verbose > 0:
-              print "File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex
+              print("File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex)
             return 1
     return 0
 

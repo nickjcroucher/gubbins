@@ -148,7 +148,7 @@ class GubbinsCommon():
     
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
-    FASTML_EXEC = 'fastml -mg -qf -b '
+    FASTML_EXEC = 'fastml -qf -b -a 0.00001 -mg'
 
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
 

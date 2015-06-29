@@ -16,13 +16,16 @@ class Fastml(object):
       if re.search('nucgtr', str(self.__run_without_options__())):
           self.fastml_version = 3
           self.fastml_model = 'g'
+          print("Using FastML 3 with GTR model\n")
       else:
           self.fastml_version = 2
           
           if re.search('General time Reversible', str(self.__run_with_fake_file__())):
               self.fastml_model = 'g'
+              print("Using Gubbins patched FastML 2 with GTR model\n")
           else:
               self.fastml_model = 'n'
+              print("Using FastML 2 with Jukes Cantor model\n")
           
       return self.fastml_exec + " -qf -b -a 0.00001 -m"+self.fastml_model+" "
 

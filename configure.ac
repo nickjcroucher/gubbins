@@ -18,7 +18,7 @@ AX_PTHREAD
 PKG_CHECK_MODULES([zlib], [zlib])
 
 # Check for Python
-AM_PATH_PYTHON([2.0],
+AM_PATH_PYTHON([3.0],
                [],
                [AC_MSG_WARN([Python not found. Python is required to build presage python binding. Python can be obtained from http://www.python.org])])
 

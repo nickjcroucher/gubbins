@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 
 class Fastml(object):
@@ -9,14 +10,15 @@ class Fastml(object):
       self.fastml_parameters = self.__calculate_parameters__()
       
   def __calculate_parameters__(self):
-      if(self.which(self.fastml_exec) == None)
+      if(self.which(self.fastml_exec) == None):
         return None
       
-      if re.search('nucgtr', self.__run_without_options__()):
+      if re.search('nucgtr', str(self.__run_without_options__())):
           self.fastml_version = 3
           self.fastml_model = 'g'
-      else
+      else:
           self.fastml_version = 2
+          self.fastml_model = 'n'
           
       return self.fastml_exec + " -qf -b -a 0.00001 -m"+self.fastml_model+" "
 
@@ -24,7 +26,7 @@ class Fastml(object):
   def __run_without_options__(self):
       return subprocess.Popen(self.fastml_exec, stdout = subprocess.PIPE, shell=True).communicate()[0]
       
-  def which(program):
+  def which(self,program):
       executable = program.split(" ")
       program = executable[0]
       def is_exe(fpath):

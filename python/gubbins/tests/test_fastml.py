@@ -25,19 +25,19 @@ class TestFastml(unittest.TestCase):
       fastml_check = Fastml('dummy_fastml3')
       self.assertEqual(fastml_check.fastml_version, 3)
       self.assertEqual(fastml_check.fastml_model,'g')
-      self.assertEqual(fastml_check.fastml_parameters, 'dummy_fastml3 -qf -b -a 0.00001 -mg')
+      self.assertEqual(fastml_check.fastml_parameters, 'dummy_fastml3 -qf -b -a 0.00001 -mg ')
     
   def test_fastml_2_installed(self):
       fastml_check = Fastml('dummy_fastml2')
       self.assertEqual(fastml_check.fastml_version, 2)
       self.assertEqual(fastml_check.fastml_model, 'n')
-      self.assertEqual(fastml_check.fastml_parameters, 'dummy_fastml2 -qf -b -a 0.00001 -mn')
+      self.assertEqual(fastml_check.fastml_parameters, 'dummy_fastml2 -qf -b -a 0.00001 -mn ')
     
   def test_custom_fastml_2_installed(self):
       fastml_check = Fastml('dummy_custom_fastml2')
       self.assertEqual(fastml_check.fastml_version, 2)
       self.assertEqual(fastml_check.fastml_model,'g')
-      self.assertEqual(fastml_check.fastml_parameters, 'dummy_custom_fastml2 -qf -b -a 0.00001 -mg')
+      self.assertEqual(fastml_check.fastml_parameters, 'dummy_custom_fastml2 -qf -b -a 0.00001 -mg ')
 
 if __name__ == "__main__":
   unittest.main()

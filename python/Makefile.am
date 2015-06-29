@@ -5,7 +5,7 @@ all-local:
 
 
 install-exec-local:
-	${PYTHON} setup.py install  --root=$(DESTDIR) --install-purelib=$(pythondir) --install-scripts=/usr/bin
+	${PYTHON} setup.py install
 
 uninstall-local:
 	rm -rf $(pythondir)/*gubbins*

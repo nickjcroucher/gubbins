@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+
+if test "$#" -eq 0; then
 cat << "EOF"
 START OF LOG FILE
 USAGE:	fastml [-options] 
@@ -43,3 +45,18 @@ USAGE:	fastml [-options]
  |     alpha and branches will be evaluated from the data (override -b)       |
  +----------------------------------------------------------------------------+
 EOF
+
+else
+
+cat << "PARAMS"
+START OF LOG FILE
+END OF LOG FILE
+Using homogenous model (no among site rate variation)
+Nucleotide substitution model is General time Reversible
+
+Error - unable to open tree file xxx
+System Error: No such file or directory
+Assertion failed: (0), function reportError, file errorMsg.cpp, line 41.
+Abort trap: 6
+PARAMS
+fi

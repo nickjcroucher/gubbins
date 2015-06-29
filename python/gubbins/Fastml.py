@@ -18,10 +18,25 @@ class Fastml(object):
           self.fastml_model = 'g'
       else:
           self.fastml_version = 2
-          self.fastml_model = 'n'
+          
+          if re.search('General time Reversible', str(self.__run_with_fake_file__())):
+              self.fastml_model = 'g'
+          else:
+              self.fastml_model = 'n'
           
       return self.fastml_exec + " -qf -b -a 0.00001 -m"+self.fastml_model+" "
 
+
+  def __run_with_fake_file__(self):
+      
+      # Create a minimal FASTA file
+      with open('.seq.aln','w') as out:
+          out.writelines(['>1','A','>2','A'])
+      
+      cmd = self.fastml_exec + " -qf -b -a 0.00001 -mg -s .seq.aln -t doesnt_exist.tre"
+      output = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell=True).communicate()[0]
+      os.remove('.seq.aln')
+      return output
       
   def __run_without_options__(self):
       return subprocess.Popen(self.fastml_exec, stdout = subprocess.PIPE, shell=True).communicate()[0]

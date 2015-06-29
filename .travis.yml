@@ -8,6 +8,7 @@ addons:
     - libtool
     - pkg-config
     - python-dev
+    - python-setuptools
 cache:
   directories:
   - "build"

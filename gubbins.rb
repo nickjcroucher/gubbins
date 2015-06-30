@@ -1,20 +1,22 @@
 require 'formula'
 
 class Gubbins < Formula
-  homepage 'https://github.com/sanger-pathogens/gubbins'
-  url 'https://github.com/sanger-pathogens/gubbins/archive/v1.3.4.tar.gz'
-  sha1 '3b47c6fd28040a1632d417cb941ae86668f23bf4'
-  head 'https://github.com/sanger-pathogens/gubbins.git'
+  # tag "bioinformatics"
+  # doi "10.1093/nar/gku1196"
+
+  homepage 'https://github.com/andrewjpage/gubbins'
+  url 'https://github.com/andrewjpage/gubbins/archive/convert_python_to_3.tar.gz'
+  sha1 'e779b4f9def6e671587248b92c00fc8e60107314'
+  head 'https://github.com/andrewjpage/gubbins.git'
 
   depends_on :autoconf
   depends_on :automake
   depends_on :libtool
+  depends_on :check
   depends_on 'raxml'
   depends_on 'fasttree'
-  depends_on 'fastml2'
-  depends_on :python
-  
-  depends_on LanguageModuleDependency.new :python, "biopython", "Bio"
+  depends_on 'fastml'
+  depends_on :python3
   
   def install
     inreplace "src/Makefile.am", "-lrt", "" if OS.mac? # no librt for osx
@@ -27,13 +29,13 @@ class Gubbins < Formula
            "--disable-debug",
            "--disable-dependency-tracking",
            "--prefix=#{prefix}"
-
+    system "make","check"
     system "make","install"
   end
 
   test do
     system "gubbins"
     system "run_gubbins.py"
+    system "gubbins_drawer.py"
   end
 end
-

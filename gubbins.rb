@@ -12,7 +12,7 @@ class Gubbins < Formula
   depends_on :autoconf
   depends_on :automake
   depends_on :libtool
-  depends_on :check
+  depends_on 'check'
   depends_on 'raxml'
   depends_on 'fasttree'
   depends_on 'fastml'

@@ -66,87 +66,9 @@ The paper is available on Nucleic Acids Research (open access):
 </ul>
 
 <h2>
-<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Downloading and installing</h2>
-<p>There are a number of options for installing Gubbins. We provide a few pre built downloads which vary depending on what system your running.</p>
-<ul>
-  <li><a href="#virtual-machine">Virtual machine</a> - For Windows, OSX, Linux</li>
-  <li><a href="#trusty">Prebuilt Debian/Ubuntu package</a> - For Ubuntu Trusty</li>
-  <li><a href="#linux_binary">Binary package</a> - For 64 bit Linux</li>
-  <li><a href="#homebrew">Homebrew recipes</a> - OSX</li>
-  <li><a href="#compiling">Compiling from source</a> - OSX, Linux</li>
-</ul>
-
-<h3>
-<a name="virtual-machine" class="anchor" href="#virtual-machine"><span class="octicon octicon-link"></span></a>Virtual machine</h3>
-
-<p>We have created virtual machine which has all of the software setup, along with the test datasets from the paper, based on <a href="http://environmentalomics.org/bio-linux/">Bio-Linux 8</a>. If you run Windows, then this is the only way to use Gubbins on your machine. You need to first install <a href="https://www.virtualbox.org/">VirtualBox</a>, then load the virtual machine, using the 'File -> Import Appliance' menu option. The root password is 'manager'.</p>
-
-<ul>
-<li><a href="ftp://ftp.sanger.ac.uk/pub/pathogens/pathogens-vm/pathogens-vm.latest.ova">Virtual Machine with Gubbins installed</a></li>
-</ul>
-
-
-
-<h3>
-<a name="trusty" class="anchor" href="#trusty"><span class="octicon octicon-link"></span></a>Ubuntu Trusty</h3>
-<p>
-  We have precompiled packages for Ubuntu (Trusty). You dont need to download anything, just copy and past the commands into a terminal. You need to first install DendroPy:
-</p>
-<ul>
-  <li>wget http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-  </li>
-  <li>tar xzvf DendroPy-3.12.0.tar.gz
-  </li>
-  <li>cd DendroPy-3.12.0
-  </li>
-  <li>sudo python setup.py install
-  </li>
-</ul>
-<p>
-  Then install gubbins
-</p>
-<ul>
-  <li>sudo add-apt-repository ppa:ap13/gubbins
-  </li>
-  <li>sudo apt-get update
-  </li>
-  <li>sudo apt-get install fasttree raxml fastml2 gubbins
-  </li>
-</ul>
-
-
-<h3>
-<a name="linux_binary" class="anchor" href="#linux_binary"><span class="octicon octicon-link"></span></a>Precompiled packages</h3>
-<p>We have prepared a binary package for amd 64 Linux. It was compiled on Ubuntu Trusty.  The dependancies will need to be manually installed following the instructions in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL.md">INSTALL file</a>.</p> 
-<ul>
-  <li>
-    <a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/gubbins_latest_amd64.tar.gz">Precompiled 64 bit Linux binary package</a>
-  </li>
-</ul>
-
-<h3>
-<a name="homebrew" class="anchor" href="#homebrew"><span class="octicon octicon-link"></span></a>Using Homebrew recipes</h3>
-<p>If you are running OSX, you can use the homebrew package manager.  These instructions are for OSX 10.9.4 (Mavericks). First of all you need to install homebrew, which involves also installing Xcode with command line tools. Then install the python modules, and finally the gubbins recipes.</p>
-
-<ul>
-  <li><a href="http://brew.sh/">Install homebrew from brew.sh</a></li>
-  <li>Open a terminal and enter these commands</li>
-  <li>curl https://bootstrap.pypa.io/ez_setup.py  | python - --user</li>
-  <li>export PATH=~/Library/Python/2.7/bin:${PATH}</li>
-  <li>easy_install pip</li>
-  <li>pip install --user dendropy</li>
-  <li>pip install --user biopython</li>
-  <li>pip install --user reportlab</li>
-  <li>brew tap homebrew/science</li>
-  <li>brew install http://sanger-pathogens.github.io/gubbins/fastml2.rb</li>
-  <li>brew install http://sanger-pathogens.github.io/gubbins/gubbins.rb</li>  
-</ul>
-
-
-<h3>
-<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Compiling from source</h3>
-<p>
-  Download the latest version of the <a href="https://github.com/sanger-pathogens/gubbins/tarball/master">Gubbins source code</a>, then follow the compile instructions in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL">INSTALL file</a>.
+<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Installing</h2>
+<p>Detailed installation instructions are available in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL.md">INSTALL file</a>. 
+	If you already have homebrew installed then run <em>brew install gubbins</em>.
 </p>
 
 

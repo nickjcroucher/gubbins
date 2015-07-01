@@ -4,10 +4,10 @@ class Gubbins < Formula
   # tag "bioinformatics"
   # doi "10.1093/nar/gku1196"
 
-  homepage 'https://github.com/andrewjpage/gubbins'
-  url 'https://github.com/andrewjpage/gubbins/archive/convert_python_to_3.tar.gz'
-  sha1 '4b2d50c635323f857340db37e949bac27c45ef82'
-  head 'https://github.com/andrewjpage/gubbins.git'
+  homepage 'https://github.com/sanger-pathogens/gubbins'
+  url 'https://github.com/sanger-pathogens/gubbins/archive/v1.4.0.tar.gz'
+  sha1 'adf2d25eb1740155370f3c33c07c1622d4703c0c'
+  head 'https://github.com/sanger-pathogens/gubbins.git'
 
   depends_on :autoconf
   depends_on :automake

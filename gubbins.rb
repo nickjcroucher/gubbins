@@ -15,13 +15,13 @@ class Gubbins < Formula
   depends_on 'check'
   depends_on 'raxml'
   depends_on 'fasttree'
-  depends_on 'fastml'
+  depends_on 'fastml' => :optional
   depends_on :python3
+  depends_on 'zlib'
   
   def install
     inreplace "src/Makefile.am", "-lrt", "" if OS.mac? # no librt for osx
     inreplace "configure.ac", "PKG_CHECK_MODULES([zlib], [zlib])", "AC_CHECK_LIB(zlib, zlib)" if OS.mac?
-    inreplace "python/Makefile.am", "--root=$(DESTDIR)", "--root=#{prefix}" if OS.mac?
     
     system "cat python/Makefile.am"
     system "autoreconf -i"

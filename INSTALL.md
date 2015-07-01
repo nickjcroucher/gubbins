@@ -81,7 +81,7 @@ ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.4
 ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
 brew install ruby
 brew install gubbins
-
+```
 
 ## OSX/Linux - from source
 This is the most difficult method and is only suitable for someone with advanced computing skills. Please consider using HomeBrew/LinuxBrew instead.

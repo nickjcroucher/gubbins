@@ -36,6 +36,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	char *pcOutputFile;
 	char acStrArray[256];
 	newick_node *root;
+    char *returnchar;
 	
 	FILE *f;
 	
@@ -57,7 +58,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	while (1)
 	{
 		memset(acStrArray, '\0', 256);
-		fgets(acStrArray, 255, f);
+		returnchar = fgets(acStrArray, 255, f);
 		if (acStrArray[0] == '\0' && feof(f))
 		{
 			break;

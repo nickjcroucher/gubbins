@@ -129,10 +129,10 @@ int get_number_of_snps(FILE * vcf_file_pointer)
 	int i = 0;
 	int length_of_line =0;
 	char szBuffer[2] = {0};  
-	
+    char *returnchar;	
 	do{
 		// check the first character of the line to see if its in the header
-		fgets(szBuffer, sizeof(szBuffer), vcf_file_pointer);
+		returnchar = fgets(szBuffer, sizeof(szBuffer), vcf_file_pointer);
 		if(szBuffer[0] != '#')
 		{
 			i++;

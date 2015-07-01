@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #################################
 # Import some necessary modules #
@@ -49,17 +49,17 @@ def tab_parser(handle, quiet=False):
 				break
 				raise ValueError("Premature end of line during features table")
 			if line[:object.HEADER_WIDTH].rstrip() in object.SEQUENCE_HEADERS:
-				if object.debug : print "Found start of sequence"
+				if object.debug : print("Found start of sequence")
 				break
 			line = line.rstrip()
 			if line == "//":
 				raise ValueError("Premature end of features table, marker '//' found")
 			if line in object.FEATURE_END_MARKERS:
-				if object.debug : print "Found end of features"
+				if object.debug : print("Found end of features")
 				line = object.handle.readline()
 				break
 			if line[2:object.FEATURE_QUALIFIER_INDENT].strip() == "":
-				print line[2:object.FEATURE_QUALIFIER_INDENT].strip()
+				print(line[2:object.FEATURE_QUALIFIER_INDENT].strip())
 				raise ValueError("Expected a feature qualifier in line '%s'" % line)
 			
 			if skip:
@@ -170,7 +170,7 @@ def add_ordered_embl_to_diagram(record, incfeatures=["CDS", "feature"], emblfile
 	
 	new_tracks={}
 	
-	print len(record.features), "features found for", record.name
+	print(len(record.features), "features found for", record.name)
 	
 	if len(record.seq)>500000:
 		scale_largetick_interval=int(round((len(record.seq)/10),-5))
@@ -184,9 +184,9 @@ def add_ordered_embl_to_diagram(record, incfeatures=["CDS", "feature"], emblfile
 			
 			continue
 		
-		if feature.qualifiers.has_key("colour"):
+		if "colour" in feature.qualifiers:
 			colourline=feature.qualifiers["colour"][0]
-		elif feature.qualifiers.has_key("color"):
+		elif "color" in feature.qualifiers:
 			colourline=feature.qualifiers["color"][0]
 		else:
 			colourline = "5"
@@ -195,8 +195,8 @@ def add_ordered_embl_to_diagram(record, incfeatures=["CDS", "feature"], emblfile
 		elif len(colourline.split())==3:
 			colour=translator.int255_color((int(colourline.split()[0]),int(colourline.split()[1]),int(colourline.split()[2])))
 		else:
-			print "Can't understand colour code!"
-			print colourline
+			print("Can't understand colour code!")
+			print(colourline)
 			sys.exit()
 		
 		locations=[]
@@ -244,7 +244,7 @@ def add_ordered_tab_to_diagram(filename):
 	try:
 		record=tab_parser(open(filename,"r"))
 	except IOError:
-		print "Cannot find file", filename
+		print("Cannot find file", filename)
 		sys.exit()
 	record.name=filename
 	new_tracks=add_ordered_embl_to_diagram(record, incfeatures=["i", "d", "li", "del", "snp", "misc_feature", "core", "cds", "insertion", "deletion", "recombination", "feature", "blastn_hit", "fasta_record", "variation"], emblfile=False)
@@ -349,7 +349,7 @@ def drawtree(treeObject, treeheight, treewidth, xoffset, yoffset, name_offset=5)
 			
 			if treeObject.node(node).data.comment and "name_colour" in treeObject.node(node).data.comment:
 				name_colours=[]
-				for x in xrange(0,len(treeObject.node(node).data.comment["name_colour"])):
+				for x in range(0,len(treeObject.node(node).data.comment["name_colour"])):
 					r,g,b= treeObject.node(node).data.comment["name_colour"][x]
 					name_colours.append(colors.Color(float(r)/255,float(g)/255,float(b)/255))
 			else:
@@ -362,7 +362,7 @@ def drawtree(treeObject, treeheight, treewidth, xoffset, yoffset, name_offset=5)
 			gubbins_length += namewidth
 			colpos=1
 			
-			for x in xrange(colpos,len(name_colours)):
+			for x in range(colpos,len(name_colours)):
 				gubbins_length += block_length
 				if x!=0:
 					gubbins_length += vertical_scaling_factor
@@ -657,7 +657,7 @@ if __name__ == "__main__":
 	height, width = pagesize
   
 	if len(args)==0:
-		print "Found nothing to draw"
+		print("Found nothing to draw")
 		sys.exit()
 	
 	d = Drawing(width, height)
@@ -708,7 +708,7 @@ if __name__ == "__main__":
 	
 	if options.tree!="":
 		if not os.path.isfile(options.tree):
-			print "Cannot find file:", options.tree
+			print("Cannot find file:", options.tree)
 			options.tree=""
 		else:
 			treestring=open(options.tree,"rU").read().strip()
@@ -754,7 +754,7 @@ if __name__ == "__main__":
 	track_number=0
 	
 	for track in output_order:
-		if(not my_tracks.has_key(track)):
+		if(track not in my_tracks):
 			my_tracks = add_empty_track(my_tracks, track)
 		
 		track_height=my_tracks[track].track_height

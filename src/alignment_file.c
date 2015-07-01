@@ -161,6 +161,10 @@ int build_reference_sequence(char reference_sequence[], char filename[])
 			reference_sequence[i]  = '-';
 		}
 	}
+    if(reference_sequence[seq->seq.l] != '\0')
+    {
+      reference_sequence[seq->seq.l]  =   '\0';
+    }
 	
 	kseq_destroy(seq);
 	gzclose(fp);

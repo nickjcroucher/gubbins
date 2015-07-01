@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 Imports into the `gubbins` namespace all fundamental
@@ -13,7 +13,7 @@ import os
 ## Populate the 'gubbins' namespace
 
 from gubbins import common
-
+from gubbins import Fastml
 
 ###############################################################################
 ## PACKAGE METADATA

@@ -1,194 +1,111 @@
-Quick start
-=======
-Before you do anything, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/). It contains links to the latest precompiled binaries.
+Before you do anything, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/).
+
+# Installation
+There are a few ways to install Gubbins and its dependancies. The simpliest way is using HomeBrew (OSX) or LinuxBrew.
+
+* OSX - Mavericks (10.9) & Yosemite (10.10)
+* OSX - Mountain Lion (10.8)
+* Linux - Ubuntu Trusty (14.04) & Precise (12.04)
+* Linux - CentOS 7
+* Linux - CentOS 6
+* OSX/Linux - from source
+* OSX/Linux/Windows - Virtual Machine
 
 
-Gubbins Install
-=======
-
-There are a few ways to Install/Use Gubbins, with detailed instructions below:
-
-1. OSX - using homebrew
-2. Ubuntu Trusty - using apt-get
-3. Linux - using precompiled binaries or compiling from source
-4. Windows - using our virtual machine
-
-
-
-## Prep work ##
-As listed in the dependancies section below, you need
- * Python 2.7.
- * Python development headers (the python-dev package on Debian/Ubuntu).
-
-You will also need the following python packages installed, if they are not then they will be downloaded and installed automatically during the Gubbins installation process:
-
- * Biopython ( >=1.59 )
- * DendroPy ( >=3.11.1 )
- * ReportLab ( >= 2.5 )
-
-Gubbins also depends on the following pieces of software.  Depending on your installation choice these may be downloaded and installed automatically during the Gubbins installation process. 
-
-* [FastTree](http://www.microbesonline.org/fasttree/) ( >=2.1.4 )
-* [RAxML](http://sco.h-its.org/exelixis/software.html) ( >=7.2.8, the full version )
-* [FASTML](http://fastml.tau.ac.il/) ( 2.02 )
-
-If you choose to install from source, you should follow the FastTree and RAxML instructions to do so.  In the case of installing FASTML from source, we recommend using our slight modifications to the FASTML build system available at https://github.com/sanger-pathogens/fastml.
-
-## Install ##
-
-There are multiple ways to install gubbins depending on your requirements
-
-1. install system-wide from binaries,
-2. install per-user from binaries,
-3. install system-wied from source, and
-4. install per-user from source.
-
-Each of the system-wide cases assumes you have permissions to _sudo_.  The per-user cases do not make that assumption.  Please note this software does not work on Windows (and never will), only on Linux and OSX (*nix).
-
-### System-wide from binaries ###
-
-We currently only support Ubuntu 14.04 x86_64 as a system-wide binary install.  Other architectures will be added on request.
-
-Install the DendroPy dependancy:
-
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
+## OSX - Mavericks (10.9) & Yosemite (10.10)
+Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version). Then run:
+```
+brew tap homebrew/science
+brew tap homebrew/dupes
+brew install gubbins
 ```
 
-Then install gubbins
+## OSX - Mountain Lion (10.8)
+Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version).
 
-``` bash
-$ sudo add-apt-repository ppa:ap13/gubbins
-$ sudo apt-get update
-$ sudo apt-get install fasttree raxml fastml2 gubbins
+Manually install [FastML](http://fastml.tau.ac.il/source.php) and include the binary in your PATH. For example:
+```
+wget 'http://fastml.tau.ac.il/source/FastML.v3.1.tgz'
+tar -xzf FastML.v3.1.tgz
+cd FastML.v3.1
+export PATH=${HOME}/FastML.v3.1/bin:$PATH
+```
+Then run:
+```
+brew tap homebrew/science
+brew tap homebrew/dupes
+brew install gubbins --without-fastml
 ```
 
-If you have your own version of the raxml binary, then you can omit it from the list of packages to install.  Many users have reported vastly increased performance by installing RAxML from source by selecting the most appropriate makefile.
+## OSX - It failed to install
+* Run 'brew doctor' and correct any errors with your homebrew setup.
+* Make sure Xcode is 5.1.1 or greater (xcodebuild -version). 
+* Install it in /usr/local. Homebrew warn 'Pick another prefix at your peril!'.
+* Run 'brew install -vd gubbins' and try and correct any errors.
 
+## Linux - Ubuntu
+Tested on Ubuntu Trusty (14.04) and Precise (12.04). Install [LinuxBrew](http://brew.sh/linuxbrew/). Then run:
 
-### System-wide from binaries for other debian based systems ###
-This might work on other Debian based systems and other versions of Ubuntu, but is untested.
-
-Install the DendroPy dependancy:
-
-``` bash
-$ wget  http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.12.0.tar.gz
-$ tar xzvf DendroPy-3.12.0.tar.gz
-$ cd DendroPy-3.12.0
-$ sudo python setup.py install
+```
+brew tap homebrew/science
+brew tap homebrew/dupes
+brew install python3
+brew install gubbins
 ```
 
-Then install gubbins
-
-
-```bash
-echo "deb http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
-echo "deb-src http://ppa.launchpad.net/ap13/gubbins/ubuntu trusty main" >> /etc/apt/sources.list
-
-sudo apt-get update
-sudo apt-get install fasttree raxml fastml2 gubbins
+## Linux - CentOS/RHEL 7
+Enable EPEL and make sure compilers are installed.
+```
+sudo yum install epel-release gcc gcc-c++ automake
+```
+Install [LinuxBrew](http://brew.sh/linuxbrew/).
+```
+brew tap homebrew/science
+brew tap homebrew/dupes
+ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.8
+ln -s $(which g++) ~/.linuxbrew/bin/g++-4.8
+brew install ruby gpatch
+brew install gubbins
 ```
 
-### Per-user from binaries  ###
+## Linux - CentOS/RHEL 6.6
+Enable EPEL and make sure compilers are installed.
+```
+sudo yum install epel-release gcc gcc-c++ automake
+```
+Install [LinuxBrew](http://brew.sh/linuxbrew/).
+```
+brew tap homebrew/science
+brew tap homebrew/dupes
+ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.4
+ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
+brew install ruby
+brew install gubbins
 
-Again, we currently only support Ubuntu 14.04 x86_64 as a binary install option
 
-Check out a version of the repository from GitHub
+## OSX/Linux - from source
+This is the most difficult method and is only suitable for someone with advanced computing skills. Please consider using HomeBrew/LinuxBrew instead.
 
-> $ git clone https://github.com/sanger-pathogens/gubbins
+Install the dependances and include them in your PATH:
+* [FastTree](http://www.microbesonline.org/fasttree/#Install) ( >=2.1.4 )
+* [RAxML](https://github.com/stamatak/standard-RAxML) ( >=8.0 )
+* [FASTML](http://fastml.tau.ac.il/source.php) ( >=2.02 )
+* Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose
+* Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 
-Run the installation script to install it in your home directory, spectifically into ~/.local.  The installation script ensures that the Python dependencies are also installed locally.
-
-> $ ./install-userspace.sh
-
-Source the .bashrc file
-
-> $ source ~/.bashrc
-
-### System-wide from source ###
-
-You must first enssure that the dependencies are installed.
-
-On a Debian/Ubuntu system
-``` bash
-$ sudo apt-get install python-biopython python-setuptools
-$ easy_install -U dendropy
+```
+autoreconf -i
+./configure
+make
+sudo make install
 ```
 
-Alternatively, if you need to install the dependencies from source:
-``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python -
-$ sudo easy_install -U biopython
-$ sudo easy_install -U dendropy
-```
+## OSX/Linux/Windows - Virtual Machine
+Roary wont run natively on Windows but we have created virtual machine which has all of the software setup, along with the test datasets from the paper. 
+It is based on [Bio-Linux 8](http://environmentalomics.org/bio-linux/).  You need to first install [VirtualBox](https://www.virtualbox.org/), 
+then load the virtual machine, using the 'File -> Import Appliance' menu option. The root password is 'manager'.
 
-Check out a version of the repository from github and
+* ftp://ftp.sanger.ac.uk/pub/pathogens/pathogens-vm/pathogens-vm.latest.ova
 
-> $ git clone https://github.com/sanger-pathogens/gubbins
+More importantly though, if your trying to do bioinformatics on Windows, your not going to get very far and you should seriously consider upgrading to Linux.
 
-Run the following commands to compile and install the software:
-
-``` bash
-$ autoreconf -i
-$ ./configure
-$ make
-$ sudo make install
-```
-
-### Per-user from source ###
-
-If you do not have permission to install the software as root and instead want to install it in a local user directory then the following commands can be used instead:
-
-``` bash
-$ wget https://bootstrap.pypa.io/ez_setup.py -O - | python - --user
-$ ~/.local/bin/easy_install -U --user biopython
-$ ~/.local/bin/easy_install -U --user dendropy
-$ autoreconf -i
-$ ./configure --prefix=~/.local
-$ make
-$ make install
-```
-
-Ensure that
-
-> LD_LIBRARY_PATH=~/.local/lib
-
-and
-
-> PATH=~/.local/bin:$PATH
-
-This is best achieved by adding them to ~/.bashrc in the usual manner.
-
-## Running Gubbins ##
-
-For bash users ensure you run
-
-> $ source ~/.bashrc
-
-To run the Gubbins application use:
-
-> $ run_gubbins my_alignment.fa
-
-To see full usage of this script run:
-
-> $ run_gubbins -h
-
-
-### OSX ###
-Install the python dependancies:
-
-> curl https://bootstrap.pypa.io/ez_setup.py  | python - --user
-> ~/bin/easy_install -U --user biopython
-> ~/bin/easy_install -U --user dendropy
-> ~/bin/easy_install -U --user reportlab
-
-Go to the [homebrew website](http://brew.sh/) and install the homebrew package manager.
-
-Install fastml and gubbins from the following recipes.
-
-> brew tap homebrew/science
-> brew install http://sanger-pathogens.github.io/gubbins/fastml2.rb
-> brew install http://sanger-pathogens.github.io/gubbins/gubbins.rb

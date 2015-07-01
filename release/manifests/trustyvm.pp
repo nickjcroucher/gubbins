@@ -2,7 +2,7 @@ package { "dh-make":
     ensure => "installed"
     }
 
-package { ["gcc", "build-essential", "pkg-config","ntp"]:
+package { ["gcc", "build-essential", "pkg-config","ntp","libtool"]:
     ensure => "installed"
     }
 
@@ -48,6 +48,11 @@ package {"python-reportlab":
 package {"python-nose":
   ensure => "installed"
 }
+
+package {"python3-pip":
+  ensure => "installed"
+}
+
 
 # The Debian/Ubuntu system biopython library has no egg-info associated with it
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=743927

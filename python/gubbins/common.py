@@ -22,10 +22,11 @@ from Bio import Phylo
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
-from cStringIO import StringIO
+from io import StringIO
 from collections import Counter
 import argparse
 import dendropy
+from dendropy.calculate import treecompare
 import math
 import os
 import re
@@ -34,6 +35,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from gubbins.Fastml import Fastml
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -53,55 +55,55 @@ class GubbinsCommon():
       Phylo.read(starting_tree, 'newick')
       tree  = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
     except:
-      print "Error with the input starting tree: Is it a valid Newick file?"
+      print("Error with the input starting tree: Is it a valid Newick file?")
       return 0
     return 1
     
   @staticmethod
   def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
-    input_handle  = open(alignment_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    sequence_names = {}
-    for alignment in alignments:
-        for record in alignment:
-            sequence_names[record.name] = 1
-    input_handle.close()
-    
-    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
-    
-    leaf_nodes = tree.leaf_nodes()
-    for i,lf in enumerate(leaf_nodes):
-      if not leaf_nodes[i].taxon.label in sequence_names:
-        print "Error: A taxon referenced in the starting tree isnt found in the input fasta file"
-        return 0
-
+    with open(alignment_filename, "r") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      sequence_names = {}
+      for alignment in alignments:
+          for record in alignment:
+              sequence_names[record.name] = 1
+      input_handle.close()
+      
+      tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+      
+      leaf_nodes = tree.leaf_nodes()
+      for i,lf in enumerate(leaf_nodes):
+        if not leaf_nodes[i].taxon.label in sequence_names:
+          print("Error: A taxon referenced in the starting tree isnt found in the input fasta file")
+          return 0
+      
     return 1
 
 
   @staticmethod
   def does_fasta_contain_variation(alignment_filename):
-    input_handle  = open(alignment_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    first_sequence = ""
-
-    for index, alignment in enumerate(alignments):
-      for record_index, record in enumerate(alignment):
-
-        if record_index == 0:
-          first_sequence = record.seq
-
-        if str(record.seq) != str(first_sequence):
-          input_handle.close()
-          return 1
-          
-    input_handle.close()
+    with open(alignment_filename, "r") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      first_sequence = ""
+      
+      for index, alignment in enumerate(alignments):
+        for record_index, record in enumerate(alignment):
+      
+          if record_index == 0:
+            first_sequence = record.seq
+      
+          if str(record.seq) != str(first_sequence):
+            input_handle.close()
+            return 1
+            
+      input_handle.close()
     return 0
 
 
   @staticmethod
   def does_file_exist(alignment_filename, file_type_msg):
     if(not os.path.exists(alignment_filename)):
-      print GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly')
+      print(GubbinsError('','Cannot access the input '+file_type_msg+'. Check its been entered correctly'))
       return 0
     return 1
  
@@ -135,7 +137,7 @@ class GubbinsCommon():
     if self.args.threads == 1 and raxml_executable == "":
       self.args.threads = 2
       raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
-      print "Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n"
+      print("Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n")
       raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
     
     RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
@@ -147,7 +149,8 @@ class GubbinsCommon():
     
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
-    FASTML_EXEC = 'fastml -mg -qf -b '
+
+    FASTML_EXEC = Fastml('fastml').fastml_parameters
 
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
 
@@ -183,7 +186,7 @@ class GubbinsCommon():
     if self.args.use_time_stamp > 0:
       current_time = str(int(time.time()))+'.'
       if self.args.verbose > 0:
-        print current_time
+        print(current_time)
 
     # get the base filename
     (base_directory,base_filename) = os.path.split(self.args.alignment_filename)
@@ -205,14 +208,14 @@ class GubbinsCommon():
 
     # find all snp sites
     if self.args.verbose > 0:
-      print GUBBINS_EXEC +" "+ self.args.alignment_filename
+      print(GUBBINS_EXEC +" "+ self.args.alignment_filename)
     try:
       subprocess.check_call([GUBBINS_EXEC, self.args.alignment_filename])
     except:
       sys.exit("Gubbins crashed, please ensure you have enough free memory")
       
     if self.args.verbose > 0:
-      print int(time.time())
+      print(int(time.time()))
 
     GubbinsCommon.reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
 
@@ -281,7 +284,7 @@ class GubbinsCommon():
         gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
       if self.args.verbose > 0:
-        print tree_building_command
+        print(tree_building_command)
 
 
       if self.args.starting_tree is not None and i == 1:
@@ -293,13 +296,13 @@ class GubbinsCommon():
           sys.exit("Failed while building the tree.")
 
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
       fastml_command_suffix = ' > /dev/null 2>&1'
       if self.args.verbose > 0:
-        print fastml_command
+        print(fastml_command)
         fastml_command_suffix = ''
 
 
@@ -317,16 +320,16 @@ class GubbinsCommon():
 
 
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       if self.args.verbose > 0:
-        print gubbins_command
+        print(gubbins_command)
       try:
         subprocess.check_call(gubbins_command, shell=True)
       except:
         sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
       if self.args.verbose > 0:
-        print int(time.time())
+        print(int(time.time()))
 
       tree_file_names.append(current_tree_name)
       if i > 2:
@@ -335,12 +338,12 @@ class GubbinsCommon():
           
           if GubbinsCommon.have_recombinations_been_seen_before(current_recomb_file,previous_recomb_files):
             if self.args.verbose > 0:
-              print "Recombinations observed before so stopping: "+ str(current_tree_name)
+              print("Recombinations observed before so stopping: "+ str(current_tree_name))
             break
         else:
           if GubbinsCommon.has_tree_been_seen_before(tree_file_names,self.args.converge_method):
             if self.args.verbose > 0:
-              print "Tree observed before so stopping: "+ str(current_tree_name)
+              print("Tree observed before so stopping: "+ str(current_tree_name))
             break
 
     # cleanup intermediate files
@@ -381,15 +384,21 @@ class GubbinsCommon():
   
   @staticmethod
   def robinson_foulds_distance(input_tree_name,output_tree_name):
-    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-    return input_tree.robinson_foulds_distance(output_tree)
+    tns = dendropy.TaxonNamespace()
+    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick',taxon_namespace=tns)
+    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick',taxon_namespace=tns)
+    input_tree.encode_bipartitions()
+    output_tree.encode_bipartitions()
+    return dendropy.calculate.treecompare.weighted_robinson_foulds_distance(input_tree, output_tree)
     
   @staticmethod
   def symmetric_difference(input_tree_name,output_tree_name):
-    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick')
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick')
-    return input_tree.symmetric_difference(output_tree)
+    tns = dendropy.TaxonNamespace()
+    input_tree  = dendropy.Tree.get_from_path(input_tree_name, 'newick',taxon_namespace=tns)
+    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick',taxon_namespace=tns)
+    input_tree.encode_bipartitions()
+    output_tree.encode_bipartitions()
+    return dendropy.calculate.treecompare.symmetric_difference(input_tree,output_tree)
     
   @staticmethod
   def has_tree_been_seen_before(tree_file_names,converge_method):
@@ -422,11 +431,11 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     
     for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
       if leaf_node.taxon.label not in outgroups:
-        print "Your outgroups do not form a clade.\n  Using the first taxon "+str(outgroups[0])+" as the outgroup.\n  Taxon "+str(leaf_node.taxon.label)+" is in the clade but not in your list of outgroups."
+        print("Your outgroups do not form a clade.\n  Using the first taxon "+str(outgroups[0])+" as the outgroup.\n  Taxon "+str(leaf_node.taxon.label)+" is in the clade but not in your list of outgroups.")
         return [outgroups[0]]
     
     return outgroups
@@ -451,10 +460,9 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(tree_name, 'newick',
               preserve_underscores=True)
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=False,
@@ -467,12 +475,11 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
-    output_file = open(tree_name, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(tree_name, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def split_all_non_bi_nodes(node):
@@ -504,12 +511,11 @@ class GubbinsCommon():
               preserve_underscores=True)
     GubbinsCommon.split_all_non_bi_nodes(tree.seed_node)
 
-    tree.reroot_at_midpoint(update_splits=True, delete_outdegree_one=False)
+    tree.update_bipartitions()
     tree.deroot()
-    tree.update_splits()
+    tree.update_bipartitions()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=False,
@@ -522,12 +528,11 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
-    output_file = open(tree_name, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(tree_name, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def raxml_base_name(base_filename_without_ext,current_time):
@@ -610,8 +615,7 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
 
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=True,
@@ -624,12 +628,11 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
-    output_file = open(output_filename, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(output_filename, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
   @staticmethod
   def translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_intermediate_iteration, output_prefix):
@@ -724,26 +727,26 @@ class GubbinsCommon():
   @staticmethod
   def get_sequence_names_from_alignment(filename):
     sequence_names = []
-    handle = open(filename, "rU")
-    for record in SeqIO.parse(handle, "fasta") :
-      sequence_names.append(record.id)
-    handle.close()
+    with open(filename, "r") as handle:
+      for record in SeqIO.parse(handle, "fasta") :
+        sequence_names.append(record.id)
+      handle.close()
     return sequence_names
 
   @staticmethod
   def is_input_fasta_file_valid(input_filename):
     try:
       if GubbinsCommon.does_each_sequence_have_the_same_length(input_filename) == 0:
-        print "Each sequence must be the same length"
+        print("Each sequence must be the same length")
         return 0
       if GubbinsCommon.are_sequence_names_unique(input_filename) == 0:
-        print "All sequence names in the fasta file must be unique"
+        print("All sequence names in the fasta file must be unique")
         return 0
       if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
-        print "Each sequence must have a name and some genomic data"
+        print("Each sequence must have a name and some genomic data")
         return 0
       if GubbinsCommon.does_fasta_contain_variation(input_filename) == 0:
-        print "All of the input sequences contain the same data"
+        print("All of the input sequences contain the same data")
         return 0
     except:
       return 0
@@ -765,93 +768,94 @@ class GubbinsCommon():
 
   @staticmethod
   def does_each_sequence_have_a_name_and_genomic_data(input_filename):
-    input_handle  = open(input_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    number_of_sequences = 0
-    for alignment in alignments:
-        for record in alignment:
-            number_of_sequences +=1
-            if record.name is None or record.name == "":
-              print "Error with the input FASTA file: One of the sequence names is blank"
-              return 0
-            if record.seq is None or record.seq == "":
-              print "Error with the input FASTA file: One of the sequences is empty"
-              return 0
-            if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
-              print "Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted"
-              return 0
-    if number_of_sequences <= 3:
-      print "Error with input FASTA file: you need more than 3 sequences to build a meaningful tree"
-      return 0
-    input_handle.close()
+    with  open(input_filename, "r") as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      number_of_sequences = 0
+      for alignment in alignments:
+          for record in alignment:
+              number_of_sequences +=1
+              if record.name is None or record.name == "":
+                print("Error with the input FASTA file: One of the sequence names is blank")
+                return 0
+              if record.seq is None or record.seq == "":
+                print("Error with the input FASTA file: One of the sequences is empty")
+                return 0
+              if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
+                print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
+                return 0
+      if number_of_sequences <= 3:
+        print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
+        return 0
+      input_handle.close()
     return 1
     
     
   @staticmethod
   def does_each_sequence_have_the_same_length(input_filename):
     try:
-      input_handle  = open(input_filename, "rU")
-      alignments = AlignIO.parse(input_handle, "fasta")
-      sequence_length = -1
-      for alignment in alignments:
-          for record in alignment:
-             if sequence_length == -1:
-               sequence_length = len(record.seq)
-             elif sequence_length != len(record.seq):
-               print "Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name
-               return 0
-      input_handle.close()
+      with open(input_filename) as input_handle:
+      
+        alignments = AlignIO.parse(input_handle, "fasta")
+        sequence_length = -1
+        for alignment in alignments:
+            for record in alignment:
+               if sequence_length == -1:
+                 sequence_length = len(record.seq)
+               elif sequence_length != len(record.seq):
+                 print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
+                 return 0
+        input_handle.close()
     except:
-      print "Error with the input FASTA file: It is in the wrong format so check its an alignment"
+      print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
       return 0
     return 1
 
   @staticmethod
   def are_sequence_names_unique(input_filename):
-    input_handle  = open(input_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    sequence_names = []
-    for alignment in alignments:
-        for record in alignment:
-            sequence_names.append(record.name)
-            
-    if [k for k,v in Counter(sequence_names).items() if v>1] != []:
-      return 0
-    input_handle.close()
+    with open(input_filename) as input_handle:
+      alignments = AlignIO.parse(input_handle, "fasta")
+      sequence_names = []
+      for alignment in alignments:
+          for record in alignment:
+              sequence_names.append(record.name)
+              
+      if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
+        return 0
+      input_handle.close()
     return 1
 
   @staticmethod
   def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
-    input_handle  = open(input_filename, "rU")
-    output_handle = open(output_filename, "w+")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    output_alignments = []
-    taxa_removed = []
-    number_of_included_alignments = 0
-    for alignment in alignments:
-        for record in alignment:
-          number_of_gaps = 0
-          number_of_gaps += record.seq.count('n')
-          number_of_gaps += record.seq.count('N')
-          number_of_gaps += record.seq.count('-')
-          sequence_length = len(record.seq)
-
-          if sequence_length == 0:
-            taxa_removed.append(record.id)
-            print "Excluded sequence " + record.id + " because there werent enough bases in it"
-          elif((number_of_gaps*100/sequence_length) <= filter_percentage):
-            output_alignments.append(record)
-            number_of_included_alignments += 1
-          else:
-            taxa_removed.append(record.id)
-            print "Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed"
-
-    if number_of_included_alignments <= 1:
-      sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
-
-    AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
-    output_handle.close()
-    input_handle.close()
+    with open(input_filename) as input_handle:
+      with open(output_filename, "w+") as output_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        output_alignments = []
+        taxa_removed = []
+        number_of_included_alignments = 0
+        for alignment in alignments:
+            for record in alignment:
+              number_of_gaps = 0
+              number_of_gaps += record.seq.count('n')
+              number_of_gaps += record.seq.count('N')
+              number_of_gaps += record.seq.count('-')
+              sequence_length = len(record.seq)
+        
+              if sequence_length == 0:
+                taxa_removed.append(record.id)
+                print("Excluded sequence " + record.id + " because there werent enough bases in it")
+              elif((number_of_gaps*100/sequence_length) <= filter_percentage):
+                output_alignments.append(record)
+                number_of_included_alignments += 1
+              else:
+                taxa_removed.append(record.id)
+                print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
+        
+        if number_of_included_alignments <= 1:
+          sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
+        
+        AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
+        output_handle.close()
+      input_handle.close()
     return taxa_removed
 
   @staticmethod
@@ -865,12 +869,11 @@ class GubbinsCommon():
     tree  = dendropy.Tree.get_from_path(starting_tree, 'newick',
               preserve_underscores=True)
 
-    tree.prune_taxa_with_labels(taxa_removed, update_splits=True, delete_outdegree_one=False)          
-    tree.prune_leaves_without_taxa(update_splits=True, delete_outdegree_one=False)
+    tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)          
+    tree.prune_leaves_without_taxa(update_bipartitions=True)
     tree.deroot()
     output_tree_string = tree.as_string(
-      'newick',
-      taxon_set=None,
+      schema='newick',
       suppress_leaf_taxon_labels=False,
       suppress_leaf_node_labels=True,
       suppress_internal_taxon_labels=True,
@@ -883,12 +886,11 @@ class GubbinsCommon():
       suppress_annotations=True,
       annotations_as_nhx=False,
       suppress_item_comments=True,
-      node_label_element_separator=' ',
-      node_label_compose_func=None
+      node_label_element_separator=' '
       )
-    output_file = open(temp_starting_tree, 'w+')
-    output_file.write(output_tree_string.replace('\'', ''))
-    output_file.closed
+    with open(temp_starting_tree, 'w+') as output_file:
+      output_file.write(output_tree_string.replace('\'', ''))
+      output_file.closed
 
     return temp_starting_tree
 
@@ -896,71 +898,71 @@ class GubbinsCommon():
   def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_fasta_filename):
     # find out where the gaps are located
     # PyVCF removed for performance reasons
-    vcf_file = open(input_vcf_file, 'r')
-
-    sample_names  = []
-    gap_position = []
-    gap_alt_base = []
-
-    for vcf_line in vcf_file:
-      if re.match('^#CHROM', vcf_line)  != None :
-         sample_names = vcf_line.rstrip().split('\t' )[9:]
-      elif re.match('^\d', vcf_line)  != None :
-        # If the alternate is only a gap it wont have a base in this column
-        if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:
-          m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) 
-          gap_position.append(1)
-          gap_alt_base.append(m.group(2))
-        elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
-          # sometimes the ref can be a gap only 
-          m = re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line) 
-          gap_position.append(1)
-          gap_alt_base.append(m.group(3))
-        else:
-          gap_position.append(0)
-          gap_alt_base.append('-')
-
-    gapped_alignments = []
-    # interleave gap only and snp bases
-    input_handle = open(input_fasta_filename, "rU")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    for alignment in alignments:
-      for record in alignment:
-        inserted_gaps = []
-        if record.id in sample_names:
-          # only apply to internal nodes
-          continue
-        gap_index = 0
-        for input_base in record.seq:
-          while gap_index < len(gap_position) and gap_position[gap_index] == 1:
-            inserted_gaps.append(gap_alt_base[gap_index])
-            gap_index+=1
-          if gap_index < len(gap_position):
-            inserted_gaps.append(input_base)
-            gap_index+=1
-
-        while gap_index < len(gap_position):
-          inserted_gaps.append(gap_alt_base[gap_index])
-          gap_index+=1
-
-        record.seq = Seq(''.join(inserted_gaps))
-        gapped_alignments.append(record)
-
-    output_handle = open(output_fasta_filename, "a")
-    AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
-
+    with open(input_vcf_file) as vcf_file:
+     
+      sample_names  = []
+      gap_position = []
+      gap_alt_base = []
+     
+      for vcf_line in vcf_file:
+        if re.match('^#CHROM', vcf_line)  != None :
+           sample_names = vcf_line.rstrip().split('\t' )[9:]
+        elif re.match('^\d', vcf_line)  != None :
+          # If the alternate is only a gap it wont have a base in this column
+          if  re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)  != None:
+            m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) 
+            gap_position.append(1)
+            gap_alt_base.append(m.group(2))
+          elif re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line)  != None:
+            # sometimes the ref can be a gap only 
+            m = re.match('^([^\t]+\t){3}([^ACGTacgt])\t([ACGTacgt])\t', vcf_line) 
+            gap_position.append(1)
+            gap_alt_base.append(m.group(3))
+          else:
+            gap_position.append(0)
+            gap_alt_base.append('-')
+     
+      gapped_alignments = []
+      # interleave gap only and snp bases
+      with open(input_fasta_filename, "r") as input_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        for alignment in alignments:
+          for record in alignment:
+            inserted_gaps = []
+            if record.id in sample_names:
+              # only apply to internal nodes
+              continue
+            gap_index = 0
+            for input_base in record.seq:
+              while gap_index < len(gap_position) and gap_position[gap_index] == 1:
+                inserted_gaps.append(gap_alt_base[gap_index])
+                gap_index+=1
+              if gap_index < len(gap_position):
+                inserted_gaps.append(input_base)
+                gap_index+=1
+        
+            while gap_index < len(gap_position):
+              inserted_gaps.append(gap_alt_base[gap_index])
+              gap_index+=1
+        
+            record.seq = Seq(''.join(inserted_gaps))
+            gapped_alignments.append(record)
+        
+      with open(output_fasta_filename, "a") as output_handle:
+        AlignIO.write(MultipleSeqAlignment(gapped_alignments), output_handle, "fasta")
+        output_handle.close()
     return
 
 
     # reparsing a fasta file splits the lines which makes fastml work
   @staticmethod
   def reconvert_fasta_file(input_filename, output_filename):
-    input_handle = open(input_filename, "rU")
-    output_handle = open(output_filename, "w+")
-    alignments = AlignIO.parse(input_handle, "fasta")
-    AlignIO.write(alignments, output_handle, "fasta")
-    output_handle.close()
-    input_handle.close()
+    with open(input_filename, "r") as input_handle:
+      with open(output_filename, "w+") as output_handle:
+        alignments = AlignIO.parse(input_handle, "fasta")
+        AlignIO.write(alignments, output_handle, "fasta")
+        output_handle.close()
+      input_handle.close()
     return
 
   @staticmethod
@@ -982,7 +984,8 @@ class GubbinsCommon():
 
   @staticmethod
   def create_pairwise_newick_tree(sequence_names, output_filename):
-    tree = Phylo.read(StringIO('('+sequence_names[0]+','+sequence_names[1]+')'), "newick")
+    stringio = StringIO("".join(('(',sequence_names[0], ',', sequence_names[1],')')))
+    tree = Phylo.read(stringio, "newick")
     Phylo.write(tree, output_filename, 'newick')
 
   @staticmethod
@@ -993,7 +996,7 @@ class GubbinsCommon():
           full_path_of_file_for_deletion = os.path.join(directory_to_search, filename)
           if(re.match(str(deletion_regex), filename) != None and os.path.exists(full_path_of_file_for_deletion)):
             if verbose > 0:
-              print "Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex
+              print("Deleting file: "+ os.path.join(directory_to_search, filename) + " regex:"+deletion_regex)
             os.remove(full_path_of_file_for_deletion)
             
   @staticmethod
@@ -1004,7 +1007,7 @@ class GubbinsCommon():
           full_path_of_file_for_find = os.path.join(directory_to_search, filename)
           if(re.match(str(find_regex), filename) != None and os.path.exists(full_path_of_file_for_find)):
             if verbose > 0:
-              print "File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex
+              print("File exists: "+ os.path.join(directory_to_search, filename) + " regex:"+find_regex)
             return 1
     return 0
 
@@ -1036,31 +1039,31 @@ class GubbinsCommon():
   
   @staticmethod
   def extract_recombinations_from_embl(filename):
-    fh = open(filename, "rU")
-    sequences_to_coords = {}
-    start_coord = -1
-    end_coord = -1
-    for line in fh:
-      searchObj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
-      if searchObj != None:
-        start_coord = int(searchObj.group(1))
-        end_coord = int(searchObj.group(2))
-        continue
-
-      if start_coord >= 0 and end_coord >= 0:
-        searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
-        if searchTaxa != None:
-          taxa_names = searchTaxa.group(1).strip().split(' ')
-          for taxa_name in taxa_names:
-            if taxa_name in sequences_to_coords:
-              sequences_to_coords[taxa_name].append([start_coord,end_coord])
-            else:
-              sequences_to_coords[taxa_name] = [[start_coord,end_coord]]
-            
-          start_coord = -1
-          end_coord   = -1
-        continue
-    fh.close()
+    with open(filename, "r") as fh:
+      sequences_to_coords = {}
+      start_coord = -1
+      end_coord = -1
+      for line in fh:
+        searchObj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
+        if searchObj != None:
+          start_coord = int(searchObj.group(1))
+          end_coord = int(searchObj.group(2))
+          continue
+      
+        if start_coord >= 0 and end_coord >= 0:
+          searchTaxa = re.search('taxa\=\"([^"]+)\"', line)
+          if searchTaxa != None:
+            taxa_names = searchTaxa.group(1).strip().split(' ')
+            for taxa_name in taxa_names:
+              if taxa_name in sequences_to_coords:
+                sequences_to_coords[taxa_name].append([start_coord,end_coord])
+              else:
+                sequences_to_coords[taxa_name] = [[start_coord,end_coord]]
+              
+            start_coord = -1
+            end_coord   = -1
+          continue
+      fh.close()
     return sequences_to_coords
     
   @staticmethod

@@ -6,7 +6,7 @@ class Gubbins < Formula
 
   homepage 'https://github.com/andrewjpage/gubbins'
   url 'https://github.com/andrewjpage/gubbins/archive/convert_python_to_3.tar.gz'
-  sha1 'e779b4f9def6e671587248b92c00fc8e60107314'
+  sha1 '4b2d50c635323f857340db37e949bac27c45ef82'
   head 'https://github.com/andrewjpage/gubbins.git'
 
   depends_on :autoconf

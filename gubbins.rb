@@ -15,7 +15,7 @@ class Gubbins < Formula
   depends_on 'check'
   depends_on 'raxml'
   depends_on 'fasttree'
-  depends_on 'fastml' => :optional
+  depends_on 'fastml' => :recommended
   depends_on :python3
   depends_on 'zlib'
   

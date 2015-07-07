@@ -31,9 +31,9 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         ],
     install_requires=[
-        'Biopython >= 1.59',
-        'DendroPy  >= 4.0.2',
-        'Reportlab >= 2.5',
+        'biopython >= 1.59',
+        'dendropy  >= 4.0.2',
+        'reportlab >= 3.0',
         'nose >= 1.3'
     ],
     license='GPL',

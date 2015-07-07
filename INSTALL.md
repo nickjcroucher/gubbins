@@ -15,9 +15,7 @@ There are a few ways to install Gubbins and its dependancies. The simpliest way 
 ## OSX - Mavericks (10.9) & Yosemite (10.10)
 Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version). Then run:
 ```
-pip3 install nose biopython dendropy reportlab
 brew tap homebrew/science
-brew tap homebrew/dupes
 brew install gubbins
 ```
 
@@ -34,9 +32,7 @@ export PATH=${HOME}/FastML.v3.1/bin:$PATH
 Then run:
 ```
 brew tap homebrew/science
-brew tap homebrew/dupes
 brew install python3
-pip3 install nose biopython dendropy reportlab 
 brew install gubbins --without-fastml
 ```
 
@@ -50,10 +46,9 @@ brew install gubbins --without-fastml
 Tested on Ubuntu Trusty (14.04) and Precise (12.04). Install [LinuxBrew](http://brew.sh/linuxbrew/). Then run:
 
 ```
+sudo apt-get install gfortran
 brew tap homebrew/science
-brew tap homebrew/dupes
 brew install python3
-pip3 install nose biopython dendropy reportlab 
 brew install gubbins
 ```
 
@@ -65,11 +60,9 @@ sudo yum install epel-release gcc gcc-c++ automake
 Install [LinuxBrew](http://brew.sh/linuxbrew/).
 ```
 brew tap homebrew/science
-brew tap homebrew/dupes
 ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.8
 ln -s $(which g++) ~/.linuxbrew/bin/g++-4.8
 brew install ruby gpatch python3
-pip3 install nose biopython dendropy reportlab 
 brew install gubbins
 ```
 
@@ -81,11 +74,9 @@ sudo yum install epel-release gcc gcc-c++ automake
 Install [LinuxBrew](http://brew.sh/linuxbrew/).
 ```
 brew tap homebrew/science
-brew tap homebrew/dupes
 ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.4
 ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
 brew install ruby python3
-pip3 install nose biopython dendropy reportlab 
 brew install gubbins
 ```
 
@@ -96,7 +87,7 @@ Install the dependances and include them in your PATH:
 * [FastTree](http://www.microbesonline.org/fasttree/#Install) ( >=2.1.4 )
 * [RAxML](https://github.com/stamatak/standard-RAxML) ( >=8.0 )
 * [FASTML](http://fastml.tau.ac.il/source.php) ( >=2.02 )
-* Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose
+* Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose, pillow
 * Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 
 ```

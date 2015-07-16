@@ -16,7 +16,7 @@ There are a few ways to install Gubbins and its dependancies. The simpliest way 
 Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version). Then run:
 ```
 brew tap homebrew/science
-brew install https://raw.githubusercontent.com/andrewjpage/homebrew-science/master/gubbins.rb
+brew install gubbins
 ```
 
 ## OSX - Mountain Lion (10.8)
@@ -33,7 +33,7 @@ Then run:
 ```
 brew tap homebrew/science
 brew install python3
-brew install https://raw.githubusercontent.com/andrewjpage/homebrew-science/master/gubbins.rb --without-fastml
+brew install gubbins --without-fastml
 ```
 
 ## OSX - It failed to install
@@ -49,7 +49,7 @@ Tested on Ubuntu Trusty (14.04) and Precise (12.04). Install [LinuxBrew](http://
 sudo apt-get install gfortran
 brew tap homebrew/science
 brew install python3
-brew install https://raw.githubusercontent.com/andrewjpage/homebrew-science/master/gubbins.rb
+brew install gubbins
 ```
 
 ## Linux - CentOS/RHEL 7
@@ -65,7 +65,7 @@ ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.8
 ln -s $(which g++) ~/.linuxbrew/bin/g++-4.8
 ln -s $(which gfortran) ~/.linuxbrew/bin/gfortran-4.8
 brew install ruby gpatch python3
-brew install https://raw.githubusercontent.com/andrewjpage/homebrew-science/master/gubbins.rb
+brew install gubbins
 ```
 
 ## Linux - CentOS/RHEL 6.6
@@ -80,7 +80,7 @@ ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.4
 ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
 ln -s $(which gfortran) ~/.linuxbrew/bin/gfortran-4.4
 brew install ruby python3
-brew install https://raw.githubusercontent.com/andrewjpage/homebrew-science/master/gubbins.rb
+brew install gubbins
 ```
 
 ## OSX/Linux - from source

@@ -205,6 +205,9 @@ class GubbinsCommon():
     (base_directory,base_filename) = os.path.split(self.args.alignment_filename)
     (base_filename_without_ext,extension) = os.path.splitext(base_filename)
     starting_base_filename = base_filename
+    
+    if len(base_filename) > 115:
+        sys.exit("Your filename is too long for RAxML at "+ str(len(base_filename))+ " characters, please shorten it to less than 115 characters")
 
     # find all snp sites
     if self.args.verbose > 0:

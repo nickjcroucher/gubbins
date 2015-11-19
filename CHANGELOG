@@ -1,0 +1,250 @@
+gubbins (1.3.4~trusty1) trusty; urgency=low
+
+  * Identify blocks at end of genome
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 18 Apr 2015 14:51:00 +0000
+
+gubbins (1.3.3~trusty1) trusty; urgency=low
+
+  * Max window size arg bug
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 16 Apr 2015 16:09:00 +0000
+
+gubbins (1.3.2~trusty1) trusty; urgency=low
+
+  * pass in self to window size check
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 16 Apr 2015 16:00:00 +0000
+
+gubbins (1.3.1~trusty1) trusty; urgency=low
+
+  * Calculate bases used for clonal frame
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 16 Apr 2015 15:00:00 +0000
+
+gubbins (1.3.0~trusty1) trusty; urgency=low
+
+  * Apply filtering to leaf nodes
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+gubbins (1.2.5~trusty1) trusty; urgency=low
+
+  * Block out SNPs from downstream recombinations
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+gubbins (1.2.4~trusty1) trusty; urgency=low
+
+  * Python verion number in script
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+
+gubbins (1.2.3~trusty1) trusty; urgency=low
+
+  * Eggs werent included in deb
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+
+gubbins (1.2.2~trusty1) trusty; urgency=low
+
+  * Last sequence wasnt in array
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 14:17:00 +0000
+
+gubbins (1.2.1~trusty1) trusty; urgency=low
+
+  * Update VCF and EMBL output formats
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 11:36:00 +0000
+
+gubbins (1.2.0~trusty1) trusty; urgency=low
+
+  * Dont fill in parent bases with gaps from children
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 30 Mar 2015 10:16:00 +0000
+
+gubbins (1.1.2~trusty1) trusty; urgency=low
+
+  * Fix GFF formatting and C warnings
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 23 Jan 2015 16:02:00 +0000
+
+gubbins (1.1.1~trusty1) trusty; urgency=low
+
+  * Message to tell user theres a problem with outgroups not a clade
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 23 Jan 2015 16:02:00 +0000
+
+gubbins (1.1.0~trusty1) trusty; urgency=low
+
+  * Allow for multiple outgroups
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 23 Jan 2015 15:05:00 +0000
+
+gubbins (1.0.12~trusty1) trusty; urgency=low
+
+  * Remove internal labels from final tree
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 20 Jan 2015 09:03:00 +0000
+
+gubbins (1.0.11~trusty1) trusty; urgency=low
+
+  * Test inputs contain variation
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 19 Jan 2015 09:01:00 +0000
+
+gubbins (1.0.10~trusty1) trusty; urgency=low
+
+  * Upload failed on ubuntu
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 19 Jan 2015 09:01:00 +0000
+
+gubbins (1.0.9~trusty1) trusty; urgency=low
+
+  * Remove cpu info and manually look for the flag
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 6 Jan 2015 14:09:00 +0000
+
+gubbins (1.0.8~trusty1) trusty; urgency=low
+
+  * Limit the cpu info lookup to get around bug in ubuntu build
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 8 Dec 2014 12:58:00 +0000
+
+gubbins (1.0.7~trusty1) trusty; urgency=low
+
+  * Update rho/theta calculation to blocks/snps outside recombinations
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 8 Dec 2014 12:58:00 +0000
+
+gubbins (1.0.6~trusty1) trusty; urgency=low
+
+  * Drawer allow for variation tag
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Wed, 3 Dec 2014 11:32:00 +0000
+
+gubbins (1.0.5~trusty1) trusty; urgency=low
+
+  * Fasttree executables with upper and lower case
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Wed, 19 Nov 2014 14:16:00 +0000
+
+gubbins (1.0.4~trusty1) trusty; urgency=low
+
+  * Warning when number of threads changed for raxml
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 14 Nov 2014 14:16:00 +0000
+
+gubbins (1.0.3~trusty1) trusty; urgency=low
+
+  * Dont use multiple threads for raxml if not requested
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 14 Nov 2014 14:16:00 +0000
+
+gubbins (1.0.2~trusty1) trusty; urgency=low
+
+  * Allow for more convergence methods
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 14 Oct 2014 14:16:00 +0000
+
+gubbins (1.0.1~trusty1) trusty; urgency=low
+
+  * Fixed unstable python test
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 14 Oct 2014 14:16:00 +0000
+
+gubbins (1.0~trusty1) trusty; urgency=low
+
+  * Strict convergence option
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 14 Oct 2014 14:16:00 +0000
+
+gubbins (0.6~trusty1) trusty; urgency=low
+
+  * Gubbins drawer can now use .embl file with recombination regions
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 9 Sep 2014 13:03:00 +0000
+
+gubbins (0.5~trusty1) trusty; urgency=low
+
+  * Thread support for RAXML
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Tue, 9 Sep 2014 09:45:00 +0000
+
+gubbins (0.4.1~trusty1) trusty; urgency=low
+
+  * Check for FastTree lowercase executable
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 8 Sep 2014 10:32:00 +0000
+
+gubbins (0.4~trusty1) trusty; urgency=low
+
+  * Rename output files for pairwise comparison
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 5 Sep 2014 10:26:00 +0000
+
+gubbins (0.3~trusty1) trusty; urgency=low
+
+  * Changes statistics file output
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 4 Sep 2014 17:07:00 +0000
+
+gubbins (0.2~trusty1) trusty; urgency=low
+
+  * Rename final output files
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Mon, 1 Sep 2014 16:44:00 +0000
+
+gubbins (0.1.11~trusty1) trusty; urgency=low
+
+  * Python remove internal node names if passed in as a starting tree
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 22 Aug 2014 16:44:00 +0000
+
+gubbins (0.1.10~trusty1) trusty; urgency=low
+
+  * Python print list of excluded sequences to STDOUT by default
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 22 Aug 2014 14:44:00 +0000
+
+gubbins (0.1.9~trusty1) trusty; urgency=low
+
+  * Python prints error messages for invalid sequence files and sends exit code 1
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Fri, 22 Aug 2014 10:37:00 +0000
+
+gubbins (0.1.8~trusty1) trusty; urgency=low
+
+  * Python fastml exec fix
+  * Python check sequence names in tree
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 15 Aug 2014 16:32:00 +0000
+
+gubbins (0.1.7~trusty2) trusty; urgency=low
+
+  * Package for trusty
+  * Move blocks further inwards
+
+ -- Andrew Page <ap13@sanger.ac.uk>  Thu, 14 Aug 2014 09:56:00 +0000
+
+gubbins (0.1.6) saucy; urgency=low
+
+  * Changed build depends
+
+ -- Aidan Delaney (Packaging Key) <aidan@ontologyengineering.org>  Wed, 26 Jun 2014 14:46:07 +0000
+
+gubbins (0.1.5) saucy; urgency=low
+
+  * Updated build system and removed some tests
+
+ -- Aidan Delaney (Packaging Key) <aidan@ontologyengineering.org>  Wed, 25 Jun 2014 14:46:07 +0000
+
+gubbins (0.1.4) saucy; urgency=low
+
+  * Updated Debian packages such that the build version is taken from Automake.
+
+ -- Aidan Delaney (Packaging Key) <aidan@ontologyengineering.org>  Mon, 31 Mar 2014 14:46:07 +0000
+

@@ -1,4 +1,3 @@
-
 # ship these headers in the "make dist" target
 EXTRA_DIST = Newickform.h alignment_file.h block_tab_file.h string_cat.h branch_sequences.h fasta_of_snp_sites.h gff_file.h gubbins.h kseq.h parse_phylip.h parse_vcf.h phylip_of_snp_sites.h seqUtil.h snp_searching.h snp_sites.h tree_statistics.h tree_scaling.h vcf.h
 
@@ -18,7 +17,6 @@ libgubbins_la_LIBADD = -lm
 #libPyGubbins_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
 #libPyGubbins_la_LIBADD = $(PYTHON_LDFLAGS) -lboost_python libgubbins.la -lz -lm
 
-
 # "make check" target
 TESTS = $(check_PROGRAMS)
 check_PROGRAMS = run_all_tests
@@ -32,4 +30,8 @@ run_all_tests_SOURCES = \
 	../tests/helper_methods.c \
 	../tests/run_all_tests.c
 run_all_tests_CFLAGS = -I../tests $(PTHREAD_CFLAGS)
-run_all_tests_LDADD = -lcheck libgubbins.la -lz -lm $(PTHREAD_LDFLAGS) -lrt
+run_all_tests_LDADD = -lcheck libgubbins.la -lz -lm $(PTHREAD_LDFLAGS)
+
+if HOST_LINUX
+run_all_tests_LDADD += -lrt
+endif

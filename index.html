@@ -37,8 +37,8 @@
 <p>Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous increase in the size of datasets being used for estimating bacterial population phylodynamics. Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used for mitigating the effect of mechanisms of horizontal sequence transfer on phylogenetic reconstructions cannot cope with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.</p>
 
 <h2>The paper</h2>
-The paper is available on Nucleic Acids Research (open access):
-<a href="http://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1196.abstract">Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins</a>.
+The paper is available from Nucleic Acids Research (open access):
+<a href="http://nar.oxfordjournals.org/content/43/3/e15">Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins</a>.
 
 <h3>Citing Gubbins</h3>
 
@@ -162,6 +162,9 @@ X.Y</p>
 <p>Final phylogenetic tree in newick format.</p>
 <ul><li>.final_tree.tre	</li></ul>
 
+<h3><a name="roary" class="anchor" href="#roary"><span class="octicon octicon-link"></span></a>Roary</h3>
+<p>The output of <a href="http://sanger-pathogens.github.io/Roary/">Roary (the pan genome pipeline)</a> cannot be used as the input to Gubbins.
+They are fundamentally different methods. Detecting recombination in pan genomes is an open problem.</p>
 
 <h3>
 <a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running on LSF</h3>

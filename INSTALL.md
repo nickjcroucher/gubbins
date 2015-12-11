@@ -3,16 +3,17 @@ Before you do anything, please have a look at the [Gubbins webpage](http://sange
 # Installation
 There are a few ways to install Gubbins and its dependancies. The simpliest way is using HomeBrew (OSX) or LinuxBrew.
 
-* OSX - Mavericks (10.9) & Yosemite (10.10)
+* OSX - Mavericks (10.9) & Yosemite (10.10) & El Capitan (10.11)
 * OSX - Mountain Lion (10.8)
 * Linux - Ubuntu Trusty (14.04) & Precise (12.04)
+* Linux - Debian (unstable)
 * Linux - CentOS 7
 * Linux - CentOS 6
 * OSX/Linux - from source
 * OSX/Linux/Windows - Virtual Machine
 
 
-## OSX - Mavericks (10.9) & Yosemite (10.10)
+## OSX - Mavericks (10.9) & Yosemite (10.10) & El Capitan (10.11)
 Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version). Then run:
 ```
 brew tap homebrew/science
@@ -42,7 +43,7 @@ brew install gubbins --without-fastml
 * Install it in /usr/local. Homebrew warn 'Pick another prefix at your peril!'.
 * Run 'brew install -vd gubbins' and try and correct any errors.
 
-## Linux - Ubuntu
+## Linux - Ubuntu Trusty (14.04) & Precise (12.04)
 Tested on Ubuntu Trusty (14.04) and Precise (12.04). Install [LinuxBrew](http://brew.sh/linuxbrew/). Then run:
 
 ```
@@ -50,6 +51,12 @@ sudo apt-get install gfortran
 brew tap homebrew/science
 brew install python3
 brew install gubbins
+```
+
+## Linux - Debian (unstable)
+Gubbins has been packed by the Debian Med team and will eventually be the easiest way to install on Debian based systems.
+```
+sudo apt-get install gubbins
 ```
 
 ## Linux - CentOS/RHEL 7

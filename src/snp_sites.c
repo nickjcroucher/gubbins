@@ -85,7 +85,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 		internal_nodes[a] = 0;
 	}
 	
-	char* bases_for_snps[number_of_snps];
+	char** bases_for_snps = malloc(number_of_snps * sizeof(char *));
 	
 	for(i = 0; i < number_of_snps; i++)
 	{

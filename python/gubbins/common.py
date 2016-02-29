@@ -515,6 +515,7 @@ class GubbinsCommon():
     GubbinsCommon.split_all_non_bi_nodes(tree.seed_node)
 
     tree.update_bipartitions()
+    tree.reroot_at_midpoint()
     tree.deroot()
     tree.update_bipartitions()
     output_tree_string = tree.as_string(

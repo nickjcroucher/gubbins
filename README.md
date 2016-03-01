@@ -125,3 +125,8 @@ Data from the paper
 ===================
 * ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz
 * ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz
+* 
+
+Midpoint rerooting
+==================
+From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default. This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.

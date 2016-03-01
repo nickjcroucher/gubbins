@@ -129,4 +129,4 @@ Data from the paper
 
 Midpoint rerooting
 ==================
-From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default. This doesnt have any effect on the recombination detection, but the output trees didnt look as expected. Users are advised to upgrade to the latest version.
+From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default. This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.

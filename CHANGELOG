@@ -1,3 +1,44 @@
+v1.4.7 - 29 Feb 2016
+------
+Fix allocation from stack bug (from jeromekelleher). For large numbers of SNPs allocating from the stack caused a segfault. 
+This fixes the issue by allocating from the heap with malloc.
+
+v1.4.6 - 29 Feb 2016
+------
+Added back midpoint rerooting as the default. Was the default up to v1.3.5 (25/6/15) and was removed by mistake. 
+It didnt effect the recombination detection, just the tree didnt look as pretty at the end.
+
+v1.4.5 - 13 Jan 2016
+------
+Removed the install.sh file which gets regenerated automatically when the code is built, 
+but if its there already it can cause problems on some platforms.
+
+v1.4.4 - 9 Dec 2015
+------
+Debian reported that Gubbins failed to build on one platform. These changes fix this bug and 
+cleaned up some other build issues to make it easier to compile on OSX from source.
+
+v1.4.3 - 19 Nov 2015
+------
+The Debian directory was removed because it now lives in its own repository in the Debian world.
+
+v1.4.2 - 2 Sept 2015
+------
+If filenames are too long, RAxML crashes. To avoid this a hard limit was introduced, and Gubbins exits with an error message.
+
+v1.4.1 - 7 Jul 2015
+------
+Update Brew installation instructions and python dependancy versions.
+
+v1.4.0 - 1 Jul 2015
+------
+Update from python 2 to python 3. This is to allow for inclusion in Debian (because they dont accept python 2 anymore). 
+Also detect fastml version and modify parameters as required.
+
+
+
+Changes prior to May 2015
+=========
 gubbins (1.3.4~trusty1) trusty; urgency=low
 
   * Identify blocks at end of genome

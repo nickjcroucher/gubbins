@@ -111,7 +111,7 @@ class GubbinsCommon():
   def choose_executable(list_of_executables):
     flags = []
     if os.path.exists('/proc/cpuinfo'):
-      output = subprocess.Popen('grep flags /proc/cpuinfo', stdout = subprocess.PIPE, shell=True).communicate()[0]
+      output = subprocess.Popen('grep flags /proc/cpuinfo', stdout = subprocess.PIPE, shell=True).communicate()[0].decode("utf-8")
       flags =  output.split()
     
     for executable in list_of_executables:

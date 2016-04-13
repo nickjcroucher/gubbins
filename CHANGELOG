@@ -1,3 +1,7 @@
+v1.4.8 - 12 Apr 2016
+------
+Fix to lookup of CPU instruction sets to decide which versions of RAxML are supported. Provided by aaronk.
+
 v1.4.7 - 29 Feb 2016
 ------
 Fix allocation from stack bug (from jeromekelleher). For large numbers of SNPs allocating from the stack caused a segfault. 

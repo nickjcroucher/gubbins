@@ -23,7 +23,6 @@ from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 from io import StringIO
-from collections import Counter
 import argparse
 import dendropy
 from dendropy.calculate import treecompare
@@ -36,6 +35,8 @@ import sys
 import tempfile
 import time
 from gubbins.Fastml import Fastml
+from gubbins.PreProcessFasta import PreProcessFasta
+from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -78,26 +79,6 @@ class GubbinsCommon():
           return 0
       
     return 1
-
-
-  @staticmethod
-  def does_fasta_contain_variation(alignment_filename):
-    with open(alignment_filename, "r") as input_handle:
-      alignments = AlignIO.parse(input_handle, "fasta")
-      first_sequence = ""
-      
-      for index, alignment in enumerate(alignments):
-        for record_index, record in enumerate(alignment):
-      
-          if record_index == 0:
-            first_sequence = record.seq
-      
-          if str(record.seq) != str(first_sequence):
-            input_handle.close()
-            return 1
-            
-      input_handle.close()
-    return 0
 
 
   @staticmethod
@@ -171,7 +152,7 @@ class GubbinsCommon():
     if self.args.converge_method not in ['weighted_robinson_foulds','robinson_foulds','recombination']:
       sys.exit("Please choose weighted_robinson_foulds, robinson_foulds or recombination for the --converge_method option")
 
-    if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(self.args.alignment_filename) == 0 ):
+    if(GubbinsCommon.does_file_exist(self.args.alignment_filename, 'Alignment File') == 0 or not ValidateFastaAlignment(self.args.alignment_filename).is_input_fasta_file_valid() ):
        sys.exit("There is a problem with your input fasta file so nothing can be done until you fix it")
        
     if(self.args.starting_tree is not None and self.args.starting_tree != "" and (GubbinsCommon.does_file_exist(self.args.starting_tree, 'Starting Tree') == 0 or GubbinsCommon.is_input_starting_tree_valid(self.args.starting_tree) )):
@@ -195,7 +176,10 @@ class GubbinsCommon():
 
     # put a filtered copy into a temp directory and work from that
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-    taxa_removed = GubbinsCommon.filter_out_alignments_with_too_much_missing_data(self.args.alignment_filename, temp_working_dir+"/"+starting_base_filename, self.args.filter_percentage, self.args.verbose)
+    
+    pre_process_fasta = PreProcessFasta(self.args.alignment_filename,self.args.verbose,self.args.filter_percentage)
+    taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(temp_working_dir+"/"+starting_base_filename)
+    
     self.args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 
     # If a starting tree has been provided make sure that taxa filtered out in the previous step are removed from the tree
@@ -308,7 +292,6 @@ class GubbinsCommon():
         print(fastml_command)
         fastml_command_suffix = ''
 
-
       try:
         subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
       except:
@@ -318,9 +301,8 @@ class GubbinsCommon():
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
       GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
 
-      if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or GubbinsCommon.is_input_fasta_file_valid(starting_base_filename+".gaps.snp_sites.aln") == 0 ):
+      if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or not ValidateFastaAlignment(starting_base_filename+".gaps.snp_sites.aln").is_input_fasta_file_valid() ):
          sys.exit("There is a problem with your FASTA file after running FASTML. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")
-
 
       if self.args.verbose > 0:
         print(int(time.time()))
@@ -736,26 +718,6 @@ class GubbinsCommon():
         sequence_names.append(record.id)
       handle.close()
     return sequence_names
-
-  @staticmethod
-  def is_input_fasta_file_valid(input_filename):
-    try:
-      if GubbinsCommon.does_each_sequence_have_the_same_length(input_filename) == 0:
-        print("Each sequence must be the same length")
-        return 0
-      if GubbinsCommon.are_sequence_names_unique(input_filename) == 0:
-        print("All sequence names in the fasta file must be unique")
-        return 0
-      if GubbinsCommon.does_each_sequence_have_a_name_and_genomic_data(input_filename) == 0:
-        print("Each sequence must have a name and some genomic data")
-        return 0
-      if GubbinsCommon.does_fasta_contain_variation(input_filename) == 0:
-        print("All of the input sequences contain the same data")
-        return 0
-    except:
-      return 0
-
-    return 1
     
   @staticmethod
   def is_input_starting_tree_valid(starting_tree):
@@ -768,99 +730,6 @@ class GubbinsCommon():
       return 0
 
     return 1
-  
-
-  @staticmethod
-  def does_each_sequence_have_a_name_and_genomic_data(input_filename):
-    with  open(input_filename, "r") as input_handle:
-      alignments = AlignIO.parse(input_handle, "fasta")
-      number_of_sequences = 0
-      for alignment in alignments:
-          for record in alignment:
-              number_of_sequences +=1
-              if record.name is None or record.name == "":
-                print("Error with the input FASTA file: One of the sequence names is blank")
-                return 0
-              if record.seq is None or record.seq == "":
-                print("Error with the input FASTA file: One of the sequences is empty")
-                return 0
-              if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
-                print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
-                return 0
-      if number_of_sequences <= 3:
-        print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
-        return 0
-      input_handle.close()
-    return 1
-    
-    
-  @staticmethod
-  def does_each_sequence_have_the_same_length(input_filename):
-    try:
-      with open(input_filename) as input_handle:
-      
-        alignments = AlignIO.parse(input_handle, "fasta")
-        sequence_length = -1
-        for alignment in alignments:
-            for record in alignment:
-               if sequence_length == -1:
-                 sequence_length = len(record.seq)
-               elif sequence_length != len(record.seq):
-                 print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
-                 return 0
-        input_handle.close()
-    except:
-      print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
-      return 0
-    return 1
-
-  @staticmethod
-  def are_sequence_names_unique(input_filename):
-    with open(input_filename) as input_handle:
-      alignments = AlignIO.parse(input_handle, "fasta")
-      sequence_names = []
-      for alignment in alignments:
-          for record in alignment:
-              sequence_names.append(record.name)
-              
-      if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
-        return 0
-      input_handle.close()
-    return 1
-
-  @staticmethod
-  def filter_out_alignments_with_too_much_missing_data(input_filename, output_filename, filter_percentage,verbose):
-    with open(input_filename) as input_handle:
-      with open(output_filename, "w+") as output_handle:
-        alignments = AlignIO.parse(input_handle, "fasta")
-        output_alignments = []
-        taxa_removed = []
-        number_of_included_alignments = 0
-        for alignment in alignments:
-            for record in alignment:
-              number_of_gaps = 0
-              number_of_gaps += record.seq.count('n')
-              number_of_gaps += record.seq.count('N')
-              number_of_gaps += record.seq.count('-')
-              sequence_length = len(record.seq)
-        
-              if sequence_length == 0:
-                taxa_removed.append(record.id)
-                print("Excluded sequence " + record.id + " because there werent enough bases in it")
-              elif((number_of_gaps*100/sequence_length) <= filter_percentage):
-                output_alignments.append(record)
-                number_of_included_alignments += 1
-              else:
-                taxa_removed.append(record.id)
-                print("Excluded sequence " + record.id + " because it had " + str(number_of_gaps*100/sequence_length) +" percentage gaps while a maximum of "+ str(filter_percentage) +" is allowed")
-        
-        if number_of_included_alignments <= 1:
-          sys.exit("Too many sequences have been excluded so theres no data left to work with. Please increase the -f parameter")
-        
-        AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
-        output_handle.close()
-      input_handle.close()
-    return taxa_removed
 
   @staticmethod
   def filter_out_removed_taxa_from_tree_and_return_new_file(starting_tree, temp_working_dir, taxa_removed):

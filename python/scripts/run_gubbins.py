@@ -27,7 +27,7 @@ from gubbins import common
 
 
 
-parser = argparse.ArgumentParser(description='Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R. "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". Nucleic Acids Res. 2015 Feb 18;43(3):e15. doi: 10.1093/nar/gku1196.')
+parser = argparse.ArgumentParser(description='Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R. "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". Nucleic Acids Res. 2015 Feb 18;43(3):e15. doi: 10.1093/nar/gku1196 .')
 parser.add_argument('alignment_filename',       help='Multifasta alignment file')
 parser.add_argument('--outgroup',         '-o', help='Outgroup name for rerooting. A list of comma separated names can be used if they form a clade')
 parser.add_argument('--starting_tree',    '-s', help='Starting tree')

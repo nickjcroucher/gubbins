@@ -188,12 +188,11 @@ void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, 
 		}
 		if(bases_for_snp[i] == reference_base)
 		{
-			fprintf( vcf_file_pointer, "%c", (char) '0' );	
+			fprintf( vcf_file_pointer, "%c", (char) '0' );
 		}
 		else
 		{
-			int alt_base_idx = check_where_char_in_string(alt_bases, bases_for_snp[i]) - 1;
-         fprintf( vcf_file_pointer, "%c", (char) alt_bases[alt_base_idx] );	
+         fprintf( vcf_file_pointer, "%c", (char) check_where_char_in_string(alt_bases, bases_for_snp[i]));
 		}
 		if(i+1 != number_of_samples)
 		{

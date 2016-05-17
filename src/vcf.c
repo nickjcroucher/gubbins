@@ -111,10 +111,10 @@ void output_vcf_row(FILE * vcf_file_pointer, char * bases_for_snp, int snp_locat
 	fprintf( vcf_file_pointer, ".\t");
 	
 	// FORMAT
-	fprintf( vcf_file_pointer, "AB\t");
+	fprintf( vcf_file_pointer, "GT\t");
 	
 	// Bases for each sample
-	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, bases_for_snp, number_of_samples,internal_nodes );
+	output_vcf_row_samples_bases(vcf_file_pointer, reference_base, alt_bases, bases_for_snp, number_of_samples,internal_nodes );
 	
 	fprintf( vcf_file_pointer, "\n");	
 }
@@ -160,7 +160,23 @@ int check_if_char_in_string(char search_string[], char target_char, int search_s
 	return 0;
 }
 
-void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char * bases_for_snp, int number_of_samples,int internal_nodes[])
+// One indexed. String must be null terminated
+int check_where_char_in_string(char search_string[], char target_char)
+{
+	int i;
+	while(search_string[i] != '\0')
+	{
+		if(search_string[i] == target_char)
+		{
+			return i+1;
+		}
+      i++;
+	}
+	return 0;
+}
+
+
+void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, char alt_bases[], char * bases_for_snp, int number_of_samples,int internal_nodes[])
 {
 	int i;
 	
@@ -172,11 +188,12 @@ void output_vcf_row_samples_bases(FILE * vcf_file_pointer, char reference_base, 
 		}
 		if(bases_for_snp[i] == reference_base)
 		{
-			fprintf( vcf_file_pointer, "%c", (char) reference_base );	
+			fprintf( vcf_file_pointer, "%c", (char) '0' );	
 		}
 		else
 		{
-			fprintf( vcf_file_pointer, "%c", (char) bases_for_snp[i] );	
+			int alt_base_idx = check_where_char_in_string(alt_bases, bases_for_snp[i]) - 1;
+         fprintf( vcf_file_pointer, "%c", (char) alt_bases[alt_base_idx] );	
 		}
 		if(i+1 != number_of_samples)
 		{

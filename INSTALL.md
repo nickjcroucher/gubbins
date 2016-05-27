@@ -23,18 +23,11 @@ brew install gubbins
 ## OSX - Mountain Lion (10.8)
 Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version).
 
-Manually install [FastML](http://fastml.tau.ac.il/source.php) and include the binary in your PATH. For example:
-```
-wget 'http://fastml.tau.ac.il/source/FastML.v3.1.tgz'
-tar -xzf FastML.v3.1.tgz
-cd FastML.v3.1
-export PATH=${HOME}/FastML.v3.1/bin:$PATH
-```
 Then run:
 ```
 brew tap homebrew/science
 brew install python3
-brew install gubbins --without-fastml
+brew install gubbins
 ```
 
 ## OSX - It failed to install
@@ -96,7 +89,6 @@ This is the most difficult method and is only suitable for someone with advanced
 Install the dependances and include them in your PATH:
 * [FastTree](http://www.microbesonline.org/fasttree/#Install) ( >=2.1.4 )
 * [RAxML](https://github.com/stamatak/standard-RAxML) ( >=8.0 )
-* [FASTML](http://fastml.tau.ac.il/source.php) ( >=2.02 )
 * Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose, pillow
 * Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 

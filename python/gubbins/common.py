@@ -34,9 +34,11 @@ import subprocess
 import sys
 import tempfile
 import time
-from gubbins.Fastml import Fastml
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
+from gubbins.RAxMLSequenceReconstruction import RAxMLSequenceReconstruction
+from gubbins.RAxMLExecutable import RAxMLExecutable
+
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -91,17 +93,8 @@ class GubbinsCommon():
   @staticmethod
   def choose_executable(list_of_executables):
     flags = []
-    if os.path.exists('/proc/cpuinfo'):
-      output = subprocess.Popen('grep flags /proc/cpuinfo', stdout = subprocess.PIPE, shell=True).communicate()[0].decode("utf-8")
-      flags =  output.split()
     
     for executable in list_of_executables:
-      if os.path.exists('/proc/cpuinfo'):
-        if re.search('AVX', executable) and 'avx' not in flags:
-          continue
-        elif re.search('SSE3', executable) and 'ssse3'  not in flags:
-          continue
-      
       if GubbinsCommon.which(executable) != None:
         return executable
         
@@ -109,29 +102,13 @@ class GubbinsCommon():
 
   def parse_and_run(self):
     # Default parameters
-    raxml_executables = ['raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
-    if self.args.threads > 1:
-      raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
-    raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
-    
-    # raxml PTHREADS needs 2 or more threads, however some systems dont come with the single threaded exec
-    if self.args.threads == 1 and raxml_executable == "":
-      self.args.threads = 2
-      raxml_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
-      print("Trying PTHREADS version of raxml because no single threaded version of raxml could be found. Just to warn you, this requires 2 threads.\n")
-      raxml_executable = GubbinsCommon.choose_executable(raxml_executables)
-    
-    RAXML_EXEC = raxml_executable+' -f d -p 1 -m GTRGAMMA'
-    if re.search('PTHREADS', str(RAXML_EXEC)) != None:
-      RAXML_EXEC = RAXML_EXEC+" -T " +str(self.args.threads)
+    raxml_executable_obj = RAxMLExecutable(self.args.threads, self.args.verbose)
     
     fasttree_executables = ['FastTree','fasttree']
     FASTTREE_EXEC = GubbinsCommon.choose_executable(fasttree_executables)
     
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
     GUBBINS_EXEC = 'gubbins'
-
-    FASTML_EXEC = Fastml('fastml').fastml_parameters
 
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
 
@@ -140,10 +117,6 @@ class GubbinsCommon():
       GUBBINS_EXEC = GubbinsCommon.use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
       if GubbinsCommon.which(GUBBINS_EXEC) is None:
         sys.exit(GUBBINS_EXEC+" is not in your path")
-    if GubbinsCommon.which(FASTML_EXEC) is None:
-      sys.exit("fastml is not in your path")
-    if (self.args.tree_builder == "raxml" or self.args.tree_builder == "hybrid") and GubbinsCommon.which(RAXML_EXEC) is None:
-      sys.exit("RAxML is not in your path")
       
     if self.args.tree_builder == "fasttree" or self.args.tree_builder == "hybrid":
       if GubbinsCommon.which(FASTTREE_EXEC) is None:
@@ -206,11 +179,10 @@ class GubbinsCommon():
 
     GubbinsCommon.reconvert_fasta_file(starting_base_filename+".gaps.snp_sites.aln",starting_base_filename+".start")
 
-    # Perform pairwise comparison if there are only 2 sequences
+
     number_of_sequences = GubbinsCommon.number_of_sequences_in_alignment(self.args.alignment_filename)
-    if(number_of_sequences == 2):
-      GubbinsCommon.pairwise_comparison(self.args.alignment_filename,starting_base_filename,GUBBINS_EXEC,self.args.alignment_filename,FASTML_EXEC,base_filename_without_ext)
-      sys.exit()
+    if(number_of_sequences < 3):
+      sys.exit("4 or more sequences are required.")
 
     latest_file_name = "latest_tree."+base_filename_without_ext+"."+str(current_time)+"tre"
     tree_file_names = []
@@ -237,27 +209,24 @@ class GubbinsCommon():
           previous_tree_name    = GubbinsCommon.fasttree_previous_tree_name(base_filename, i)
           current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
           tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,base_filename,previous_tree_name,FASTTREE_EXEC, FASTTREE_PARAMS,base_filename )
-          fastml_command        = GubbinsCommon.fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
           gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
         elif i == 2:
           previous_tree_name    = current_tree_name
           current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
-          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-          fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,raxml_executable_obj.tree_building_command(),previous_tree_name, self.args.verbose)
           gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
         else:
           previous_tree_name    = GubbinsCommon.raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
           current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
-          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-          fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+          tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,raxml_executable_obj.tree_building_command(),previous_tree_name, self.args.verbose)
           gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
       elif self.args.tree_builder == "raxml":
         previous_tree_name    = GubbinsCommon.raxml_previous_tree_name(base_filename_without_ext,base_filename, current_time,i)
         current_tree_name     = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
-        tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,RAXML_EXEC,previous_tree_name, self.args.verbose)
-        fastml_command        = GubbinsCommon.raxml_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename_without_ext,current_time, i)
+        tree_building_command = GubbinsCommon.raxml_tree_building_command(i,base_filename_without_ext,base_filename,current_time,raxml_executable_obj.tree_building_command(),previous_tree_name, self.args.verbose)
+		
         gubbins_command       = GubbinsCommon.raxml_gubbins_command(base_filename_without_ext,starting_base_filename+".gaps",current_time, i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
       elif self.args.tree_builder == "fasttree":
@@ -267,7 +236,6 @@ class GubbinsCommon():
         current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
 
         tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,current_tree_name,previous_tree_name,previous_tree_name,FASTTREE_EXEC,FASTTREE_PARAMS,base_filename )
-        fastml_command        = GubbinsCommon.fasttree_fastml_command(FASTML_EXEC, starting_base_filename+".snp_sites.aln", base_filename, i)
         gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,starting_base_filename+".gaps", i,self.args.alignment_filename,GUBBINS_EXEC,self.args.min_snps,self.args.alignment_filename, self.args.min_window_size,self.args.max_window_size)
 
       if self.args.verbose > 0:
@@ -287,22 +255,18 @@ class GubbinsCommon():
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
-      fastml_command_suffix = ' > /dev/null 2>&1'
-      if self.args.verbose > 0:
-        print(fastml_command)
-        fastml_command_suffix = ''
+      try:  
+        raxml_seq_recon = RAxMLSequenceReconstruction(starting_base_filename+".snp_sites.aln", current_tree_name, starting_base_filename+".seq.joint.txt", current_tree_name , raxml_executable_obj.internal_sequence_reconstruction_command(), self.args.verbose)
+        raxml_seq_recon.reconstruct_ancestor_sequences()
 
-      try:
-        subprocess.check_call(fastml_command+fastml_command_suffix, shell=True)
       except:
-        sys.exit("Failed while running FastML")
+        sys.exit("Failed while running RAxML internal sequence reconstruction")
         
-      shutil.copyfile(current_tree_name+'.output_tree',current_tree_name)
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
-      GubbinsCommon.reinsert_gaps_into_fasta_file(current_tree_name+'.seq.joint.txt', starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+      GubbinsCommon.reinsert_gaps_into_fasta_file(starting_base_filename+".seq.joint.txt", starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
 
       if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or not ValidateFastaAlignment(starting_base_filename+".gaps.snp_sites.aln").is_input_fasta_file_valid() ):
-         sys.exit("There is a problem with your FASTA file after running FASTML. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")
+         sys.exit("There is a problem with your FASTA file after running RAxML internal sequence reconstruction. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")
 
       if self.args.verbose > 0:
         print(int(time.time()))
@@ -629,21 +593,6 @@ class GubbinsCommon():
     return GubbinsCommon.translation_of_filenames_to_final_filenames("RAxML_result."+GubbinsCommon.raxml_base_name(base_filename_without_ext,current_time)+str(max_intermediate_iteration), output_prefix)
 
   @staticmethod
-  def translation_of_filenames_to_final_filenames_pairwise(input_prefix, output_prefix):
-    input_names_to_output_names = {  
-      str(input_prefix)+".vcf":             str(output_prefix)+".summary_of_snp_distribution.vcf"  ,
-      str(input_prefix)+".branch_snps.tab": str(output_prefix)+".branch_base_reconstruction.embl"  ,
-      str(input_prefix)+".tab":             str(output_prefix)+".recombination_predictions.embl"   ,
-      str(input_prefix)+".gff":             str(output_prefix)+".recombination_predictions.gff"    ,
-      str(input_prefix)+".stats":           str(output_prefix)+".per_branch_statistics.csv"        ,
-      str(input_prefix)+".snp_sites.aln":   str(output_prefix)+".filtered_polymorphic_sites.fasta" ,
-      str(input_prefix)+".phylip":          str(output_prefix)+".filtered_polymorphic_sites.phylip",
-      str(input_prefix)+".output_tree":     str(output_prefix)+".node_labelled.tre",
-      str(input_prefix)+".tre":             str(output_prefix)+".final_tree.tre"
-    }
-    return input_names_to_output_names
-
-  @staticmethod
   def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {  
       str(input_prefix)+".vcf":             str(output_prefix)+".summary_of_snp_distribution.vcf"  ,
@@ -682,29 +631,6 @@ class GubbinsCommon():
   def  fasttree_gubbins_command(base_filename,starting_base_filename, i,alignment_filename,gubbins_exec,min_snps,original_aln,min_window_size,max_window_size):
     current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
     return gubbins_exec+" -r -v "+starting_base_filename+".vcf"+" -a "+str(min_window_size)+" -b "+str(max_window_size) + " -f "+original_aln+" -t "+str(current_tree_name)+" -m "+ str(min_snps)+" "+ starting_base_filename+".snp_sites.aln"
-
-  @staticmethod
-  def fasttree_fastml_command(fastml_exec, alignment_filename, base_filename,i):
-    current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
-    return GubbinsCommon.generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
-
-  @staticmethod
-  def raxml_fastml_command(fastml_exec, alignment_filename, base_filename_without_ext,current_time, i):
-    current_tree_name = GubbinsCommon.raxml_current_tree_name(base_filename_without_ext,current_time, i)
-    return GubbinsCommon.generate_fastml_command(fastml_exec, alignment_filename, current_tree_name)
-
-  @staticmethod
-  def generate_fastml_command(fastml_exec, alignment_filename, tree_filename):
-
-    return (fastml_exec 
-      + " -s " + alignment_filename 
-      + " -t " + tree_filename 
-      + " -x " + tree_filename + ".output_tree"
-      + " -y " + tree_filename + ".ancestor.tre"
-      + " -j " + tree_filename + ".seq.joint.txt"
-      + " -k " + tree_filename + ".seq.marginal.txt"
-      + " -d " + tree_filename + ".prob.joint.txt"
-      + " -e " + tree_filename + ".prob.marginal.txt")
 
   @staticmethod
   def number_of_sequences_in_alignment(filename):
@@ -826,8 +752,6 @@ class GubbinsCommon():
         output_handle.close()
     return
 
-
-    # reparsing a fasta file splits the lines which makes fastml work
   @staticmethod
   def reconvert_fasta_file(input_filename, output_filename):
     with open(input_filename, "r") as input_handle:
@@ -837,29 +761,6 @@ class GubbinsCommon():
         output_handle.close()
       input_handle.close()
     return
-
-  @staticmethod
-  def pairwise_comparison(filename,base_filename,gubbins_exec,alignment_filename,fastml_exec,base_filename_without_ext):
-    sequence_names = GubbinsCommon.get_sequence_names_from_alignment(filename)
-    GubbinsCommon.create_pairwise_newick_tree(sequence_names, base_filename+".tre")
-
-    try:
-      subprocess.check_call(GubbinsCommon.generate_fastml_command(fastml_exec, base_filename+".gaps.snp_sites.aln", base_filename+".tre"), shell=True)
-    except:
-      sys.exit("Failed while running fastML")
-    shutil.copyfile(base_filename+'.tre.output_tree',base_filename+".tre")
-    shutil.copyfile(base_filename+'.tre.seq.joint.txt', base_filename+".snp_sites.aln")
-    try:
-      subprocess.check_call(gubbins_exec+" -r -v "+base_filename+".vcf -t "+base_filename+".tre -f "+ alignment_filename +" "+ base_filename+".snp_sites.aln", shell=True)
-    except:
-      sys.exit("Failed while running Gubbins")
-    GubbinsCommon.rename_files(GubbinsCommon.translation_of_filenames_to_final_filenames_pairwise(base_filename, base_filename_without_ext))
-
-  @staticmethod
-  def create_pairwise_newick_tree(sequence_names, output_filename):
-    stringio = StringIO("".join(('(',sequence_names[0], ',', sequence_names[1],')')))
-    tree = Phylo.read(stringio, "newick")
-    Phylo.write(tree, output_filename, 'newick')
 
   @staticmethod
   def delete_files_based_on_list_of_regexes(directory_to_search, regex_for_file_deletions, verbose):

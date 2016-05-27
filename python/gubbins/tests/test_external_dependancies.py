@@ -131,7 +131,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
     assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
     assert os.path.exists('multiple_recombinations.final_tree.tre')
-    assert os.path.exists('multiple_recombinations.node_labelled.tre')
+    #assert os.path.exists('multiple_recombinations.node_labelled.tre')
 
     self.cleanup()
 
@@ -168,22 +168,6 @@ class TestExternalDependancies(unittest.TestCase):
   
     self.cleanup()
   
-  def test_pairwise_comparison(self):
-    shutil.copyfile('gubbins/tests/data/input_pairwise.aln.vcf','gubbins/tests/data/pairwise.aln.vcf' )
-    shutil.copyfile('gubbins/tests/data/input_pairwise.aln.phylip','gubbins/tests/data/pairwise.aln.phylip' )
-    common.GubbinsCommon.pairwise_comparison('gubbins/tests/data/pairwise.aln','gubbins/tests/data/pairwise.aln','../src/gubbins','gubbins/tests/data/pairwise.aln','fastml  -mg -qf -b ','pairwise')
-    # Check the tree file exists
-    assert os.path.exists('pairwise.final_tree.tre')
-    
-    # Check the VCF file is as expected
-    assert filecmp.cmp('pairwise.summary_of_snp_distribution.vcf','gubbins/tests/data/pairwise.aln.tre.vcf_expected')
-    
-    # Check the reconstruction of internal nodes
-    assert filecmp.cmp('pairwise.filtered_polymorphic_sites.fasta','gubbins/tests/data/pairwise.aln.snp_sites.aln_expected');
-    
-    self.cleanup()
-    
-  
   def test_delete_files_based_on_list_of_regexes(self):
     open('gubbins/tests/data/AAA', 'w').close()
     open('gubbins/tests/data/BBB', 'w').close() 
@@ -201,7 +185,6 @@ class TestExternalDependancies(unittest.TestCase):
   
   def test_use_bundled_exec(self):
     assert re.search('raxmlHPC -f d -p 1 -m GTRGAMMA',common.GubbinsCommon.use_bundled_exec('raxmlHPC -f d -p 1 -m GTRGAMMA', 'raxmlHPC')) != None
-    assert re.search('fastml -mg -qf -b ',common.GubbinsCommon.use_bundled_exec('fastml -mg -qf -b ', 'fastml')) != None
     assert re.search('../src/gubbins',common.GubbinsCommon.use_bundled_exec('gubbins', '../src/gubbins')) != None
 
   def cleanup(self):

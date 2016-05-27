@@ -110,11 +110,6 @@ class TestTreePythonMethods(unittest.TestCase):
     os.remove(temp_working_dir + '/tree_with_internal_nodes.tre')
     os.removedirs(temp_working_dir)
     
-  def test_create_pairwise_newick_tree(self):
-    common.GubbinsCommon.create_pairwise_newick_tree(['sequence_2','sequence_3'], 'gubbins/tests/data/pairwise_newick_tree.actual')
-    assert os.path.exists('gubbins/tests/data/pairwise_newick_tree.actual')
-    os.remove('gubbins/tests/data/pairwise_newick_tree.actual')
-    
   def test_remove_internal_node_labels(self):
     common.GubbinsCommon.remove_internal_node_labels_from_tree('gubbins/tests/data/final_tree_with_internal_labels.tre', 'final_tree_with_internal_labels.tre')
     assert os.path.exists('final_tree_with_internal_labels.tre')

@@ -98,14 +98,5 @@ class TestStringConstruction(unittest.TestCase):
   def test_fasttree_gubbins_command(self):
     assert common.GubbinsCommon.fasttree_gubbins_command('AAA','BBB', 5,'CCC','DDD',3,'EEE', 10,100) == 'DDD -r -v BBB.vcf -a 10 -b 100 -f EEE -t AAA.iteration_5 -m 3 BBB.snp_sites.aln'
 
-  def test_fasttree_fastml_command(self):
-    assert common.GubbinsCommon.fasttree_fastml_command('AAA', 'BBB', 'CCC',2) == 'AAA -s BBB -t CCC.iteration_2 -x CCC.iteration_2.output_tree -y CCC.iteration_2.ancestor.tre -j CCC.iteration_2.seq.joint.txt -k CCC.iteration_2.seq.marginal.txt -d CCC.iteration_2.prob.joint.txt -e CCC.iteration_2.prob.marginal.txt'
-
-  def test_raxml_fastml_command(self):
-    assert common.GubbinsCommon.raxml_fastml_command('AAA', 'BBB', 'CCC',1234, 5) == 'AAA -s BBB -t RAxML_result.CCC.1234iteration_5 -x RAxML_result.CCC.1234iteration_5.output_tree -y RAxML_result.CCC.1234iteration_5.ancestor.tre -j RAxML_result.CCC.1234iteration_5.seq.joint.txt -k RAxML_result.CCC.1234iteration_5.seq.marginal.txt -d RAxML_result.CCC.1234iteration_5.prob.joint.txt -e RAxML_result.CCC.1234iteration_5.prob.marginal.txt'
-
-  def test_generate_fastml_command(self):
-    assert common.GubbinsCommon.generate_fastml_command('AAA', 'BBB', 'CCC') == 'AAA -s BBB -t CCC -x CCC.output_tree -y CCC.ancestor.tre -j CCC.seq.joint.txt -k CCC.seq.marginal.txt -d CCC.prob.joint.txt -e CCC.prob.marginal.txt'
-
 if __name__ == "__main__":
   unittest.main()

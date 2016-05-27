@@ -64,11 +64,3 @@ package {"python-dev":
 
 include apt
 
-# we need to pull in a packaged version of fastml for building.
-# Supplied by Aidan Delaney <aidan@ontologyengineering.org>, so blame him.
-apt::ppa { 'ppa:ap13/gubbins': }
-
-package {"fastml2":
-  ensure => "installed",
-  require => Apt::Ppa['ppa:ap13/gubbins']
-}

@@ -31,8 +31,8 @@ class RAxMLSequenceReconstruction(object):
 	def __init__(self, input_alignment_filename, input_tree, output_alignment_filename, output_tree, raxml_internal_sequence_reconstruction_command, verbose = False ):
 		self.input_alignment_filename = os.path.abspath(input_alignment_filename)
 		self.input_tree = os.path.abspath(input_tree)
-		self.output_alignment_filename = output_alignment_filename
-		self.output_tree = output_tree
+		self.output_alignment_filename = os.path.abspath(output_alignment_filename)
+		self.output_tree = os.path.abspath(output_tree)
 		self.raxml_internal_sequence_reconstruction_command = raxml_internal_sequence_reconstruction_command
 		self.verbose = verbose
 		
@@ -42,27 +42,33 @@ class RAxMLSequenceReconstruction(object):
 	
 	def reconstruct_ancestor_sequences(self):
 		self.root_tree(self.input_tree, self.temp_rooted_tree)
-		self.run_raxml_ancestor_command()
+		
+		self.run_raxml_ancestor_command(self.temp_rooted_tree)
 		self.convert_raw_ancestral_states_to_fasta(self.raw_internal_sequence_filename(), self.temp_interal_fasta)
 		self.combine_fastas(self.input_alignment_filename, self.temp_interal_fasta,self.output_alignment_filename)
 		
-		if os.path.exists(self.raw_internal_rooted_tree_filename()):
-			shutil.move(self.raw_internal_rooted_tree_filename(), self.output_tree)
+		if os.path.exists(self.temp_rooted_tree):
+			print(self.temp_rooted_tree + "\n\n")
+			print(self.raw_internal_rooted_tree_filename() + "\n\n")
+			print(self.output_tree + "\n\n")
+			self.transfer_internal_names_to_tree(self.raw_internal_rooted_tree_filename(), self.temp_rooted_tree, self.output_tree)
+
 		shutil.rmtree(self.working_dir)
 	
-	def run_raxml_ancestor_command(self):
+	def run_raxml_ancestor_command(self,rooted_tree):
 		current_directory = os.getcwd()
 		if self.verbose > 0:
 			print(self.raxml_reconstruction_command())
 		try:
 			os.chdir(self.working_dir)
-			subprocess.check_call(self.raxml_reconstruction_command(), shell=True)
+			subprocess.check_call(self.raxml_reconstruction_command(rooted_tree), shell=True)
 			os.chdir(current_directory)
 		except:
 			os.chdir(current_directory)
 			sys.exit("Something went wrong while creating the ancestor sequences using RAxML")
 		if self.verbose > 0:
 			print(int(time.time()))
+			
 	
 	def raw_internal_sequence_filename(self):
 		return self.working_dir +'/RAxML_marginalAncestralStates.internal'
@@ -70,17 +76,43 @@ class RAxMLSequenceReconstruction(object):
 	def raw_internal_rooted_tree_filename(self):
 		return self.working_dir +'/RAxML_nodeLabelledRootedTree.internal'
 	
-	def raxml_reconstruction_command(self):
+	def raxml_reconstruction_command(self,rooted_tree):
 		verbose_suffix = ''
-		if self.verbose:
+		if not self.verbose:
 			verbose_suffix = '> /dev/null 2>&1'
 		
-		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', self.temp_rooted_tree, '-n', 'internal' ,verbose_suffix ])
+		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', rooted_tree, '-n', 'internal' ,verbose_suffix ])
 	
-	def root_tree(self, input_tree_filename, output_tree):
-		tree  = dendropy.Tree.get_from_path(self.input_tree, 'newick', preserve_underscores=True)
-		self.split_all_non_bi_nodes(tree.seed_node)
+	
+    # Warning - recursion
+	def add_ordered_internal_node_to_list(self, node, node_list):
+		if node.is_leaf():
+			return None
+		elif node.taxon == None:
+			node.taxon = node_list.append(node)
+			node.label = None
+				
+		for child_node in reversed(node.child_nodes()):
+			self.add_ordered_internal_node_to_list(child_node, node_list)
+		return None
+	
+	
+	def label_internal_nodes(self, tree):
+		#((B:0.1,(C:0.1,(D:0.1,E:0.1)10)9)8,(A:0.1,F:0.1)7:0.0)ROOT;
+		#((B,(C,(D,E)10)9)8,(A,F)7)ROOT; - Actual
+
+		internal_node_counter = len(tree.leaf_nodes()) + 1
+		tree.seed_node.label = None
+		tree.seed_node.taxon = dendropy.Taxon('ROOT')
+		node_list = []
+		self.add_ordered_internal_node_to_list(tree.seed_node,node_list )
 		
+		for node in node_list:
+			node.taxon = dendropy.Taxon(internal_node_counter)
+			internal_node_counter += 1
+		return tree
+	
+	def write_tree(self, tree, output_tree):
 		output_tree_string = tree.as_string(
 			schema='newick',
 			suppress_leaf_taxon_labels=False,
@@ -102,6 +134,29 @@ class RAxMLSequenceReconstruction(object):
 			output_file.closed
 			
 			return output_tree
+			
+	def transfer_internal_names_to_tree(self, source_tree, destination_tree, output_tree):
+		source_tree_obj  = dendropy.Tree.get_from_path(source_tree, 'newick', preserve_underscores=True)
+		source_internal_node_labels = []
+		for source_internal_node in source_tree_obj.internal_nodes():
+			if source_internal_node.label:
+				source_internal_node_labels.append(source_internal_node.label)
+			else:
+				source_internal_node_labels.append('')
+		
+		destination_tree_obj  = dendropy.Tree.get_from_path(destination_tree, 'newick', preserve_underscores=True)
+		for index, destination_internal_node in enumerate(destination_tree_obj.internal_nodes()):
+			destination_internal_node.label = None
+			destination_internal_node.taxon = dendropy.Taxon(source_internal_node_labels[index])
+		self.write_tree( destination_tree_obj, output_tree)
+		
+	
+	def root_tree(self, input_tree_filename, output_tree):
+		# split bi nodes and root tree
+		tree  = dendropy.Tree.get_from_path(input_tree_filename, 'newick', preserve_underscores=True)
+		self.split_all_non_bi_nodes(tree.seed_node)
+		self.write_tree( tree, output_tree)
+
 	
 	def convert_raw_ancestral_states_to_fasta(self, input_filename, output_filename):
 		with open(input_filename, 'r') as infile:

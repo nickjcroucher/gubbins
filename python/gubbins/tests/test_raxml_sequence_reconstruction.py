@@ -9,6 +9,7 @@ Tests for reconstructing internal sequences using raxml
 import unittest
 import re
 import os
+import sys
 import subprocess
 import filecmp
 import shutil
@@ -25,7 +26,7 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 			'output_alignment_filename', 'output_tree',
 			'raxmlHPC -f A -p 1 -m GTRGAMMA',
 			verbose = False)
-		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename + ' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal ')
+		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(raxml_seq_recon.working_dir+'/rooted_tree.newick' ), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename + ' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal > /dev/null 2>&1')
 		self.cleanup()
 	
 	def test_ancestor_raxml_command_verbose(self):
@@ -33,7 +34,7 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 			'output_alignment_filename', 'output_tree',
 			'raxmlHPC -f A -p 1 -m GTRGAMMA',
 			verbose = True)
-		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename+' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal > /dev/null 2>&1')
+		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(raxml_seq_recon.working_dir+'/rooted_tree.newick'), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename+' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal ')
 		self.cleanup()
 	
 	def test_working_directory_construction(self):
@@ -43,7 +44,7 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 	
 	def test_root_input_tree(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('abc', 'gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick', 'abc', 'abc', '', False)
-		output_tree = raxml_seq_recon.root_tree_and_label_internal_nodes('gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick',raxml_seq_recon.temp_rooted_tree)
+		output_tree = raxml_seq_recon.root_tree('gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick',raxml_seq_recon.temp_rooted_tree)
 		self.assertTrue(filecmp.cmp(str(raxml_seq_recon.temp_rooted_tree), 'gubbins/tests/data/raxml_sequence_reconstruction/expected_rooted_tree.newick'))
 		self.cleanup()
 	
@@ -70,10 +71,10 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 		
 	def test_add_labels_to_tree(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', '', '', False)
-		raxml_seq_recon.root_tree_and_label_internal_nodes('gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick', raxml_seq_recon.temp_rooted_tree)
+		raxml_seq_recon.root_tree('gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick', raxml_seq_recon.temp_rooted_tree)
 		
 		tree  = dendropy.Tree.get_from_path(raxml_seq_recon.temp_rooted_tree, 'newick', preserve_underscores=True)
-		self.assertEqual("((B:0.1,(C:0.1,(D:0.1,E:0.1)10)9)8,(A:0.1,F:0.1)7:0.0)ROOT;\n",tree.as_string(schema='newick'))
+		self.assertEqual("((B:0.1,(C:0.1,(D:0.1,E:0.1))),(A:0.1,F:0.1):0.0);\n",tree.as_string(schema='newick'))
 	
 	def test_transfer_internal_labels(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', 'output_tree', '', False)

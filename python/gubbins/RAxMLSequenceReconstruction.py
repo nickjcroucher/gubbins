@@ -48,9 +48,6 @@ class RAxMLSequenceReconstruction(object):
 		self.combine_fastas(self.input_alignment_filename, self.temp_interal_fasta,self.output_alignment_filename)
 		
 		if os.path.exists(self.temp_rooted_tree):
-			print(self.temp_rooted_tree + "\n\n")
-			print(self.raw_internal_rooted_tree_filename() + "\n\n")
-			print(self.output_tree + "\n\n")
 			self.transfer_internal_names_to_tree(self.raw_internal_rooted_tree_filename(), self.temp_rooted_tree, self.output_tree)
 
 		shutil.rmtree(self.working_dir)
@@ -68,7 +65,6 @@ class RAxMLSequenceReconstruction(object):
 			sys.exit("Something went wrong while creating the ancestor sequences using RAxML")
 		if self.verbose > 0:
 			print(int(time.time()))
-			
 	
 	def raw_internal_sequence_filename(self):
 		return self.working_dir +'/RAxML_marginalAncestralStates.internal'
@@ -83,7 +79,6 @@ class RAxMLSequenceReconstruction(object):
 		
 		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', rooted_tree, '-n', 'internal' ,verbose_suffix ])
 	
-	
     # Warning - recursion
 	def add_ordered_internal_node_to_list(self, node, node_list):
 		if node.is_leaf():
@@ -95,22 +90,6 @@ class RAxMLSequenceReconstruction(object):
 		for child_node in reversed(node.child_nodes()):
 			self.add_ordered_internal_node_to_list(child_node, node_list)
 		return None
-	
-	
-	def label_internal_nodes(self, tree):
-		#((B:0.1,(C:0.1,(D:0.1,E:0.1)10)9)8,(A:0.1,F:0.1)7:0.0)ROOT;
-		#((B,(C,(D,E)10)9)8,(A,F)7)ROOT; - Actual
-
-		internal_node_counter = len(tree.leaf_nodes()) + 1
-		tree.seed_node.label = None
-		tree.seed_node.taxon = dendropy.Taxon('ROOT')
-		node_list = []
-		self.add_ordered_internal_node_to_list(tree.seed_node,node_list )
-		
-		for node in node_list:
-			node.taxon = dendropy.Taxon(internal_node_counter)
-			internal_node_counter += 1
-		return tree
 	
 	def write_tree(self, tree, output_tree):
 		output_tree_string = tree.as_string(

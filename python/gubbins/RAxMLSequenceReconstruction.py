@@ -55,7 +55,7 @@ class RAxMLSequenceReconstruction(object):
 	def run_raxml_ancestor_command(self,rooted_tree):
 		current_directory = os.getcwd()
 		if self.verbose > 0:
-			print(self.raxml_reconstruction_command())
+			print(self.raxml_reconstruction_command(rooted_tree))
 		try:
 			os.chdir(self.working_dir)
 			subprocess.check_call(self.raxml_reconstruction_command(rooted_tree), shell=True)

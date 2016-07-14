@@ -27,7 +27,6 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 			'raxmlHPC -f A -p 1 -m GTRGAMMA',
 			verbose = False)
 		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(raxml_seq_recon.working_dir+'/rooted_tree.newick' ), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename + ' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal > /dev/null 2>&1')
-		self.cleanup()
 	
 	def test_ancestor_raxml_command_verbose(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('input_alignment.fasta', 'input_tree',
@@ -35,18 +34,15 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 			'raxmlHPC -f A -p 1 -m GTRGAMMA',
 			verbose = True)
 		self.assertEqual(raxml_seq_recon.raxml_reconstruction_command(raxml_seq_recon.working_dir+'/rooted_tree.newick'), 'raxmlHPC -f A -p 1 -m GTRGAMMA  -s '+raxml_seq_recon.input_alignment_filename+' -t ' + raxml_seq_recon.working_dir+'/rooted_tree.newick -n internal ')
-		self.cleanup()
 	
 	def test_working_directory_construction(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', '', '', False)
 		self.assertTrue( os.path.exists(raxml_seq_recon.working_dir) )
-		self.cleanup()
 	
 	def test_root_input_tree(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('abc', 'gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick', 'abc', 'abc', '', False)
 		output_tree = raxml_seq_recon.root_tree('gubbins/tests/data/raxml_sequence_reconstruction/unrooted_tree.newick',raxml_seq_recon.temp_rooted_tree)
-		self.assertTrue(filecmp.cmp(str(raxml_seq_recon.temp_rooted_tree), 'gubbins/tests/data/raxml_sequence_reconstruction/expected_rooted_tree.newick'))
-		self.cleanup()
+		self.assertTrue(filecmp.cmp(str(raxml_seq_recon.temp_rooted_tree), 'gubbins/tests/data/raxml_sequence_reconstruction/expected_rooted_tree.newick', shallow = False))
 	
 	def test_run_raxml_ancestor_reconstruction(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('gubbins/tests/data/raxml_sequence_reconstruction/input_alignment.fasta',
@@ -55,19 +51,16 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 		raxml_seq_recon.reconstruct_ancestor_sequences()
 
 		assert os.path.exists('outputfile')
-		self.cleanup()
 	
 	def test_convert_raw_ancestral_file_to_fasta(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', '', '', False)
 		raxml_seq_recon.convert_raw_ancestral_states_to_fasta('gubbins/tests/data/raxml_sequence_reconstruction/raw_marginalAncestralStates.phylip','outputfile')
-		self.assertTrue(filecmp.cmp('outputfile','gubbins/tests/data/raxml_sequence_reconstruction/expected_marginalAncestralStates.fasta'))
-		self.cleanup()
+		self.assertTrue(filecmp.cmp('outputfile','gubbins/tests/data/raxml_sequence_reconstruction/expected_marginalAncestralStates.fasta', shallow = False))
 	
 	def test_merging_fasta_files(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', '', '', False)
 		raxml_seq_recon.combine_fastas('gubbins/tests/data/raxml_sequence_reconstruction/1.fasta','gubbins/tests/data/raxml_sequence_reconstruction/2.fasta','combined.fasta')
-		self.assertTrue(filecmp.cmp('combined.fasta','gubbins/tests/data/raxml_sequence_reconstruction/expected_combined_1_2.fasta'))
-		self.cleanup()
+		self.assertTrue(filecmp.cmp('combined.fasta','gubbins/tests/data/raxml_sequence_reconstruction/expected_combined_1_2.fasta', shallow = False))
 		
 	def test_add_labels_to_tree(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', '', '', False)
@@ -80,8 +73,7 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 		raxml_seq_recon = RAxMLSequenceReconstruction('', '', '', 'output_tree', '', False)
 		raxml_seq_recon.transfer_internal_names_to_tree('gubbins/tests/data/source_tree.tre', 'gubbins/tests/data/destination_tree.tre', 'renamed_output_tree')
 		assert os.path.exists('renamed_output_tree')
-		self.assertTrue(filecmp.cmp('renamed_output_tree','gubbins/tests/data/expected_renamed_output_tree'))
-		os.remove('renamed_output_tree')
+		self.assertTrue(filecmp.cmp('renamed_output_tree','gubbins/tests/data/expected_renamed_output_tree', shallow = False))
 	
 	def test_more_complex_tree(self):
 		raxml_seq_recon = RAxMLSequenceReconstruction('gubbins/tests/data/multiple_recombinations.aln',
@@ -91,17 +83,12 @@ class TestRAxMLSequenceReconstruction(unittest.TestCase):
 
 		assert os.path.exists('output_alignment')
 		assert os.path.exists('output_tree')
-		self.cleanup()
 	
-	def cleanup(self):
-		for file_to_delete in ['combined.fasta','outputfile','RAxML_nodeLabelledRootedTree.internal','RAxML_marginalAncestralProbabilities.internal', 'RAxML_info.internal', 'RAxML_flagCheck', 'output_tree']:
+	def tearDown(self):
+		for file_to_delete in ['combined.fasta','outputfile','RAxML_nodeLabelledRootedTree.internal','RAxML_marginalAncestralProbabilities.internal', 'RAxML_info.internal', 'RAxML_flagCheck', 'output_tree','renamed_output_tree']:
 			if os.path.exists(file_to_delete):
 				os.remove(file_to_delete)
 
 if __name__ == "__main__":
   unittest.main()
-  
-  
-  
-  
   

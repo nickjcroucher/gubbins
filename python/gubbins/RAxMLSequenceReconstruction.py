@@ -26,6 +26,7 @@ import shutil
 import time
 from random import randint
 from Bio import AlignIO
+from Bio.Align import MultipleSeqAlignment
 
 class RAxMLSequenceReconstruction(object):
 	def __init__(self, input_alignment_filename, input_tree, output_alignment_filename, output_tree, raxml_internal_sequence_reconstruction_command, verbose = False ):
@@ -39,6 +40,7 @@ class RAxMLSequenceReconstruction(object):
 		self.working_dir = tempfile.mkdtemp(dir=os.getcwd())
 		self.temp_rooted_tree = self.working_dir +'/' +'rooted_tree.newick'
 		self.temp_interal_fasta = self.working_dir +'/' +'internal.fasta'
+		self.internal_node_prefix = 'internal_'
 	
 	def reconstruct_ancestor_sequences(self):
 		self.root_tree(self.input_tree, self.temp_rooted_tree)
@@ -79,18 +81,6 @@ class RAxMLSequenceReconstruction(object):
 		
 		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', rooted_tree, '-n', 'internal' ,verbose_suffix ])
 	
-    # Warning - recursion
-	def add_ordered_internal_node_to_list(self, node, node_list):
-		if node.is_leaf():
-			return None
-		elif node.taxon == None:
-			node.taxon = node_list.append(node)
-			node.label = None
-				
-		for child_node in reversed(node.child_nodes()):
-			self.add_ordered_internal_node_to_list(child_node, node_list)
-		return None
-	
 	def write_tree(self, tree, output_tree):
 		output_tree_string = tree.as_string(
 			schema='newick',
@@ -126,7 +116,7 @@ class RAxMLSequenceReconstruction(object):
 		destination_tree_obj  = dendropy.Tree.get_from_path(destination_tree, 'newick', preserve_underscores=True)
 		for index, destination_internal_node in enumerate(destination_tree_obj.internal_nodes()):
 			destination_internal_node.label = None
-			destination_internal_node.taxon = dendropy.Taxon(source_internal_node_labels[index])
+			destination_internal_node.taxon = dendropy.Taxon(self.internal_node_prefix + str(source_internal_node_labels[index]))
 		self.write_tree( destination_tree_obj, output_tree)
 		
 	
@@ -163,14 +153,24 @@ class RAxMLSequenceReconstruction(object):
 		new_child_node.set_child_nodes(all_child_nodes)
 		node.set_child_nodes((first_child,new_child_node))
 	
-	def combine_fastas(self, input_file1, input_file2, output_file ):
+	def combine_fastas(self, leaf_node_filename, internl_node_filename, output_file ):
 		with open(output_file, 'w') as output_handle:
-			for input_file in [input_file1, input_file2]:
-				with open(input_file, 'r') as input_handle:
-					alignments = AlignIO.parse(input_handle, "fasta")
-					AlignIO.write(alignments,output_handle, "fasta")
-					input_handle.closed
-					output_handle.closed
+			# print out leafnodes as is
+			with open(leaf_node_filename, 'r') as input_handle:
+				alignments = AlignIO.parse(input_handle, "fasta")
+				AlignIO.write(alignments,output_handle, "fasta")
+				input_handle.closed
+			
+			with open(internl_node_filename, 'r') as input_handle:
+				alignments = AlignIO.parse(input_handle, "fasta")
+				output_alignments = []
+				for alignment in alignments:
+					for record in alignment:
+						record.id = self.internal_node_prefix + str(record.id)
+						record.description = ''
+						output_alignments.append(record)
+				
+				AlignIO.write(MultipleSeqAlignment(output_alignments),output_handle, "fasta")
+				input_handle.closed
+				output_handle.closed
 	 
-	
-	

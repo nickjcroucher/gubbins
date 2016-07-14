@@ -30,7 +30,6 @@ class TestPreProcessFasta(unittest.TestCase):
 
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/no_duplicates.aln'))
-      self.cleanup()
 
   def test_input_file_with_one_duplicate_sequences(self):   
       preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/one_duplicate.aln')
@@ -43,7 +42,6 @@ class TestPreProcessFasta(unittest.TestCase):
       
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_one_duplicate.aln'))
-      self.cleanup()
  
   def test_input_file_with_multiple_duplicate_sequences(self):   
       preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/multiple_duplicates.aln')
@@ -55,7 +53,6 @@ class TestPreProcessFasta(unittest.TestCase):
       
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_multiple_duplicates.aln'))
-      self.cleanup()
  
   def test_input_file_with_all_duplicate_sequences(self):   
       preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/all_same_sequence.aln')
@@ -68,15 +65,13 @@ class TestPreProcessFasta(unittest.TestCase):
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1',
                                                       'sample2',
                                                       'sample3'])
-      self.cleanup()
                                                       
   def test_filter_out_alignments_with_too_much_missing_data(self):
     preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/missing_data.aln', False, 5)
     preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
-    self.assertTrue(filecmp.cmp('output.aln','gubbins/tests/data/preprocessfasta/expected_missing_data.aln'))
-    self.cleanup()           
+    self.assertTrue(filecmp.cmp('output.aln','gubbins/tests/data/preprocessfasta/expected_missing_data.aln'))        
       
-  def cleanup(self):
+  def tearDown(self):
       for file_to_delete in ['output.aln']:
           if os.path.exists(file_to_delete):
               os.remove(file_to_delete) 

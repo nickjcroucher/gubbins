@@ -26,37 +26,41 @@ import shutil
 import time
 from random import randint
 from Bio import AlignIO
+from Bio.Align import MultipleSeqAlignment
 
 class RAxMLSequenceReconstruction(object):
 	def __init__(self, input_alignment_filename, input_tree, output_alignment_filename, output_tree, raxml_internal_sequence_reconstruction_command, verbose = False ):
 		self.input_alignment_filename = os.path.abspath(input_alignment_filename)
 		self.input_tree = os.path.abspath(input_tree)
-		self.output_alignment_filename = output_alignment_filename
-		self.output_tree = output_tree
+		self.output_alignment_filename = os.path.abspath(output_alignment_filename)
+		self.output_tree = os.path.abspath(output_tree)
 		self.raxml_internal_sequence_reconstruction_command = raxml_internal_sequence_reconstruction_command
 		self.verbose = verbose
 		
 		self.working_dir = tempfile.mkdtemp(dir=os.getcwd())
 		self.temp_rooted_tree = self.working_dir +'/' +'rooted_tree.newick'
 		self.temp_interal_fasta = self.working_dir +'/' +'internal.fasta'
+		self.internal_node_prefix = 'internal_'
 	
 	def reconstruct_ancestor_sequences(self):
 		self.root_tree(self.input_tree, self.temp_rooted_tree)
-		self.run_raxml_ancestor_command()
+		
+		self.run_raxml_ancestor_command(self.temp_rooted_tree)
 		self.convert_raw_ancestral_states_to_fasta(self.raw_internal_sequence_filename(), self.temp_interal_fasta)
 		self.combine_fastas(self.input_alignment_filename, self.temp_interal_fasta,self.output_alignment_filename)
 		
-		if os.path.exists(self.raw_internal_rooted_tree_filename()):
-			shutil.move(self.raw_internal_rooted_tree_filename(), self.output_tree)
+		if os.path.exists(self.temp_rooted_tree):
+			self.transfer_internal_names_to_tree(self.raw_internal_rooted_tree_filename(), self.temp_rooted_tree, self.output_tree)
+
 		shutil.rmtree(self.working_dir)
 	
-	def run_raxml_ancestor_command(self):
+	def run_raxml_ancestor_command(self,rooted_tree):
 		current_directory = os.getcwd()
 		if self.verbose > 0:
-			print(self.raxml_reconstruction_command())
+			print(self.raxml_reconstruction_command(rooted_tree))
 		try:
 			os.chdir(self.working_dir)
-			subprocess.check_call(self.raxml_reconstruction_command(), shell=True)
+			subprocess.check_call(self.raxml_reconstruction_command(rooted_tree), shell=True)
 			os.chdir(current_directory)
 		except:
 			os.chdir(current_directory)
@@ -70,17 +74,14 @@ class RAxMLSequenceReconstruction(object):
 	def raw_internal_rooted_tree_filename(self):
 		return self.working_dir +'/RAxML_nodeLabelledRootedTree.internal'
 	
-	def raxml_reconstruction_command(self):
+	def raxml_reconstruction_command(self,rooted_tree):
 		verbose_suffix = ''
-		if self.verbose:
+		if not self.verbose:
 			verbose_suffix = '> /dev/null 2>&1'
 		
-		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', self.temp_rooted_tree, '-n', 'internal' ,verbose_suffix ])
+		return " ".join([self.raxml_internal_sequence_reconstruction_command, ' -s', self.input_alignment_filename, '-t', rooted_tree, '-n', 'internal' ,verbose_suffix ])
 	
-	def root_tree(self, input_tree_filename, output_tree):
-		tree  = dendropy.Tree.get_from_path(self.input_tree, 'newick', preserve_underscores=True)
-		self.split_all_non_bi_nodes(tree.seed_node)
-		
+	def write_tree(self, tree, output_tree):
 		output_tree_string = tree.as_string(
 			schema='newick',
 			suppress_leaf_taxon_labels=False,
@@ -102,6 +103,29 @@ class RAxMLSequenceReconstruction(object):
 			output_file.closed
 			
 			return output_tree
+			
+	def transfer_internal_names_to_tree(self, source_tree, destination_tree, output_tree):
+		source_tree_obj  = dendropy.Tree.get_from_path(source_tree, 'newick', preserve_underscores=True)
+		source_internal_node_labels = []
+		for source_internal_node in source_tree_obj.internal_nodes():
+			if source_internal_node.label:
+				source_internal_node_labels.append(source_internal_node.label)
+			else:
+				source_internal_node_labels.append('')
+		
+		destination_tree_obj  = dendropy.Tree.get_from_path(destination_tree, 'newick', preserve_underscores=True)
+		for index, destination_internal_node in enumerate(destination_tree_obj.internal_nodes()):
+			destination_internal_node.label = None
+			destination_internal_node.taxon = dendropy.Taxon(self.internal_node_prefix + str(source_internal_node_labels[index]))
+		self.write_tree( destination_tree_obj, output_tree)
+		
+	
+	def root_tree(self, input_tree_filename, output_tree):
+		# split bi nodes and root tree
+		tree  = dendropy.Tree.get_from_path(input_tree_filename, 'newick', preserve_underscores=True)
+		self.split_all_non_bi_nodes(tree.seed_node)
+		self.write_tree( tree, output_tree)
+
 	
 	def convert_raw_ancestral_states_to_fasta(self, input_filename, output_filename):
 		with open(input_filename, 'r') as infile:
@@ -129,14 +153,24 @@ class RAxMLSequenceReconstruction(object):
 		new_child_node.set_child_nodes(all_child_nodes)
 		node.set_child_nodes((first_child,new_child_node))
 	
-	def combine_fastas(self, input_file1, input_file2, output_file ):
+	def combine_fastas(self, leaf_node_filename, internl_node_filename, output_file ):
 		with open(output_file, 'w') as output_handle:
-			for input_file in [input_file1, input_file2]:
-				with open(input_file, 'r') as input_handle:
-					alignments = AlignIO.parse(input_handle, "fasta")
-					AlignIO.write(alignments,output_handle, "fasta")
-					input_handle.closed
-					output_handle.closed
+			# print out leafnodes as is
+			with open(leaf_node_filename, 'r') as input_handle:
+				alignments = AlignIO.parse(input_handle, "fasta")
+				AlignIO.write(alignments,output_handle, "fasta")
+				input_handle.closed
+			
+			with open(internl_node_filename, 'r') as input_handle:
+				alignments = AlignIO.parse(input_handle, "fasta")
+				output_alignments = []
+				for alignment in alignments:
+					for record in alignment:
+						record.id = self.internal_node_prefix + str(record.id)
+						record.description = ''
+						output_alignments.append(record)
+				
+				AlignIO.write(MultipleSeqAlignment(output_alignments),output_handle, "fasta")
+				input_handle.closed
+				output_handle.closed
 	 
-	
-	

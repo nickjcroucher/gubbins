@@ -67,7 +67,7 @@ Print debugging messages. Default is off.
 
     --no_cleanup, -n
     
-Do not remove files from intermediate iterations. This option will also keep other files created by RAxML, fastml and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.
+Do not remove files from intermediate iterations. This option will also keep other files created by RAxML and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.
     
 Output files    
 ==========

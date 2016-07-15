@@ -6,11 +6,9 @@ set -e
 start_dir=$(pwd)
 
 RAXML_VERSION="8.1.21"
-FASTML_VERSION="3.1"
 FASTTREE_VERSION="2.1.9"
 
 RAXML_DOWNLOAD_URL="https://github.com/stamatak/standard-RAxML/archive/v${RAXML_VERSION}.tar.gz"
-FASTML_DOWNLOAD_URL="http://fastml.tau.ac.il/source/FastML.v${FASTML_VERSION}.tgz"
 FASTTREE_DOWNLOAD_URL="http://www.microbesonline.org/fasttree/FastTree-${FASTTREE_VERSION}.c"
 
 # Make an install location
@@ -34,7 +32,6 @@ download () {
 }
 
 download $RAXML_DOWNLOAD_URL "raxml-${RAXML_VERSION}.tgz"
-download $FASTML_DOWNLOAD_URL "fastml-${FASTML_VERSION}.tgz"
 download $FASTTREE_DOWNLOAD_URL "fasttree-${FASTTREE_VERSION}.c"
 
 # Update dependencies
@@ -67,28 +64,6 @@ fi
 
 cd $build_dir
 
-## FASTML
-fastml_dir=$(pwd)/"FastML.v${FASTML_VERSION}"
-
-if [ ! -d $fastml_dir ]; then
-  tar xzf fastml-${FASTML_VERSION}.tgz
-  ls -al
-fi
-cd $fastml_dir
-if [ -e "${fastml_dir}/programs/fastml/fastml" ]; then
-  echo "Already build FASTML; skipping build"
-else
-  sed -i 's/getopt/fastml_getopt/g' libs/phylogeny/phylogeny.vcxproj
-  sed -i 's/getopt/fastml_getopt/g' libs/phylogeny/phylogeny.vcproj
-  mv libs/phylogeny/getopt.h libs/phylogeny/fastml_getopt.h
-  mv libs/phylogeny/getopt.c libs/phylogeny/fastml_getopt.c
-  mv libs/phylogeny/getopt1.c libs/phylogeny/fastml_getopt1.c
-
-  make
-fi
-
-cd $build_dir
-
 ## FastTree
 fasttree_dir=${build_dir}/fasttree-${FASTTREE_VERSION}
 if [ ! -d $fasttree_dir ]; then
@@ -110,7 +85,6 @@ update_path () {
 }
 
 update_path ${raxml_dir}
-update_path ${fastml_dir}/programs/fastml
 update_path ${fasttree_dir}
 
 cd $start_dir

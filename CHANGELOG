@@ -1,3 +1,10 @@
+v2.0.0 - 26 May 2016
+------
+Reconstruct internal sequences by default using RAxML rather than fastML. 
+Addresses speed issues raised by users. 
+RAxML version 8 now required as a minimum.
+Remove pairwise support since RAxML wont support it. Need at least 4 genomes as input.
+
 v1.4.9 - 15 Apr 2016
 ------
 If sequences are 100% identical, filter out duplicates.

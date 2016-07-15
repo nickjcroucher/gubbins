@@ -13,7 +13,6 @@ import os
 ## Populate the 'gubbins' namespace
 
 from gubbins import common
-from gubbins import Fastml
 
 ###############################################################################
 ## PACKAGE METADATA

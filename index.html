@@ -123,7 +123,7 @@ The paper is available from Nucleic Acids Research (open access):
 
     <ul><li>--no_cleanup, -n</li></ul>
     
-<p>Do not remove files from intermediate iterations. This option will also keep other files created by RAxML, fastml and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.</p>
+<p>Do not remove files from intermediate iterations. This option will also keep other files created by RAxML and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.</p>
 
 
 <h2><a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Output files</h2>
@@ -167,17 +167,11 @@ X.Y</p>
 They are fundamentally different methods. Detecting recombination in pan genomes is an open problem.</p>
 
 <h3>
-<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running on LSF</h3>
-<p>The command to run the script using LSF with 8GB of RAM and 16 cores looks like:</p>
+<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running Gubbins within Sanger</h3>
+<p>The command to run the script within Sanger with 8GB of RAM and 16 cores looks like:</p>
 <ul><li>
-bsub -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
+bsub.py --threads 16 8 log run_gubbins.py --threads 16 my_alignment.aln
 </li></ul>
-
-<p>If you are using the Sanger cluster (farm3), the avx option (-R "avx") will guarantee your analysis will run on the fastest processors using the AVX version of raxml:</p>
-<ul><li>
-bsub -R "avx" -o log -e err -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 my_alignment.aln'
-</li></ul>
-
 
       </section>
     </div>

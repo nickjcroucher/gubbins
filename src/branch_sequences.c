@@ -567,11 +567,6 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	// Set up the window counter with 1 value per base in the branch
  	int * window_count;
 	window_count = (int *) calloc((genome_size+1),sizeof(int));
-	int i;
-	for(i =0; i< genome_size; i++)
-	{
-		window_count[i] = 0;
-	}
 	
 	// Integer array with location of gaps
 	int * gaps_in_original_genome_space;
@@ -620,7 +615,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int in_block = 0;
 	int block_lower_bound = 0;
 	// Scan across the pileup and record where blocks are above the cutoff
-	
+	int i;
 	for(i = 0; i < genome_size; i++)
 	{
 		// Just entered the start of a block
@@ -1037,12 +1032,14 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 	int * bases_to_be_excluded;  
 	bases_to_be_excluded = (int*) calloc((length_of_sequence + 1),sizeof(int));
 	
+  int genome_length = length_of_sequence;
 	int i = 0;
 	for(i = 0; i<length_of_sequence; i++)
 	{
 		if(sequence[i] == 'N' || sequence[i] == '-' )
 		{
 			bases_to_be_excluded[i] = 1;
+      genome_length--;
 		}
 	}
 	
@@ -1058,21 +1055,15 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 		int block_index = 0;
 		for(block_index = block_coordinates[0][j]; block_index <= block_coordinates[1][j]; block_index++ )
 		{
-			bases_to_be_excluded[block_index-1] = 1;
+      if(bases_to_be_excluded[block_index-1] == 0)
+      {
+        bases_to_be_excluded[block_index-1] = 1;
+        genome_length--;
+      }
 		}
 	}
 	
-    int genome_length = 0;
-	for(i = 0; i<length_of_sequence; i++)
-	{
-		if(bases_to_be_excluded[i] == 0 )
-		{
-			genome_length++;
-		}
-	}
 	return genome_length;
 }
-
-
 
 

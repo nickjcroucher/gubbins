@@ -1,3 +1,8 @@
+v2.1.0 - 22 July 2016
+------
+Use GTRCAT model by default in RAxML instead of GTRGAMMA (massive speedup).
+C code optimisations in Gubbins.
+
 v2.0.0 - 26 May 2016
 ------
 Reconstruct internal sequences by default using RAxML rather than fastML. 

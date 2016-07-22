@@ -102,7 +102,7 @@ class GubbinsCommon():
 
   def parse_and_run(self):
     # Default parameters
-    raxml_executable_obj = RAxMLExecutable(self.args.threads, self.args.verbose)
+    raxml_executable_obj = RAxMLExecutable(self.args.threads, self.args.raxml_model, self.args.verbose)
     
     fasttree_executables = ['FastTree','fasttree']
     FASTTREE_EXEC = GubbinsCommon.choose_executable(fasttree_executables)

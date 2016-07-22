@@ -23,18 +23,24 @@ import subprocess
 import re
 
 class RAxMLExecutable(object):
-	def __init__(self, threads,  verbose = False ):
+	def __init__(self, threads, model = 'GTRCAT', verbose = False ):
 		self.verbose = verbose
 		self.threads = threads
 		self.single_threaded_executables = ['raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
 		self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
+		self.model = model
 		
 		self.raxml_executable = self.select_executable_based_on_threads()
-		self.tree_building_parameters = ' -f d -p 1 -m GTRGAMMA '
+		self.tree_building_parameters_gtrgamma = ' -f d -p 1 -m GTRGAMMA '
+		self.tree_building_parameters_gtrcat = ' -f d -p 1 -m GTRCAT -V '
 		self.internal_sequence_parameters = ' -f A -p 1 -m GTRGAMMA '
 		
 	def tree_building_command(self):
-		command = self.raxml_executable + self.threads_parameter() + self.tree_building_parameters
+		tree_building_parameters = self.tree_building_parameters_gtrcat
+		if self.model == 'GTRGAMMA':
+			tree_building_parameters =self.tree_building_parameters_gtrgamma
+		
+		command = self.raxml_executable + self.threads_parameter() + tree_building_parameters
 		if self.verbose:
 			print("Tree building command: "+command)
 		return command

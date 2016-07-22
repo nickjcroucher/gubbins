@@ -78,37 +78,31 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 {
 	int num_snps_in_recombinations =0;
 	int i = 0;
+  
+  // loop over each block
 	for(i = 0; i<num_blocks; i++ )
 	{
 		int current_index = 0;
+    // convert the starting coordinates of block to the nearest SNP index
 		current_index = find_starting_index(current_block_coordinates[0][i],snp_locations,0, number_of_snps);
 		
-		int j;
-		for(j = current_index; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
+    //make sure that the index begins at start of block
+		int beginning_j = current_index;
+    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
+    {
+    }
+    
+    int j;
+    // starting at the begining index of block, count all the snps until the end of the bock.
+		for(j = beginning_j; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
 		{
-			if(snp_locations[j] >= current_block_coordinates[0][i] && snp_locations[j] <= current_block_coordinates[1][i])
-			{
-				int k = 0;
-				int seen_before = 0;
-				// has this snp index been flagged before?
-				for(k =0; k < num_snps_in_recombinations; k++)
-				{
-					if(snps_in_recombinations[k] == j)
-					{
-						seen_before = 1;
-						break;
-					}
-				}
-				if(seen_before == 0)
-				{
-					snps_in_recombinations[num_snps_in_recombinations] = j;
-					num_snps_in_recombinations++;
-    			}
-			}
+				snps_in_recombinations[num_snps_in_recombinations] = j;
+				num_snps_in_recombinations++;
 		}
 	}
+
+  // may contain duplications
 	return num_snps_in_recombinations;
-		
 }
 
 
@@ -573,11 +567,6 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	// Set up the window counter with 1 value per base in the branch
  	int * window_count;
 	window_count = (int *) calloc((genome_size+1),sizeof(int));
-	int i;
-	for(i =0; i< genome_size; i++)
-	{
-		window_count[i] = 0;
-	}
 	
 	// Integer array with location of gaps
 	int * gaps_in_original_genome_space;
@@ -626,7 +615,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int in_block = 0;
 	int block_lower_bound = 0;
 	// Scan across the pileup and record where blocks are above the cutoff
-	
+	int i;
 	for(i = 0; i < genome_size; i++)
 	{
 		// Just entered the start of a block
@@ -1043,12 +1032,14 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 	int * bases_to_be_excluded;  
 	bases_to_be_excluded = (int*) calloc((length_of_sequence + 1),sizeof(int));
 	
+  int genome_length = length_of_sequence;
 	int i = 0;
 	for(i = 0; i<length_of_sequence; i++)
 	{
 		if(sequence[i] == 'N' || sequence[i] == '-' )
 		{
 			bases_to_be_excluded[i] = 1;
+      genome_length--;
 		}
 	}
 	
@@ -1064,41 +1055,15 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 		int block_index = 0;
 		for(block_index = block_coordinates[0][j]; block_index <= block_coordinates[1][j]; block_index++ )
 		{
-			bases_to_be_excluded[block_index-1] = 1;
+      if(bases_to_be_excluded[block_index-1] == 0)
+      {
+        bases_to_be_excluded[block_index-1] = 1;
+        genome_length--;
+      }
 		}
 	}
 	
-    int genome_length = 0;
-	for(i = 0; i<length_of_sequence; i++)
-	{
-		if(bases_to_be_excluded[i] == 0 )
-		{
-			genome_length++;
-		}
-	}
 	return genome_length;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

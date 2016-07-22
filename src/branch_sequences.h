@@ -47,7 +47,6 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 
 int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks);
 
-
 #define WINDOW_SNP_MODE_TARGET 10
 #define RANDOMNESS_DAMPNER 0.05
 #define MAX_SAMPLE_NAME_SIZE 1024

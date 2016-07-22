@@ -97,6 +97,8 @@ autoreconf -i
 ./configure
 make
 sudo make install
+cd python
+sudo python3 setup.py install
 ```
 
 ## OSX/Linux/Windows - Virtual Machine

@@ -21,16 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 int size_of_string(char *input_string)
 {
-	int i = 0;
-
-	while( input_string[i] != '\0')
-	{
-		i++;
-	}
-	return i;
+  return strlen(input_string);
 }
 
 void concat_strings_created_with_malloc(char *input_string, char *string_to_concat)

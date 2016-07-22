@@ -78,37 +78,31 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 {
 	int num_snps_in_recombinations =0;
 	int i = 0;
+  
+  // loop over each block
 	for(i = 0; i<num_blocks; i++ )
 	{
 		int current_index = 0;
+    // convert the starting coordinates of block to the nearest SNP index
 		current_index = find_starting_index(current_block_coordinates[0][i],snp_locations,0, number_of_snps);
 		
-		int j;
-		for(j = current_index; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
+    //make sure that the index begins at start of block
+		int beginning_j = current_index;
+    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
+    {
+    }
+    
+    int j;
+    // starting at the begining index of block, count all the snps until the end of the bock.
+		for(j = beginning_j; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
 		{
-			if(snp_locations[j] >= current_block_coordinates[0][i] && snp_locations[j] <= current_block_coordinates[1][i])
-			{
-				int k = 0;
-				int seen_before = 0;
-				// has this snp index been flagged before?
-				for(k =0; k < num_snps_in_recombinations; k++)
-				{
-					if(snps_in_recombinations[k] == j)
-					{
-						seen_before = 1;
-						break;
-					}
-				}
-				if(seen_before == 0)
-				{
-					snps_in_recombinations[num_snps_in_recombinations] = j;
-					num_snps_in_recombinations++;
-    			}
-			}
+				snps_in_recombinations[num_snps_in_recombinations] = j;
+				num_snps_in_recombinations++;
 		}
 	}
+
+  // may contain duplications
 	return num_snps_in_recombinations;
-		
 }
 
 
@@ -1078,26 +1072,6 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 	}
 	return genome_length;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

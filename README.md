@@ -69,9 +69,9 @@ Print debugging messages. Default is off.
     
 Do not remove files from intermediate iterations. This option will also keep other files created by RAxML and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.
 
-Change the model used by RAxML. The default it GTRCAT (with -V). You can set it to GTRGAMMA.
-
     --raxml_model, -r
+
+Change the model used by RAxML. The default it GTRCAT (with -V). You can set it to GTRGAMMA.
     
 Output files    
 ==========

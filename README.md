@@ -136,5 +136,5 @@ From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint 
 
 Ancestoral sequence reconstruction
 ==================
-From version 2.0.0 onwards, RAxML is used to reconstruction ancestral sequences instead of fastML.
+From version 2.0.0 onwards, RAxML is used to reconstruction ancestral sequences instead of fastML. RAxML doesnt always produce results as you would expect so the results can be lower quaility than fastML. If you would like to stick with fastML for ancestral sequence reconstruction, please checkout and install v1.4.9.
 

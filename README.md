@@ -68,6 +68,10 @@ Print debugging messages. Default is off.
     --no_cleanup, -n
     
 Do not remove files from intermediate iterations. This option will also keep other files created by RAxML and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.
+
+    --raxml_model, -r
+
+Change the model used by RAxML. The default it GTRCAT (with -V). You can set it to GTRGAMMA.
     
 Output files    
 ==========
@@ -125,8 +129,12 @@ Data from the paper
 ===================
 * ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz
 * ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz
-* 
 
 Midpoint rerooting
 ==================
 From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default. This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.
+
+Ancestoral sequence reconstruction
+==================
+From version 2.0.0 onwards, RAxML is used to reconstruction ancestral sequences instead of fastML. RAxML doesnt always produce results as you would expect so the results can be lower quaility than fastML. If you would like to stick with fastML for ancestral sequence reconstruction, please checkout and install v1.4.9.
+

@@ -28,7 +28,7 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),[])
 
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/no_duplicates.aln'))
       self.cleanup()
 
@@ -41,7 +41,7 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1'])
       
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_one_duplicate.aln'))
       self.cleanup()
  
@@ -53,7 +53,7 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1','sample2'])
       
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_multiple_duplicates.aln'))
       self.cleanup()
  
@@ -72,7 +72,7 @@ class TestPreProcessFasta(unittest.TestCase):
                                                       
   def test_filter_out_alignments_with_too_much_missing_data(self):
     preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/missing_data.aln', False, 5)
-    preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+    preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
     self.assertTrue(filecmp.cmp('output.aln','gubbins/tests/data/preprocessfasta/expected_missing_data.aln'))
     self.cleanup()           
       

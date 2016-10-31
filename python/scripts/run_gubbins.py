@@ -44,6 +44,7 @@ parser.add_argument('--converge_method',  '-z', help='Criteria to use to know wh
 parser.add_argument('--version',                action='version', version=str(pkg_resources.get_distribution("gubbins").version))
 parser.add_argument('--min_window_size',  '-a', help='Minimum window size, default 100', type=int,  default = 100)
 parser.add_argument('--max_window_size',  '-b', help='Maximum window size, default 10000', type=int,  default = 10000)
+parser.add_argument('--remove_identical_sequences', '-d', action='count', help='Remove identical sequences', default = 0)
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())
 gubbins_runner.parse_and_run()

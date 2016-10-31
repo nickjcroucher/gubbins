@@ -178,7 +178,7 @@ class GubbinsCommon():
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
     
     pre_process_fasta = PreProcessFasta(self.args.alignment_filename,self.args.verbose,self.args.filter_percentage)
-    taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(temp_working_dir+"/"+starting_base_filename)
+    taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(temp_working_dir+"/"+starting_base_filename, self.args.remove_identical_sequences)
     
     self.args.alignment_filename = temp_working_dir+"/"+starting_base_filename
 

@@ -1,3 +1,7 @@
+v2.2.0 - 31 Oct 2016
+------
+By default dont filter out sequences which are 100% identical.
+
 v2.1.0 - 22 July 2016
 ------
 Use GTRCAT model by default in RAxML instead of GTRGAMMA (massive speedup).

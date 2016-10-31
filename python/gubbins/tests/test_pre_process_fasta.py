@@ -28,7 +28,7 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),[])
 
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/no_duplicates.aln'))
 
   def test_input_file_with_one_duplicate_sequences(self):   
@@ -40,7 +40,7 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1'])
       
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_one_duplicate.aln'))
  
   def test_input_file_with_multiple_duplicate_sequences(self):   
@@ -51,8 +51,22 @@ class TestPreProcessFasta(unittest.TestCase):
         
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1','sample2'])
       
-      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
       self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_multiple_duplicates.aln'))
+      
+      
+  def test_dont_filter_input_file_with_multiple_duplicate_sequences(self):   
+      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/multiple_duplicates.aln')
+      self.assertEqual(preprocessfasta.hash_sequences(), 
+       {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1', 'sample3'],
+        b'\x9c\xe6\x8b\xf7\xae\xe2\x1f\xf5j\xcfu\xf4\xfdO\x8b\xec': ['sample2', 'sample4']})
+        
+      self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1','sample2'])
+      
+      preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',0)
+      self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/multiple_duplicates.aln'))    
+      
+      
  
   def test_input_file_with_all_duplicate_sequences(self):   
       preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/all_same_sequence.aln')
@@ -68,7 +82,7 @@ class TestPreProcessFasta(unittest.TestCase):
                                                       
   def test_filter_out_alignments_with_too_much_missing_data(self):
     preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/missing_data.aln', False, 5)
-    preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln')
+    preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
     self.assertTrue(filecmp.cmp('output.aln','gubbins/tests/data/preprocessfasta/expected_missing_data.aln'))        
       
   def tearDown(self):

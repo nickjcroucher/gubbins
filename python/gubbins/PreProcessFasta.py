@@ -71,8 +71,13 @@ class PreProcessFasta(object):
      
      return taxa_to_remove
 
-  def remove_duplicate_sequences_and_sequences_missing_too_much_data(self, output_filename):
-      taxa_to_remove = self.taxa_of_duplicate_sequences() + self.taxa_missing_too_much_data()
+  def remove_duplicate_sequences_and_sequences_missing_too_much_data(self, output_filename,remove_identical_sequences = 0):
+	  
+      taxa_to_remove = []
+      if remove_identical_sequences < 1:	  
+          taxa_to_remove = self.taxa_missing_too_much_data()
+      else:
+          taxa_to_remove = self.taxa_of_duplicate_sequences() + self.taxa_missing_too_much_data()
       
       with open(self.input_filename) as input_handle:
           with open(output_filename, "w+") as output_handle:

@@ -213,6 +213,7 @@ class TestExternalDependancies(unittest.TestCase):
       parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
       parser.add_argument('--version',                action='version', version=str(pkg_resources.get_distribution("gubbins").version))
       parser.add_argument('--raxml_model',      '-r', help='RAxML model [GTRGAMMA|GTRCAT], default GTRCAT',  default = 'GTRCAT')
+      parser.add_argument('--remove_identical_sequences', '-d', action='count', help='Remove identical sequences', default = 0)
       return parser
       
   def default_arg_parse(self):

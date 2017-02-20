@@ -201,8 +201,9 @@ def add_ordered_embl_to_diagram(record, incfeatures=["CDS", "feature"], emblfile
 		
 		locations=[]
 		
-		locations=iterate_subfeatures(feature, locations)
-		
+
+		locations.append((feature.location.start, feature.location.end))
+
 		if "taxa" in feature.qualifiers:
 			qualifiernames=feature.qualifiers["taxa"][0].replace(", "," ").split()
 			

@@ -1,3 +1,7 @@
+v2.2.1 - 20 Feb 2017
+-----
+Remove use of Biopythons sub_features function which has been deprecated.
+
 v2.2.0 - 31 Oct 2016
 ------
 By default dont filter out sequences which are 100% identical.

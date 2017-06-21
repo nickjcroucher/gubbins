@@ -9,6 +9,7 @@ There are a few ways to install Gubbins and its dependancies. The simpliest way 
 * Linux - Ubuntu Xenial (16.04) & Debian (unstable)
 * Linux - CentOS 7
 * Linux - CentOS 6
+* OSX/Linux - Bioconda
 * OSX/Linux - from source
 * OSX/Linux/Windows - Virtual Machine
 
@@ -81,6 +82,13 @@ ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
 ln -s $(which gfortran) ~/.linuxbrew/bin/gfortran-4.4
 brew install ruby python3
 brew install gubbins
+```
+
+## OSX/Linux - Bioconda
+Install conda and enable the bioconda channels.
+
+```
+conda install gubbins
 ```
 
 ## OSX/Linux - from source

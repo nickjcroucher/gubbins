@@ -73,6 +73,11 @@ Do not remove files from intermediate iterations. This option will also keep oth
 
 Change the model used by RAxML. The default it GTRCAT (with -V). You can set it to GTRGAMMA.
     
+Generating Input files
+======================
+Any application which can generate a whole genome multi-FASTA alignment can be used with Gubbins, such as [Snippy](https://github.com/tseemann/snippy).
+    
+    
 Output files    
 ==========
 

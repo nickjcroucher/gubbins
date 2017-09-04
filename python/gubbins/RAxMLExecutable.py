@@ -26,8 +26,8 @@ class RAxMLExecutable(object):
 	def __init__(self, threads, model = 'GTRCAT', verbose = False ):
 		self.verbose = verbose
 		self.threads = threads
-		self.single_threaded_executables = ['raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
-		self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
+		self.single_threaded_executables = ['raxmlHPC-AVX2','raxmlHPC-AVX','raxmlHPC-SSE3','raxmlHPC']
+		self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2','raxmlHPC-PTHREADS-AVX','raxmlHPC-PTHREADS-SSE3','raxmlHPC-PTHREADS']
 		self.model = model
 		
 		self.raxml_executable = self.select_executable_based_on_threads()
@@ -59,7 +59,9 @@ class RAxMLExecutable(object):
 			
 		for executable in list_of_executables:
 			if os.path.exists('/proc/cpuinfo'):
-				if re.search('AVX', executable) and 'avx' not in flags:
+				if re.search('AVX2', executable) and 'avx2' not in flags:
+					continue
+				elif re.search('AVX', executable) and 'avx' not in flags:
 					continue
 				elif re.search('SSE3', executable) and 'ssse3'  not in flags:
 					continue
@@ -107,5 +109,5 @@ class RAxMLExecutable(object):
 			if multi_threaded_exec != None:
 				return multi_threaded_exec
 			else:
-				sys.exit("No usable version of RAxML could be found, please ensure one of these executables is in your PATH:\nraxmlHPC-PTHREADS-AVX\nraxmlHPC-PTHREADS-SSE3\nraxmlHPC-PTHREADS\n raxmlHPC-AVX\nraxmlHPC-SSE3\nraxmlHPC")
+				sys.exit("No usable version of RAxML could be found, please ensure one of these executables is in your PATH:\nraxmlHPC-PTHREADS-AVX2\nraxmlHPC-PTHREADS-AVX\nraxmlHPC-PTHREADS-SSE3\nraxmlHPC-PTHREADS\nraxmlHPC-AVX2\nraxmlHPC-AVX\nraxmlHPC-SSE3\nraxmlHPC")
 			

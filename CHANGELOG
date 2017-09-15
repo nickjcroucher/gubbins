@@ -1,3 +1,7 @@
+v2.2.3 - 15 Sept 2017
+-----
+Fix default extended help text.
+
 v2.2.2 - 4 Sept 2017
 -----
 Allow the use of RAXML AVX2 binaries. 

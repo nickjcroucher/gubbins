@@ -4,7 +4,8 @@
 # Import some necessary modules #
 #################################
 
-from optparse import OptionParser, OptionGroup
+import argparse
+import pkg_resources
 
 from Bio.Nexus import Trees, Nodes
 from Bio.Graphics.GenomeDiagram._Colors import ColorTranslator
@@ -24,14 +25,11 @@ from reportlab.graphics import renderPDF
 
 
 def main():
-	usage = "usage: %prog [options] args"
-	parser = OptionParser(usage=usage)
-	
-	group = OptionGroup(parser, "Output Options")
-	group.add_option("-o", "--output", action="store", dest="outputfile", help="output file name [default= %default]", type="string", metavar="FILE", default="test.pdf")
-	group.add_option("-t", "--tree", action="store", dest="tree", help="tree file to align tab files to", default="")
-	
-	parser.add_option_group(group)
+	parser = argparse.ArgumentParser(description='Gubbins Drawer creates a PDF with a tree on one side and the recombination regions plotted on the reference space on the other side. An interactive version can be found https://sanger-pathogens.github.io/phandango/',  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('embl_file',     help='EMBL file, such as RAxML_result.recombination_predictions.embl')
+	parser.add_argument('--outputfile', '-o', help='Output PDF filename', default = 'gubbins_recombinations.pdf')
+    parser.add_argument('--tree',       '-t', help='Tree in Newick format, such as XXXX.final_tree.tre')
+	parser.add_argument('--version',     action='version', version=str(pkg_resources.get_distribution("gubbins").version))
 	
 	return parser.parse_args()
 
@@ -653,7 +651,9 @@ class Feature:
 
 if __name__ == "__main__":
 
-	(options, args) = main()
+	options = main()
+	args = (options.embl_file)
+	
 	pagesize=pagesizes.A4
 	height, width = pagesize
   

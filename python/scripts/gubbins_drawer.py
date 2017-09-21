@@ -4,7 +4,8 @@
 # Import some necessary modules #
 #################################
 
-from optparse import OptionParser, OptionGroup
+import argparse
+import pkg_resources
 
 from Bio.Nexus import Trees, Nodes
 from Bio.Graphics.GenomeDiagram._Colors import ColorTranslator
@@ -24,17 +25,12 @@ from reportlab.graphics import renderPDF
 
 
 def main():
-	usage = "usage: %prog [options] args"
-	parser = OptionParser(usage=usage)
-	
-	group = OptionGroup(parser, "Output Options")
-	group.add_option("-o", "--output", action="store", dest="outputfile", help="output file name [default= %default]", type="string", metavar="FILE", default="test.pdf")
-	group.add_option("-t", "--tree", action="store", dest="tree", help="tree file to align tab files to", default="")
-	
-	parser.add_option_group(group)
-	
+	parser = argparse.ArgumentParser(description='Gubbins Drawer creates a PDF with a tree on one side and the recombination regions plotted on the reference space on the other side. An interactive version can be found at https://sanger-pathogens.github.io/phandango/',  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('tree',  help='Tree in Newick format, such as XXXX.final_tree.tre')
+	parser.add_argument('embl_file',     help='EMBL file, such as XXXX.recombination_predictions.embl')
+	parser.add_argument( '-o', '--outputfile', help='Output PDF filename', default = 'gubbins_recombinations.pdf')
 	return parser.parse_args()
-
+	
   ##########################################################
   # Function to read an alignment whichever format it's in #
   ##########################################################
@@ -653,11 +649,12 @@ class Feature:
 
 if __name__ == "__main__":
 
-	(options, args) = main()
+	options = main()
+	
 	pagesize=pagesizes.A4
 	height, width = pagesize
   
-	if len(args)==0:
+	if len(options.embl_file)==0:
 		print("Found nothing to draw")
 		sys.exit()
 	
@@ -675,33 +672,25 @@ if __name__ == "__main__":
 	track_names={}
 	input_order=[]
 	
+	new_tracks=add_ordered_tab_to_diagram(options.embl_file)
 	
-	for arg in args[::-1]:
-		if arg.lower() in ["tree", "list"]:
-			input_order.append(arg.lower())
-			continue
-		if arg.split('.')[-1].lower() in ["plot", "hist", "heat", "bar", "line", "graph", "area","embl", "gb", "tab", "bam", "fas", "fasta", "mfa", "dna", "fst", "phylip", "phy", "nexus", "nxs"]:
-			
-			if arg.split('.')[-1].lower() =="embl":
-				 new_tracks=add_ordered_tab_to_diagram(arg)
-				 
-				 for track in new_tracks:
-				 	newtrack=new_tracks[track]
-				 	newtrack.beginning=0
-				 	newtrack.name=new_tracks[track].name
-				 	name=newtrack.name
-				 	x=1
-				 	while name in my_tracks:
-				 		name=newtrack.name+"_"+str(x)
-				 		x+=1
-				 	if not newtrack.name in track_names:
-				 		track_names[newtrack.name]=[]
-				 	input_order.append(name)
-				 	track_names[newtrack.name].append(name)
-				 	
-				 	track_count+=1
-				 	newtrack.track_height=1
-				 	my_tracks[name]=newtrack
+	for track in new_tracks:
+		newtrack=new_tracks[track]
+		newtrack.beginning=0
+		newtrack.name=new_tracks[track].name
+		name=newtrack.name
+		x=1
+		while name in my_tracks:
+			name=newtrack.name+"_"+str(x)
+			x+=1
+		if not newtrack.name in track_names:
+			track_names[newtrack.name]=[]
+		input_order.append(name)
+		track_names[newtrack.name].append(name)
+		
+		track_count+=1
+		newtrack.track_height=1
+		my_tracks[name]=newtrack
 	
 	treenames=[]
 	tree_name_to_node={}

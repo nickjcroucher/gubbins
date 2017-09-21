@@ -25,14 +25,12 @@ from reportlab.graphics import renderPDF
 
 
 def main():
-	parser = argparse.ArgumentParser(description='Gubbins Drawer creates a PDF with a tree on one side and the recombination regions plotted on the reference space on the other side. An interactive version can be found https://sanger-pathogens.github.io/phandango/',  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument('embl_file',     help='EMBL file, such as RAxML_result.recombination_predictions.embl')
-	parser.add_argument('--outputfile', '-o', help='Output PDF filename', default = 'gubbins_recombinations.pdf')
-    parser.add_argument('--tree',       '-t', help='Tree in Newick format, such as XXXX.final_tree.tre')
-	parser.add_argument('--version',     action='version', version=str(pkg_resources.get_distribution("gubbins").version))
-	
+	parser = argparse.ArgumentParser(description='Gubbins Drawer creates a PDF with a tree on one side and the recombination regions plotted on the reference space on the other side. An interactive version can be found at https://sanger-pathogens.github.io/phandango/',  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('tree',  help='Tree in Newick format, such as XXXX.final_tree.tre')
+	parser.add_argument('embl_file',     help='EMBL file, such as XXXX.recombination_predictions.embl')
+	parser.add_argument( '-o', '--outputfile', help='Output PDF filename', default = 'gubbins_recombinations.pdf')
 	return parser.parse_args()
-
+	
   ##########################################################
   # Function to read an alignment whichever format it's in #
   ##########################################################

@@ -650,12 +650,11 @@ class Feature:
 if __name__ == "__main__":
 
 	options = main()
-	args = (options.embl_file)
 	
 	pagesize=pagesizes.A4
 	height, width = pagesize
   
-	if len(args)==0:
+	if len(options.embl_file)==0:
 		print("Found nothing to draw")
 		sys.exit()
 	
@@ -673,33 +672,25 @@ if __name__ == "__main__":
 	track_names={}
 	input_order=[]
 	
+	new_tracks=add_ordered_tab_to_diagram(options.embl_file)
 	
-	for arg in args[::-1]:
-		if arg.lower() in ["tree", "list"]:
-			input_order.append(arg.lower())
-			continue
-		if arg.split('.')[-1].lower() in ["plot", "hist", "heat", "bar", "line", "graph", "area","embl", "gb", "tab", "bam", "fas", "fasta", "mfa", "dna", "fst", "phylip", "phy", "nexus", "nxs"]:
-			
-			if arg.split('.')[-1].lower() =="embl":
-				 new_tracks=add_ordered_tab_to_diagram(arg)
-				 
-				 for track in new_tracks:
-				 	newtrack=new_tracks[track]
-				 	newtrack.beginning=0
-				 	newtrack.name=new_tracks[track].name
-				 	name=newtrack.name
-				 	x=1
-				 	while name in my_tracks:
-				 		name=newtrack.name+"_"+str(x)
-				 		x+=1
-				 	if not newtrack.name in track_names:
-				 		track_names[newtrack.name]=[]
-				 	input_order.append(name)
-				 	track_names[newtrack.name].append(name)
-				 	
-				 	track_count+=1
-				 	newtrack.track_height=1
-				 	my_tracks[name]=newtrack
+	for track in new_tracks:
+		newtrack=new_tracks[track]
+		newtrack.beginning=0
+		newtrack.name=new_tracks[track].name
+		name=newtrack.name
+		x=1
+		while name in my_tracks:
+			name=newtrack.name+"_"+str(x)
+			x+=1
+		if not newtrack.name in track_names:
+			track_names[newtrack.name]=[]
+		input_order.append(name)
+		track_names[newtrack.name].append(name)
+		
+		track_count+=1
+		newtrack.track_height=1
+		my_tracks[name]=newtrack
 	
 	treenames=[]
 	tree_name_to_node={}

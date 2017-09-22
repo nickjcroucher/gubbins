@@ -316,6 +316,8 @@ class GubbinsCommon():
     else:
       output_filenames_to_final_filenames = GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames(starting_base_filename, max_iteration - 1,  self.args.prefix)
     GubbinsCommon.rename_files(output_filenames_to_final_filenames)
+	
+    shutil.copyfile(str(self.args.prefix)+".final_tree.tre", str(self.args.prefix)+".node_labelled.final_tree.tre")
     GubbinsCommon.remove_internal_node_labels_from_tree(str(self.args.prefix)+".final_tree.tre", str(self.args.prefix)+".no_internal_labels.final_tree.tre")
     shutil.move(str(self.args.prefix)+".no_internal_labels.final_tree.tre", str(self.args.prefix)+".final_tree.tre")
     

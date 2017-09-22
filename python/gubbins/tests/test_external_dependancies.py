@@ -41,7 +41,8 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('different_prefix.recombination_predictions.gff')
     assert os.path.exists('different_prefix.branch_base_reconstruction.embl')
     assert os.path.exists('different_prefix.final_tree.tre')
-
+    assert os.path.exists('different_prefix.node_labelled.final_tree.tre')
+	
     self.cleanup()
   
   def test_rename_final_output(self):
@@ -58,6 +59,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('different_prefix.recombination_predictions.gff')
     assert os.path.exists('different_prefix.branch_base_reconstruction.embl')
     assert os.path.exists('different_prefix.final_tree.tre')
+    assert os.path.exists('different_prefix.node_labelled.final_tree.tre')
 
     self.cleanup()
     
@@ -97,6 +99,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('ft_prefix.recombination_predictions.gff')
     assert os.path.exists('ft_prefix.branch_base_reconstruction.embl')
     assert os.path.exists('ft_prefix.final_tree.tre')
+    assert os.path.exists('ft_prefix.node_labelled.final_tree.tre')
 
     self.cleanup()
     
@@ -114,6 +117,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('hybrid_prefix.recombination_predictions.gff')
     assert os.path.exists('hybrid_prefix.branch_base_reconstruction.embl')
     assert os.path.exists('hybrid_prefix.final_tree.tre')
+    assert os.path.exists('hybrid_prefix.node_labelled.final_tree.tre')
  
     self.cleanup()
     
@@ -131,7 +135,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
     assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
     assert os.path.exists('multiple_recombinations.final_tree.tre')
-    #assert os.path.exists('multiple_recombinations.node_labelled.tre')
+    assert os.path.exists('multiple_recombinations.node_labelled.final_tree.tre')
 
     self.cleanup()
 
@@ -149,6 +153,7 @@ class TestExternalDependancies(unittest.TestCase):
     assert os.path.exists('multiple_recombinations.recombination_predictions.gff')
     assert os.path.exists('multiple_recombinations.branch_base_reconstruction.embl')
     assert os.path.exists('multiple_recombinations.final_tree.tre')
+    assert os.path.exists('multiple_recombinations.node_labelled.final_tree.tre')
 
     self.cleanup()
 
@@ -224,4 +229,3 @@ class TestExternalDependancies(unittest.TestCase):
          
 if __name__ == "__main__":
   unittest.main()
-

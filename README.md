@@ -128,6 +128,11 @@ Phylip format alignment of filtered polymorphic sites used to generate the phylo
 
 Final phylogenetic tree in newick format.
 
+    .node_labelled.final_tree.tre
+    
+Final phylogenetic tree in newick format but with internal node labels.
+
+
 
 
 Data from the paper

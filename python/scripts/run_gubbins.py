@@ -41,11 +41,11 @@ parser.add_argument('--min_snps',         '-m', help='Min SNPs to identify a rec
 parser.add_argument('--filter_percentage','-f', help='Filter out taxa with more than this percentage of gaps', type=int,  default = 25)
 parser.add_argument('--prefix',           '-p', help='Add a prefix to the final output filenames')
 parser.add_argument('--threads',          '-c', help='Number of threads to run with RAXML, but only if a PTHREADS version is available', type=int,  default = 1)
-parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations [weighted_robinson_foulds|robinson_foulds|recombination]',  default = 'weighted_robinson_foulds')
+parser.add_argument('--converge_method',  '-z', help='Criteria to use to know when to halt iterations.',  default = 'weighted_robinson_foulds', choices=['weighted_robinson_foulds', 'robinson_foulds', 'recombination'])
 parser.add_argument('--version',                action='version', version=str(pkg_resources.get_distribution("gubbins").version))
 parser.add_argument('--min_window_size',  '-a', help='Minimum window size', type=int,  default = 100)
 parser.add_argument('--max_window_size',  '-b', help='Maximum window size', type=int,  default = 10000)
-parser.add_argument('--raxml_model',      '-r', help='RAxML model [GTRGAMMA|GTRCAT]',  default = 'GTRCAT')
+parser.add_argument('--raxml_model',      '-r', help='RAxML model.',  default = 'GTRCAT', choices=['GTRGAMMA', 'GTRCAT'])
 parser.add_argument('--remove_identical_sequences', '-d', action='count', help='Remove identical sequences', default = 0)
 
 gubbins_runner  = common.GubbinsCommon(parser.parse_args())

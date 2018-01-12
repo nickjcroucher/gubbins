@@ -1,50 +1,23 @@
 Before you do anything, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/).
 
 # Installation
-There are a few ways to install Gubbins and its dependancies. The simpliest way is using HomeBrew (OSX) or LinuxBrew.
+There are a few ways to install Gubbins and its dependancies. The simpliest way is using conda.
 
-* OSX - Mavericks (10.9) & Yosemite (10.10) & El Capitan (10.11)
-* OSX - Mountain Lion (10.8)
-* Linux - Ubuntu Trusty (14.04) & Precise (12.04)
-* Linux - Ubuntu Xenial (16.04) & Debian (unstable)
-* Linux - CentOS 7
-* Linux - CentOS 6
 * OSX/Linux - Bioconda
+* Linux - Ubuntu Xenial (16.04) & Debian (unstable)
+* OSX/Linux/Cloud/Windows - Docker
 * OSX/Linux - from source
 * OSX/Linux/Windows - Virtual Machine
 
-
-## OSX - Mavericks (10.9) & Yosemite (10.10) & El Capitan (10.11)
-Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version). Then run:
-```
-brew tap homebrew/science
-brew install gubbins
-```
-
-## OSX - Mountain Lion (10.8)
-Install [HomeBrew](http://brew.sh/). It requires a minimum of Xcode 5.1.1 (xcodebuild -version).
-
-Then run:
-```
-brew tap homebrew/science
-brew install python3
-brew install gubbins
-```
-
-## OSX - It failed to install
-* Run 'brew doctor' and correct any errors with your homebrew setup.
-* Make sure Xcode is 5.1.1 or greater (xcodebuild -version). 
-* Install it in /usr/local. Homebrew warn 'Pick another prefix at your peril!'.
-* Run 'brew install -vd gubbins' and try and correct any errors.
-
-## Linux - Ubuntu Trusty (14.04) & Precise (12.04)
-Tested on Ubuntu Trusty (14.04) and Precise (12.04). Install [LinuxBrew](http://brew.sh/linuxbrew/). Then run:
+## OSX/Linux - conda
+Install conda and enable the bioconda channels.
 
 ```
-sudo apt-get install gfortran
-brew tap homebrew/science
-brew install python3
-brew install gubbins
+conda config --add channels r
+conda config --add channels defaults
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda install gubbins
 ```
 
 ## Linux - Ubuntu Xenial (16.04) & Debian (unstable)
@@ -53,46 +26,20 @@ Gubbins has been packaged by the Debian Med team and is trivial to install using
 sudo apt-get install gubbins
 ```
 
-## Linux - CentOS/RHEL 7
-Enable EPEL and make sure compilers are installed.
-```
-sudo yum install epel-release gcc gcc-c++ automake
-```
-Install [LinuxBrew](http://brew.sh/linuxbrew/).
-```
-brew tap homebrew/science
-brew tap homebrew/dupes	
-ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.8
-ln -s $(which g++) ~/.linuxbrew/bin/g++-4.8
-ln -s $(which gfortran) ~/.linuxbrew/bin/gfortran-4.8
-brew install ruby gpatch python3
-brew install gubbins
-```
-
-## Linux - CentOS/RHEL 6.6
-Enable EPEL and make sure compilers are installed.
-```
-sudo yum install epel-release gcc gcc-c++ automake ruby-irb
-```
-Install [LinuxBrew](http://brew.sh/linuxbrew/).
-```
-brew tap homebrew/science
-ln -s $(which gcc) ~/.linuxbrew/bin/gcc-4.4
-ln -s $(which g++) ~/.linuxbrew/bin/g++-4.4
-ln -s $(which gfortran) ~/.linuxbrew/bin/gfortran-4.4
-brew install ruby python3
-brew install gubbins
-```
-
-## OSX/Linux - Bioconda
-Install conda and enable the bioconda channels.
+## OSX/Linux/Cloud/Windows - Docker
+We have a docker container which gets automatically built from the latest version of Gubbins in Debian Med. To install it:
 
 ```
-conda install gubbins
+docker pull sangerpathogens/gubbins
+```
+
+To use it you would use a command such as this (substituting in your directories), where your GFF files are assumed to be stored in /home/ubuntu/data:
+```
+docker run --rm -it -v /home/ubuntu/data:/data sangerpathogens/run_gubbins.py
 ```
 
 ## OSX/Linux - from source
-This is the most difficult method and is only suitable for someone with advanced computing skills. Please consider using HomeBrew/LinuxBrew instead.
+This is the most difficult method and is only suitable for someone with advanced computing skills. Please consider using Conda instead.
 
 Install the dependances and include them in your PATH:
 * [FastTree](http://www.microbesonline.org/fasttree/#Install) ( >=2.1.4 )

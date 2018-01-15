@@ -16,4 +16,4 @@ RUN apt-get update -qq
 #
 # Install Roary
 #
-RUN apt-get install gubbins
+RUN apt-get install -y gubbins

@@ -38,7 +38,9 @@ from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.RAxMLSequenceReconstruction import RAxMLSequenceReconstruction
 from gubbins.RAxMLExecutable import RAxMLExecutable
-
+### PERMAFROST
+from gubbins.jar_log import *
+### PERMAFROST
 
 class GubbinsError(Exception):
   def __init__(self, value,message):
@@ -255,15 +257,25 @@ class GubbinsCommon():
 
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
 
-      try:  
-        raxml_seq_recon = RAxMLSequenceReconstruction(starting_base_filename+".snp_sites.aln", current_tree_name, starting_base_filename+".seq.joint.txt", current_tree_name , raxml_executable_obj.internal_sequence_reconstruction_command(), self.args.verbose)
-        raxml_seq_recon.reconstruct_ancestor_sequences()
-
+      try:
+#        raxml_seq_recon = RAxMLSequenceReconstruction(starting_base_filename+".snp_sites.aln", current_tree_name, starting_base_filename+".seq.joint.txt", current_tree_name , raxml_executable_obj.internal_sequence_reconstruction_command(), self.args.verbose)
+#        raxml_seq_recon.reconstruct_ancestor_sequences()
+### PERMAFROST_start
+        # model parameter estimation with RAxML
+        os.system("raxmlHPC-PTHREADS -m GTRCAT -s "+starting_base_filename+".snp_sites.aln -n "+base_filename_without_ext+"_"+str(i)+" -f e -p 45789 -t "+current_tree_name)
+        # ancestral state reconstruction
+        infoFile="RAxML_info."+base_filename_without_ext+"_"+str(i)
+        print(starting_base_filename+".snp_sites.aln",current_tree_name,infoFile,starting_base_filename,current_tree_name)
+        jar(starting_base_filename+".snp_sites.aln",current_tree_name,infoFile,starting_base_filename,current_tree_name)
+### PERMAFROST_end
       except:
-        sys.exit("Failed while running RAxML internal sequence reconstruction")
+        sys.exit("Failed while running proper sequence reconstruction")
         
       shutil.copyfile(starting_base_filename+".start", starting_base_filename+".gaps.snp_sites.aln")
+### PERMAFROST_start
       GubbinsCommon.reinsert_gaps_into_fasta_file(starting_base_filename+".seq.joint.txt", starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+#      GubbinsCommon.reinsert_gaps_into_fasta_file(starting_base_filename+".seq.joint.txt", starting_base_filename +".gaps.vcf", starting_base_filename+".gaps.snp_sites.aln")
+### PERMAFROST_end
 
       if(GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') == 0 or not ValidateFastaAlignment(starting_base_filename+".gaps.snp_sites.aln").is_input_fasta_file_valid() ):
          sys.exit("There is a problem with your FASTA file after running RAxML internal sequence reconstruction. Please check this intermediate file is valid: "+ str(starting_base_filename)+".gaps.snp_sites.aln")

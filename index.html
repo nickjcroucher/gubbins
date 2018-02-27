@@ -164,12 +164,16 @@ X.Y</p>
 <p>Final phylogenetic tree in newick format but with internal node labels.</p>
 <ul><li>.node_labelled.final_tree.tre	</li></ul>
 
-<h3><a name="roary" class="anchor" href="#roary"><span class="octicon octicon-link"></span></a>Roary</h3>
+<h1><a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h1>
+        <h3><a name="segfault" class="anchor" href="#segfault"><span class="octicon octicon-link"></span></a>What do I do if I get a Segmentation fault?</h3>
+        <p>If you get a segfault, it means your input data is probably too divergenet or insufficiently curated for quality. Keep removing samples until gubbins can complete.</p>
+        
+<h3><a name="roary" class="anchor" href="#roary"><span class="octicon octicon-link"></span></a>Can the output of Roary be used as the input to Gubbins?</h3>
 <p>The output of <a href="http://sanger-pathogens.github.io/Roary/">Roary (the pan genome pipeline)</a> cannot be used as the input to Gubbins.
 They are fundamentally different methods. Detecting recombination in pan genomes is an open problem.</p>
 
 <h3>
-<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running Gubbins within Sanger</h3>
+<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running Gubbins within Sanger?</h3>
 <p>The command to run the script within Sanger with 8GB of RAM and 16 cores looks like:</p>
 <ul><li>
 bsub.py --threads 16 8 log run_gubbins.py --threads 16 my_alignment.aln

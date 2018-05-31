@@ -33,9 +33,9 @@ We have a docker container which gets automatically built from the latest versio
 docker pull sangerpathogens/gubbins
 ```
 
-To use it you would use a command such as this (substituting in your directories), where your GFF files are assumed to be stored in /home/ubuntu/data:
+To use it you would use a command such as this (substituting in your directories), where your input files are  assumed to be stored in /home/ubuntu/data:
 ```
-docker run --rm -it -v /home/ubuntu/data:/data sangerpathogens/run_gubbins.py
+docker run --rm -it -v /home/ubuntu/data:/data sangerpathogens/gubbins run_gubbins --help
 ```
 
 ## OSX/Linux - from source

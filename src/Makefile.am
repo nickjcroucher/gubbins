@@ -33,5 +33,5 @@ run_all_tests_CFLAGS = -I../tests $(PTHREAD_CFLAGS)
 run_all_tests_LDADD = -lcheck libgubbins.la -lz -lm $(PTHREAD_LDFLAGS)
 
 if HOST_LINUX
-run_all_tests_LDADD += -lrt
+run_all_tests_LDADD += -lrt -lsubunit
 endif

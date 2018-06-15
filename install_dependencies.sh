@@ -43,6 +43,7 @@ else
                              check \
                              g++ \
                              libtool \
+                             libsubunit-dev \
                              pkg-config \
                              python-dev
 fi

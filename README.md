@@ -13,7 +13,7 @@ Since the introduction of high-throughput, second-generation DNA sequencing tech
 
 Install
 =======
-Please see the INSTALL file for detailed instructions.
+Please see the [INSTALL](https://github.com/sanger-pathogens/gubbins/blob/master/INSTALL.md) file for detailed instructions.
 
 Running Gubbins
 ===============

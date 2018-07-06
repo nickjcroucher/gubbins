@@ -109,13 +109,15 @@ class GubbinsCommon():
 
     fasttree_executables = ['FastTree', 'fasttree']
     FASTTREE_EXEC = GubbinsCommon.choose_executable(fasttree_executables)
-
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
-    GUBBINS_EXEC = 'gubbins'
 
+    IQTREE_EXEC = "iqtree"
+    IQTREE_PARAMS = ""
+
+    GUBBINS_EXEC = 'gubbins'
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
 
-    # check that all the external executable dependancies are available
+    # check that all the external executable dependencies are available
     if GubbinsCommon.which(GUBBINS_EXEC) is None:
       GUBBINS_EXEC = GubbinsCommon.use_bundled_exec(GUBBINS_EXEC, GUBBINS_BUNDLED_EXEC)
       if GubbinsCommon.which(GUBBINS_EXEC) is None:
@@ -143,8 +145,8 @@ class GubbinsCommon():
     current_time = ''
     if self.args.use_time_stamp > 0:
       current_time = str(int(time.time()))+'.'
-      if self.args.verbose > 0:
-        print(current_time)
+    if self.args.verbose > 0:
+      print(int(time.time()))
 
     # get the base filename
     (base_directory, base_filename) = os.path.split(self.args.alignment_filename)
@@ -202,15 +204,17 @@ class GubbinsCommon():
       sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
+    # Start the main loop
     for i in range(1, self.args.iterations+1):
       max_iteration += 1
 
+      # 1. Construct the commands depending on the employed options
       if self.args.tree_builder == "hybrid":
         if i == 1:
           previous_tree_name    = GubbinsCommon.fasttree_previous_tree_name(base_filename, i)
           current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
           tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,
-            current_tree_name, base_filename, previous_tree_name, FASTTREE_EXEC, FASTTREE_PARAMS, base_filename)
+            current_tree_name, base_filename, previous_tree_name, FASTTREE_EXEC, FASTTREE_PARAMS)
           gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,
             starting_base_filename + ".gaps", i, self.args.alignment_filename, GUBBINS_EXEC,
             self.args.min_snps, self.args.alignment_filename, self.args.min_window_size, self.args.max_window_size)
@@ -250,14 +254,28 @@ class GubbinsCommon():
           previous_tree_name = GubbinsCommon.fasttree_previous_tree_name(base_filename, i)
         current_tree_name     = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
         tree_building_command = GubbinsCommon.fasttree_tree_building_command(i, self.args.starting_tree,
-            current_tree_name, previous_tree_name, previous_tree_name, FASTTREE_EXEC, FASTTREE_PARAMS, base_filename)
+            current_tree_name, previous_tree_name, previous_tree_name, FASTTREE_EXEC, FASTTREE_PARAMS)
         gubbins_command       = GubbinsCommon.fasttree_gubbins_command(base_filename,
             starting_base_filename + ".gaps", i, self.args.alignment_filename, GUBBINS_EXEC,
             self.args.min_snps, self.args.alignment_filename, self.args.min_window_size, self.args.max_window_size)
 
+      elif self.args.tree_builder == "iqtree":
+        if i == 1:
+          previous_tree_name = self.args.starting_tree
+          alignment_filename = base_filename + ".snp_sites.aln"
+        else:
+          previous_tree_name = GubbinsCommon.iqtree_previous_tree_name(base_filename, i)
+          alignment_filename = previous_tree_name + ".snp_sites.aln"
+        current_tree_name = GubbinsCommon.iqtree_current_tree_name(base_filename, i)
+        tree_building_command = GubbinsCommon.iqtree_tree_building_command(i, alignment_filename, previous_tree_name,
+            base_filename, IQTREE_EXEC, IQTREE_PARAMS, self.args.threads, self.args.verbose)
+        gubbins_command = GubbinsCommon.iqtree_gubbins_command(base_filename, starting_base_filename + ".gaps", i,
+            GUBBINS_EXEC, self.args.min_snps, self.args.alignment_filename, self.args.min_window_size,
+            self.args.max_window_size)
+
+      # 2. Construct the phylogenetic tree
       if self.args.verbose > 0:
         print(tree_building_command)
-
       if self.args.starting_tree is not None and i == 1:
         shutil.copyfile(self.args.starting_tree, current_tree_name)
       else:
@@ -269,8 +287,10 @@ class GubbinsCommon():
       if self.args.verbose > 0:
         print(int(time.time()))
 
+      # 3. Reconstruct the ancestral sequence
       GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
-
+      if self.args.verbose > 0:
+        print("RAxML sequence reconstruction")
       try:
         raxml_seq_recon = RAxMLSequenceReconstruction(starting_base_filename + ".snp_sites.aln", current_tree_name,
             starting_base_filename + ".seq.joint.txt", current_tree_name,
@@ -279,19 +299,22 @@ class GubbinsCommon():
       except:
         sys.exit("Failed while running RAxML internal sequence reconstruction")
 
+      # 4. Reinsert gaps
       shutil.copyfile(starting_base_filename + ".start", starting_base_filename + ".gaps.snp_sites.aln")
       GubbinsCommon.reinsert_gaps_into_fasta_file(starting_base_filename + ".seq.joint.txt",
           starting_base_filename + ".gaps.vcf", starting_base_filename + ".gaps.snp_sites.aln")
 
-      if not GubbinsCommon.does_file_exist(starting_base_filename+".gaps.snp_sites.aln", 'Alignment File') \
+      if not GubbinsCommon.does_file_exist(starting_base_filename + ".gaps.snp_sites.aln", 'Alignment File') \
           or not ValidateFastaAlignment(starting_base_filename + ".gaps.snp_sites.aln").is_input_fasta_file_valid():
         sys.exit("There is a problem with your FASTA file after running RAxML internal sequence reconstruction. "
                  "Please check this intermediate file is valid: " + str(starting_base_filename) + ".gaps.snp_sites.aln")
 
       if self.args.verbose > 0:
         print(int(time.time()))
-        print(gubbins_command)
 
+      # 5. Run Gubbins
+      if self.args.verbose > 0:
+        print(gubbins_command)
       try:
         subprocess.check_call(gubbins_command, shell=True)
       except:
@@ -300,6 +323,7 @@ class GubbinsCommon():
       if self.args.verbose > 0:
         print(int(time.time()))
 
+      # 6. Check for convergence
       tree_file_names.append(current_tree_name)
       if i > 2:
         if self.args.converge_method == 'recombination':
@@ -327,20 +351,29 @@ class GubbinsCommon():
       fasttree_files_to_delete = GubbinsCommon.fasttree_regex_for_file_deletions(starting_base_filename,
                                                                                  max_intermediate_iteration)
       GubbinsCommon.delete_files_based_on_list_of_regexes('.', fasttree_files_to_delete, self.args.verbose)
+
+      iqtree_files_to_delete = GubbinsCommon.iqtree_regex_for_file_deletions(starting_base_filename,
+                                                                             max_intermediate_iteration)
+      GubbinsCommon.delete_files_based_on_list_of_regexes('.', iqtree_files_to_delete, self.args.verbose)
+
       shutil.rmtree(temp_working_dir)
 
       GubbinsCommon.delete_files_based_on_list_of_regexes('.',
           [GubbinsCommon.starting_files_regex("^" + starting_base_filename), "^log.txt"], self.args.verbose)
 
+    # create the final output
     output_filenames_to_final_filenames = {}
     if self.args.prefix is None:
       self.args.prefix = base_filename_without_ext
     if self.args.tree_builder == "hybrid" or self.args.tree_builder == "raxml":
       output_filenames_to_final_filenames = GubbinsCommon.translation_of_raxml_filenames_to_final_filenames(
         base_filename_without_ext, current_time, max_iteration - 1, self.args.prefix)
-    else:
+    elif self.args.tree_builder == "fasttree":
       output_filenames_to_final_filenames = GubbinsCommon.translation_of_fasttree_filenames_to_final_filenames(
         starting_base_filename, max_iteration - 1,  self.args.prefix)
+    elif self.args.tree_builder == "iqtree":
+      output_filenames_to_final_filenames = GubbinsCommon.translation_of_iqtree_filenames_to_final_filenames(
+        starting_base_filename, max_iteration - 1, self.args.prefix)
     GubbinsCommon.rename_files(output_filenames_to_final_filenames)
 
     shutil.copyfile(str(self.args.prefix) + ".final_tree.tre", str(self.args.prefix) + ".node_labelled.final_tree.tre")
@@ -586,6 +619,17 @@ class GubbinsCommon():
     return regex_for_file_deletions
 
   @staticmethod
+  def iqtree_regex_for_file_deletions(starting_base_filename, max_intermediate_iteration):
+    regex_for_file_deletions = []
+
+    # loop over previous iterations and delete
+    for file_iteration in range(1, max_intermediate_iteration):
+      regex_for_file_deletions.append("^" + starting_base_filename + "\.iteration_" + str(file_iteration) + '\..*')
+
+    return regex_for_file_deletions
+
+
+  @staticmethod
   def rename_files(input_to_output_filenames):
     for input_file in input_to_output_filenames:
       if os.path.exists(input_file):
@@ -626,6 +670,12 @@ class GubbinsCommon():
                                                                      str(max_intermediate_iteration), output_prefix)
 
   @staticmethod
+  def translation_of_iqtree_filenames_to_final_filenames(starting_base_filename,
+                                                           max_intermediate_iteration, output_prefix):
+    return GubbinsCommon.translation_of_filenames_to_final_filenames(starting_base_filename + ".iteration_" +
+                str(max_intermediate_iteration) + ".treefile", output_prefix)
+
+  @staticmethod
   def translation_of_raxml_filenames_to_final_filenames(base_filename_without_ext, current_time,
                                                         max_intermediate_iteration, output_prefix):
     return GubbinsCommon.translation_of_filenames_to_final_filenames("RAxML_result." + GubbinsCommon.raxml_base_name(
@@ -656,14 +706,12 @@ class GubbinsCommon():
 
   @staticmethod
   def fasttree_tree_building_command(i, starting_tree, current_tree_name, starting_base_filename, previous_tree_name,
-                                     fasttree_exec, fasttree_params, base_filename):
-    current_tree_name = GubbinsCommon.fasttree_current_tree_name(base_filename, i)
-
+                                     fasttree_exec, fasttree_params):
     input_tree = ""
-    if starting_tree is not None:
-      input_tree = "-intree " + starting_tree
-    elif i > 1:
+    if i > 1:
       input_tree = "-intree " + previous_tree_name
+    elif i == 1 and starting_tree is not None:
+      input_tree = "-intree " + starting_tree
 
     command = fasttree_exec + " " + input_tree + " " + fasttree_params + " " + starting_base_filename \
               + ".snp_sites.aln > " + current_tree_name
@@ -677,6 +725,37 @@ class GubbinsCommon():
               + " -b " + str(max_window_size) + " -f " + original_aln + " -t " + str(current_tree_name) \
               + " -m " + str(min_snps) + " " + starting_base_filename + ".snp_sites.aln"
     return command
+
+  @staticmethod
+  def iqtree_current_tree_name(base_filename, i):
+    return base_filename + ".iteration_" + str(i) + ".treefile"
+
+  @staticmethod
+  def iqtree_previous_tree_name(base_filename, i):
+    return base_filename + ".iteration_" + str(i-1) + ".treefile"
+
+  @staticmethod
+  def iqtree_tree_building_command(i, alignment_filename, starting_tree_name, base_filename,
+                                   iqtree_exec, iqtree_params, cores, verbose):
+
+    prefix = base_filename + ".iteration_" + str(i)
+    command = [iqtree_exec, iqtree_params, "-s", alignment_filename, "-nt", str(cores), "-pre", prefix]
+    if starting_tree_name:
+      command.append("-t")
+      command.append(starting_tree_name)
+    if verbose:
+      command.append("-v")
+
+    return " ".join(command)
+
+  @staticmethod
+  def iqtree_gubbins_command(base_filename, starting_base_filename, i, gubbins_exec, min_snps,
+                             original_alignment_filename, min_window_size, max_window_size):
+    current_tree_name = GubbinsCommon.iqtree_current_tree_name(base_filename, i)
+    command = [gubbins_exec, "-r", "-v", starting_base_filename + ".vcf", "-a", str(min_window_size),
+               "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
+               "-m", str(min_snps), starting_base_filename + ".snp_sites.aln"]
+    return " ".join(command)
 
   @staticmethod
   def number_of_sequences_in_alignment(filename):

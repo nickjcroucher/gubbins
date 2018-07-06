@@ -74,6 +74,10 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.fasttree_regex_for_file_deletions('AAA', 5) \
         == ['^AAA.iteration_1[$|\\.]', '^AAA.iteration_2[$|\\.]', '^AAA.iteration_3[$|\\.]', '^AAA.iteration_4[$|\\.]']
 
+  def test_iqtree_regex_for_file_deletions(self):
+    assert common.GubbinsCommon.iqtree_regex_for_file_deletions('AAA', 5) \
+        == ['^AAA\\.iteration_1\\..*', '^AAA\\.iteration_2\\..*', '^AAA\\.iteration_3\\..*', '^AAA\\.iteration_4\\..*']
+
   def test_starting_files_regex(self):
     assert common.GubbinsCommon.starting_files_regex('AAA') == 'AAA.(gaps|vcf|snp_sites|phylip|start)'
     assert common.GubbinsCommon.starting_files_regex('^') == '^.(gaps|vcf|snp_sites|phylip|start)'
@@ -90,6 +94,19 @@ class TestStringConstruction(unittest.TestCase):
       'AAA.iteration_5.stats':           'test.per_branch_statistics.csv',
       'AAA.iteration_5.output_tree':     'test.node_labelled.tre',
       'AAA.iteration_5':                 'test.final_tree.tre'
+    }
+
+  def test_translation_of_iqtree_filenames_to_final_filenames(self):
+    assert common.GubbinsCommon.translation_of_iqtree_filenames_to_final_filenames('AAA', 5, 'test') == {
+      'AAA.iteration_5.treefile.vcf':             'test.summary_of_snp_distribution.vcf',
+      'AAA.iteration_5.treefile.tab':             'test.recombination_predictions.embl',
+      'AAA.iteration_5.treefile.branch_snps.tab': 'test.branch_base_reconstruction.embl',
+      'AAA.iteration_5.treefile.gff':             'test.recombination_predictions.gff',
+      'AAA.iteration_5.treefile.snp_sites.aln':   'test.filtered_polymorphic_sites.fasta',
+      'AAA.iteration_5.treefile.phylip':          'test.filtered_polymorphic_sites.phylip',
+      'AAA.iteration_5.treefile.stats':           'test.per_branch_statistics.csv',
+      'AAA.iteration_5.treefile.output_tree':     'test.node_labelled.tre',
+      'AAA.iteration_5.treefile':                 'test.final_tree.tre'
     }
 
   def test_translation_of_raxml_filenames_to_final_filenames(self):
@@ -122,13 +139,30 @@ class TestStringConstruction(unittest.TestCase):
     assert common.GubbinsCommon.fasttree_previous_tree_name('AAA', 5) == 'AAA.iteration_4'
 
   def test_fasttree_tree_building_command(self):
-    assert common.GubbinsCommon.fasttree_tree_building_command(5, 'AAA', 'BBB', 'CCC', 'EEE', 'FFF', 'GGG', 'HHH') \
-           == 'FFF -intree AAA GGG CCC.snp_sites.aln > HHH.iteration_5'
+    assert common.GubbinsCommon.fasttree_tree_building_command(1, 'AAA', 'BBB', 'CCC', 'EEE', 'FFF', 'GGG') \
+           == 'FFF -intree AAA GGG CCC.snp_sites.aln > BBB'
+    assert common.GubbinsCommon.fasttree_tree_building_command(5, 'AAA', 'BBB', 'CCC', 'EEE', 'FFF', 'GGG') \
+           == 'FFF -intree EEE GGG CCC.snp_sites.aln > BBB'
 
   def test_fasttree_gubbins_command(self):
     assert common.GubbinsCommon.fasttree_gubbins_command('AAA', 'BBB', 5, 'CCC', 'DDD', 3, 'EEE', 10, 100) \
            == 'DDD -r -v BBB.vcf -a 10 -b 100 -f EEE -t AAA.iteration_5 -m 3 BBB.snp_sites.aln'
 
+  def test_iqtree_current_tree_name(self):
+    assert common.GubbinsCommon.iqtree_current_tree_name('AAA', 5)  == 'AAA.iteration_5.treefile'
+
+  def test_iqtree_previous_tree_name(self):
+    assert common.GubbinsCommon.iqtree_previous_tree_name('AAA', 5) == 'AAA.iteration_4.treefile'
+
+  def test_iqtree_tree_building_command(self):
+    assert common.GubbinsCommon.iqtree_tree_building_command(5, 'AAA', 'BBB', 'CCC', 'DDD', 'EEE', 8, 0) \
+           == 'DDD EEE -s AAA -nt 8 -pre CCC.iteration_5 -t BBB'
+    assert common.GubbinsCommon.iqtree_tree_building_command(4, 'AAA', '', 'CCC', 'DDD', 'EEE', 1, 1) \
+           == 'DDD EEE -s AAA -nt 1 -pre CCC.iteration_4 -v'
+
+  def test_iqtree_gubbins_command(self):
+    assert common.GubbinsCommon.iqtree_gubbins_command('AAA', 'BBB', 5, 'CCC', 3, 'DDD', 10, 100) \
+           == 'CCC -r -v BBB.vcf -a 10 -b 100 -f DDD -t AAA.iteration_5.treefile -m 3 BBB.snp_sites.aln'
 
 if __name__ == "__main__":
   unittest.main()

@@ -112,7 +112,7 @@ class GubbinsCommon():
     FASTTREE_PARAMS = '-nosupport -gtr -gamma -nt'
 
     IQTREE_EXEC = "iqtree"
-    IQTREE_PARAMS = ""
+    IQTREE_PARAMS = "-safe"
 
     GUBBINS_EXEC = 'gubbins'
     GUBBINS_BUNDLED_EXEC = '../src/gubbins'
@@ -284,11 +284,11 @@ class GubbinsCommon():
         except:
           sys.exit("Failed while building the tree.")
 
+      GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
       if self.args.verbose > 0:
         print(int(time.time()))
 
       # 3. Reconstruct the ancestral sequence
-      GubbinsCommon.reroot_tree(str(current_tree_name), self.args.outgroup)
       if self.args.verbose > 0:
         print("RAxML sequence reconstruction")
       try:

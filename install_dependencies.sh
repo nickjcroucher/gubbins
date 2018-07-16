@@ -65,8 +65,8 @@ if [ ! -d $RAXML_DIR ]; then
   tar xzf $RAXML_ZIP_FILE
 fi
 cd $RAXML_DIR
-if [ -e "$RAXML_DIR/raxmlHPC" ]; then
-  echo "Already build RAxML; skipping build"
+if [ -e "raxmlHPC" ]; then
+  echo "Already built RAxML; skipping build"
 else
   make -f Makefile.gcc
 fi
@@ -91,7 +91,7 @@ if [ ! -d $IQTREE_DIR ]; then
   tar xzf $IQTREE_ZIP_FILE
 fi
 cd $IQTREE_DIR
-if [ -e "$IQTREE_DIR/bin/iqtree" ]; then
+if [ -e "bin/iqtree" ]; then
   cp bin/iqtree iqtree
 fi
 

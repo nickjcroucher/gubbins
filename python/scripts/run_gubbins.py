@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('alignment_filename',        help='Multifasta alignment file')
 parser.add_argument('--outgroup',          '-o', help='Outgroup name for rerooting. A list of comma separated names '
-                                                     'can be used if they form a clade')
+                                                      'can be used if they form a clade')
 parser.add_argument('--starting_tree',     '-s', help='Starting tree')
 parser.add_argument('--use_time_stamp',    '-u', help='Use a time stamp in file names', action='store_true')
 parser.add_argument('--verbose',           '-v', help='Turn on debugging', action='store_true')
@@ -47,7 +47,7 @@ parser.add_argument('--threads',           '-c', help='Number of threads to run 
 parser.add_argument('--converge_method',   '-z', help='Criteria to use to know when to halt iterations',
                     default='weighted_robinson_foulds', choices=['weighted_robinson_foulds', 'robinson_foulds',
                                                                  'recombination'])
-parser.add_argument('--version',                action='version',
+parser.add_argument('--version',                 action='version',
                     version=str(pkg_resources.get_distribution("gubbins").version))
 parser.add_argument('--min_window_size',   '-a', help='Minimum window size', type=int, default=100)
 parser.add_argument('--max_window_size',   '-b', help='Maximum window size', type=int, default=10000)

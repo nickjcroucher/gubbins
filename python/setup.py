@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from setuptools import setup
-import multiprocessing
 import os
 
 version = 'x'
@@ -36,5 +35,5 @@ setup(
         'reportlab >= 3.0',
         'nose >= 1.3'
     ],
-    license='GPL',
-    )
+    license='GPL'
+)

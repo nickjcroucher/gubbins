@@ -17,7 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-import os
 import sys
 from gubbins import utils
 
@@ -35,17 +34,17 @@ class FastTree:
         self.executable = utils.choose_executable(self.potential_executables)
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")
-        self.parameters = ["-nosupport", "-gtr", "-gamma", "-nt"]
+        self.tree_building_parameters = ["-nosupport", "-gtr", "-gamma", "-nt"]
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
         output_tree = basename + self.tree_suffix
         command = [self.executable]
-        command.extend(self.parameters)
+        command.extend(self.tree_building_parameters)
         if input_tree:
-            command.extend(["-intree", os.path.abspath(input_tree)])
+            command.extend(["-intree", input_tree])
         command.extend(["-out", output_tree])
-        command.append(os.path.abspath(alignment_filename))
+        command.append(alignment_filename)
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
@@ -76,11 +75,13 @@ class IQTree:
         """Constructs the command to call the IQTree executable"""
         command = [self.executable]
         command.extend(self.tree_building_parameters)
-        command.extend(["-s", os.path.abspath(alignment_filename), "-pre", basename])
+        command.extend(["-s", alignment_filename, "-pre", basename])
         if self.threads:
             command.extend(["-nt", str(self.threads)])
+        else:
+            command.extend(["-nt", "AUTO"])
         if input_tree:
-            command.extend(["-t", os.path.abspath(input_tree)])
+            command.extend(["-t", input_tree])
         if not self.verbose:
             command.append("-quiet")
         return " ".join(command)
@@ -89,11 +90,11 @@ class IQTree:
         """Constructs the command to call the IQTree executable for ancestral sequence reconstruction"""
         command = [self.executable]
         command.extend(self.internal_sequence_reconstruction_parameters)
-        command.extend(["-s", os.path.abspath(alignment_filename), "-pre", basename])
+        command.extend(["-s", alignment_filename, "-pre", basename])
         if self.threads:
             command.extend(["-nt", str(self.threads)])
         if input_tree:
-            command.extend(["-te", os.path.abspath(input_tree)])
+            command.extend(["-te", input_tree])
         if not self.verbose:
             command.append("-quiet")
         return " ".join(command)
@@ -129,6 +130,7 @@ class RAxML:
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
+        self.model = model
         self.tree_prefix = "RAxML_result."
         self.tree_suffix = ""
         self.asr_prefix = "RAxML_marginalAncestralStates."
@@ -145,7 +147,7 @@ class RAxML:
             sys.exit("No usable version of RAxML could be found.")
 
         self.tree_building_parameters = ["-f", "d", "-p", str(1)]
-        if model == "GTRGAMMA":
+        if self.model == "GTRGAMMA":
             self.tree_building_parameters.extend(["-m", "GTRGAMMA"])
         else:
             self.tree_building_parameters.extend(["-m", "GTRCAT", "-V"])
@@ -155,11 +157,11 @@ class RAxML:
         """Constructs the command to call the RAxML executable for tree building"""
         command = [self.executable]
         command.extend(self.tree_building_parameters)
-        command.extend(["-s", os.path.abspath(alignment_filename), "-n", basename])
+        command.extend(["-s", alignment_filename, "-n", basename])
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
         if input_tree:
-            command.extend(["-t", os.path.abspath(input_tree)])
+            command.extend(["-t", input_tree])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
@@ -168,10 +170,10 @@ class RAxML:
         """Constructs the command to call the RAxML executable for ancestral sequence reconstruction"""
         command = [self.executable]
         command.extend(self.internal_sequence_reconstruction_parameters)
-        command.extend(["-s", os.path.abspath(alignment_filename), "-n", basename])
+        command.extend(["-s", alignment_filename, "-n", basename])
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
-        command.extend(["-t", os.path.abspath(input_tree)])
+        command.extend(["-t", input_tree])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)

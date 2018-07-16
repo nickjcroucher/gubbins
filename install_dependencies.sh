@@ -103,9 +103,9 @@ update_path () {
   fi
 }
 
-update_path $RAXML_DIR
+update_path $build_dir/$RAXML_DIR
 update_path ${fasttree_dir}
-update_path $IQTREE_DIR
+update_path $build_dir/$IQTREE_DIR
 
 cd $start_dir
 

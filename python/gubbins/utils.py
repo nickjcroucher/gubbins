@@ -18,6 +18,7 @@
 #
 
 import os
+import shutil
 import subprocess
 import re
 
@@ -55,11 +56,6 @@ class VerbosePrinter:
                 print(message)
 
 
-def is_executable(fpath: str):
-    """Checks if a given path corresponds to an executable file"""
-    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-
 def which(program: str):
     """Checks if a given program exists on the system. Works analogously to the UNIX "which" function"""
     program_and_parameters = program.split(" ")
@@ -76,6 +72,11 @@ def which(program: str):
             if is_executable(exe_file):
                 return exe_file
     return None
+
+
+def is_executable(fpath: str):
+    """Checks if a given path corresponds to an executable file"""
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
 
 def choose_executable(list_of_executables: list):
@@ -98,11 +99,11 @@ def choose_executable_based_on_processor(list_of_executables: list):
 
     for executable in list_of_executables:
         if cpu_info:
-            if re.search('AVX2', executable) and 'avx2' not in flags:
+            if 'AVX2' in executable and 'avx2' not in flags:
                 continue
-            elif re.search('AVX', executable) and 'avx' not in flags:
+            elif 'AVX' in executable and 'avx' not in flags:
                 continue
-            elif re.search('SSE3', executable) and 'ssse3' not in flags:
+            elif 'SSE3' in executable and 'ssse3' not in flags:
                 continue
 
         if which(executable) is not None:
@@ -112,7 +113,41 @@ def choose_executable_based_on_processor(list_of_executables: list):
 
 
 def replace_executable(command, alternative_executable):
-    """Change the executable in a command"""
+    """Changes the executable in a command"""
     executable_and_params = command.split(" ")
     executable_and_params[0] = alternative_executable
     return " ".join(executable_and_params)
+
+
+def do_files_exist(directory, basenames, suffix_regex, verbose=False):
+    """Checks if files with a given name structure exist"""
+    files = os.listdir(directory)
+    for file in files:
+        full_path = os.path.join(directory, file)
+        for basename in basenames:
+            regex = "^" + basename + suffix_regex
+            if re.match(regex, file) is not None and os.path.exists(full_path):
+                if verbose:
+                    print("File exists: " + full_path)
+                return True
+    return False
+
+
+def delete_files(directory, basenames, suffix_regex, verbose=False):
+    """Deletes files with a given name structure"""
+    files = os.listdir(directory)
+    for file in files:
+        full_path = os.path.join(directory, file)
+        for basename in basenames:
+            regex = "^" + basename + suffix_regex
+            if re.match(regex, file) is not None and os.path.exists(full_path):
+                if verbose:
+                    print("Deleting file: " + full_path)
+                os.remove(full_path)
+
+
+def rename_files(input_to_output_filenames):
+    """Renames files"""
+    for input_file, output_file in input_to_output_filenames.items():
+        if os.path.exists(input_file):
+            shutil.move(input_file, output_file)

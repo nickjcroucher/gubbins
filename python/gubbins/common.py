@@ -41,12 +41,11 @@ from gubbins.treebuilders import FastTree, IQTree, RAxML
 from gubbins import utils
 
 
-def parse_and_run(input_args, program_description):
+def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
     start_time = time.time()
     current_directory = os.getcwd()
     printer = utils.VerbosePrinter(True, "\n")
-    v2_printer = utils.VerbosePrinter(input_args.verbose, "\n")
 
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
     gubbins_exec = 'gubbins'
@@ -110,8 +109,8 @@ def parse_and_run(input_args, program_description):
     # Check if intermediate files from a previous run exist
     intermediate_files = [basename + ".iteration_"]
     if not input_args.no_cleanup:
-        delete_intermediate_files(".", intermediate_files, "", v2_printer)
-    if do_intermediate_files_exist(".", intermediate_files, "", v2_printer):
+        utils.delete_files(".", intermediate_files, "", input_args.verbose)
+    if utils.do_files_exist(".", intermediate_files, "", input_args.verbose):
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
@@ -163,10 +162,15 @@ def parse_and_run(input_args, program_description):
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
+
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
-        tree_building_command = tree_builder.tree_building_command(alignment_filename, previous_tree_name,
-                                                                   current_basename)
+        if previous_tree_name:
+            tree_building_command = tree_builder.tree_building_command(
+                os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
+        else:
+            tree_building_command = tree_builder.tree_building_command(
+                os.path.abspath(alignment_filename), "", current_basename)
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
 
         # 1.2. Construct the phylogenetic tree
@@ -196,7 +200,8 @@ def parse_and_run(input_args, program_description):
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
         sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
-            base_filename + alignment_suffix, temp_rooted_tree, ancestral_sequence_basename)
+            os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
+            ancestral_sequence_basename)
         raw_internal_sequence_filename \
             = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
             + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
@@ -268,7 +273,7 @@ def parse_and_run(input_args, program_description):
         input_args.prefix = basename
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
-    rename_files(output_filenames_to_final_filenames)
+    utils.rename_files(output_filenames_to_final_filenames)
     shutil.copyfile(str(input_args.prefix) + ".final_tree.tre",
                     str(input_args.prefix) + ".node_labelled.final_tree.tre")
     remove_internal_node_labels_from_tree(
@@ -279,8 +284,8 @@ def parse_and_run(input_args, program_description):
     # Cleanup intermediate files
     if not input_args.no_cleanup:
         shutil.rmtree(temp_working_dir)
-        delete_intermediate_files(".", tree_file_names[:-1], intermediate_files_regex(), v2_printer)
-        delete_intermediate_files(".", [base_filename], starting_files_regex(), v2_printer)
+        utils.delete_files(".", tree_file_names[:-1], intermediate_files_regex(), input_args.verbose)
+        utils.delete_files(".", [base_filename], starting_files_regex(), input_args.verbose)
     printer.print("...finished. Total run time: {:.2f} s".format(time.time() - start_time))
 
 
@@ -366,29 +371,6 @@ def starting_files_regex():
 
 def intermediate_files_regex():
     return "($|\\.(gff|vcf|snp_sites|branch_snps|phylip|stats|tab))"
-
-
-def delete_intermediate_files(directory, basenames, suffix_regex, the_printer: utils.VerbosePrinter):
-    files = os.listdir(directory)
-    for file in files:
-        full_path = os.path.join(directory, file)
-        for basename in basenames:
-            regex = "^" + basename + suffix_regex
-            if re.match(regex, file) is not None and os.path.exists(full_path):
-                the_printer.print("Deleting file: " + full_path)
-                os.remove(full_path)
-
-
-def do_intermediate_files_exist(directory, basenames, suffix_regex, the_printer: utils.VerbosePrinter):
-    files = os.listdir(directory)
-    for file in files:
-        full_path = os.path.join(directory, file)
-        for basename in basenames:
-            regex = "^" + basename + suffix_regex
-            if re.match(regex, file) is not None and os.path.exists(full_path):
-                the_printer.print("File exists: " + full_path)
-                return True
-    return False
 
 
 def root_tree(input_filename, output_filename):
@@ -700,9 +682,3 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names
-
-
-def rename_files(input_to_output_filenames):
-    for input_file, output_file in input_to_output_filenames.items():
-        if os.path.exists(input_file):
-            shutil.move(input_file, output_file)

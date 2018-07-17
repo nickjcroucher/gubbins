@@ -49,8 +49,9 @@ def parse_and_run(input_args, program_description=""):
 
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
     gubbins_exec = 'gubbins'
-    gubbins_bundled_exec = '../src/gubbins'
     if utils.which(gubbins_exec) is None:
+        # Check if the Gubbins C-program is available in its source directory (for tests/Travis)
+        gubbins_bundled_exec = os.path.abspath(os.path.join(current_directory, '../src/gubbins'))
         if utils.which(gubbins_bundled_exec) is None:
             sys.exit(gubbins_exec + " is not in your path")
         else:

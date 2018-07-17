@@ -4,8 +4,9 @@ from setuptools import setup
 import os
 
 version = 'x'
-if os.path.exists('../VERSION'):
-  version = open('../VERSION').read().strip()
+version_file = os.path.abspath(os.path.join(os.getcwd(), '../VERSION'))
+if os.path.exists(version_file):
+  version = open(version_file).read().strip()
 
 setup(
     name='gubbins',

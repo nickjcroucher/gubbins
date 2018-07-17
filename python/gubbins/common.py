@@ -56,8 +56,12 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    printer.print(["\n--- Gubbins " + str(pkg_resources.get_distribution(gubbins_exec).version) + " ---\n",
-                   program_description])
+    program_version = ""
+    try:
+        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
+    except pkg_resources.RequirementParseError:
+        pass
+    printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Initialize tree builder and ancestral sequence reconstructor; check if all required dependencies are available
     printer.print("\nChecking dependencies...")

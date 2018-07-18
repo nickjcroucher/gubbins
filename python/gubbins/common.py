@@ -262,15 +262,16 @@ def parse_and_run(input_args, program_description=""):
             if input_args.converge_method == 'recombination':
                 current_recomb_file, previous_recomb_files = get_recombination_files(tree_file_names)
                 if have_recombinations_been_seen_before(current_recomb_file, previous_recomb_files):
-                    printer.print("Recombinations observed before. Exiting the main loop.")
+                    printer.print("Convergence after " + str(i) + " iterations: Recombinations observed before.")
                     break
             else:
                 if has_tree_been_seen_before(tree_file_names, input_args.converge_method):
-                    printer.print("Tree observed before. Exiting the main loop.")
+                    printer.print("Convergence after " + str(i) + " iterations: Tree observed before.")
                     break
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
     else:
-        printer.print("\nMaximum number of iterations reached. Exiting the main loop.")
+        printer.print("Maximum number of iterations (" + str(input_args.iterations) + ") reached.")
+    printer.print("\nExiting the main loop.")
 
     # Create the final output
     printer.print("\nCreating the final output...")

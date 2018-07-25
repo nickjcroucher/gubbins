@@ -59,7 +59,7 @@ RUN curl -L https://github.com/Cibiv/IQ-TREE/releases/download/v${iqtree_version
   && rm -rf iqtree-${iqtree_version}-Linux
 
 # Install Gubbins
-RUN git clone -b iqtree https://github.com/puethe/gubbins.git \
+RUN git clone https://github.com/sanger-pathogens/gubbins.git \
   && cd gubbins \
   && autoreconf -i \
   && ./configure \

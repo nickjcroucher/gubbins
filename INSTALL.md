@@ -49,7 +49,7 @@ This is the most difficult method and is only suitable for someone with advanced
 Install the dependencies and include them in your `PATH`:
 * [FastTree](http://www.microbesonline.org/fasttree/#Install) ( >=2.1.4 )
 * [RAxML](https://github.com/stamatak/standard-RAxML) ( >=8.0 )
-* Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose, pillow
+* Python modules: Biopython (> 1.59), DendroPy (>=4.0), nose, pillow
 * Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 
 Clone or download the source code from GitHub and run the following commands to install Gubbins:

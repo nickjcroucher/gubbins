@@ -226,12 +226,13 @@ def parse_and_run(input_args, program_description=""):
         os.chdir(current_directory)
 
         # 3.3. Join ancestral sequences with given sequences
+        current_tree_name_with_internal_nodes = current_tree_name + ".internal"
         sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                      processed_internal_sequence_filename)
         concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                 joint_sequences_filename)
-        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree, current_tree_name,
-                                              sequence_reconstructor)
+        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                              current_tree_name_with_internal_nodes, sequence_reconstructor)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
         # 4. Reinsert gaps (?)
@@ -245,9 +246,10 @@ def parse_and_run(input_args, program_description=""):
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
         # 5. Detect recombination sites with Gubbins
+        shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
-            gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name, input_args.alignment_filename,
-            input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
+            gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
+            input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         try:
             subprocess.check_call(gubbins_command, shell=True)
@@ -257,6 +259,7 @@ def parse_and_run(input_args, program_description=""):
 
         # 6. Check for convergence
         printer.print("\nChecking for convergence...")
+        remove_internal_node_labels_from_tree(current_tree_name_with_internal_nodes, current_tree_name)
         tree_file_names.append(current_tree_name)
         if i > 1:
             if input_args.converge_method == 'recombination':
@@ -280,12 +283,6 @@ def parse_and_run(input_args, program_description=""):
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
-    shutil.copyfile(str(input_args.prefix) + ".final_tree.tre",
-                    str(input_args.prefix) + ".node_labelled.final_tree.tre")
-    remove_internal_node_labels_from_tree(
-        str(input_args.prefix) + ".final_tree.tre", str(input_args.prefix) + ".no_internal_labels.final_tree.tre")
-    shutil.move(str(input_args.prefix) + ".no_internal_labels.final_tree.tre",
-                str(input_args.prefix) + ".final_tree.tre")
 
     # Cleanup intermediate files
     if not input_args.no_cleanup:
@@ -376,7 +373,7 @@ def starting_files_regex():
 
 
 def intermediate_files_regex():
-    return "($|\\.(gff|vcf|snp_sites|branch_snps|phylip|stats|tab))"
+    return "($|\\.(gff|vcf|snp_sites|branch_snps|phylip|stats|tab|internal))"
 
 
 def root_tree(input_filename, output_filename):
@@ -685,6 +682,7 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix) + ".stats":           str(output_prefix) + ".per_branch_statistics.csv",
         str(input_prefix) + ".snp_sites.aln":   str(output_prefix) + ".filtered_polymorphic_sites.fasta",
         str(input_prefix) + ".phylip":          str(output_prefix) + ".filtered_polymorphic_sites.phylip",
+        str(input_prefix) + ".internal":        str(output_prefix) + ".node_labelled.final_tree.tre",
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names

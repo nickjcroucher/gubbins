@@ -68,6 +68,3 @@ RUN git clone https://github.com/sanger-pathogens/gubbins.git \
   && make install \
   && cd python \
   && python3 setup.py install
-  
-# Rename executable for backwards compatibility
-RUN mv /usr/local/bin/run_gubbins.py /usr/local/bin/run_gubbins

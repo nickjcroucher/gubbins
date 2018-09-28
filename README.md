@@ -115,7 +115,7 @@ More importantly though, if your trying to do bioinformatics on Windows, your no
 ## Usage
 To run Gubbins with default settings:
 
-    run_gubbins.py [FASTA alignment]
+    run_gubbins [FASTA alignment]
 
 Input options:
 
@@ -251,3 +251,6 @@ This doesnt have any effect on the recombination detection, but the output trees
 From version 2.0.0 onwards, RAxML is used to reconstruction ancestral sequences instead of fastML.
 RAxML doesnt always produce results as you would expect so the results can be lower quaility than fastML.
 If you would like to stick with fastML for ancestral sequence reconstruction, please checkout and install v1.4.9.
+
+### Naming
+In version 2.4.0, the main script was renamed from `run_gubbins.py` to `run_gubbins`.

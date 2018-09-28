@@ -6,7 +6,7 @@ ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz
 and was run through gubbins with all of the default parameters:
 ```
 gunzip ST239.aln.gz
-run_gubbins.py ST239.aln
+run_gubbins ST239.aln
 ```
 
 This directory contains the output files generated.

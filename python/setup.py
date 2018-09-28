@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name='gubbins',
     version='2.4.0',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     author_email='gubbins-help@sanger.ac.uk',
     url='https://github.com/sanger-pathogens/gubbins/',
-    scripts=[
-        'scripts/run_gubbins.py',
-    ],
-    packages=[
-        'gubbins'
-    ],
+    packages=setuptools.find_packages(),
+    entry_points={
+        "console_scripts": [
+            "run_gubbins = script.run_gubbins:main",
+        ]
+    },
     test_suite='nose.collector',
     tests_require=[
         "nose >= 1.3"

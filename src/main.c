@@ -38,7 +38,7 @@ const char* program_name;
 
 void print_usage(FILE* stream, int exit_code)
 {
-  fprintf (stream, "This program is not supposed to be directly run. Use run_gubbins.py instead\n");
+  fprintf (stream, "This program is not supposed to be directly run. Use run_gubbins instead\n");
   fprintf (stream, "Usage:  %s [options] alignment_file\n", program_name);
   fprintf (stream, "Version: %s\n", PACKAGE_VERSION);
   fprintf (stream,

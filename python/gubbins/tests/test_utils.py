@@ -32,6 +32,7 @@ class TestUtilities(unittest.TestCase):
             'AAA.stats':           'test.per_branch_statistics.csv',
             'AAA.snp_sites.aln':   'test.filtered_polymorphic_sites.fasta',
             'AAA.phylip':          'test.filtered_polymorphic_sites.phylip',
+            'AAA.internal':        'test.node_labelled.final_tree.tre',
             'AAA':                 'test.final_tree.tre'
         }
 

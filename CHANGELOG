@@ -1,6 +1,18 @@
-v2.3.2 - 12 Jan 2018
+v2.3.4 - 30 July 2018
+-----
+Dynamically allocate memory of arrays to circumvent segmentation faults,
+which occur on alignments with a large number of SNPs and are due to stack overflow.
+
+v2.3.3 - 26 July 2018
+-----
+Supply a Dockerfile independent from the Debian package.
+
+v2.3.2 - 29 June 2018
 -----
 Update installation instructions to remove all reference to HomeBrew.
+Improve handling of several arguments that have a fixed set of possible values.
+Fix of test suite.
+Remove gubbins_drawer.
 
 v2.3.1 - 22 Sept 2017
 -----

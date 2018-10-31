@@ -235,7 +235,7 @@ def parse_and_run(input_args, program_description=""):
                                               current_tree_name_with_internal_nodes, sequence_reconstructor)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-        # 4. Reinsert gaps (?)
+        # 4. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
         printer.print("\nReinserting gaps into the alignment...")
         shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
         reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
@@ -245,7 +245,8 @@ def parse_and_run(input_args, program_description=""):
                      "Please check this intermediate file is valid: " + gaps_alignment_filename)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-        # 5. Detect recombination sites with Gubbins
+        # 5. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
+        # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
@@ -256,6 +257,7 @@ def parse_and_run(input_args, program_description=""):
         except subprocess.SubprocessError:
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+        shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
 
         # 6. Check for convergence
         printer.print("\nChecking for convergence...")

@@ -68,7 +68,7 @@ class IQTree:
         self.executable = "iqtree"
         if utils.which(self.executable) is None:
             sys.exit("No usable version of IQTree could be found.")
-        self.tree_building_parameters = ["-safe"]
+        self.tree_building_parameters = ["-safe -m GTR+G4"]
         self.internal_sequence_reconstruction_parameters = ["-safe -asr -m GTR+G4"]
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:

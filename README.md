@@ -18,7 +18,7 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
     * [OSX/Linux/Cloud/Windows \- Docker](#osxlinuxcloudwindows---docker)
     * [OSX/Linux \- from source](#osxlinux---from-source)
     * [OSX/Linux/Windows \- Virtual Machine](#osxlinuxwindows---virtual-machine)
-    * [Running the tests](running-the-tests)
+    * [Running the tests](#running-the-tests)
   * [Usage](#usage)
     * [Generating Input files](#generating-input-files)
     * [Output files](#output-files)

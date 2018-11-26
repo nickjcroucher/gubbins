@@ -18,6 +18,7 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
     * [OSX/Linux/Cloud/Windows \- Docker](#osxlinuxcloudwindows---docker)
     * [OSX/Linux \- from source](#osxlinux---from-source)
     * [OSX/Linux/Windows \- Virtual Machine](#osxlinuxwindows---virtual-machine)
+    * [Running the tests](running-the-tests)
   * [Usage](#usage)
     * [Generating Input files](#generating-input-files)
     * [Output files](#output-files)
@@ -102,6 +103,10 @@ then load the virtual machine, using the 'File -> Import Appliance' menu option.
 
 More importantly though, if your trying to do bioinformatics on Windows, your not going to get very far and you should seriously consider upgrading to Linux.
 
+### Running the tests
+The test can be run from the top level directory:  
+
+`make check`
 
 ## Usage
 To run Gubbins with default settings:

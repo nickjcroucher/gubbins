@@ -19,6 +19,7 @@ python:
 sudo: false
 install:
   - "source ./install_dependencies.sh"
-  - "autoreconf -i"
-  - "./configure"
-script: "make check"
+script:
+  - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+after_success:
+  - bash <(curl -s https://codecov.io/bash) 

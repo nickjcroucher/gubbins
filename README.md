@@ -8,6 +8,8 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
 [![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/gubbins)  
 [![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
 [![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
+[![codecov](https://codecov.io/gh/sanger-pathogens/gubbins/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/gubbins)
+
 
 ## Contents
   * [Introduction](#introduction)

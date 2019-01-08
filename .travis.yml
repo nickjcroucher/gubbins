@@ -24,5 +24,5 @@ before_script:
 script:
   - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -cF C
-  - bash <(curl -s https://codecov.io/bash) -cF python
+  - bash <(curl -s https://codecov.io/bash)
+  - codecov

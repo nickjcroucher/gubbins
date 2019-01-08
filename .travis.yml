@@ -19,7 +19,10 @@ python:
 sudo: false
 install:
   - "source ./install_dependencies.sh"
+before_script:
+- pip install codecov
 script:
   - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
 after_success:
-  - bash <(curl -s https://codecov.io/bash) 
+  - bash <(curl -s https://codecov.io/bash) -cF C
+  - bash <(curl -s https://codecov.io/bash) -cF python

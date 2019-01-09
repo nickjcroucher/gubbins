@@ -22,7 +22,8 @@ install:
 before_script:
 - pip install codecov
 script:
-  - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check && coverage run python/setup.py test
+  - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+  - cd python && coverage run setup.py test
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - codecov

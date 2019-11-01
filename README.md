@@ -1,6 +1,9 @@
 # Gubbins
 Genealogies Unbiased By recomBinations In Nucleotide Sequences  
 
+PLEASE NOTE: we currently do not have the resources to provide support for Gubbins, so please do not expect a reply if you flag any issue.
+
+[![Unmaintained](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 [![Build Status](https://travis-ci.org/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.org/sanger-pathogens/gubbins)   
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
@@ -222,7 +225,7 @@ Final phylogenetic tree in newick format but with internal node labels.
 Gubbins is free software, licensed under [GPLv2](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE).
 
 ## Feedback/Issues
-Please report any issues to the [issues page](https://github.com/sanger-pathogens/gubbins/issues) or email us at gubbins-help@sanger.ac.uk.
+We currently do not have the resources to provide support for Gubbins. However, the community might be able to help you out if you report any issues about usage of the software to the [issues page](https://github.com/sanger-pathogens/gubbins/issues).
 
 ## Citation
 If you use this software please cite:

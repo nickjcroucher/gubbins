@@ -3,7 +3,7 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
 
 PLEASE NOTE: we currently do not have the resources to provide support for Gubbins, so please do not expect a reply if you flag any issue.
 
-[![Unmaintained](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
+[![Unmaintained](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)   
 [![Build Status](https://travis-ci.org/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.org/sanger-pathogens/gubbins)   
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
@@ -47,7 +47,7 @@ Before you do anything, please have a look at the [Gubbins webpage](http://sange
 * Python modules: Biopython (> 1.59), DendroPy (>=4.0), Reportlab, nose, pillow
 * Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 
-There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator. If you encounter a bug please log it [here](https://github.com/sanger-pathogens/gubbins/issues) or email us at gubbins-help@sanger.ac.uk.
+There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
 ### OSX/Linux - conda
 Install conda and enable the bioconda channels.

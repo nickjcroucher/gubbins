@@ -15,7 +15,7 @@ cache:
   - "build"
   - "$HOME/.cache/pip"
 python:
-  - "3.4"
+  - "3.5"
 sudo: false
 install:
   - "source ./install_dependencies.sh"

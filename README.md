@@ -79,7 +79,7 @@ We have a docker container which gets automatically built from the latest versio
 
 To use it you would use a command such as this:
 
-    docker run --rm -it -v <local_dir>:<remote_dir> sangerpathogens/gubbins run_gubbins -p <remote_dir>/<prefix> [<options>] <remote_dir>/<alignment_file>
+    docker run --rm -it -v <local_dir>:<remote_dir> sangerpathogens/gubbins run_gubbins.py -p <remote_dir>/<prefix> [<options>] <remote_dir>/<alignment_file>
 
 The flag `-v` synchronizes a directory on the host machine (here denoted as `<local_dir>`) with a directory in the Docker container (here denoted as `<remote_dir>`).
 `<remote_dir>` does not need to exist in the container before the run, a common choice is `/data`.
@@ -122,7 +122,7 @@ The test can be run from the top level directory:
 ## Usage
 To run Gubbins with default settings:
 
-    run_gubbins [FASTA alignment]
+    run_gubbins.py [FASTA alignment]
 
 Input options:
 
@@ -258,6 +258,3 @@ This doesnt have any effect on the recombination detection, but the output trees
 From version 2.0.0 onwards, RAxML is used to reconstruction ancestral sequences instead of fastML.
 RAxML doesnt always produce results as you would expect so the results can be lower quaility than fastML.
 If you would like to stick with fastML for ancestral sequence reconstruction, please checkout and install v1.4.9.
-
-### Naming
-In version 2.4.0, the main script was renamed from `run_gubbins.py` to `run_gubbins`.

@@ -1,13 +1,17 @@
 # Gubbins
 Genealogies Unbiased By recomBinations In Nucleotide Sequences
 
-[![Build Status](https://travis-ci.org/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.org/sanger-pathogens/gubbins)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)
-[![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)
-[![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/gubbins)
-[![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)
-[![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)
+PLEASE NOTE: we currently do not have the resources to provide support for Gubbins, so please do not expect a reply if you flag any issue.
+
+[![Unmaintained](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)   
+[![Build Status](https://travis-ci.org/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.org/sanger-pathogens/gubbins)   
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
+[![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  
+[![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/gubbins)  
+[![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
+[![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
+[![codecov](https://codecov.io/gh/sanger-pathogens/gubbins/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/gubbins)
 
 ## Contents
   * [Introduction](#introduction)
@@ -18,6 +22,7 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
     * [OSX/Linux/Cloud/Windows \- Docker](#osxlinuxcloudwindows---docker)
     * [OSX/Linux \- from source](#osxlinux---from-source)
     * [OSX/Linux/Windows \- Virtual Machine](#osxlinuxwindows---virtual-machine)
+    * [Running the tests](#running-the-tests)
   * [Usage](#usage)
     * [Generating Input files](#generating-input-files)
     * [Output files](#output-files)
@@ -49,9 +54,7 @@ Before you do anything, please have a look at the [Gubbins webpage](http://sange
 * Python modules: Biopython (> 1.59), DendroPy (>=4.0), nose
 * Standard build environment tools (e.g. python3, pip3, make, autoconf, libtool, gcc, check, etc...)
 
-There are a number of ways to install Gubbins and details are provided below.
-If you encounter an issue when installing Gubbins please contact your local system administrator.
-If you encounter a bug please log it [here](https://github.com/sanger-pathogens/gubbins/issues) or email us at gubbins-help@sanger.ac.uk.
+There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
 ### OSX/Linux - conda
 Install conda and enable the bioconda channels.
@@ -111,6 +114,10 @@ then load the virtual machine, using the 'File -> Import Appliance' menu option.
 
 More importantly though, if your trying to do bioinformatics on Windows, your not going to get very far and you should seriously consider upgrading to Linux.
 
+### Running the tests
+The test can be run from the top level directory:  
+
+`make check`
 
 ## Usage
 To run Gubbins with default settings:
@@ -228,7 +235,7 @@ Final phylogenetic tree in newick format but with internal node labels.
 Gubbins is free software, licensed under [GPLv2](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE).
 
 ## Feedback/Issues
-Please report any issues to the [issues page](https://github.com/sanger-pathogens/gubbins/issues) or email us at gubbins-help@sanger.ac.uk.
+We currently do not have the resources to provide support for Gubbins. However, the community might be able to help you out if you report any issues about usage of the software to the [issues page](https://github.com/sanger-pathogens/gubbins/issues).
 
 ## Citation
 If you use this software please cite:

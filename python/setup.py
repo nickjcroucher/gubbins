@@ -12,7 +12,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
-            "run_gubbins = script.run_gubbins:main",
+            "run_gubbins.py = scripts.run_gubbins:main",
         ]
     },
     test_suite='nose.collector',

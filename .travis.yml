@@ -15,10 +15,15 @@ cache:
   - "build"
   - "$HOME/.cache/pip"
 python:
-  - "3.4"
+  - "3.5"
 sudo: false
 install:
   - "source ./install_dependencies.sh"
-  - "autoreconf -i"
-  - "./configure"
-script: "make check"
+before_script:
+- pip install codecov
+script:
+  - autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+  - cd python && coverage run setup.py test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - codecov

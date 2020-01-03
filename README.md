@@ -9,7 +9,7 @@ PLEASE NOTE: we currently do not have the resources to provide support for Gubbi
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  
 [![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/gubbins)  
-[![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
 [![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
 [![codecov](https://codecov.io/gh/sanger-pathogens/gubbins/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/gubbins)
 

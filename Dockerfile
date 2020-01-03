@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	check \
 	libtool \
 	libsubunit-dev \
-	git \
     python3 \
     python3-dev \
     python3-setuptools \
@@ -59,8 +58,10 @@ RUN curl -L https://github.com/Cibiv/IQ-TREE/releases/download/v${iqtree_version
   && rm -rf iqtree-${iqtree_version}-Linux
 
 # Install Gubbins
-RUN git clone https://github.com/sanger-pathogens/gubbins.git \
-  && cd gubbins \
+ENV BUILD_DIR /opt/gubbins
+RUN mkdir -p ${BUILD_DIR}
+COPY . ${BUILD_DIR}
+RUN cd ${BUILD_DIR} \
   && autoreconf -i \
   && ./configure \
   && make \

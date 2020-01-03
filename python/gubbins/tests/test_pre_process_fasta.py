@@ -91,4 +91,4 @@ class TestPreProcessFasta(unittest.TestCase):
               os.remove(file_to_delete) 
 
 if __name__ == "__main__":
-  unittest.main()
+  unittest.main(buffer=True)

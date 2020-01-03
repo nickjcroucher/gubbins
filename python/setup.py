@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
-import multiprocessing
-import os
+import setuptools
 
-version = 'x'
-if os.path.exists('../VERSION'):
-  version = open('../VERSION').read().strip()
-
-setup(
+setuptools.setup(
     name='gubbins',
-    version=version,
+    version='2.4.0',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
-    author_email='ap13@sanger.ac.uk',
+    author_email='gubbins-help@sanger.ac.uk',
     url='https://github.com/sanger-pathogens/gubbins/',
-    scripts=['scripts/run_gubbins.py','scripts/gubbins_drawer.py'],
-    packages=['gubbins'],
+    packages=setuptools.find_packages(),
+    entry_points={
+        "console_scripts": [
+            "run_gubbins.py = scripts.run_gubbins:main",
+        ]
+    },
     test_suite='nose.collector',
+    tests_require=[
+        "nose >= 1.3"
+    ],
     long_description="""\
       Gubbins is a tool for BioInformaticians that takes in a multi
       fasta alignment and detects recombination regions.  This package provides
@@ -29,12 +30,10 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
-        ],
+    ],
     install_requires=[
         'biopython >= 1.59',
-        'dendropy  >= 4.0.2',
-        'reportlab >= 3.0',
-        'nose >= 1.3'
+        'dendropy  >= 4.0.2'
     ],
-    license='GPL',
-    )
+    license='GPL'
+)

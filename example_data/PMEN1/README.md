@@ -10,4 +10,3 @@ run_gubbins.py PMEN1.aln
 ```
 This directory contains the output files generated.
 It required 60 Mbytes of memory and took 50 seconds to run.
-

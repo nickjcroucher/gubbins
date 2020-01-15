@@ -71,22 +71,22 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	
 	number_of_snps  = number_of_snps_in_phylip();
 	
-	int* snp_locations = calloc(number_of_snps, sizeof(int));
+	int* snp_locations = calloc((number_of_snps+1), sizeof(int));
 	
 	get_integers_from_column_in_vcf(vcf_file_pointer, snp_locations, number_of_snps, column_number_for_column_name(column_names, "POS", number_of_columns));
 
 	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, length_of_original_genome,min_snps,window_min, window_max);
 	fclose(vcf_file_pointer);
 
-	int* filtered_snp_locations = calloc(number_of_snps, sizeof(int));
+	int* filtered_snp_locations = calloc((number_of_snps+1), sizeof(int));
 	int number_of_filtered_snps;
 	int number_of_samples = number_of_samples_from_parse_phylip();
 
 	char * sample_names[number_of_samples];
-    get_sample_names_from_parse_phylip(sample_names);
+	get_sample_names_from_parse_phylip(sample_names);
 
-    char * reference_sequence_bases;
-    reference_sequence_bases = (char *) calloc((number_of_snps+1),sizeof(char));
+	char * reference_sequence_bases;
+	reference_sequence_bases = (char *) calloc((number_of_snps+1),sizeof(char));
 
 	get_sequence_for_sample_name(reference_sequence_bases, sample_names[0]);
 	int internal_nodes[number_of_samples];
@@ -97,7 +97,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	}
 
 	number_of_filtered_snps = refilter_existing_snps(reference_sequence_bases, number_of_snps, snp_locations, filtered_snp_locations,internal_nodes);
-	char ** filtered_bases_for_snps = (char **) calloc(number_of_filtered_snps, sizeof(char *));
+	char ** filtered_bases_for_snps = (char **) calloc((number_of_filtered_snps+1), sizeof(char *));
 
 	filter_sequence_bases_and_rotate(reference_sequence_bases, filtered_bases_for_snps, number_of_filtered_snps);
 	

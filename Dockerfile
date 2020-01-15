@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-dev \
     python3-setuptools \
     python3-pip \
-    gdb
+    gdb \
+    valgrind
 
 # Install python dependencies 
 RUN pip3 install --trusted-host pypi.python.org --upgrade pip

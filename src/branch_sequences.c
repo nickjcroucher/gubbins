@@ -98,7 +98,6 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 		{
 				snps_in_recombinations[num_snps_in_recombinations] = j;
 				num_snps_in_recombinations++;
-				printf("num_snps_in_recombinations: %d \n", num_snps_in_recombinations);
 		}
 	}
 
@@ -149,7 +148,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 
     // TODO: The stats for the number of snps in recombinations will need to be updated.
 	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
-	printf("maximum number of snps in recombinations: %d \n", number_of_snps);
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates, (num_blocks + root->number_of_blocks),snp_locations, number_of_snps, snps_in_recombinations);
     int num_snps_updated_from_downstream_recombintations=0;
  	for(i = 0; i < num_snps_in_recombinations; i++)
@@ -576,7 +574,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int x =0;
 	for(x=0; x< number_of_snps; x++)
 	{
-		if(original_sequence[x]  == 'N' || original_sequence[x]  == '-' )
+		if((original_sequence[x] == 'N' || original_sequence[x] == '-' ) && snp_locations[x] != 0)
 		{
 		  gaps_in_original_genome_space[snp_locations[x]-1] = 1;
 	  }

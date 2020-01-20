@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
     name='gubbins',
-    version='2.4.0',
+    version='2.4.1',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     author_email='gubbins-help@sanger.ac.uk',

@@ -574,7 +574,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 	int x =0;
 	for(x=0; x< number_of_snps; x++)
 	{
-		if(original_sequence[x]  == 'N' || original_sequence[x]  == '-' )
+		if((original_sequence[x] == 'N' || original_sequence[x] == '-' ) && snp_locations[x] != 0)
 		{
 		  gaps_in_original_genome_space[snp_locations[x]-1] = 1;
 	  }

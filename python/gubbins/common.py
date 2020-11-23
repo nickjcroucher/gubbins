@@ -178,6 +178,7 @@ def parse_and_run(input_args, program_description=""):
         else:
             tree_building_command = tree_builder.tree_building_command(
                 os.path.abspath(alignment_filename), "", current_basename)
+            print('Alignment is: ' + alignment_filename)
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
 
         # 1.2. Construct the phylogenetic tree
@@ -216,7 +217,11 @@ def parse_and_run(input_args, program_description=""):
             ancestral_sequence_basename,
             verbose = input_args.verbose)
         gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
-        current_tree_name_with_internal_nodes = ancestral_sequence_basename + ".joint.tre"
+        raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"
+        current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                              current_tree_name_with_internal_nodes, "pyjar")
+        #current_tree_name_with_internal_nodes = ancestral_sequence_basename + ".joint.tre"
         sys.stderr.write('Finished ASR with pyjar\nStarting tree: ' + os.path.abspath(temp_rooted_tree))
 #
 #
@@ -264,6 +269,7 @@ def parse_and_run(input_args, program_description=""):
         # 5. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         print("Copying " + current_tree_name_with_internal_nodes +  "  to " + current_tree_name)
+        print("GAPS ALIGNMENT FILENAME: " + gaps_alignment_filename)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
@@ -274,6 +280,8 @@ def parse_and_run(input_args, program_description=""):
         except subprocess.SubprocessError:
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+#        if i > 1:
+#            quit()
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
 
         # 6. Check for convergence
@@ -526,7 +534,10 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
     # read original tree and add in the labels from the ancestral sequence reconstruction
     destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
     for index, destination_internal_node in enumerate(destination_tree.internal_nodes()):
-        new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_labels[index]))
+        if sequence_reconstructor == 'pyjar':
+            new_label = str(source_internal_node_labels[index])
+        else:
+            new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_labels[index]))
         destination_internal_node.label = None
         destination_internal_node.taxon = dendropy.Taxon(new_label)
 

@@ -58,5 +58,6 @@ def main():
     parser.add_argument('--raxml_model',       '-r', help='RAxML model', default='GTRCAT',
                         choices=['GTRGAMMA', 'GTRCAT'])
     parser.add_argument('--remove_identical_sequences', '-d', help='Remove identical sequences', action='store_true')
+    parser.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
 
     gubbins.common.parse_and_run(parser.parse_args(), parser.description)

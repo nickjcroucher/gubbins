@@ -207,66 +207,73 @@ def parse_and_run(input_args, program_description=""):
         print("Current: " + current_tree_name + " temp rooted: " + temp_rooted_tree)
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
-        sys.stderr.write('Beginning ASR with pyjar - reconstructing ' + temp_alignment_filename + '\n')
         ancestral_sequence_basename = current_basename + ".internal"
-        jar(#temp_alignment_filename,
-            base_filename + ".start",
-            os.path.abspath(temp_rooted_tree),
-            temp_working_dir + '/RAxML_info.' + current_basename,
-            #'',
-            ancestral_sequence_basename,
-            verbose = input_args.verbose)
-        gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
-        raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"
         current_tree_name_with_internal_nodes = current_tree_name + ".internal"
-        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
-                                              current_tree_name_with_internal_nodes, "pyjar")
-        #current_tree_name_with_internal_nodes = ancestral_sequence_basename + ".joint.tre"
-        sys.stderr.write('Finished ASR with pyjar\nStarting tree: ' + os.path.abspath(temp_rooted_tree))
-#
-#
-#        sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
-#            os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
-#            ancestral_sequence_basename)
-#        raw_internal_sequence_filename \
-#            = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
-#            + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
-#        processed_internal_sequence_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".aln"
-#        raw_internal_rooted_tree_filename \
-#            = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
-#            + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
-#
-#        # 3.2. Reconstruct the ancestral sequence
-#        printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
-#                       sequence_reconstruction_command])
-#        os.chdir(temp_working_dir)
-#        try:
-#            subprocess.check_call(sequence_reconstruction_command, shell=True)
-#        except subprocess.SubprocessError:
-#            sys.exit("Failed while reconstructing the ancestral sequences.")
-#        os.chdir(current_directory)
-#
-#        # 3.3. Join ancestral sequences with given sequences
-#        current_tree_name_with_internal_nodes = current_tree_name + ".internal"
-#        sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
-#                                                                     processed_internal_sequence_filename)
-#        concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
-#                                joint_sequences_filename)
-#        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
-#                                              current_tree_name_with_internal_nodes, sequence_reconstructor)
-#        printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-#
-#        # 4. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
-#        printer.print("\nReinserting gaps into the alignment...")
-#        shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
-#        reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
-#        if not os.path.exists(gaps_alignment_filename) \
-#                or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
-#            sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
-#                     "Please check this intermediate file is valid: " + gaps_alignment_filename)
+        
+        if not input_args.mar:
+        
+            # 3.2a. Joint ancestral reconstruction
+            sys.stderr.write('Beginning ASR with pyjar - reconstructing ' + temp_alignment_filename + '\n')
+            jar(#temp_alignment_filename,
+                base_filename + ".start",
+                os.path.abspath(temp_rooted_tree),
+                temp_working_dir + '/RAxML_info.' + current_basename,
+                #'',
+                ancestral_sequence_basename,
+                verbose = input_args.verbose)
+            gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
+            raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"
+            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes, "pyjar")
+            #current_tree_name_with_internal_nodes = ancestral_sequence_basename + ".joint.tre"
+            sys.stderr.write('Finished ASR with pyjar\nStarting tree: ' + os.path.abspath(temp_rooted_tree))
+            
+        else:
+
+            sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
+                os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
+                ancestral_sequence_basename)
+            raw_internal_sequence_filename \
+                = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
+                + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
+            processed_internal_sequence_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".aln"
+            raw_internal_rooted_tree_filename \
+                = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
+                + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
+
+            # 3.2b. Reconstruct the ancestral sequence
+            printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
+                           sequence_reconstruction_command])
+            os.chdir(temp_working_dir)
+            try:
+                subprocess.check_call(sequence_reconstruction_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while reconstructing the ancestral sequences.")
+            os.chdir(current_directory)
+
+            # 3.3b. Join ancestral sequences with given sequences
+            current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+            sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
+                                                                         processed_internal_sequence_filename)
+            concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
+                                    joint_sequences_filename)
+            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes, sequence_reconstructor)
+            printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+
+            # 3.4b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
+            printer.print("\nReinserting gaps into the alignment...")
+            shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
+            reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
+            if not os.path.exists(gaps_alignment_filename) \
+                    or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
+                sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
+                         "Please check this intermediate file is valid: " + gaps_alignment_filename)
+        
+        # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-        # 5. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
+        # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         print("Copying " + current_tree_name_with_internal_nodes +  "  to " + current_tree_name)
         print("GAPS ALIGNMENT FILENAME: " + gaps_alignment_filename)
@@ -284,7 +291,7 @@ def parse_and_run(input_args, program_description=""):
 #            quit()
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
 
-        # 6. Check for convergence
+        # 5. Check for convergence
         printer.print("\nChecking for convergence...")
         remove_internal_node_labels_from_tree(current_tree_name_with_internal_nodes, current_tree_name)
         tree_file_names.append(current_tree_name)

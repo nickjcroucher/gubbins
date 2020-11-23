@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# pyjar written by Simon Harris
+# code modified from https://github.com/simonrharris/pyjar
+# pyjar is free software, licensed under GPLv3.
+
 from scipy import linalg
 import numpy
 import dendropy
@@ -106,12 +110,9 @@ def calculate_pij(branch_length,rate_matrix):
 #Read the tree file and root
 def read_tree(treefile):
     if not os.path.isfile(treefile):
-        print("Error: alignment file does not exist")
+        print("Error: tree file does not exist")
         sys.exit()
     t=dendropy.Tree.get(path=treefile, schema="newick", preserve_underscores=True, rooting="force-rooted")
-# not for gubbins
-#    t.reroot_at_midpoint()
-#    t.update_bipartitions()
     return t
 
 
@@ -163,7 +164,7 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
     if verbose:
         print("Alignment size:", len(alignment), "taxa and", len(alignment[0]), "sites")
     
-    #Create a new alignment for the output containing all taxa in the input alignment
+    # Create a new alignment for the output containing all taxa in the input alignment
     new_alignment={}
     for i, x in enumerate(alignment):
         new_alignment[x.id]=list(str(x.seq))
@@ -327,7 +328,6 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
                     node.L[start]=j
                     node.C[start]=end
             
-        
         max_root_base=None
         max_root_base_likelihood=float("-inf")
         for root_base in columnbases:
@@ -387,9 +387,6 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
             except AttributeError:
                 continue
 
-    #if verbose:
-    #    print(onetime, twotime, threetime)
-    
     for node in tree.preorder_node_iter():
         try:
             node.edge_length=node.snps;
@@ -412,17 +409,3 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
     
     if verbose:
         print("Done")
-
-
-
-################
-# Main program #
-################   
-
-def main():
-    args=getargv()
-    jar(args.alignment, args.tree, args.info, args.prefix, args.verbose)
-            
-
-if __name__ == "__main__":
-    main()

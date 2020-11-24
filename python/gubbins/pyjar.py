@@ -12,8 +12,15 @@ import os
 import time
 from Bio import AlignIO
 from math import log, exp
-from multiprocessing import Pool, RawArray, shared_memory, managers
 from functools import partial
+import collections
+try:
+    from multiprocessing import Pool, shared_memory
+    from multiprocessing.managers import SharedMemoryManager
+    NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
+except ImportError as e:
+    sys.stderr.write("This version of Gubbins requires python v3.8 or higher\n")
+    sys.exit(0)
 
 ####################################################
 # Function to read an alignment in various formats #
@@ -208,13 +215,13 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
     rootlens.sort()
     tree.seed_node.r=rootlens[-1][1].r
 
-    #Put gaps back in and check that any ancestor with only gaps downstream is made a gap
+    # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
     # store reconstructed alleles
     reconstructed_bases = {}
     for node in tree.postorder_node_iter():
-        if not node.is_leaf():
-#            node.r=base[node.taxon.label]
-#        else:
+        if node.is_leaf():
+            node.r=base[node.taxon.label]
+        else:
             has_child_base=False
             for child in node.child_node_iter():
                 if child.r in bases:
@@ -296,7 +303,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     node_snps = {x:dict() for x in range(len(base_patterns))}
     reconstructed_bases = {x:dict() for x in range(len(base_patterns))}
     
-    with Pool(processes = 1) as pool:
+    with Pool(processes = 2) as pool:
         reconstruction_results = pool.map(partial(
                                     reconstruct_alignment_column,
                                         tree = tree,

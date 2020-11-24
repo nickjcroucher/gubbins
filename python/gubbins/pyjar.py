@@ -243,7 +243,7 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
 
     return node_snps, reconstructed_bases
 
-def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, verbose = False):
+def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, threads = 1, verbose = False):
     
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T":3 }
@@ -303,7 +303,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     node_snps = {x:dict() for x in range(len(base_patterns))}
     reconstructed_bases = {x:dict() for x in range(len(base_patterns))}
     
-    with Pool(processes = 2) as pool:
+    with Pool(processes = threads) as pool:
         reconstruction_results = pool.map(partial(
                                     reconstruct_alignment_column,
                                         tree = tree,

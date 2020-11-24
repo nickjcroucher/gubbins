@@ -99,13 +99,15 @@ def get_base_patterns(alignment, verbose):
         print("Unique base patterns:", len(base_patterns))
     return base_patterns
 
-def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base_patterns, allbases, mb, f):
+def reconstruct_alignment_column(tree = None, alignment_sequence_names = None, column = None, base_pattern_columns = None, base_matrix = None, base_frequencies = None):
+
+    bases = frozenset(["A", "C", "G", "T"])
 
     columnbases=set([])
     base={}
     for i, y in enumerate(column):
         base[alignment_sequence_names[i]]=y
-        if y in allbases:
+        if y in bases:
             columnbases.add(y)
     
     #1 For each OTU y perform the following:
@@ -127,11 +129,11 @@ def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base
                     node.C={"A": base[taxon], "C": base[taxon], "G": base[taxon], "T": base[taxon]}
                 
                     #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
-                    node.L={"A": pij[mb["A"]][mb[base[taxon]]], "C": pij[mb["C"]][mb[base[taxon]]], "G": pij[mb["G"]][mb[base[taxon]]], "T": pij[mb["T"]][mb[base[taxon]]]}
+                    node.L={"A": pij[base_matrix["A"]][base_matrix[base[taxon]]], "C": pij[base_matrix["C"]][base_matrix[base[taxon]]], "G": pij[base_matrix["G"]][base_matrix[base[taxon]]], "T": pij[base_matrix["T"]][base_matrix[base[taxon]]]}
                 else:
                     
                     node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
-                    node.L={"A": pij[mb["A"]][mb["A"]], "C": pij[mb["C"]][mb["C"]], "G": pij[mb["G"]][mb["G"]], "T": pij[mb["T"]][mb["T"]]}
+                    node.L={"A": pij[base_matrix["A"]][base_matrix["A"]], "C": pij[base_matrix["C"]][base_matrix["C"]], "G": pij[base_matrix["G"]][base_matrix["G"]], "T": pij[base_matrix["T"]][base_matrix["T"]]}
                 
             except KeyError:
                 print("Cannot find", taxon, "in base")
@@ -153,7 +155,7 @@ def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base
                 for child in node.child_node_iter():
                     c+=child.L[end]
                 for start in columnbases:
-                    j=pij[mb[start],mb[end]]+c
+                    j=pij[base_matrix[start],base_matrix[end]]+c
                     
                     
                     if j>node.L[start]:
@@ -170,7 +172,7 @@ def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base
         for child in node.child_node_iter():
             c+=child.L[end]
         for start in columnbases:
-            j=log(f[mb[end]])+c
+            j=log(base_frequencies[base_matrix[end]])+c
 
             if j>node.L[start]:
                 node.L[start]=j
@@ -212,14 +214,13 @@ def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base
         else:
             has_child_base=False
             for child in node.child_node_iter():
-                if child.r in allbases:
+                if child.r in bases:
                     has_child_base=True
                     break
             if not has_child_base:
                 node.r="-"
-            for bp in base_patterns[column]:
+            for bp in base_pattern_columns:
                 reconstructed_bases[node.taxon.label][bp]=node.r
-                #new_alignment[node.taxon.label][bp]=node.r
     
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
@@ -227,7 +228,7 @@ def reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base
     for node in tree.preorder_node_iter():
         try:
             if node.r in ["A", "C", "G", "T"] and node.parent_node.r in ["A", "C", "G", "T"] and node.r!=node.parent_node.r:
-                node_snps[node.taxon.label] += len(base_patterns[column])
+                node_snps[node.taxon.label] += len(base_pattern_columns)
         except AttributeError:
             continue
 
@@ -266,7 +267,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         print("Rates:", ", ".join(map(str,r)))
     
     # Create rate matrix from f and r
-    rm=create_rate_matrix(f,r)
+    rm = create_rate_matrix(f,r)
     
     # Label internal nodes in tree and add these to the new alignment and calculate pij per non-root branch
     nodecounter=0
@@ -286,8 +287,6 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
             
         node.snps=0;
     
-    allbases=set(["A", "C", "G", "T"])
-    
     if verbose:
         print("Reconstructing sites on tree")
     
@@ -295,7 +294,12 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     node_snps = {x:dict() for x in range(len(base_patterns))}
     reconstructed_bases = {x:dict() for x in range(len(base_patterns))}
     for x, column in enumerate(base_patterns):
-        node_snps[x], reconstructed_bases[x] = reconstruct_alignment_column(x, column, tree, alignment_sequence_names, base_patterns, allbases, mb, f)
+        node_snps[x], reconstructed_bases[x] = reconstruct_alignment_column(tree = tree,
+                                                                            alignment_sequence_names = alignment_sequence_names,
+                                                                            column = column,
+                                                                            base_pattern_columns = base_patterns[column],
+                                                                            base_matrix = mb,
+                                                                            base_frequencies = f)
 
     # Combine results for each base across the alignment
     for node in tree.preorder_node_iter():

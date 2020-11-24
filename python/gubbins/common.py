@@ -35,7 +35,7 @@ from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 
-from gubbins.pyjar import jar
+from gubbins.pyjar import jar, read_alignment, get_base_patterns
 
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
@@ -213,14 +213,18 @@ def parse_and_run(input_args, program_description=""):
         
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
-            aln_type = 'fasta'
-            if alignment_suffix.endswith('phylip'):
-                aln_type = 'phylip-relaxed'
-            jar(aln = base_filename + ".start", # starting sequence alignment
-                aln_type = aln_type, # alignment format
-                tree = os.path.abspath(temp_rooted_tree), # current tree
-                info = temp_working_dir + '/RAxML_info.' + current_basename, # file containing evolutionary model parameters
-                prefix = ancestral_sequence_basename, # output prefix
+            if i == 1:
+                # read alignment and identify unique base patterns in first iteration only
+                alignment_filename = base_filename + ".start"
+                alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
+                polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
+                base_patterns = get_base_patterns(polymorphism_alignment, input_args.verbose)
+            # reconstruct with new tree and info file in each iteration
+            jar(alignment = polymorphism_alignment, # complete polymorphism alignment
+                base_patterns = base_patterns, # unique base patterns in alignment
+                tree_filename = os.path.abspath(temp_rooted_tree), # current tree
+                info_filename = temp_working_dir + '/RAxML_info.' + current_basename, # file containing evolutionary model parameters
+                output_prefix = ancestral_sequence_basename, # output prefix
                 verbose = input_args.verbose)
             gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"

@@ -225,6 +225,7 @@ def parse_and_run(input_args, program_description=""):
                 tree_filename = os.path.abspath(temp_rooted_tree), # current tree
                 info_filename = temp_working_dir + '/RAxML_info.' + current_basename, # file containing evolutionary model parameters
                 output_prefix = ancestral_sequence_basename, # output prefix
+                threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose)
             gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"

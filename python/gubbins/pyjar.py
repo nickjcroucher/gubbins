@@ -121,6 +121,7 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
 
     for column in columns:
+    
         base_pattern_columns = base_patterns[column]
         
         columnbases=set([])
@@ -176,7 +177,6 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                         c+=child.L[end]
                     for start in columnbases:
                         j=pij[base_matrix[start],base_matrix[end]]+c
-                        
                         
                         if j>node.L[start]:
                             node.L[start]=j
@@ -242,7 +242,7 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
         # iterate through tree
         for node in tree.preorder_node_iter():
             try:
-                if node.r in ["A", "C", "G", "T"] and node.parent_node.r in ["A", "C", "G", "T"] and node.r!=node.parent_node.r:
+                if node.r in bases and node.parent_node.r in bases and node.r!=node.parent_node.r:
                     node_snps[node.taxon.label] += len(base_pattern_columns)
             except AttributeError:
                 continue
@@ -339,7 +339,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
                                             new_aln = new_aln_shared_array),
                                         base_pattern_lists
                                     )
-        
+
         # Write out alignment while shared memory manager still active
         out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
         out_aln = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = out_aln_shm.buf)

@@ -24,7 +24,7 @@ def read_alignment(filename, file_type, verbose=False):
         sys.exit()
 
     if verbose:
-        print("Trying to open file "+filename+" as "+filetype[x])
+        print("Trying to open file " + filename + " as " + file_type)
 
     try:
         alignmentObject = AlignIO.read(open(filename), file_type)
@@ -90,18 +90,27 @@ def create_rate_matrix(f, r):
     
     return rm
 
-def jar(aln = alignment_filename, aln_type = 'fasta', tree = tree_filename, info = info_filename, prefix = output_prefix, verbose = False):
+def get_base_patterns(alignment, verbose):
+    if verbose:
+        print("Finding unique base patterns")
+    base_patterns={}
+    t1=time.process_time()
+    for x in range(len(alignment[0])):
+        try:
+            base_patterns[alignment[:,x]].append(x)
+        except KeyError:
+            base_patterns[alignment[:,x]]=[x]
+    t2=time.process_time()
+    if verbose:
+        print("Time taken to find unique base patterns:", t2-t1, "seconds")
+        print("Unique base patterns:", len(base_patterns))
+    return base_patterns
+
+def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, verbose = False):
     
     #Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T":3 }
-    
-    # read the alignment
-    if verbose:
-        print("Reading alignment file:", alignment_filename)
-    alignment=read_alignment(alignment_filename, aln_type, verbose)
-    if verbose:
-        print("Alignment size:", len(alignment), "taxa and", len(alignment[0]), "sites")
-    
+
     # Create a new alignment for the output containing all taxa in the input alignment
     new_alignment={}
     for i, x in enumerate(alignment):
@@ -112,7 +121,7 @@ def jar(aln = alignment_filename, aln_type = 'fasta', tree = tree_filename, info
         print("Reading tree file:", tree_filename)
     tree=read_tree(tree_filename)
     
-    #read the info file and get frequencids and rates
+    #read the info file and get frequencies and rates
     if info_filename!="":
         if verbose:
             print("Reading info file:", info_filename)
@@ -147,23 +156,6 @@ def jar(aln = alignment_filename, aln_type = 'fasta', tree = tree_filename, info
             node.pij=calculate_pij(node.edge_length, rm)
             
         node.snps=0;
-    
-    
-    #Find unique base patterns to speed up calculations
-    if verbose:
-        print("Finding unique base patterns")
-    base_patterns={}
-    t1=time.process_time()
-    for x in range(len(alignment[0])):
-        try:
-            base_patterns[alignment[:,x]].append(x)
-        except KeyError:
-            base_patterns[alignment[:,x]]=[x]
-    t2=time.process_time()
-    if verbose:
-        print("Time taken to find unique base patterns:", t2-t1, "seconds")
-        print("Unique base patterns:", len(base_patterns))
-    
     
     allbases=set(["A", "C", "G", "T"])
     

@@ -108,8 +108,9 @@ def get_base_patterns(alignment, verbose):
         print("Unique base patterns:", len(base_patterns))
     return base_patterns
 
-def reconstruct_alignment_column(column, tree = None, alignment_sequence_names = None, base_patterns = None, base_matrix = None, base_frequencies = None):
+def reconstruct_alignment_column(column, tree = None, alignment_sequence_names = None, alignment_name_indices = None, base_patterns = None, base_matrix = None, base_frequencies = None, new_aln = None):
 
+    # process bases for alignment column
     bases = frozenset(["A", "C", "G", "T"])
     base_pattern_columns = base_patterns[column]
     
@@ -119,6 +120,10 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
         base[alignment_sequence_names[i]]=y
         if y in bases:
             columnbases.add(y)
+
+    # load output alignment
+    out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
+    out_aln = numpy.ndarray(new_aln.shape, dtype = new_aln.dtype, buffer = out_aln_shm.buf)
     
     #1 For each OTU y perform the following:
 
@@ -217,7 +222,6 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
 
     # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
     # store reconstructed alleles
-    reconstructed_bases = {}
     for node in tree.postorder_node_iter():
         if node.is_leaf():
             node.r=base[node.taxon.label]
@@ -229,7 +233,7 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
                     break
             if not has_child_base:
                 node.r="-"
-            reconstructed_bases[node.taxon.label]=node.r
+            out_aln[alignment_name_indices[node.taxon.label],base_patterns[column]] = node.r
     
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
@@ -241,7 +245,7 @@ def reconstruct_alignment_column(column, tree = None, alignment_sequence_names =
         except AttributeError:
             continue
 
-    return node_snps, reconstructed_bases
+    return node_snps
 
 def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, threads = 1, verbose = False):
     
@@ -291,59 +295,68 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
                 print(nodename, "already in alignment. Quitting")
                 sys.exit()
             new_alignment[nodename]=["?"]*len(alignment[0])
+            alignment_sequence_names.append(nodename) # index for reconstruction
         if node.parent_node != None:
             node.pij=calculate_pij(node.edge_length, rm)
-            
-        node.snps=0;
-    
+
+    # Index names for reconstruction
+    alignment_name_indices = {name:i for i,name in enumerate(alignment_sequence_names)}
+
+    # Reconstruct each base position
     if verbose:
         print("Reconstructing sites on tree")
-    
-    # Reconstruct each base position
     node_snps = {x:dict() for x in range(len(base_patterns))}
-    reconstructed_bases = {x:dict() for x in range(len(base_patterns))}
     
-    with Pool(processes = threads) as pool:
-        reconstruction_results = pool.map(partial(
-                                    reconstruct_alignment_column,
-                                        tree = tree,
-                                        alignment_sequence_names = alignment_sequence_names,
-                                        base_patterns = base_patterns,
-                                        base_matrix = mb,
-                                        base_frequencies = f),
-                                    base_patterns.keys()
-                                )
+    with SharedMemoryManager() as smm:
+    
+        # Convert alignment to shared memory numpy array
+        new_aln_array = numpy.array([new_alignment[record] for record in new_alignment], dtype = numpy.unicode_)
+        new_aln_array_raw = smm.SharedMemory(size = new_aln_array.nbytes)
+        new_aln_shared_array = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = new_aln_array_raw.buf)
+        new_aln_shared_array[:] = new_aln_array[:]
+        new_aln_shared_array = NumpyShared(name = new_aln_array_raw.name, shape = new_aln_array.shape, dtype = new_aln_array.dtype)
 
-    # Combine results for each base across the alignment
-    for node in tree.preorder_node_iter():
-        node.edge_length = 0.0 # reset lengths to convert to SNPs
-        for x, column in enumerate(base_patterns):
-            reconstructed_branch_lengths = reconstruction_results[x][0]
-            reconstructed_bases = reconstruction_results[x][1]
-            try:
-                node.edge_length += reconstructed_branch_lengths[node.taxon.label];
-            except AttributeError:
-                continue
-            if not node.is_leaf():
-                reconstructed_base = reconstructed_bases[node.taxon.label]
-                for bp in base_patterns[column]:
-                    new_alignment[node.taxon.label][bp] = reconstructed_base
+        # Parallelise reconstructions across alignment columns using multiprocessing
+        with Pool(processes = threads) as pool:
+            reconstruction_results = pool.map(partial(
+                                        reconstruct_alignment_column,
+                                            tree = tree,
+                                            alignment_sequence_names = alignment_sequence_names,
+                                            alignment_name_indices = alignment_name_indices,
+                                            base_patterns = base_patterns,
+                                            base_matrix = mb,
+                                            base_frequencies = f,
+                                            new_aln = new_aln_shared_array),
+                                        base_patterns.keys()
+                                    )
+        
+        # Write out alignment while shared memory manager still active
+        out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
+        out_aln = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = out_aln_shm.buf)
+        if verbose:
+            print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
+        asr_output = open(output_prefix+".joint.aln", "w")
+        for taxon in new_alignment:
+            print(">"+taxon, file=asr_output)
+            print(''.join(out_aln[alignment_name_indices[taxon],:]), file=asr_output)
+        asr_output.close()
 
-    # Print alignment
-    if verbose:
-        print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-    asr_output = open(output_prefix+".joint.aln", "w")
-    for taxon in new_alignment:
-        print(">"+taxon, file=asr_output)
-        print(''.join(new_alignment[taxon]), file=asr_output)
-    asr_output.close()
-    
-    # Print tree
-    if verbose:
-        print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
-    tree_output=open(output_prefix+".joint.tre", "w")
-    print(tree.as_string(schema="newick", suppress_rooting=True, unquoted_underscores=True, suppress_internal_node_labels=True).replace("'",""), file=tree_output)
-    tree_output.close()
-    
+        # Combine results for each base across the alignment
+        for node in tree.preorder_node_iter():
+            node.edge_length = 0.0 # reset lengths to convert to SNPs
+            for x in range(len(reconstruction_results)):
+                reconstructed_branch_lengths = reconstruction_results[x]
+                try:
+                    node.edge_length += reconstructed_branch_lengths[node.taxon.label];
+                except AttributeError:
+                    continue
+
+        # Print tree
+        if verbose:
+            print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
+        tree_output=open(output_prefix+".joint.tre", "w")
+        print(tree.as_string(schema="newick", suppress_rooting=True, unquoted_underscores=True, suppress_internal_node_labels=True).replace("'",""), file=tree_output)
+        tree_output.close()
+        
     if verbose:
         print("Done")

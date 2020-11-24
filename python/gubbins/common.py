@@ -178,7 +178,6 @@ def parse_and_run(input_args, program_description=""):
         else:
             tree_building_command = tree_builder.tree_building_command(
                 os.path.abspath(alignment_filename), "", current_basename)
-            print('Alignment is: ' + alignment_filename)
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
 
         # 1.2. Construct the phylogenetic tree
@@ -213,23 +212,24 @@ def parse_and_run(input_args, program_description=""):
         if not input_args.mar:
         
             # 3.2a. Joint ancestral reconstruction
-            sys.stderr.write('Beginning ASR with pyjar - reconstructing ' + temp_alignment_filename + '\n')
-            jar(#temp_alignment_filename,
-                base_filename + ".start",
-                os.path.abspath(temp_rooted_tree),
-                temp_working_dir + '/RAxML_info.' + current_basename,
-                #'',
-                ancestral_sequence_basename,
+            printer.print(["\nReconstructing ancestral sequences with pyjar..."])
+            aln_type = 'fasta'
+            if alignment_suffix.endswith('phylip'):
+                aln_type = 'phylip-relaxed'
+            jar(aln = base_filename + ".start", # starting sequence alignment
+                aln_type = aln_type, # alignment format
+                tree = os.path.abspath(temp_rooted_tree), # current tree
+                info = temp_working_dir + '/RAxML_info.' + current_basename, # file containing evolutionary model parameters
+                prefix = ancestral_sequence_basename, # output prefix
                 verbose = input_args.verbose)
             gaps_alignment_filename = ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = ancestral_sequence_basename + ".joint.tre"
             transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, "pyjar")
-            #current_tree_name_with_internal_nodes = ancestral_sequence_basename + ".joint.tre"
-            sys.stderr.write('Finished ASR with pyjar\nStarting tree: ' + os.path.abspath(temp_rooted_tree))
-            
+
         else:
 
+            # 3.2b. Marginal ancestral reconstruction with RAxML or IQTree
             sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
                 os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
                 ancestral_sequence_basename)
@@ -241,7 +241,7 @@ def parse_and_run(input_args, program_description=""):
                 = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
                 + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
 
-            # 3.2b. Reconstruct the ancestral sequence
+            # 3.3b. Reconstruct the ancestral sequence
             printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
                            sequence_reconstruction_command])
             os.chdir(temp_working_dir)
@@ -251,7 +251,7 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit("Failed while reconstructing the ancestral sequences.")
             os.chdir(current_directory)
 
-            # 3.3b. Join ancestral sequences with given sequences
+            # 3.4b. Join ancestral sequences with given sequences
             current_tree_name_with_internal_nodes = current_tree_name + ".internal"
             sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                          processed_internal_sequence_filename)
@@ -261,7 +261,7 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-            # 3.4b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
+            # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
             printer.print("\nReinserting gaps into the alignment...")
             shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
             reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
@@ -275,8 +275,6 @@ def parse_and_run(input_args, program_description=""):
 
         # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
-        print("Copying " + current_tree_name_with_internal_nodes +  "  to " + current_tree_name)
-        print("GAPS ALIGNMENT FILENAME: " + gaps_alignment_filename)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
@@ -287,8 +285,6 @@ def parse_and_run(input_args, program_description=""):
         except subprocess.SubprocessError:
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-#        if i > 1:
-#            quit()
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
 
         # 5. Check for convergence

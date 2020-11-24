@@ -12,91 +12,29 @@ import os
 import time
 from Bio import AlignIO
 from math import log, exp
-from argparse import ArgumentParser
-
-##########################################
-# Function to Get command line arguments #
-##########################################
-
-
-def getargv():
-
-        usage = "usage: %(prog)s [options]"
-        description = "A python implementation of the joint ancestral state reconstruction algorithm of Pupko et al."
-        epilog = "For the method, please cite \"Tal Pupko, Itsik Pe, Ron Shamir, Dan Graur; A Fast Algorithm for Joint Reconstruction of Ancestral Amino Acid Sequences, Molecular Biology and Evolution, Volume 17, Issue 6, 1 June 2000, Pages 890-896\""
-        parser = ArgumentParser(usage=usage, description=description, epilog=epilog)
-        
-        parser.add_argument("-a", "--alignment", action="store", dest="alignment", help="Input alignment file. Required.", default="", metavar="FILE", required=True)
-        parser.add_argument("-i", "--info", action="store", dest="info", help="Input RAxML info file. Optional. By default a JC model will be applied.", default="", metavar="FILE")
-        parser.add_argument("-t", "--tree", action="store", dest="tree", help="Input tree file. Required.", default="", metavar="FILE", required=True)
-        parser.add_argument("-o", "--output_prefix", action="store", dest="prefix", help="Output prefix. Required.", default="", required=True)
-        parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="More verbose output", default=False)
-        
-
-        return parser.parse_args()
-
 
 ####################################################
 # Function to read an alignment in various formats #
 ####################################################
 
-def read_alignment(filename, verbose=False):
+def read_alignment(filename, file_type, verbose=False):
 
     if not os.path.isfile(filename):
         print("Error: alignment file does not exist")
         sys.exit()
 
-    filetype=["phylip", "phylip-relaxed", "fasta", "clustal", "nexus", "emboss", "stockholm", "fasta-m10", "ig"]
+    if verbose:
+        print("Trying to open file "+filename+" as "+filetype[x])
 
-    if filename.split(".")[-1].lower() in filetype:
-        guesstype=filename.split(".")[-1].lower()
-    elif filename.split(".")[-1].lower() in ["phy"]:
-        guesstype="phylip"
-    elif filename.split(".")[-1].lower() in ["fna", "dna", "aa", "aln", "fas"]:
-        guesstype="fasta"
-    elif filename.split(".")[-1].lower() in ["nxs", "nex", "nexus"]:
-        guesstype="nexus"
-    else:
-        guesstype=""
-    
-    readok=False
-    
-    
-    if guesstype!="":
-        if verbose:
-            print("Guessing file is in "+guesstype+" format")
-            print("Trying to open file "+filename+" as "+guesstype)
-        try:
-            alignmentObject = AlignIO.read(open(filename, "r"), guesstype)
-        except:
-            print("Cannot open alignment file as "+guesstype)
-        else:
-            readok=True
-            
-        filetype.remove(guesstype)
-
-    x=0
-
-    while readok==False and x<len(filetype):
-        if verbose:
-            print("Trying to open file "+filename+" as "+filetype[x])
-
-        try:
-            alignmentObject = AlignIO.read(open(filename), filetype[x])
-        except:
-            print("Cannot open alignment file "+filename+" as "+filetype[x])
-        else:
-            readok=True
-
-        x=x+1
-
-    if readok==False:
-        print("Failed to open alignment")
-        sys.exit()
-    else:
+    try:
+        alignmentObject = AlignIO.read(open(filename), file_type)
         if verbose:
             print("Alignment read successfully")
-        return alignmentObject
+    except:
+        print("Cannot open alignment file " + filename + " as " + file_type)
+        sys.exit()
+        
+    return alignmentObject
 
 #Calculate Pij from Q matrix and branch length
 def calculate_pij(branch_length,rate_matrix):
@@ -152,7 +90,7 @@ def create_rate_matrix(f, r):
     
     return rm
 
-def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose=False):
+def jar(aln = alignment_filename, aln_type = 'fasta', tree = tree_filename, info = info_filename, prefix = output_prefix, verbose = False):
     
     #Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T":3 }
@@ -160,7 +98,7 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
     # read the alignment
     if verbose:
         print("Reading alignment file:", alignment_filename)
-    alignment=read_alignment(alignment_filename, verbose)
+    alignment=read_alignment(alignment_filename, aln_type, verbose)
     if verbose:
         print("Alignment size:", len(alignment), "taxa and", len(alignment[0]), "sites")
     
@@ -173,7 +111,6 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
     if verbose:
         print("Reading tree file:", tree_filename)
     tree=read_tree(tree_filename)
-    
     
     #read the info file and get frequencids and rates
     if info_filename!="":
@@ -309,9 +246,7 @@ def jar(alignment_filename, tree_filename, info_filename, output_prefix, verbose
                         if j>node.L[start]:
                             node.L[start]=j
                             node.C[start]=end
-                
-                    
-        
+
         node.L={}
         node.C={}
         for basenum in columnbases:

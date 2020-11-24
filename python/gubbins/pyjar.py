@@ -12,6 +12,8 @@ import os
 import time
 from Bio import AlignIO
 from math import log, exp
+from multiprocessing import Pool, RawArray, shared_memory, managers
+from functools import partial
 
 ####################################################
 # Function to read an alignment in various formats #
@@ -99,10 +101,11 @@ def get_base_patterns(alignment, verbose):
         print("Unique base patterns:", len(base_patterns))
     return base_patterns
 
-def reconstruct_alignment_column(tree = None, alignment_sequence_names = None, column = None, base_pattern_columns = None, base_matrix = None, base_frequencies = None):
+def reconstruct_alignment_column(column, tree = None, alignment_sequence_names = None, base_patterns = None, base_matrix = None, base_frequencies = None):
 
     bases = frozenset(["A", "C", "G", "T"])
-
+    base_pattern_columns = base_patterns[column]
+    
     columnbases=set([])
     base={}
     for i, y in enumerate(column):
@@ -207,11 +210,11 @@ def reconstruct_alignment_column(tree = None, alignment_sequence_names = None, c
 
     #Put gaps back in and check that any ancestor with only gaps downstream is made a gap
     # store reconstructed alleles
-    reconstructed_bases = {node.taxon.label:dict() for node in tree.postorder_node_iter()}
+    reconstructed_bases = {}
     for node in tree.postorder_node_iter():
-        if node.is_leaf():
-            node.r=base[node.taxon.label]
-        else:
+        if not node.is_leaf():
+#            node.r=base[node.taxon.label]
+#        else:
             has_child_base=False
             for child in node.child_node_iter():
                 if child.r in bases:
@@ -219,8 +222,7 @@ def reconstruct_alignment_column(tree = None, alignment_sequence_names = None, c
                     break
             if not has_child_base:
                 node.r="-"
-            for bp in base_pattern_columns:
-                reconstructed_bases[node.taxon.label][bp]=node.r
+            reconstructed_bases[node.taxon.label]=node.r
     
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
@@ -293,25 +295,32 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     # Reconstruct each base position
     node_snps = {x:dict() for x in range(len(base_patterns))}
     reconstructed_bases = {x:dict() for x in range(len(base_patterns))}
-    for x, column in enumerate(base_patterns):
-        node_snps[x], reconstructed_bases[x] = reconstruct_alignment_column(tree = tree,
-                                                                            alignment_sequence_names = alignment_sequence_names,
-                                                                            column = column,
-                                                                            base_pattern_columns = base_patterns[column],
-                                                                            base_matrix = mb,
-                                                                            base_frequencies = f)
+    
+    with Pool(processes = 1) as pool:
+        reconstruction_results = pool.map(partial(
+                                    reconstruct_alignment_column,
+                                        tree = tree,
+                                        alignment_sequence_names = alignment_sequence_names,
+                                        base_patterns = base_patterns,
+                                        base_matrix = mb,
+                                        base_frequencies = f),
+                                    base_patterns.keys()
+                                )
 
     # Combine results for each base across the alignment
     for node in tree.preorder_node_iter():
-        try:
-            for x in node_snps:
-                node.edge_length += node_snps[x][node.taxon.label];
-        except AttributeError:
-            continue
-        if not node.is_leaf():
-            for x, column in enumerate(base_patterns):
+        node.edge_length = 0.0 # reset lengths to convert to SNPs
+        for x, column in enumerate(base_patterns):
+            reconstructed_branch_lengths = reconstruction_results[x][0]
+            reconstructed_bases = reconstruction_results[x][1]
+            try:
+                node.edge_length += reconstructed_branch_lengths[node.taxon.label];
+            except AttributeError:
+                continue
+            if not node.is_leaf():
+                reconstructed_base = reconstructed_bases[node.taxon.label]
                 for bp in base_patterns[column]:
-                    new_alignment[node.taxon.label][bp] = reconstructed_bases[x][node.taxon.label][bp]
+                    new_alignment[node.taxon.label][bp] = reconstructed_base
 
     # Print alignment
     if verbose:

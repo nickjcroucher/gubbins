@@ -62,7 +62,12 @@ def read_info(infofile, type = 'raxml'):
     if not os.path.isfile(infofile):
         print("Error: alignment file does not exist")
         sys.exit()
-    r=[-1.0] * 6 # initialiase rates
+    
+    if type not in ['raxml','iqtree','fasttree']:
+        sys.stderr.write('Only able to parse GTR-type models from raxml, iqtree ot fasttree')
+        sys.exit()
+    
+    r=[-1.0] * 6 # initialise rates
     f=[-1.0] * 4 # initialise frequencies
     
     for line in open(infofile, "r"):
@@ -83,13 +88,25 @@ def read_info(infofile, type = 'raxml'):
                 words=line.split()
                 r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
         elif type == 'iqtree':
-            if "Base frequencies:" in line:
+            if line.startswith('Base frequencies:'):
                 words=line.split()
                 f=[float(words[3]), float(words[5]), float(words[7]), float(words[9])]
-            elif "Rate parameters:" in line:
+            elif line.startswith('Rate parameters:'):
                 words=line.split()
                 # order is ac ag at cg ct gt
                 r=[float(words[3]), float(words[5]), float(words[7]), float(words[9]), float(words[11]), float(words[13])]
+        elif type == 'fasttree':
+            if line.startswith('GTRFreq'):
+                words=line.split()
+                f=[float(words[1]), float(words[2]), float(words[3]), float(words[4])]
+            elif line.startswith('GTRRates'):
+                words=line.split()
+                r=[float(words[1]), float(words[2]), float(words[3]), float(words[4]), float(words[5]), float(words[6])]
+
+    # Check frequencies and rates have been extracted correctly
+    if -1.0 in f or -1.0 in r:
+        sys.stderr.write('Problem with extracting model parameters')
+        sys.exit()
 
     return f, r
 

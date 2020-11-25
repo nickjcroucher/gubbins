@@ -24,9 +24,10 @@ from gubbins import utils
 class FastTree:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, verbose=False):
+    def __init__(self, threads: int, verbose=False):
         """Initialises the object"""
         self.verbose = verbose
+        self.threads = threads
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
 
@@ -39,7 +40,8 @@ class FastTree:
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
         output_tree = basename + self.tree_suffix
-        command = [self.executable]
+        command = ['export OMP_NUM_THREADS=' + str(self.threads) + ';']
+        command.extend([self.executable])
         command.extend(self.tree_building_parameters)
         if input_tree:
             command.extend(["-intree", input_tree])

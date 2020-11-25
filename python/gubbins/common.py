@@ -220,10 +220,15 @@ def parse_and_run(input_args, program_description=""):
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
                 base_patterns = get_base_patterns(polymorphism_alignment, input_args.verbose)
             # reconstruct with new tree and info file in each iteration
+            if input_args.tree_builder == "raxml":
+                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
+            elif input_args.tree_builder == "iqtree":
+                info_filename = temp_working_dir + '/' + current_basename + '.log'
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_patterns, # unique base patterns in alignment
                 tree_filename = os.path.abspath(temp_rooted_tree), # current tree
-                info_filename = temp_working_dir + '/RAxML_info.' + current_basename, # file containing evolutionary model parameters
+                info_filename = info_filename, # file containing evolutionary model parameters
+                info_filetype = input_args.tree_builder, # format of file containing evolutionary model parameters
                 output_prefix = ancestral_sequence_basename, # output prefix
                 threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose)

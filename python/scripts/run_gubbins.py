@@ -39,7 +39,7 @@ def main():
     parser.add_argument('--verbose',           '-v', help='Turn on debugging', action='store_true')
     parser.add_argument('--no_cleanup',        '-n', help='Dont cleanup intermediate files', action='store_true')
     parser.add_argument('--tree_builder',      '-t', help='Application to use for tree building', default="raxml",
-                        choices=['raxml', 'fasttree', 'hybrid'])
+                        choices=['raxml', 'iqtree', 'fasttree', 'hybrid'])
     parser.add_argument('--iterations',        '-i', help='Maximum No. of iterations', type=int, default=5)
     parser.add_argument('--min_snps',          '-m', help='Min SNPs to identify a recombination block', type=int,
                         default=3)

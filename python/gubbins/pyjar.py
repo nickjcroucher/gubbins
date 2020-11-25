@@ -56,29 +56,41 @@ def read_tree(treefile):
     t=dendropy.Tree.get(path=treefile, schema="newick", preserve_underscores=True, rooting="force-rooted")
     return t
 
-#Read the RAxML info file to get rates and frequencies
-def read_info(infofile):
+# Read the RAxML info file to get rates and frequencies
+def read_info(infofile, type = 'raxml'):
+
     if not os.path.isfile(infofile):
         print("Error: alignment file does not exist")
         sys.exit()
-    r=[]
-    f=[]
+    r=[-1.0] * 6 # initialiase rates
+    f=[-1.0] * 4 # initialise frequencies
+    
     for line in open(infofile, "r"):
         line=line.strip()
-        if "freq pi" in line:
-            words=line.split()
-            f.append(float(words[2]))
-        elif "Base frequencies:" in line:
-            words=line.split()
-            f=[float(words[2]), float(words[3]), float(words[4]), float(words[5])]
-        elif "<->" in line:
-            # order is ac ag at cg ct gt
-            words=line.split()
-            r.append(float(words[4]))
-        elif "alpha[0]:" in line:
-            # order is ac ag at cg ct gt
-            words=line.split()
-            r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
+        if type == 'raxml':
+            if "freq pi" in line:
+                words=line.split()
+                f.append(float(words[2]))
+            elif "Base frequencies:" in line:
+                words=line.split()
+                f=[float(words[2]), float(words[3]), float(words[4]), float(words[5])]
+            elif "<->" in line:
+                # order is ac ag at cg ct gt
+                words=line.split()
+                r.append(float(words[4]))
+            elif "alpha[0]:" in line:
+                # order is ac ag at cg ct gt
+                words=line.split()
+                r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
+        elif type == 'iqtree':
+            if "Base frequencies:" in line:
+                words=line.split()
+                f=[float(words[3]), float(words[5]), float(words[7]), float(words[9])]
+            elif "Rate parameters:" in line:
+                words=line.split()
+                # order is ac ag at cg ct gt
+                r=[float(words[3]), float(words[5]), float(words[7]), float(words[9]), float(words[11]), float(words[13])]
+
     return f, r
 
 def create_rate_matrix(f, r):
@@ -324,7 +336,7 @@ def chunks(l, k):
     n = len(l)
     return [l[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
 
-def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, threads = 1, verbose = False):
+def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, info_filetype = None, output_prefix = None, threads = 1, verbose = False):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T":3 }
@@ -344,7 +356,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     if info_filename!="":
         if verbose:
             print("Reading info file:", info_filename)
-        f, r=read_info(info_filename)
+        f, r=read_info(info_filename, type = info_filetype)
     else:
         if verbose:
             print("Using default JC rates and frequencies")

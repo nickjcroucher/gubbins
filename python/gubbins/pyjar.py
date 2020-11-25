@@ -109,21 +109,37 @@ def get_base_patterns(alignment, verbose):
     return base_patterns
 
 def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names = None, alignment_name_indices = None, base_patterns = None, base_matrix = None, base_frequencies = None, new_aln = None):
-
+    
+    ### TIMING
+    calc_time = 0.0
+    storage_time = 0.0
+    writing_time = 0.0
+    prep_time_start = time.process_time()
+    
     # process bases for alignment column
     bases = frozenset(["A", "C", "G", "T"])
-    
-    # load output alignment
-    out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
-    out_aln = numpy.ndarray(new_aln.shape, dtype = new_aln.dtype, buffer = out_aln_shm.buf)
 
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
-    reconstructed_bases = {b:{alignment_name_indices[x]:list() for x in alignment_name_indices} for b in ["A", "C", "G", "T", "-"]}
-    
+    ancestrally_conserved = {b:list() for b in ["A", "C", "G", "T", "-"]}
+    ancestrally_variable = {b:{alignment_name_indices[x]:list() for x in alignment_name_indices} for b in ["A", "C", "G", "T", "-"]}
+
+    # Identify ancestral nodes for sequence reconstruction
+    ancestral_node_indices = []
+    for node in tree.postorder_node_iter():
+        if not node.is_leaf():
+            ancestral_node_indices.append(alignment_name_indices[node.taxon.label])
+
+    ### TIMING
+    prep_time_end = time.process_time()
+    prep_time = prep_time_end - prep_time_start
+
     # Iterate over columns
     for column in columns:
     
+        ### TIMING
+        calc_time_start = time.process_time()
+        
         base_pattern_columns = base_patterns[column]
         
         columnbases=set([])
@@ -226,8 +242,14 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
         rootlens.sort()
         tree.seed_node.r=rootlens[-1][1].r
 
+        ### TIMING
+        calc_time_end = time.process_time()
+        calc_time += (calc_time_end - calc_time_start)
+        storage_time_start = time.process_time()
+
         # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
         # store reconstructed alleles
+        reconstructed_alleles = {}
         for node in tree.postorder_node_iter():
             if node.is_leaf():
                 node.r=base[node.taxon.label]
@@ -238,8 +260,18 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                         has_child_base=True
                         break
                 if not has_child_base:
-                    node.r="-"
-                reconstructed_bases[node.r][alignment_name_indices[node.taxon.label]].extend(base_patterns[column])
+                    node.r = "-"
+                # Store reconstructed allele to determine how it should be inserted into the new alignment
+                reconstructed_alleles[node.taxon.label] = node.r
+        
+        # If site is monomorphic - replace whole column; else replace specific entries
+        reconstructed_allele_set = set(reconstructed_alleles.values())
+        if len(reconstructed_allele_set) == 1:
+            ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_patterns[column])
+        else:
+            for taxon in reconstructed_alleles:
+                ancestrally_variable[reconstructed_alleles[taxon]][alignment_name_indices[taxon]].extend(base_patterns[column])
+#                reconstructed_bases[node.r][alignment_name_indices[node.taxon.label]].extend(base_patterns[column])
 #                out_aln[alignment_name_indices[node.taxon.label],base_patterns[column]] = node.r
         
         # iterate through tree
@@ -249,20 +281,52 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                     node_snps[node.taxon.label] += len(base_pattern_columns)
             except AttributeError:
                 continue
+                
+        ### TIMING
+        storage_time_end = time.process_time()
+        storage_time += (storage_time_end - storage_time_start)
+
+    ### TIMING
+    storage_time_end = time.process_time()
+    storage_time += (storage_time_end - storage_time_start)
+    writing_time_start = time.process_time()
+    altered_bases = 0
 
     # combine results across columns to access shared memory object as few times as possible
+    # load output alignment
+    out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
+    out_aln = numpy.ndarray(new_aln.shape, dtype = new_aln.dtype, buffer = out_aln_shm.buf)
+
     for b in ["A", "C", "G", "T", "-"]:
-        for index in reconstructed_bases[b]:
-            if len(reconstructed_bases[b][index]) > 0:
-                out_aln[index,reconstructed_bases[b][index]] = b
+        if len(ancestrally_conserved[b]) > 0:
+            out_aln[:,ancestrally_conserved[b]] = b
+        for index in ancestrally_variable[b]:
+            if len(ancestrally_variable[b][index]) > 0:
+                out_aln[index,ancestrally_variable[b][index]] = b
+
+#    for b in ["A", "C", "G", "T", "-"]:
+#        for index in reconstructed_bases[b]:
+#            if len(reconstructed_bases[b][index]) > 0:
+#                altered_bases += len(reconstructed_bases[b][index])
+#                out_aln[index,reconstructed_bases[b][index]] = b
+
+    out_aln_shm.close()
+
+    ### TIMING
+    writing_time_end = time.process_time()
+    writing_time += (writing_time_end - writing_time_start)
+    print('PREP:\t' + str(prep_time))
+    print('CALC:\t' + str(calc_time))
+    print('STORE:\t' + str(storage_time))
+    print('WRITE:\t' + str(writing_time))
+    print('ALTERING:\t' + str(altered_bases))
 
     return node_snps
 
-# from https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+# from https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length/37414115#37414115
+def chunks(l, k):
+    n = len(l)
+    return [l[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
 
 def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, output_prefix = None, threads = 1, verbose = False):
 
@@ -271,10 +335,9 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
 
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = []
-    new_alignment={}
+    ancestral_node_names = []
     for i, x in enumerate(alignment):
         alignment_sequence_names.append(x.id)
-        new_alignment[x.id]=list(str(x.seq))
     
     # Read the tree
     if verbose:
@@ -301,23 +364,24 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     
     # Label internal nodes in tree and add these to the new alignment and calculate pij per non-root branch
     nodecounter=0
-    for node in tree.preorder_node_iter():
+    new_alignment={}
     
+    for node in tree.preorder_node_iter():
         if node.taxon == None:
             nodecounter+=1
             nodename="Node_"+str(nodecounter)
             tree.taxon_namespace.add_taxon(dendropy.Taxon(nodename))
             node.taxon=tree.taxon_namespace.get_taxon(nodename)
-            if nodename in new_alignment:
+            if nodename in alignment_sequence_names:
                 print(nodename, "already in alignment. Quitting")
                 sys.exit()
             new_alignment[nodename]=["?"]*len(alignment[0])
-            alignment_sequence_names.append(nodename) # index for reconstruction
+            ancestral_node_names.append(nodename) # index for reconstruction
         if node.parent_node != None:
             node.pij=calculate_pij(node.edge_length, rm)
 
     # Index names for reconstruction
-    alignment_name_indices = {name:i for i,name in enumerate(alignment_sequence_names)}
+    ancestral_node_indices = {name:i for i,name in enumerate(ancestral_node_names)}
 
     # Reconstruct each base position
     if verbose:
@@ -333,7 +397,8 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         new_aln_shared_array = NumpyShared(name = new_aln_array_raw.name, shape = new_aln_array.shape, dtype = new_aln_array.dtype)
 
         # split list of sites into chunks per core
-        base_pattern_lists = chunks(list(base_patterns.keys()),threads)
+        bp_list = list(base_patterns.keys())
+        base_pattern_lists = list(chunks(bp_list,threads))
 
         # Parallelise reconstructions across alignment columns using multiprocessing
         with Pool(processes = threads) as pool:
@@ -341,7 +406,7 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
                                         reconstruct_alignment_column,
                                             tree = tree,
                                             alignment_sequence_names = alignment_sequence_names,
-                                            alignment_name_indices = alignment_name_indices,
+                                            alignment_name_indices = ancestral_node_indices,
                                             base_patterns = base_patterns,
                                             base_matrix = mb,
                                             base_frequencies = f,
@@ -355,9 +420,12 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         asr_output = open(output_prefix+".joint.aln", "w")
+        for taxon in alignment:
+            print(">"+taxon.id, file=asr_output)
+            print(taxon.seq, file=asr_output)
         for taxon in new_alignment:
             print(">"+taxon, file=asr_output)
-            print(''.join(out_aln[alignment_name_indices[taxon],:]), file=asr_output)
+            print(''.join(out_aln[ancestral_node_indices[taxon],:]), file=asr_output)
         asr_output.close()
 
         # Combine results for each base across the alignment

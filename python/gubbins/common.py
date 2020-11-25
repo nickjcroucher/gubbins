@@ -222,7 +222,7 @@ def parse_and_run(input_args, program_description=""):
             # reconstruct with new tree and info file in each iteration
             if input_args.tree_builder == "raxml":
                 info_filename = temp_working_dir + '/RAxML_info.' + current_basename
-            elif input_args.tree_builder == "iqtree":
+            elif input_args.tree_builder == "iqtree" or input_args.tree_builder == "fasttree":
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_patterns, # unique base patterns in alignment

@@ -44,6 +44,7 @@ class FastTree:
         if input_tree:
             command.extend(["-intree", input_tree])
         command.extend(["-out", output_tree])
+        command.extend(["-log", basename + '.log'])
         command.append(alignment_filename)
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])

@@ -119,7 +119,9 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
 
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
-
+    reconstructed_bases = {b:{alignment_name_indices[x]:list() for x in alignment_name_indices} for b in ["A", "C", "G", "T", "-"]}
+    
+    # Iterate over columns
     for column in columns:
     
         base_pattern_columns = base_patterns[column]
@@ -237,7 +239,8 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                         break
                 if not has_child_base:
                     node.r="-"
-                out_aln[alignment_name_indices[node.taxon.label],base_patterns[column]] = node.r
+                reconstructed_bases[node.r][alignment_name_indices[node.taxon.label]].extend(base_patterns[column])
+#                out_aln[alignment_name_indices[node.taxon.label],base_patterns[column]] = node.r
         
         # iterate through tree
         for node in tree.preorder_node_iter():
@@ -246,6 +249,12 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                     node_snps[node.taxon.label] += len(base_pattern_columns)
             except AttributeError:
                 continue
+
+    # combine results across columns to access shared memory object as few times as possible
+    for b in ["A", "C", "G", "T", "-"]:
+        for index in reconstructed_bases[b]:
+            if len(reconstructed_bases[b][index]) > 0:
+                out_aln[index,reconstructed_bases[b][index]] = b
 
     return node_snps
 

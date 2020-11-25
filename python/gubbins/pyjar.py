@@ -287,11 +287,6 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                         node_snps[node.taxon.label] += len(base_pattern_columns)
                 except AttributeError:
                     continue
-                
-        ### TIMING
-        if verbose:
-            storage_time_end = time.process_time()
-            storage_time += (storage_time_end - storage_time_start)
 
     ### TIMING
     if verbose:
@@ -390,6 +385,10 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         print("Reconstructing sites on tree")
     
     with SharedMemoryManager() as smm:
+    
+        # Declare global
+        global all_base_patterns
+        all_base_patterns = base_patterns
     
         # Convert alignment to shared memory numpy array
         new_aln_array_raw = smm.SharedMemory(size = new_aln_array.nbytes)

@@ -108,13 +108,14 @@ def get_base_patterns(alignment, verbose):
         print("Unique base patterns:", len(base_patterns))
     return base_patterns
 
-def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names = None, alignment_name_indices = None, base_patterns = None, base_matrix = None, base_frequencies = None, new_aln = None):
+def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names = None, ancestral_node_indices = None, base_patterns = None, base_matrix = None, base_frequencies = None, new_aln = None, verbose = False):
     
     ### TIMING
-    calc_time = 0.0
-    storage_time = 0.0
-    writing_time = 0.0
-    prep_time_start = time.process_time()
+    if verbose:
+        calc_time = 0.0
+        storage_time = 0.0
+        writing_time = 0.0
+        prep_time_start = time.process_time()
     
     # process bases for alignment column
     bases = frozenset(["A", "C", "G", "T"])
@@ -122,175 +123,181 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
     # Record SNPs reconstructed as occurring on each branch
     node_snps = {node.taxon.label:0 for node in tree.postorder_node_iter()}
     ancestrally_conserved = {b:list() for b in ["A", "C", "G", "T", "-"]}
-    ancestrally_variable = {b:{alignment_name_indices[x]:list() for x in alignment_name_indices} for b in ["A", "C", "G", "T", "-"]}
-
-    # Identify ancestral nodes for sequence reconstruction
-    ancestral_node_indices = []
-    for node in tree.postorder_node_iter():
-        if not node.is_leaf():
-            ancestral_node_indices.append(alignment_name_indices[node.taxon.label])
+    ancestrally_variable = {b:{ancestral_node_indices[x]:list() for x in ancestral_node_indices} for b in ["A", "C", "G", "T", "-"]}
 
     ### TIMING
-    prep_time_end = time.process_time()
-    prep_time = prep_time_end - prep_time_start
+    if verbose:
+        prep_time_end = time.process_time()
+        prep_time = prep_time_end - prep_time_start
 
     # Iterate over columns
     for column in columns:
     
         ### TIMING
-        calc_time_start = time.process_time()
+        if verbose:
+            calc_time_start = time.process_time()
         
         base_pattern_columns = base_patterns[column]
         
         columnbases=set([])
         base={}
+        unknown_base_count = 0
         for i, y in enumerate(column):
             base[alignment_sequence_names[i]]=y
             if y in bases:
                 columnbases.add(y)
-        
-        #1 For each OTU y perform the following:
-
-        #Visit a nonroot internal node, z, which has not been visited yet, but both of whose sons, nodes x and y, have already been visited, i.e., Lx(j), Cx(j), Ly(j), and Cy(j) have already been defined for each j. Let tz be the length of the branch connecting node z and its father. For each amino acid i, compute Lz(i) and Cz(i) according to the following formulae:
-        
-        #Denote the three sons of the root by x, y, and z. For each amino acid k, compute the expression Pk x Lx(k) x Ly(k) x Lz(k). Reconstruct r by choosing the amino acid k maximizing this expression. The maximum value found is the likelihood of the best reconstruction.
-        for node in tree.postorder_node_iter():
-            if node.parent_node==None:
-                continue
-            #calculate the transistion matrix for the branch
-            pij=node.pij
-            
-            if node.is_leaf():
-                taxon=str(node.taxon.label).strip("'")
-                try:
-                    if base[taxon] in ["A", "C", "G", "T"]:
-                        #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
-                        node.C={"A": base[taxon], "C": base[taxon], "G": base[taxon], "T": base[taxon]}
-                    
-                        #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
-                        node.L={"A": pij[base_matrix["A"]][base_matrix[base[taxon]]], "C": pij[base_matrix["C"]][base_matrix[base[taxon]]], "G": pij[base_matrix["G"]][base_matrix[base[taxon]]], "T": pij[base_matrix["T"]][base_matrix[base[taxon]]]}
-                    else:
-                        
-                        node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
-                        node.L={"A": pij[base_matrix["A"]][base_matrix["A"]], "C": pij[base_matrix["C"]][base_matrix["C"]], "G": pij[base_matrix["G"]][base_matrix["G"]], "T": pij[base_matrix["T"]][base_matrix["T"]]}
-                    
-                except KeyError:
-                    print("Cannot find", taxon, "in base")
-                    sys.exit()
-            
             else:
-                node.L={}
-                node.C={}
-                
-                #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
-                #2b. Cz(i) = the value of j attaining the above maximum.
-                
-                for basenum in columnbases:
-                    node.L[basenum]=float("-inf")
-                    node.C[basenum]=None
-                
-                for end in columnbases:
-                    c=0.0
-                    for child in node.child_node_iter():
-                        c+=child.L[end]
-                    for start in columnbases:
-                        j=pij[base_matrix[start],base_matrix[end]]+c
-                        
-                        if j>node.L[start]:
-                            node.L[start]=j
-                            node.C[start]=end
-
-        node.L={}
-        node.C={}
-        for basenum in columnbases:
-            node.L[basenum]=float("-inf")
-            node.C[basenum]=None
-        for end in columnbases:
-            c=0
-            for child in node.child_node_iter():
-                c+=child.L[end]
-            for start in columnbases:
-                j=log(base_frequencies[base_matrix[end]])+c
-
-                if j>node.L[start]:
-                    node.L[start]=j
-                    node.C[start]=end
+                unknown_base_count = unknown_base_count + 1
+        
+        # Heuristic for speed: if all taxa are monomorphic, with a gap in only one sequence, then the ancestral states
+        # will all be the observed base, as no ancestral node will have two child nodes with unknown bases at this site
+        if unknown_base_count == 1 and len(columnbases) == 1:
             
-        max_root_base=None
-        max_root_base_likelihood=float("-inf")
-        for root_base in columnbases:
-            #print max_root_base, max_root_base_likelihood, root_base, node.L[root_base]
-            if node.L[root_base]>max_root_base_likelihood:
-                max_root_base_likelihood=node.L[root_base]
-                max_root_base=node.C[root_base]
-        node.r=max_root_base
-        
-        #Traverse the tree from the root in the direction of the OTUs, assigning to each node its most likely ancestral character as follows:
-        for node in tree.preorder_node_iter():
-        
-            try:
-                #5a. Visit an unreconstructed internal node x whose father y has already been reconstructed. Denote by i the reconstructed amino acid at node y.
-                i=node.parent_node.r
-            except AttributeError:
-                continue
-            #5b. Reconstruct node x by choosing Cx(i).
-            node.r=node.C[i]
-
-        rootlens=[]
-        for child in tree.seed_node.child_node_iter():
-            rootlens.append([child.edge_length,child,child.r])
-        rootlens.sort()
-        tree.seed_node.r=rootlens[-1][1].r
-
-        ### TIMING
-        calc_time_end = time.process_time()
-        calc_time += (calc_time_end - calc_time_start)
-        storage_time_start = time.process_time()
-
-        # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
-        # store reconstructed alleles
-        reconstructed_alleles = {}
-        for node in tree.postorder_node_iter():
-            if node.is_leaf():
-                node.r=base[node.taxon.label]
-            else:
-                has_child_base=False
-                for child in node.child_node_iter():
-                    if child.r in bases:
-                        has_child_base=True
-                        break
-                if not has_child_base:
-                    node.r = "-"
-                # Store reconstructed allele to determine how it should be inserted into the new alignment
-                reconstructed_alleles[node.taxon.label] = node.r
-        
-        # If site is monomorphic - replace whole column; else replace specific entries
-        reconstructed_allele_set = set(reconstructed_alleles.values())
-        if len(reconstructed_allele_set) == 1:
-            ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_patterns[column])
+            ancestrally_conserved[columnbases.pop()].extend(base_patterns[column])
+            
         else:
-            for taxon in reconstructed_alleles:
-                ancestrally_variable[reconstructed_alleles[taxon]][alignment_name_indices[taxon]].extend(base_patterns[column])
-#                reconstructed_bases[node.r][alignment_name_indices[node.taxon.label]].extend(base_patterns[column])
-#                out_aln[alignment_name_indices[node.taxon.label],base_patterns[column]] = node.r
+            # Otherwise perform a full ML inference
+            #1 For each OTU y perform the following:
+
+            #Visit a nonroot internal node, z, which has not been visited yet, but both of whose sons, nodes x and y, have already been visited, i.e., Lx(j), Cx(j), Ly(j), and Cy(j) have already been defined for each j. Let tz be the length of the branch connecting node z and its father. For each amino acid i, compute Lz(i) and Cz(i) according to the following formulae:
+            
+            #Denote the three sons of the root by x, y, and z. For each amino acid k, compute the expression Pk x Lx(k) x Ly(k) x Lz(k). Reconstruct r by choosing the amino acid k maximizing this expression. The maximum value found is the likelihood of the best reconstruction.
+            for node in tree.postorder_node_iter():
+                if node.parent_node==None:
+                    continue
+                #calculate the transistion matrix for the branch
+                pij=node.pij
+                
+                if node.is_leaf():
+                    taxon=str(node.taxon.label).strip("'")
+                    try:
+                        if base[taxon] in ["A", "C", "G", "T"]:
+                            #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
+                            node.C={"A": base[taxon], "C": base[taxon], "G": base[taxon], "T": base[taxon]}
+                        
+                            #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
+                            node.L={"A": pij[base_matrix["A"]][base_matrix[base[taxon]]], "C": pij[base_matrix["C"]][base_matrix[base[taxon]]], "G": pij[base_matrix["G"]][base_matrix[base[taxon]]], "T": pij[base_matrix["T"]][base_matrix[base[taxon]]]}
+                        else:
+                            
+                            node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
+                            node.L={"A": pij[base_matrix["A"]][base_matrix["A"]], "C": pij[base_matrix["C"]][base_matrix["C"]], "G": pij[base_matrix["G"]][base_matrix["G"]], "T": pij[base_matrix["T"]][base_matrix["T"]]}
+                        
+                    except KeyError:
+                        print("Cannot find", taxon, "in base")
+                        sys.exit()
+                
+                else:
+                    node.L={}
+                    node.C={}
+                    
+                    #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
+                    #2b. Cz(i) = the value of j attaining the above maximum.
+                    
+                    for basenum in columnbases:
+                        node.L[basenum]=float("-inf")
+                        node.C[basenum]=None
+                    
+                    for end in columnbases:
+                        c=0.0
+                        for child in node.child_node_iter():
+                            c+=child.L[end]
+                        for start in columnbases:
+                            j=pij[base_matrix[start],base_matrix[end]]+c
+                            
+                            if j>node.L[start]:
+                                node.L[start]=j
+                                node.C[start]=end
+
+            node.L={}
+            node.C={}
+            for basenum in columnbases:
+                node.L[basenum]=float("-inf")
+                node.C[basenum]=None
+            for end in columnbases:
+                c=0
+                for child in node.child_node_iter():
+                    c+=child.L[end]
+                for start in columnbases:
+                    j=log(base_frequencies[base_matrix[end]])+c
+
+                    if j>node.L[start]:
+                        node.L[start]=j
+                        node.C[start]=end
+                
+            max_root_base=None
+            max_root_base_likelihood=float("-inf")
+            for root_base in columnbases:
+                if node.L[root_base]>max_root_base_likelihood:
+                    max_root_base_likelihood=node.L[root_base]
+                    max_root_base=node.C[root_base]
+            node.r=max_root_base
+            
+            #Traverse the tree from the root in the direction of the OTUs, assigning to each node its most likely ancestral character as follows:
+            for node in tree.preorder_node_iter():
+            
+                try:
+                    #5a. Visit an unreconstructed internal node x whose father y has already been reconstructed. Denote by i the reconstructed amino acid at node y.
+                    i=node.parent_node.r
+                except AttributeError:
+                    continue
+                #5b. Reconstruct node x by choosing Cx(i).
+                node.r=node.C[i]
+
+            rootlens=[]
+            for child in tree.seed_node.child_node_iter():
+                rootlens.append([child.edge_length,child,child.r])
+            rootlens.sort()
+            tree.seed_node.r=rootlens[-1][1].r
+            
+            ### TIMING
+            if verbose:
+                calc_time_end = time.process_time()
+                calc_time += (calc_time_end - calc_time_start)
+                storage_time_start = time.process_time()
+
+            # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
+            # store reconstructed alleles
+            reconstructed_alleles = {}
+            for node in tree.postorder_node_iter():
+                if node.is_leaf():
+                    node.r=base[node.taxon.label]
+                else:
+                    has_child_base=False
+                    for child in node.child_node_iter():
+                        if child.r in bases:
+                            has_child_base=True
+                            break
+                    if not has_child_base:
+                        node.r = "-"
+                    # Store reconstructed allele to determine how it should be inserted into the new alignment
+                    reconstructed_alleles[node.taxon.label] = node.r
         
-        # iterate through tree
-        for node in tree.preorder_node_iter():
-            try:
-                if node.r in bases and node.parent_node.r in bases and node.r!=node.parent_node.r:
-                    node_snps[node.taxon.label] += len(base_pattern_columns)
-            except AttributeError:
-                continue
+            # If site is monomorphic - replace whole column; else replace specific entries
+            reconstructed_allele_set = set(reconstructed_alleles.values())
+            if len(reconstructed_allele_set) == 1:
+                ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_patterns[column])
+            else:
+                for taxon in reconstructed_alleles:
+                    ancestrally_variable[reconstructed_alleles[taxon]][ancestral_node_indices[taxon]].extend(base_patterns[column])
+            
+            # iterate through tree
+            for node in tree.preorder_node_iter():
+                try:
+                    if node.r in bases and node.parent_node.r in bases and node.r!=node.parent_node.r:
+                        node_snps[node.taxon.label] += len(base_pattern_columns)
+                except AttributeError:
+                    continue
                 
         ### TIMING
-        storage_time_end = time.process_time()
-        storage_time += (storage_time_end - storage_time_start)
+        if verbose:
+            storage_time_end = time.process_time()
+            storage_time += (storage_time_end - storage_time_start)
 
     ### TIMING
-    storage_time_end = time.process_time()
-    storage_time += (storage_time_end - storage_time_start)
-    writing_time_start = time.process_time()
-    altered_bases = 0
+    if verbose:
+        storage_time_end = time.process_time()
+        storage_time += (storage_time_end - storage_time_start)
+        writing_time_start = time.process_time()
 
     # combine results across columns to access shared memory object as few times as possible
     # load output alignment
@@ -299,27 +306,21 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
 
     for b in ["A", "C", "G", "T", "-"]:
         if len(ancestrally_conserved[b]) > 0:
-            out_aln[:,ancestrally_conserved[b]] = b
+            out_aln[ancestrally_conserved[b],:] = b
         for index in ancestrally_variable[b]:
             if len(ancestrally_variable[b][index]) > 0:
-                out_aln[index,ancestrally_variable[b][index]] = b
-
-#    for b in ["A", "C", "G", "T", "-"]:
-#        for index in reconstructed_bases[b]:
-#            if len(reconstructed_bases[b][index]) > 0:
-#                altered_bases += len(reconstructed_bases[b][index])
-#                out_aln[index,reconstructed_bases[b][index]] = b
+                out_aln[ancestrally_variable[b][index],index] = b
 
     out_aln_shm.close()
 
     ### TIMING
-    writing_time_end = time.process_time()
-    writing_time += (writing_time_end - writing_time_start)
-    print('PREP:\t' + str(prep_time))
-    print('CALC:\t' + str(calc_time))
-    print('STORE:\t' + str(storage_time))
-    print('WRITE:\t' + str(writing_time))
-    print('ALTERING:\t' + str(altered_bases))
+    if verbose:
+        writing_time_end = time.process_time()
+        writing_time += (writing_time_end - writing_time_start)
+        print('Time for JAR preparation:\t' + str(prep_time))
+        print('Time for JAR calculation:\t' + str(calc_time))
+        print('Time for JAR storage:\t' + str(storage_time))
+        print('Time for JAR writing:\t' + str(writing_time))
 
     return node_snps
 
@@ -364,7 +365,6 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     
     # Label internal nodes in tree and add these to the new alignment and calculate pij per non-root branch
     nodecounter=0
-    new_alignment={}
     
     for node in tree.preorder_node_iter():
         if node.taxon == None:
@@ -375,10 +375,12 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
             if nodename in alignment_sequence_names:
                 print(nodename, "already in alignment. Quitting")
                 sys.exit()
-            new_alignment[nodename]=["?"]*len(alignment[0])
             ancestral_node_names.append(nodename) # index for reconstruction
         if node.parent_node != None:
             node.pij=calculate_pij(node.edge_length, rm)
+
+    # Create new empty array
+    new_aln_array = numpy.full((len(alignment[0]),len(ancestral_node_names)), '?', dtype = numpy.unicode_)
 
     # Index names for reconstruction
     ancestral_node_indices = {name:i for i,name in enumerate(ancestral_node_names)}
@@ -390,7 +392,6 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
-        new_aln_array = numpy.array([new_alignment[record] for record in new_alignment], dtype = numpy.unicode_)
         new_aln_array_raw = smm.SharedMemory(size = new_aln_array.nbytes)
         new_aln_shared_array = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = new_aln_array_raw.buf)
         new_aln_shared_array[:] = new_aln_array[:]
@@ -406,11 +407,12 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
                                         reconstruct_alignment_column,
                                             tree = tree,
                                             alignment_sequence_names = alignment_sequence_names,
-                                            alignment_name_indices = ancestral_node_indices,
+                                            ancestral_node_indices = ancestral_node_indices,
                                             base_patterns = base_patterns,
                                             base_matrix = mb,
                                             base_frequencies = f,
-                                            new_aln = new_aln_shared_array),
+                                            new_aln = new_aln_shared_array,
+                                            verbose = verbose),
                                         base_pattern_lists
                                     )
 
@@ -423,18 +425,17 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         for taxon in alignment:
             print(">"+taxon.id, file=asr_output)
             print(taxon.seq, file=asr_output)
-        for taxon in new_alignment:
+        for taxon in ancestral_node_indices:
             print(">"+taxon, file=asr_output)
-            print(''.join(out_aln[ancestral_node_indices[taxon],:]), file=asr_output)
+            print(''.join(out_aln[:,ancestral_node_indices[taxon]]), file=asr_output)
         asr_output.close()
 
         # Combine results for each base across the alignment
         for node in tree.preorder_node_iter():
             node.edge_length = 0.0 # reset lengths to convert to SNPs
             for x in range(len(reconstruction_results)):
-                reconstructed_branch_lengths = reconstruction_results[x]
                 try:
-                    node.edge_length += reconstructed_branch_lengths[node.taxon.label];
+                    node.edge_length += reconstruction_results[x][node.taxon.label];
                 except AttributeError:
                     continue
 

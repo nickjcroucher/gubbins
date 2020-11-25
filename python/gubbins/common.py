@@ -71,7 +71,7 @@ def parse_and_run(input_args, program_description=""):
     tree_file_names = []
     internal_node_label_prefix = "internal_"
     if input_args.tree_builder == "fasttree" or input_args.tree_builder == "hybrid":
-        tree_builder = FastTree(input_args.verbose)
+        tree_builder = FastTree(input_args.threads, input_args.verbose)
         sequence_reconstructor = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix,
                                        input_args.verbose)
         alignment_suffix = ".snp_sites.aln"

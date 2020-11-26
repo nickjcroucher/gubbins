@@ -87,7 +87,8 @@ def parse_and_run(input_args, program_description=""):
         tree_builder = RapidNJ(input_args.threads, input_args.verbose)
         sequence_reconstructor = tree_builder
 #        model_fitter = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
-        model_fitter = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
+#        model_fitter = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
+        model_fitter = FastTree(input_args.threads, input_args.verbose)
         alignment_suffix = ".snp_sites.aln"
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
@@ -247,8 +248,10 @@ def parse_and_run(input_args, program_description=""):
             elif input_args.tree_builder == "rapidnj":                
 #                info_filename = temp_working_dir + '/' + current_basename + '.log'
 #                info_filetype = 'iqtree'
-                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
-                info_filetype = 'raxml'
+#                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
+#                info_filetype = 'raxml'
+                info_filename = temp_working_dir + '/' + current_basename + '.log'
+                info_filetype = 'fasttree'
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_patterns, # unique base patterns in alignment

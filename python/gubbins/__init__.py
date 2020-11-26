@@ -18,7 +18,7 @@ from gubbins import common
 ## PACKAGE METADATA
 
 __project__ = "Gubbins"
-__version__ = "0.1"
+__version__ = "3.0"
 
 try:
     try:

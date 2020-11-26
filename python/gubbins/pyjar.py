@@ -75,14 +75,32 @@ def read_info(infofile, type = 'raxml'):
         if type == 'raxml':
             if "freq pi" in line:
                 words=line.split()
-                f.append(float(words[2]))
+                if "pi(A)" in line:
+                    f[0] = float(words[2])
+                elif "pi(C)" in line:
+                    f[1] = float(words[2])
+                elif "pi(G)" in line:
+                    f[2] = float(words[2])
+                elif "pi(T)" in line:
+                    f[3] = float(words[2])
             elif "Base frequencies:" in line:
                 words=line.split()
                 f=[float(words[2]), float(words[3]), float(words[4]), float(words[5])]
             elif "<->" in line:
                 # order is ac ag at cg ct gt
                 words=line.split()
-                r.append(float(words[4]))
+                if "A <-> C" in line:
+                    r[0] = float(words[4])
+                elif "A <-> G" in line:
+                    r[1] = float(words[4])
+                elif "A <-> T" in line:
+                    r[2] = float(words[4])
+                elif "C <-> G" in line:
+                    r[3] = float(words[4])
+                elif "C <-> T" in line:
+                    r[4] = float(words[4])
+                elif "G <-> T" in line:
+                    r[5] = float(words[4])
             elif "alpha[0]:" in line:
                 # order is ac ag at cg ct gt
                 words=line.split()
@@ -105,7 +123,7 @@ def read_info(infofile, type = 'raxml'):
 
     # Check frequencies and rates have been extracted correctly
     if -1.0 in f or -1.0 in r:
-        sys.stderr.write('Problem with extracting model parameters')
+        sys.stderr.write('Problem with extracting model parameters - frequencies are ' + str(f) + ' and rates are ' + str(r))
         sys.exit()
 
     return f, r

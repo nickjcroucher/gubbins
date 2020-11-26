@@ -78,6 +78,17 @@ class FastTree:
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
+    
+    def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Fits a nucleotide substitution model to a tree and an alignment"""
+        command = ['export OMP_NUM_THREADS=' + str(self.threads) + ';']
+        command.extend([self.executable])
+        command.extend(["-gtr","-nt","-mllen","-nome"])
+        command.extend(["-intree",input_tree])
+        command.extend(["-log",basename + ".log"])
+        command.extend([alignment_filename])
+        return " ".join(command)
+        #FastTree -gtr -nt -mllen -nome -intree EVAL.PMEN1.node_labelled.final_tree.tre -log tre.log EVAL.PMEN1.aln.start
 
 class IQTree:
     """Class for operations with the IQTree executable"""

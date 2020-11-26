@@ -28,7 +28,7 @@ except ImportError as e:
 
 def read_alignment(filename, file_type, verbose=False):
     if not os.path.isfile(filename):
-        print("Error: alignment file does not exist")
+        print("Error: alignment file " + filename + " does not exist")
         sys.exit()
     if verbose:
         print("Trying to open file " + filename + " as " + file_type)
@@ -60,7 +60,7 @@ def read_tree(treefile):
 def read_info(infofile, type = 'raxml'):
 
     if not os.path.isfile(infofile):
-        print("Error: alignment file does not exist")
+        print("Error: model information file " + infofile + " does not exist")
         sys.exit()
     
     if type not in ['raxml','iqtree','fasttree']:

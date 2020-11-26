@@ -20,6 +20,32 @@
 import sys
 from gubbins import utils
 
+class RapidNJ:
+    """Class for operations with the FastTree executable"""
+
+    def __init__(self, threads: int, verbose=False):
+        """Initialises the object"""
+        self.verbose = verbose
+        self.threads = threads
+        self.tree_prefix = ""
+        self.tree_suffix = ".tre"
+
+        self.executable = "rapidnj"
+        if utils.which(self.executable) is None:
+            sys.exit("No usable version of rapidnj could be found.")
+        self.tree_building_parameters = ["-i fa", "-t d", "-n"]
+
+    def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Constructs the command to call the FastTree executable"""
+        output_tree = basename + self.tree_suffix
+        command = [self.executable]
+        command.append(alignment_filename)
+        command.extend(["-c", str(self.threads)])
+        command.extend(self.tree_building_parameters)
+        command.extend(["-x", output_tree])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
 
 class FastTree:
     """Class for operations with the FastTree executable"""
@@ -51,7 +77,6 @@ class FastTree:
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
-
 
 class IQTree:
     """Class for operations with the IQTree executable"""
@@ -125,6 +150,12 @@ class IQTree:
         """Changes the label of internal nodes"""
         return self.internal_node_prefix + label.replace("Node", "")
 
+    def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        command = [self.executable]
+        command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, "-m GTR+G4 -n 0 --mlrate"])
+        if self.threads:
+            command.extend(["-nt", str(self.threads)])
+        return command
 
 class RAxML:
     """Class for operations with the RAxML executable"""

@@ -86,7 +86,8 @@ def parse_and_run(input_args, program_description=""):
     elif input_args.tree_builder == "rapidnj":
         tree_builder = RapidNJ(input_args.threads, input_args.verbose)
         sequence_reconstructor = tree_builder
-        model_fitter = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
+#        model_fitter = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
+        model_fitter = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
         alignment_suffix = ".snp_sites.aln"
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
@@ -222,19 +223,21 @@ def parse_and_run(input_args, program_description=""):
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
             if i == 1:
-                # read alignment and identify unique base patterns in first iteration only
+
+                # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
                 base_patterns = get_base_patterns(polymorphism_alignment, input_args.verbose)
-            # 3.3a. Re-fit full polymorphism alignment to new tree
-            model_fitting_command = ' '.join(model_fitter.model_fitting_command(base_filename + ".start",
+                
+            # 3.4a. Re-fit full polymorphism alignment to new tree
+            model_fitting_command = model_fitter.model_fitting_command(base_filename + ".start",
                                                                 os.path.abspath(temp_rooted_tree),
                                                                 temp_working_dir + '/' + current_basename)
-                                                                )
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
             subprocess.check_call(model_fitting_command, shell = True)
-            # reconstruct with new tree and info file in each iteration
+            
+            # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             if input_args.tree_builder == "raxml":
                 info_filename = temp_working_dir + '/RAxML_info.' + current_basename
                 info_filetype = 'raxml'
@@ -242,8 +245,10 @@ def parse_and_run(input_args, program_description=""):
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
                 info_filetype = 'iqtree'
             elif input_args.tree_builder == "rapidnj":                
-                info_filename = temp_working_dir + '/' + current_basename + '.log'
-                info_filetype = 'iqtree'
+#                info_filename = temp_working_dir + '/' + current_basename + '.log'
+#                info_filetype = 'iqtree'
+                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
+                info_filetype = 'raxml'
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_patterns, # unique base patterns in alignment

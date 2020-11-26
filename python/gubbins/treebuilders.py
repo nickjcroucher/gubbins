@@ -18,6 +18,7 @@
 #
 
 import sys
+import os
 from gubbins import utils
 
 class RapidNJ:
@@ -151,11 +152,13 @@ class IQTree:
         return self.internal_node_prefix + label.replace("Node", "")
 
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Fits a nucleotide substitution model to a tree and an alignment"""
+        # Using http://www.iqtree.org/doc/Advanced-Tutorial#user-defined-substitution-models
         command = [self.executable]
         command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, "-m GTR+G4 -n 0 --mlrate"])
-        if self.threads:
+        if self.threads > 1:
             command.extend(["-nt", str(self.threads)])
-        return command
+        return " ".join(command)
 
 class RAxML:
     """Class for operations with the RAxML executable"""
@@ -245,3 +248,13 @@ class RAxML:
     def replace_internal_node_label(self, label):
         """Changes the label of internal nodes"""
         return self.internal_node_prefix + label
+    
+    def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Fits a nucleotide substitution model to a tree and an alignment"""
+        command = [self.executable]
+        command.extend(["-s", alignment_filename, "-n", os.path.basename(basename), "-t", input_tree])
+        command.extend(["-f B -m ",self.model])
+        command.extend(["-w",os.path.dirname(basename)])
+        if self.threads > 1:
+            command.extend(["-T", str(self.threads)])
+        return " ".join(command)

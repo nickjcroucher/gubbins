@@ -40,25 +40,34 @@ def main():
                         version=str(pkg_resources.get_distribution("gubbins").version))
                         
     dataGroup = parser.add_argument_group('Data processing options')
-    dataGroup.add_argument('--filter_percentage', '-f', help='Filter out taxa with more than this percentage of gaps',
+    dataGroup.add_argument('--filter_percentage',  '-f', help='Filter out taxa with more than this percentage of gaps',
                         type=int, default=25)
     dataGroup.add_argument('--remove_identical_sequences', '-d', help='Remove identical sequences', action='store_true')
-    dataGroup.add_argument('--threads',           '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
+    dataGroup.add_argument('--threads',            '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
                                                          'version is available', type=int,  default=1)
-    dataGroup.add_argument('--verbose',           '-v', help='Turn on debugging', action='store_true')
-    dataGroup.add_argument('--no_cleanup',        '-n', help="Don't cleanup intermediate files", action='store_true')
+    dataGroup.add_argument('--verbose',            '-v', help='Turn on debugging', action='store_true')
+    dataGroup.add_argument('--no_cleanup',         '-n', help="Don't cleanup intermediate files", action='store_true')
 
     treeGroup = parser.add_argument_group('Tree building options')
-    treeGroup.add_argument('--tree_builder',      '-t', help='Application to use for tree building', default="raxml",
+    treeGroup.add_argument('--tree_builder',       '-t', help='Application to use for tree building', default="raxml",
                         choices=['raxml', 'iqtree', 'fasttree', 'hybrid', 'rapidnj'])
-    treeGroup.add_argument('--outgroup',          '-o', help='Outgroup name for rerooting. A list of comma separated '
+    treeGroup.add_argument('--outgroup',           '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                           'names can be used if they form a clade')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
-    modelGroup.add_argument('--raxml_model',       '-r', help='RAxML model', default='GTRCAT',
-                        choices=['GTRGAMMA', 'GTRCAT'])
+    modelGroup.add_argument('--model',             '-g', help='Nucleotide substitution model (GTRCAT not available for iqtree)',
+                                                         default='GTR',
+                                                         choices=['GTR' ,'GTRGAMMA', 'GTRCAT'])
+    modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
+                                                         ' tree builder if possible, else raxml]',
+                                                         default="raxml",
+                                                         choices=['raxml', 'iqtree', 'fasttree'])
     modelGroup.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
-
+    modelGroup.add_argument('--sequence-recon',    '-q', help='Application to use for marginal reconstruction [default = '
+                                                            'same as tree builder if possible, else raxml]',
+                                                            default="raxml",
+                                                            choices=['raxml', 'iqtree'])
+    
     gubbinsGroup = parser.add_argument_group('Recombination detection options')
     gubbinsGroup.add_argument('--min_snps',          '-m', help='Min SNPs to identify a recombination block', type=int,
                         default=3)

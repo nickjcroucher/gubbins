@@ -70,29 +70,19 @@ def parse_and_run(input_args, program_description=""):
     current_tree_name = input_args.starting_tree
     tree_file_names = []
     internal_node_label_prefix = "internal_"
-    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "hybrid":
-        tree_builder = FastTree(input_args.threads, input_args.verbose)
-        sequence_reconstructor = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix,
-                                       input_args.verbose)
+    tree_builder = return_algorithm(input_args.tree_builder, input_args, node_labels = internal_node_label_prefix)
+    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "hybrid" \
+            or input_args.tree_builder == "rapidnj":
         alignment_suffix = ".snp_sites.aln"
-    elif input_args.tree_builder == "raxml":
-        tree_builder = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
-        sequence_reconstructor = tree_builder
+    elif input_args.tree_builder == "raxml" or input_args.tree_builder == "iqtree":
         alignment_suffix = ".phylip"
-    elif input_args.tree_builder == "iqtree":
-        tree_builder = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
-        sequence_reconstructor = tree_builder
-        alignment_suffix = ".phylip"
-    elif input_args.tree_builder == "rapidnj":
-        tree_builder = RapidNJ(input_args.threads, input_args.verbose)
-        sequence_reconstructor = tree_builder
-#        model_fitter = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
-#        model_fitter = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
-        model_fitter = FastTree(input_args.threads, input_args.verbose)
-        alignment_suffix = ".snp_sites.aln"
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
         sys.exit()
+    
+    # Now initialise model fitting and sequence reconstruction algorithms
+    model_fitter = return_algorithm(input_args.model_fitter, input_args, node_labels = internal_node_label_prefix)
+    sequence_reconstructor = return_algorithm(input_args.sequence_recon, input_args, node_labels = internal_node_label_prefix)
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check if the input files exist and have the right format
@@ -232,24 +222,20 @@ def parse_and_run(input_args, program_description=""):
                 base_patterns = get_base_patterns(polymorphism_alignment, input_args.verbose)
                 
             # 3.4a. Re-fit full polymorphism alignment to new tree
-            model_fitting_command = model_fitter.model_fitting_command(base_filename + ".start",
+            model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
                                                                 os.path.abspath(temp_rooted_tree),
                                                                 temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
             subprocess.check_call(model_fitting_command, shell = True)
             
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
-            if input_args.tree_builder == "raxml":
+            if input_args.model_fitter == "raxml":
                 info_filename = temp_working_dir + '/RAxML_info.' + current_basename
                 info_filetype = 'raxml'
-            elif input_args.tree_builder == "iqtree" or input_args.tree_builder == "fasttree":
+            elif input_args.model_fitter == "iqtree":
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
                 info_filetype = 'iqtree'
-            elif input_args.tree_builder == "rapidnj":                
-#                info_filename = temp_working_dir + '/' + current_basename + '.log'
-#                info_filetype = 'iqtree'
-#                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
-#                info_filetype = 'raxml'
+            elif input_args.model_fitter == "fasttree":
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
                 info_filetype = 'fasttree'
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
@@ -360,6 +346,21 @@ def parse_and_run(input_args, program_description=""):
         utils.delete_files(".", [base_filename], starting_files_regex(), input_args.verbose)
     printer.print("...finished. Total run time: {:.2f} s".format(time.time() - start_time))
 
+
+def return_algorithm(input_arg, input_args, node_labels = None):
+    initialised_algorithm = None
+    if input_arg == "fasttree" or input_arg == "hybrid":
+        initialised_algorithm = FastTree(input_args.threads, input_args.verbose)
+    elif input_arg == "raxml":
+        initialised_algorithm = RAxML(input_args.threads, input_args.model, node_labels, input_args.verbose)
+    elif input_args.tree_builder == "iqtree":
+        initialised_algorithm = IQTree(input_args.threads, node_labels, input_args.verbose)
+    elif input_args.tree_builder == "rapidnj":
+        initialised_algorithm = RapidNJ(input_args.threads, input_args.verbose)
+    else:
+        sys.stderr.write("Unrecognised algorithm: " + input_arg)
+        sys.exit()
+    return initialised_algorithm
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size):

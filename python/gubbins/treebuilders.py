@@ -75,6 +75,9 @@ class FastTree:
             command.extend(["-gtr","-gamma"])
         elif self.model == 'GTRCAT':
             command.extend(["-gtr"])
+        else:
+            sys.stderr.write('Model ' + self.model + ' cannot be used with fasttree\n')
+            sys.exit()
         self.base_command = command
         
         # Set the number of threads of parallelisation
@@ -109,7 +112,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: int, model: str, internal_node_prefix="", verbose=False):
+    def __init__(self, threads: 1, model: str, internal_node_prefix="", verbose=False):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -121,22 +124,31 @@ class IQTree:
         self.asr_tree_prefix = ""
         self.asr_tree_suffix = ".treefile"
         self.internal_node_prefix = internal_node_prefix
-
+    
+        # Construct base command
         self.executable = "iqtree"
         if utils.which(self.executable) is None:
             sys.exit("No usable version of IQTree could be found.")
-        self.tree_building_parameters = ["-safe -m GTR+G4"]
-        self.internal_sequence_reconstruction_parameters = ["-safe -asr -m GTR+G4"]
+        command = [self.executable]
+        
+        # Set parallelisation
+        command.extend(["-nt", str(self.threads)])
+
+        # Add flags
+        command.extend(["-safe"])
+        if self.model == 'GTR':
+            command.extend(["-m","GTR"])
+        elif self.model == 'GTRGAMMA':
+            command.extend(["-m","GTR+G4"])
+        else:
+            sys.stderr.write('Model ' + self.model + ' cannot be used with iqtree\n')
+            sys.exit()
+        self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the IQTree executable"""
-        command = [self.executable]
-        command.extend(self.tree_building_parameters)
+        command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-pre", basename])
-        if self.threads:
-            command.extend(["-nt", str(self.threads)])
-        else:
-            command.extend(["-nt", "AUTO"])
         if input_tree:
             command.extend(["-t", input_tree])
         if not self.verbose:
@@ -145,11 +157,9 @@ class IQTree:
 
     def internal_sequence_reconstruction_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the IQTree executable for ancestral sequence reconstruction"""
-        command = [self.executable]
-        command.extend(self.internal_sequence_reconstruction_parameters)
+        command = self.base_command.copy()
+        command.extend(["-asr"])
         command.extend(["-s", alignment_filename, "-pre", basename])
-        if self.threads:
-            command.extend(["-nt", str(self.threads)])
         if input_tree:
             command.extend(["-te", input_tree])
         if not self.verbose:
@@ -182,16 +192,14 @@ class IQTree:
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         # Using http://www.iqtree.org/doc/Advanced-Tutorial#user-defined-substitution-models
-        command = [self.executable]
-        command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, "-m GTR+G4 -n 0 --mlrate"])
-        if self.threads > 1:
-            command.extend(["-nt", str(self.threads)])
+        command = self.base_command.copy()
+        command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, " -n 0 --mlrate", "-redo"])
         return " ".join(command)
 
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: int, model='GTRCAT', internal_node_prefix="", verbose=False):
+    def __init__(self, threads: 1, model='GTRCAT', internal_node_prefix="", verbose=False):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -210,18 +218,26 @@ class RAxML:
         self.executable = self.select_executable_based_on_threads()
         if self.executable is None:
             sys.exit("No usable version of RAxML could be found.")
+        command = [self.executable]
+        
+        # Set parallelisation
+        command.extend(["-T", str(self.threads)])
 
-        self.tree_building_parameters = ["-f", "d", "-p", str(1)]
-        if self.model == "GTRGAMMA":
-            self.tree_building_parameters.extend(["-m", "GTRGAMMA"])
+        # Add flags
+        command.extend(["-safe"])
+        if self.model == 'GTRCAT':
+            command.extend(["-m","GTRCAT", "-V"])
+        elif self.model == 'GTRGAMMA':
+            command.extend(["-m","GTRGAMMA"])
         else:
-            self.tree_building_parameters.extend(["-m", "GTRCAT", "-V"])
-        self.internal_sequence_reconstruction_parameters = ["-f", "A", "-p", str(1), "-m", "GTRGAMMA"]
+            sys.stderr.write('Model ' + self.model + ' cannot be used with raxml\n')
+            sys.exit()
+        self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
-        command = [self.executable]
-        command.extend(self.tree_building_parameters)
+        command = self.base_command.copy()
+        command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
@@ -233,8 +249,8 @@ class RAxML:
 
     def internal_sequence_reconstruction_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for ancestral sequence reconstruction"""
-        command = [self.executable]
-        command.extend(self.internal_sequence_reconstruction_parameters)
+        command = self.base_command.copy()
+        command.extend(["-f", "A", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])

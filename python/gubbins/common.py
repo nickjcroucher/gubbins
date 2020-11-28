@@ -354,7 +354,7 @@ def return_algorithm(algorithm_choice, input_args, node_labels = None):
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(input_args.threads, input_args.model, node_labels, input_args.verbose)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(input_args.threads, node_labels, input_args.verbose)
+        initialised_algorithm = IQTree(input_args.threads, input_args.model, node_labels, input_args.verbose)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(input_args.threads, input_args.verbose)
     else:

@@ -19,6 +19,7 @@
 
 import sys
 import os
+import subprocess
 from gubbins import utils
 
 class RapidNJ:
@@ -59,27 +60,36 @@ class FastTree:
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
 
+        # Identify executable
         self.potential_executables = ["FastTree", "fasttree"]
         self.executable = utils.choose_executable(self.potential_executables)
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")
-        self.tree_building_parameters = ["-nosupport", "-gtr", "-gamma", "-nt"]
-        # Decide on model
+        
+        # Function for returning base command
+        command = [self.executable]
+        command.extend(["-nosupport", "-nt"])
         if self.model == 'GTR':
-            self.tree_building_parameters.extend = ["-gtr","-nocat"]
+            command.extend(["-gtr","-nocat"])
         elif self.model == 'GTRGAMMA':
-            self.tree_building_parameters.extend = ["-gtr","-gamma"]
+            command.extend(["-gtr","-gamma"])
         elif self.model == 'GTRCAT':
-            self.tree_building_parameters.extend = ["-gtr"]
+            command.extend(["-gtr"])
+        self.base_command = command
+        
+        # Set the number of threads of parallelisation
+        omp_threads_command = 'export OMP_NUM_THREADS=' + str(self.threads)
+        try:
+            subprocess.check_call(omp_threads_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed to set number of threads for fasttree with command " + omp_threads_command)
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
-        output_tree = basename + self.tree_suffix
-        command = ['export OMP_NUM_THREADS=' + str(self.threads) + ';']
-        command.extend([self.executable])
-        command.extend(self.tree_building_parameters)
+        command = self.base_command.copy()
         if input_tree:
             command.extend(["-intree", input_tree])
+        output_tree = basename + self.tree_suffix
         command.extend(["-out", output_tree])
         command.extend(["-log", basename + '.log'])
         command.append(alignment_filename)
@@ -89,21 +99,21 @@ class FastTree:
     
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
-        command = ['export OMP_NUM_THREADS=' + str(self.threads) + ';']
-        command.extend([self.executable])
-        command.extend(["-gtr","-nt","-mllen","-nome"])
+        command = self.base_command.copy()
+        command.extend(["-mllen","-nome"])
         command.extend(["-intree",input_tree])
-        command.extend(["-log",basename + ".log"])
+        command.extend(["-log", basename + ".log"])
         command.extend([alignment_filename])
         return " ".join(command)
 
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: int, internal_node_prefix="", verbose=False):
+    def __init__(self, threads: int, model: str, internal_node_prefix="", verbose=False):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
+        self.model = model
         self.tree_prefix = ""
         self.tree_suffix = ".treefile"
         self.asr_prefix = ""

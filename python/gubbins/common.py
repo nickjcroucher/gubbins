@@ -350,7 +350,7 @@ def parse_and_run(input_args, program_description=""):
 def return_algorithm(algorithm_choice, input_args, node_labels = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree" or algorithm_choice == "hybrid":
-        initialised_algorithm = FastTree(input_args.threads, input_args.verbose)
+        initialised_algorithm = FastTree(input_args.threads, input_args.model, input_args.verbose)
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(input_args.threads, input_args.model, node_labels, input_args.verbose)
     elif algorithm_choice == "iqtree":

@@ -20,7 +20,32 @@
 import sys
 import os
 import subprocess
+
+from Bio import SeqIO
+
 from gubbins import utils
+
+
+class Star:
+    """Class for constructing star phylogenies"""
+    
+    def __init__(self):
+        self.executable = "star phylogeny"
+        self.tree_prefix = ""
+        self.tree_suffix = ".tre"
+    
+    def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        # Extract taxon names from alignment
+        taxon_names = SeqIO.index(alignment_filename,"fasta")
+        # Write tree
+        star_tree_string = "("
+        star_tree_string = star_tree_string + ':1,'.join(taxon_names.keys())
+        star_tree_string = star_tree_string + ':1);'
+        # Print to file
+        output_tree = basename + self.tree_suffix
+        with open(output_tree,'w') as out_file:
+            out_file.write(star_tree_string + '\n')
+        return output_tree
 
 class RapidNJ:
     """Class for operations with the FastTree executable"""

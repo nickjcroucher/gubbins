@@ -51,10 +51,11 @@ class RapidNJ:
 class FastTree:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, threads: int, verbose=False):
+    def __init__(self, threads: int, model='GTRCAT', verbose=False):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
+        self.model = model
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
 
@@ -63,6 +64,13 @@ class FastTree:
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")
         self.tree_building_parameters = ["-nosupport", "-gtr", "-gamma", "-nt"]
+        # Decide on model
+        if self.model == 'GTR':
+            self.tree_building_parameters.extend = ["-gtr","-nocat"]
+        elif self.model == 'GTRGAMMA':
+            self.tree_building_parameters.extend = ["-gtr","-gamma"]
+        elif self.model == 'GTRCAT':
+            self.tree_building_parameters.extend = ["-gtr"]
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
@@ -88,7 +96,6 @@ class FastTree:
         command.extend(["-log",basename + ".log"])
         command.extend([alignment_filename])
         return " ".join(command)
-        #FastTree -gtr -nt -mllen -nome -intree EVAL.PMEN1.node_labelled.final_tree.tre -log tre.log EVAL.PMEN1.aln.start
 
 class IQTree:
     """Class for operations with the IQTree executable"""

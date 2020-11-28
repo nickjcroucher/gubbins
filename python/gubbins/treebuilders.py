@@ -35,15 +35,20 @@ class RapidNJ:
         self.executable = "rapidnj"
         if utils.which(self.executable) is None:
             sys.exit("No usable version of rapidnj could be found.")
-        self.tree_building_parameters = ["-i fa", "-t d", "-n"]
+        command = [self.executable]
+        command.extend(["-i fa", "-t d", "-n"])
+        command.extend(["-c", str(self.threads)])
+        self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
+        command = self.base_command.copy()
+        # Alignment file needs to be first argument
+        executable = command.pop(0)
+        command.insert(0,alignment_filename)
+        command.insert(0,executable)
+        # Specify output file
         output_tree = basename + self.tree_suffix
-        command = [self.executable]
-        command.append(alignment_filename)
-        command.extend(["-c", str(self.threads)])
-        command.extend(self.tree_building_parameters)
         command.extend(["-x", output_tree])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
@@ -80,7 +85,7 @@ class FastTree:
             sys.exit()
         self.base_command = command
         
-        # Set the number of threads of parallelisation
+        # Set the number of threads for parallelisation
         omp_threads_command = 'export OMP_NUM_THREADS=' + str(self.threads)
         try:
             subprocess.check_call(omp_threads_command, shell=True)

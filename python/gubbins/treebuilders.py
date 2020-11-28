@@ -252,8 +252,6 @@ class RAxML:
         command = self.base_command.copy()
         command.extend(["-f", "A", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
-        if self.threads > 1:
-            command.extend(["-T", str(self.threads)])
         command.extend(["-t", input_tree])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
@@ -296,9 +294,7 @@ class RAxML:
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         command = [self.executable]
-        command.extend(["-s", alignment_filename, "-n", os.path.basename(basename), "-t", input_tree])
+        command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
         command.extend(["-f B -m ",self.model])
         command.extend(["-w",os.path.dirname(basename)])
-        if self.threads > 1:
-            command.extend(["-T", str(self.threads)])
         return " ".join(command)

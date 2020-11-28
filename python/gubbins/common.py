@@ -230,7 +230,7 @@ def parse_and_run(input_args, program_description=""):
             
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             if input_args.model_fitter == "raxml":
-                info_filename = temp_working_dir + '/RAxML_info.' + current_basename
+                info_filename = temp_working_dir + '/RAxML_info.' + current_basename + '_reconstruction'
                 info_filetype = 'raxml'
             elif input_args.model_fitter == "iqtree":
                 info_filename = temp_working_dir + '/' + current_basename + '.log'

@@ -39,7 +39,7 @@ from gubbins.pyjar import jar, read_alignment, get_base_patterns
 
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RapidNJ
+from gubbins.treebuilders import FastTree, IQTree, RAxML, RapidNJ, Star
 from gubbins import utils
 
 
@@ -70,9 +70,12 @@ def parse_and_run(input_args, program_description=""):
     current_tree_name = input_args.starting_tree
     tree_file_names = []
     internal_node_label_prefix = "internal_"
-    tree_builder = return_algorithm(input_args.tree_builder, input_args, node_labels = internal_node_label_prefix)
-    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "hybrid" \
-            or input_args.tree_builder == "rapidnj":
+    if input_args.first_tree_builder is not None:
+        current_tree_builder = input_args.first_tree_builder
+    else:
+        current_tree_builder = input_args.tree_builder
+    tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
+    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "rapidnj":
         alignment_suffix = ".snp_sites.aln"
     elif input_args.tree_builder == "raxml" or input_args.tree_builder == "iqtree":
         alignment_suffix = ".phylip"
@@ -158,10 +161,18 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2 and input_args.tree_builder == "hybrid":
+        if i == 2 and input_args.first_tree_builder is not None:
             # Switch to RAxML
-            tree_builder = sequence_reconstructor
-            alignment_suffix = ".phylip"
+            current_tree_builder = input_args.tree_builder
+
+            tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
+            if input_args.tree_builder == "fasttree" or input_args.tree_builder == "rapidnj":
+                alignment_suffix = ".snp_sites.aln"
+            elif input_args.tree_builder == "raxml" or input_args.tree_builder == "iqtree":
+                alignment_suffix = ".phylip"
+            else:
+                sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
+                sys.exit()
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -172,7 +183,7 @@ def parse_and_run(input_args, program_description=""):
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
-        if previous_tree_name:
+        if previous_tree_name and input_args.first_tree_builder != "star":
             tree_building_command = tree_builder.tree_building_command(
                 os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
         else:
@@ -187,12 +198,16 @@ def parse_and_run(input_args, program_description=""):
         else:
             printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
                            tree_building_command])
-            os.chdir(temp_working_dir)
-            try:
-                subprocess.check_call(tree_building_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while building the tree.")
-            os.chdir(current_directory)
+            if current_tree_builder == "star":
+                # Move star tree into temp dir
+                subprocess.check_call(["mv", tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix, built_tree])
+            else:
+                try:
+                    os.chdir(temp_working_dir)
+                    subprocess.check_call(tree_building_command, shell=True)
+                except subprocess.SubprocessError:
+                    sys.exit("Failed while building the tree.")
+                os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
@@ -357,6 +372,8 @@ def return_algorithm(algorithm_choice, input_args, node_labels = None):
         initialised_algorithm = IQTree(input_args.threads, input_args.model, node_labels, input_args.verbose)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(input_args.threads, input_args.verbose)
+    elif algorithm_choice == "star":
+        initialised_algorithm = Star()
     else:
         sys.stderr.write("Unrecognised algorithm: " + algorithm_choice + "\n")
         sys.exit()

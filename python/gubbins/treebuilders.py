@@ -39,8 +39,8 @@ class Star:
         taxon_names = SeqIO.index(alignment_filename,"fasta")
         # Write tree
         star_tree_string = "("
-        star_tree_string = star_tree_string + ':1,'.join(taxon_names.keys())
-        star_tree_string = star_tree_string + ':1);'
+        star_tree_string = star_tree_string + ':0.9,'.join(taxon_names.keys())
+        star_tree_string = star_tree_string + ':1);' # mid point rooting fails with equidistant taxa
         # Print to file
         output_tree = basename + self.tree_suffix
         with open(output_tree,'w') as out_file:

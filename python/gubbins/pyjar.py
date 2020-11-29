@@ -293,7 +293,7 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
             rootlens=[]
             for child in tree.seed_node.child_node_iter():
                 rootlens.append([child.edge_length,child,child.r])
-            rootlens.sort()
+            rootlens.sort(key = lambda x: x[0])
             tree.seed_node.r=rootlens[-1][1].r
             
             ### TIMING

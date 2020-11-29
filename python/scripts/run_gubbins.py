@@ -51,18 +51,21 @@ def main():
     dataGroup.add_argument('--no_cleanup',         '-n', help="Don't cleanup intermediate files", action='store_true')
 
     treeGroup = parser.add_argument_group('Tree building options')
-    treeGroup.add_argument('--first-tree-builder', '-1', help='Application to use for building the first tree',
-                                                                default=None,
-                                                                choices=['raxml', 'iqtree', 'fasttree', 'rapidnj', 'star'])
     treeGroup.add_argument('--tree-builder',       '-t', help='Application to use for tree building',
                                                             default="raxml",
                                                             choices=['raxml', 'iqtree', 'fasttree', 'hybrid', 'rapidnj'])
+    treeGroup.add_argument('--first-tree-builder', '-1', help='Application to use for building the first tree',
+                                                                default=None,
+                                                                choices=['raxml', 'iqtree', 'fasttree', 'rapidnj', 'star'])
     treeGroup.add_argument('--outgroup',           '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                           'names can be used if they form a clade')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
-    modelGroup.add_argument('--model',             '-g', help='Nucleotide substitution model (GTRCAT not available for iqtree;'
-                                                        ' GTR not available for raxml)',
+    modelGroup.add_argument('--model',             '-g', help='Nucleotide substitution model (not all available for all'
+                                                         'tree building algorithms',
+                                                         default='GTRGAMMA',
+                                                         choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    modelGroup.add_argument('--first-model',        '-l', help='Nucleotide substitution model used for first tree',
                                                          default='GTRGAMMA',
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
@@ -70,7 +73,7 @@ def main():
                                                          default="raxml",
                                                          choices=['raxml', 'iqtree', 'fasttree'])
     modelGroup.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
-    modelGroup.add_argument('--sequence-recon',    '-q', help='Application to use for marginal reconstruction [default = '
+    modelGroup.add_argument('--seq-recon',    '-q', help='Application to use for marginal reconstruction [default = '
                                                             'same as tree builder if possible, else raxml]',
                                                             default="raxml",
                                                             choices=['raxml', 'iqtree'])

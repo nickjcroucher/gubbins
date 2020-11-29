@@ -74,18 +74,22 @@ def parse_and_run(input_args, program_description=""):
         current_tree_builder = input_args.first_tree_builder
     else:
         current_tree_builder = input_args.tree_builder
-    tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
-    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "rapidnj":
+    if input_args.first_model is not None:
+        current_model = input_args.first_model
+    else:
+        current_model = input_args.model
+    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix)
+    if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" or current_tree_builder == "star":
         alignment_suffix = ".snp_sites.aln"
-    elif input_args.tree_builder == "raxml" or input_args.tree_builder == "iqtree":
+    elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
         alignment_suffix = ".phylip"
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
         sys.exit()
 
     # Now initialise model fitting and sequence reconstruction algorithms
-    model_fitter = return_algorithm(input_args.model_fitter, input_args, node_labels = internal_node_label_prefix)
-    sequence_reconstructor = return_algorithm(input_args.sequence_recon, input_args, node_labels = internal_node_label_prefix)
+    model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix)
+    sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check if the input files exist and have the right format
@@ -167,19 +171,23 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2 and input_args.first_tree_builder is not None:
-            # Switch to RAxML
+        if i == 2 and (input_args.first_tree_builder is not None or input_args.first_model is not None):
+            # Switch to new tree/model combination
             current_tree_builder = input_args.tree_builder
-
-        tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
-        if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
-                or current_tree_builder == "star":
-            alignment_suffix = ".snp_sites.aln"
-        elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
-            alignment_suffix = ".phylip"
-        else:
-            sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
-            sys.exit()
+            current_model = input_args.model
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix)
+            if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
+                    or current_tree_builder == "star":
+                alignment_suffix = ".snp_sites.aln"
+            elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
+                alignment_suffix = ".phylip"
+            else:
+                sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
+                sys.exit()
+            # Update model fitting and sequence reconstruction if required
+            if input_args.first_model is not None:
+                model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix)
+                sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -369,16 +377,16 @@ def parse_and_run(input_args, program_description=""):
     printer.print("...finished. Total run time: {:.2f} s".format(time.time() - start_time))
 
 
-def return_algorithm(algorithm_choice, input_args, node_labels = None):
+def return_algorithm(algorithm_choice, model, input_args, node_labels = None):
     initialised_algorithm = None
-    if algorithm_choice == "fasttree" or algorithm_choice == "hybrid":
-        initialised_algorithm = FastTree(input_args.threads, input_args.model, input_args.verbose)
+    if algorithm_choice == "fasttree":
+        initialised_algorithm = FastTree(input_args.threads, model, input_args.verbose)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(input_args.threads, input_args.model, node_labels, input_args.verbose)
+        initialised_algorithm = RAxML(input_args.threads, model, node_labels, input_args.verbose)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(input_args.threads, input_args.model, node_labels, input_args.verbose)
+        initialised_algorithm = IQTree(input_args.threads, model, node_labels, input_args.verbose)
     elif algorithm_choice == "rapidnj":
-        initialised_algorithm = RapidNJ(input_args.threads, input_args.verbose)
+        initialised_algorithm = RapidNJ(input_args.threads, model, input_args.verbose)
     elif algorithm_choice == "star":
         initialised_algorithm = Star()
     else:

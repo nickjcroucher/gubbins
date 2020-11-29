@@ -58,6 +58,7 @@ class RapidNJ:
         self.threads = threads
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
+        self.model = model
 
         self.executable = "rapidnj"
         if utils.which(self.executable) is None:

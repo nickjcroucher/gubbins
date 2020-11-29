@@ -82,7 +82,7 @@ def parse_and_run(input_args, program_description=""):
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
         sys.exit()
-    
+
     # Now initialise model fitting and sequence reconstruction algorithms
     model_fitter = return_algorithm(input_args.model_fitter, input_args, node_labels = internal_node_label_prefix)
     sequence_reconstructor = return_algorithm(input_args.sequence_recon, input_args, node_labels = internal_node_label_prefix)

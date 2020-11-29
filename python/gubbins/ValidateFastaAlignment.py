@@ -41,9 +41,6 @@ class ValidateFastaAlignment(object):
                 if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
                   print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
                   return False
-        if number_of_sequences <= 3:
-          print("Error with input FASTA file: you need more than 3 sequences to build a meaningful tree")
-          return False
         input_handle.close()
       return True
     

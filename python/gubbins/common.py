@@ -99,8 +99,14 @@ def parse_and_run(input_args, program_description=""):
     if input_args.starting_tree is not None and input_args.starting_tree != "" \
             and not do_the_names_match_the_fasta_file(input_args.starting_tree, input_args.alignment_filename):
         sys.exit("The names in the starting tree do not match the names in the alignment file")
-    if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
-        sys.exit("3 or more sequences are required.")
+
+    # Check on number of sequences in alignment
+    if input_args.pairwise:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+            sys.exit("Pairwise mode should only be used for two sequences.")
+    else:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -165,14 +171,15 @@ def parse_and_run(input_args, program_description=""):
             # Switch to RAxML
             current_tree_builder = input_args.tree_builder
 
-            tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
-            if input_args.tree_builder == "fasttree" or input_args.tree_builder == "rapidnj":
-                alignment_suffix = ".snp_sites.aln"
-            elif input_args.tree_builder == "raxml" or input_args.tree_builder == "iqtree":
-                alignment_suffix = ".phylip"
-            else:
-                sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
-                sys.exit()
+        tree_builder = return_algorithm(current_tree_builder, input_args, node_labels = internal_node_label_prefix)
+        if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
+                or current_tree_builder == "star":
+            alignment_suffix = ".snp_sites.aln"
+        elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
+            alignment_suffix = ".phylip"
+        else:
+            sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
+            sys.exit()
 
         if i == 1:
             previous_tree_name = input_args.starting_tree

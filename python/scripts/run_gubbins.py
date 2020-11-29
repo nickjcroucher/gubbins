@@ -40,6 +40,8 @@ def main():
                         version=str(pkg_resources.get_distribution("gubbins").version))
                         
     dataGroup = parser.add_argument_group('Data processing options')
+    dataGroup.add_argument('--pairwise',        '-2', help='Compare two sequences (without using a tree)',
+                                                        default = False, action = 'store_true') # fasttree model fit, star phylogeny, one iteration
     dataGroup.add_argument('--filter_percentage',  '-f', help='Filter out taxa with more than this percentage of gaps',
                         type=int, default=25)
     dataGroup.add_argument('--remove_identical_sequences', '-d', help='Remove identical sequences', action='store_true')

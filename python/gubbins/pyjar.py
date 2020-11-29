@@ -120,6 +120,9 @@ def read_info(infofile, type = 'raxml'):
             elif line.startswith('GTRRates'):
                 words=line.split()
                 r=[float(words[1]), float(words[2]), float(words[3]), float(words[4]), float(words[5]), float(words[6])]
+            elif 'ML Model: Jukes-Cantor' in line: # Jukes-Cantor model for Fasttree
+                f = [0.25,0.25,0.25,0.25]
+                r = [1.0,1.0,1.0,1.0,1.0,1.0]
 
     # Check frequencies and rates have been extracted correctly
     if -1.0 in f or -1.0 in r:

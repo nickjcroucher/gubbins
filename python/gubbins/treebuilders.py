@@ -52,7 +52,7 @@ class Star:
 class RapidNJ:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, threads: int, verbose=False):
+    def __init__(self, threads: int, model='GTRCAT', verbose=False):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -65,6 +65,13 @@ class RapidNJ:
         command = [self.executable]
         command.extend(["-i fa", "-t d", "-n"])
         command.extend(["-c", str(self.threads)])
+        if self.model == 'JC':
+            command.extend(["-a", "jc"])
+        elif self.model == 'K2P':
+            command.extend(["-a", "kim"])
+        else:
+            sys.stderr.write('Model ' + self.model + ' cannot be used with rapidnj\n')
+            sys.exit()
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
@@ -101,7 +108,9 @@ class FastTree:
         # Function for returning base command
         command = [self.executable]
         command.extend(["-nosupport", "-nt"])
-        if self.model == 'GTR':
+        if self.model == 'JC':
+            pass # default model
+        elif self.model == 'GTR':
             command.extend(["-gtr","-nocat"])
         elif self.model == 'GTRGAMMA':
             command.extend(["-gtr","-gamma"])
@@ -168,7 +177,13 @@ class IQTree:
 
         # Add flags
         command.extend(["-safe"])
-        if self.model == 'GTR':
+        if self.model == 'JC':
+            command.extend(["-m", "JC"])
+        elif self.model == 'K2P':
+            command.extend(["-m", "K2P"])
+        elif self.model == 'HKY':
+            command.extend(["-m", "HKY"])
+        elif self.model == 'GTR':
             command.extend(["-m","GTR"])
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTR+G4"])
@@ -257,7 +272,13 @@ class RAxML:
 
         # Add flags
         command.extend(["-safe"])
-        if self.model == 'GTRCAT':
+        if self.model == 'JC':
+            command.extend(["-m", "GTRCAT","--JC69"])
+        elif self.model == 'K2P':
+            command.extend(["-m", "GTRCAT","--K80"])
+        elif self.model == 'HKY':
+            command.extend(["-m", "GTRCAT","--HKY85"])
+        elif self.model == 'GTRCAT':
             command.extend(["-m","GTRCAT", "-V"])
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTRGAMMA"])
@@ -325,8 +346,8 @@ class RAxML:
     
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
-        command = [self.executable]
+        command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
-        command.extend(["-f B -m ",self.model])
+        command.extend(["-f B"])
         command.extend(["-w",os.path.dirname(basename)])
         return " ".join(command)

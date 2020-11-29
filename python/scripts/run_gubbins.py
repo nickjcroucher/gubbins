@@ -64,7 +64,7 @@ def main():
     modelGroup.add_argument('--model',             '-g', help='Nucleotide substitution model (GTRCAT not available for iqtree;'
                                                         ' GTR not available for raxml)',
                                                          default='GTRGAMMA',
-                                                         choices=['GTR' ,'GTRGAMMA', 'GTRCAT'])
+                                                         choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
                                                          ' tree builder if possible, else raxml]',
                                                          default="raxml",

@@ -49,6 +49,9 @@ def parse_and_run(input_args, program_description=""):
     current_directory = os.getcwd()
     printer = utils.VerbosePrinter(True, "\n")
 
+    # Process input options
+    input_args = process_input_arguments(input_args)
+
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
     gubbins_exec = 'gubbins'
     if utils.which(gubbins_exec) is None:
@@ -376,6 +379,59 @@ def parse_and_run(input_args, program_description=""):
         utils.delete_files(".", [base_filename], starting_files_regex(), input_args.verbose)
     printer.print("...finished. Total run time: {:.2f} s".format(time.time() - start_time))
 
+#############
+# Functions #
+#############
+
+def process_input_arguments(input_args):
+    # Alter settings if pairwise comparison of sequences
+    if input_args.pairwise:
+        input_args.iterations = 1
+        input_args.model_fitter = 'fasttree'
+        input_args.first_tree_builder = 'star'
+    else:
+        # Make model fitting consistent with tree building
+        if input_args.model_fitter is None:
+            if input_args.tree_builder in ['raxml', 'iqtree', 'fasttree']:
+                input_args.model_fitter = input_args.tree_builder
+            else:
+                input_args.tree_builder = 'raxml'
+                
+        # Make sequence reconstruction consistent with tree building
+        if input_args.seq_recon is None:
+            if input_args.tree_builder in ['raxml', 'iqtree']:
+                input_args.seq_recon = input_args.tree_builder
+            else:
+                input_args.seq_recon = 'raxml'
+        elif not input_args.mar:
+            sys.stderr.write('Sequence reconstruction uses pyjar unless the '
+            '--mar flag is specified\n')
+            sys.exit()
+            
+        # Check substitution model consistent with tree building algorithm
+        tree_models = {
+            'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+            'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+            'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+            'rapidnj': ['JC','K2P']
+        }
+        invalid_model = False
+        if input_args.first_model not in tree_models[input_args.first_tree_builder]:
+            sys.stderr.write('First tree model ' + input_args.first_model + ' and algorithm ' +
+                            input_args.first_tree_builder + ' are incompatible\n')
+            invalid_model = True
+        elif input_args.model not in tree_models[input_args.tree_builder]:
+            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
+                        input_args.tree_builder + ' are incompatible\n')
+            invalid_model = True
+        if invalid_model:
+            sys.stderr.write('Available combinations are:\n')
+            for algorithm in tree_models:
+                models = ', '.join(tree_models[algorithm])
+                sys.stderr.write(algorithm + ':\t' + models + '\n')
+            sys.exit()
+        
+    return input_args
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None):
     initialised_algorithm = None

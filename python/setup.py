@@ -7,7 +7,6 @@ setuptools.setup(
     version='2.4.1',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
-    author_email='gubbins-help@sanger.ac.uk',
     url='https://github.com/sanger-pathogens/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={

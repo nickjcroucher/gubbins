@@ -31,7 +31,7 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     install_requires=[
-        'biopython >= 1.59',
+        'biopython >= 1.59, < 1.78',
         'dendropy  >= 4.0.2'
     ],
     license='GPL'

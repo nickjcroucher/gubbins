@@ -236,7 +236,6 @@ def parse_and_run(input_args, program_description=""):
             shutil.copyfile(current_tree_name, temp_rooted_tree)
         else:
             root_tree(current_tree_name, temp_rooted_tree)
-        print("Current: " + current_tree_name + " temp rooted: " + temp_rooted_tree)
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
@@ -253,7 +252,7 @@ def parse_and_run(input_args, program_description=""):
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
                 base_patterns = get_base_patterns(polymorphism_alignment, input_args.verbose)
-                
+
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
                                                                 os.path.abspath(temp_rooted_tree),
@@ -319,8 +318,24 @@ def parse_and_run(input_args, program_description=""):
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
-            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+            print('Raw internal: ' + raw_internal_rooted_tree_filename + '\nTemp: ' + temp_rooted_tree + '\nCurrent: ' + current_tree_name_with_internal_nodes + '\n')
+            if input_args.seq_recon == 'raxml':
+                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
+            elif input_args.seq_recon == 'iqtree':
+                # IQtree returns an unrooted tree
+                tree = dendropy.Tree.get_from_path(temp_rooted_tree, 'newick', preserve_underscores=True)
+                tree.deroot()
+                output_tree_string = tree_as_string(tree, suppress_internal=False)
+                temp_unrooted_tree = 'test.tre'
+                with open(temp_unrooted_tree, 'w+') as output_file:
+                    output_file.write(output_tree_string.replace('\'', ''))
+
+                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_unrooted_tree,
+                                                  current_tree_name_with_internal_nodes, sequence_reconstructor)
+            else:
+                sys.stderr.write('Unrecognised sequencing reconstruction command: ' + input_args.seq_recon + '\n')
+                sys.exit()
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
             # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
@@ -585,8 +600,8 @@ def reroot_tree_at_midpoint(tree_name):
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
     split_all_non_bi_nodes(tree.seed_node)
     tree.update_bipartitions()
-    tree.reroot_at_midpoint()
     tree.deroot()
+    tree.reroot_at_midpoint()
     tree.update_bipartitions()
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:

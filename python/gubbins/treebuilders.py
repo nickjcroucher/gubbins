@@ -50,7 +50,7 @@ class Star:
         return output_tree
 
 class RapidNJ:
-    """Class for operations with the FastTree executable"""
+    """Class for operations with the rapidNJ executable"""
 
     def __init__(self, threads: int, model='GTRCAT', verbose=False):
         """Initialises the object"""
@@ -76,7 +76,7 @@ class RapidNJ:
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
-        """Constructs the command to call the FastTree executable"""
+        """Constructs the command to call the rapidNJ executable"""
         command = self.base_command.copy()
         # Alignment file needs to be first argument
         executable = command.pop(0)
@@ -148,6 +148,7 @@ class FastTree:
         command.extend(["-mllen","-nome"])
         command.extend(["-intree",input_tree])
         command.extend(["-log", basename + ".log"])
+        command.extend(["-out", basename + ".treefile"])
         command.extend([alignment_filename])
         return " ".join(command)
 
@@ -349,6 +350,6 @@ class RAxML:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
-        command.extend(["-f B"])
+        command.extend(["-f e"])
         command.extend(["-w",os.path.dirname(basename)])
         return " ".join(command)

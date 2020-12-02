@@ -416,11 +416,22 @@ def process_input_arguments(input_args):
             'rapidnj': ['JC','K2P']
         }
         invalid_model = False
-        if input_args.first_model not in tree_models[input_args.first_tree_builder]:
-            sys.stderr.write('First tree model ' + input_args.first_model + ' and algorithm ' +
-                            input_args.first_tree_builder + ' are incompatible\n')
-            invalid_model = True
-        elif input_args.model not in tree_models[input_args.tree_builder]:
+        # Check on first tree builder
+        if input_args.first_tree_builder is not None:
+            # Check on first model in particular
+            if input_args.first_model is not None:
+                if input_args.first_model not in tree_models[input_args.first_tree_builder]:
+                    sys.stderr.write('First evolutionary model ' + input_args.first_model +
+                                    ' and algorithm ' + input_args.first_tree_builder +
+                                     ' are incompatible\n')
+                    invalid_model = True
+            else:
+                # Check on overall model
+                if input_args.model not in tree_models[input_args.first_tree_builder]:
+                    sys.stderr.write('Evolutionary model ' + input_args.model + ' and algorithm ' +
+                                    input_args.first_tree_builder + ' are incompatible\n')
+                    invalid_model = True
+        if input_args.model not in tree_models[input_args.tree_builder]:
             sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
                         input_args.tree_builder + ' are incompatible\n')
             invalid_model = True

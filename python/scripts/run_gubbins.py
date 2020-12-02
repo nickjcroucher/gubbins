@@ -70,13 +70,13 @@ def main():
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
                                                          ' tree builder if possible, else raxml]',
-                                                         default="raxml",
-                                                         choices=['raxml', 'iqtree', 'fasttree'])
+                                                         default = None,
+                                                         choices=['raxml', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
     modelGroup.add_argument('--seq-recon',    '-q', help='Application to use for marginal reconstruction [default = '
                                                             'same as tree builder if possible, else raxml]',
-                                                            default="raxml",
-                                                            choices=['raxml', 'iqtree'])
+                                                            default=None,
+                                                            choices=['raxml', 'iqtree', None])
     
     gubbinsGroup = parser.add_argument_group('Recombination detection options')
     gubbinsGroup.add_argument('--min_snps',          '-m', help='Min SNPs to identify a recombination block', type=int,

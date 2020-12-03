@@ -324,13 +324,8 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
             elif input_args.seq_recon == 'iqtree':
                 # IQtree returns an unrooted tree
-                tree = dendropy.Tree.get_from_path(temp_rooted_tree, 'newick', preserve_underscores=True)
-                tree.deroot()
-                output_tree_string = tree_as_string(tree, suppress_internal=False)
-                temp_unrooted_tree = 'test.tre'
-                with open(temp_unrooted_tree, 'w+') as output_file:
-                    output_file.write(output_tree_string.replace('\'', ''))
-
+                temp_unrooted_tree = temp_working_dir + "/" + current_tree_name + ".unrooted"
+                unroot_tree(temp_rooted_tree, temp_unrooted_tree)
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_unrooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
             else:
@@ -607,6 +602,12 @@ def reroot_tree_at_midpoint(tree_name):
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
+def unroot_tree(input_filename, output_filename):
+    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
+    tree.deroot()
+    output_tree_string = tree_as_string(tree, suppress_internal=False)
+    with open(output_filename, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
 
 def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)

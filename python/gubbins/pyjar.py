@@ -70,59 +70,60 @@ def read_info(infofile, type = 'raxml'):
     r=[-1.0] * 6 # initialise rates
     f=[-1.0] * 4 # initialise frequencies
     
-    for line in open(infofile, "r"):
-        line=line.strip()
-        if type == 'raxml':
-            if "freq pi" in line:
-                words=line.split()
-                if "pi(A)" in line:
-                    f[0] = float(words[2])
-                elif "pi(C)" in line:
-                    f[1] = float(words[2])
-                elif "pi(G)" in line:
-                    f[2] = float(words[2])
-                elif "pi(T)" in line:
-                    f[3] = float(words[2])
-            elif "Base frequencies:" in line:
-                words=line.split()
-                f=[float(words[2]), float(words[3]), float(words[4]), float(words[5])]
-            elif "<->" in line:
-                # order is ac ag at cg ct gt
-                words=line.split()
-                if "A <-> C" in line:
-                    r[0] = float(words[4])
-                elif "A <-> G" in line:
-                    r[1] = float(words[4])
-                elif "A <-> T" in line:
-                    r[2] = float(words[4])
-                elif "C <-> G" in line:
-                    r[3] = float(words[4])
-                elif "C <-> T" in line:
-                    r[4] = float(words[4])
-                elif "G <-> T" in line:
-                    r[5] = float(words[4])
-            elif "alpha[0]:" in line:
-                # order is ac ag at cg ct gt
-                words=line.split()
-                r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
-        elif type == 'iqtree':
-            if line.startswith('Base frequencies:'):
-                words=line.split()
-                f=[float(words[3]), float(words[5]), float(words[7]), float(words[9])]
-            elif line.startswith('Rate parameters:'):
-                words=line.split()
-                # order is ac ag at cg ct gt
-                r=[float(words[3]), float(words[5]), float(words[7]), float(words[9]), float(words[11]), float(words[13])]
-        elif type == 'fasttree':
-            if line.startswith('GTRFreq'):
-                words=line.split()
-                f=[float(words[1]), float(words[2]), float(words[3]), float(words[4])]
-            elif line.startswith('GTRRates'):
-                words=line.split()
-                r=[float(words[1]), float(words[2]), float(words[3]), float(words[4]), float(words[5]), float(words[6])]
-            elif 'ML Model: Jukes-Cantor' in line: # Jukes-Cantor model for Fasttree
-                f = [0.25,0.25,0.25,0.25]
-                r = [1.0,1.0,1.0,1.0,1.0,1.0]
+    with open(infofile, "r") as info_file:
+        for line in info_file:
+            line=line.strip()
+            if type == 'raxml':
+                if "freq pi" in line:
+                    words=line.split()
+                    if "pi(A)" in line:
+                        f[0] = float(words[2])
+                    elif "pi(C)" in line:
+                        f[1] = float(words[2])
+                    elif "pi(G)" in line:
+                        f[2] = float(words[2])
+                    elif "pi(T)" in line:
+                        f[3] = float(words[2])
+                elif "Base frequencies:" in line:
+                    words=line.split()
+                    f=[float(words[2]), float(words[3]), float(words[4]), float(words[5])]
+                elif "<->" in line:
+                    # order is ac ag at cg ct gt
+                    words=line.split()
+                    if "A <-> C" in line:
+                        r[0] = float(words[4])
+                    elif "A <-> G" in line:
+                        r[1] = float(words[4])
+                    elif "A <-> T" in line:
+                        r[2] = float(words[4])
+                    elif "C <-> G" in line:
+                        r[3] = float(words[4])
+                    elif "C <-> T" in line:
+                        r[4] = float(words[4])
+                    elif "G <-> T" in line:
+                        r[5] = float(words[4])
+                elif "alpha[0]:" in line:
+                    # order is ac ag at cg ct gt
+                    words=line.split()
+                    r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
+            elif type == 'iqtree':
+                if line.startswith('Base frequencies:'):
+                    words=line.split()
+                    f=[float(words[3]), float(words[5]), float(words[7]), float(words[9])]
+                elif line.startswith('Rate parameters:'):
+                    words=line.split()
+                    # order is ac ag at cg ct gt
+                    r=[float(words[3]), float(words[5]), float(words[7]), float(words[9]), float(words[11]), float(words[13])]
+            elif type == 'fasttree':
+                if line.startswith('GTRFreq'):
+                    words=line.split()
+                    f=[float(words[1]), float(words[2]), float(words[3]), float(words[4])]
+                elif line.startswith('GTRRates'):
+                    words=line.split()
+                    r=[float(words[1]), float(words[2]), float(words[3]), float(words[4]), float(words[5]), float(words[6])]
+                elif 'ML Model: Jukes-Cantor' in line: # Jukes-Cantor model for Fasttree
+                    f = [0.25,0.25,0.25,0.25]
+                    r = [1.0,1.0,1.0,1.0,1.0,1.0]
 
     # Check frequencies and rates have been extracted correctly
     if -1.0 in f or -1.0 in r:
@@ -470,14 +471,13 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         out_aln = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = out_aln_shm.buf)
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-        asr_output = open(output_prefix+".joint.aln", "w")
-        for taxon in alignment:
-            print(">"+taxon.id, file=asr_output)
-            print(taxon.seq, file=asr_output)
-        for taxon in ancestral_node_indices:
-            print(">"+taxon, file=asr_output)
-            print(''.join(out_aln[:,ancestral_node_indices[taxon]]), file=asr_output)
-        asr_output.close()
+        with open(output_prefix+".joint.aln", "w") as asr_output:
+            for taxon in alignment:
+                print(">"+taxon.id, file=asr_output)
+                print(taxon.seq, file=asr_output)
+            for taxon in ancestral_node_indices:
+                print(">"+taxon, file=asr_output)
+                print(''.join(out_aln[:,ancestral_node_indices[taxon]]), file=asr_output)
 
         # Combine results for each base across the alignment
         for node in tree.preorder_node_iter():
@@ -491,9 +491,8 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         # Print tree
         if verbose:
             print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
-        tree_output=open(output_prefix+".joint.tre", "w")
-        print(tree.as_string(schema="newick", suppress_rooting=True, unquoted_underscores=True, suppress_internal_node_labels=True).replace("'",""), file=tree_output)
-        tree_output.close()
+        with open(output_prefix+".joint.tre", "w") as tree_output:
+            print(tree.as_string(schema="newick", suppress_rooting=True, unquoted_underscores=True, suppress_internal_node_labels=True).replace("'",""), file=tree_output)
         
     if verbose:
         print("Done")

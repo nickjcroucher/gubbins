@@ -273,7 +273,9 @@ def parse_and_run(input_args, program_description=""):
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
                 info_filetype = 'fasttree'
                 recontree_filename = temp_working_dir + '/' + current_basename + '.treefile'
-
+            # Arbitrary rooting of tree
+            reroot_tree_at_midpoint(recontree_filename)
+            
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_patterns, # unique base patterns in alignment
@@ -341,7 +343,7 @@ def parse_and_run(input_args, program_description=""):
                     or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
                 sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
                          "Please check this intermediate file is valid: " + gaps_alignment_filename)
-        
+
         # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 

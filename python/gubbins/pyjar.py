@@ -64,7 +64,7 @@ def read_info(infofile, type = 'raxml'):
         sys.exit()
     
     if type not in ['raxml','iqtree','fasttree']:
-        sys.stderr.write('Only able to parse GTR-type models from raxml, iqtree ot fasttree')
+        sys.stderr.write('Only able to parse GTR-type models from raxml, iqtree or fasttree')
         sys.exit()
     
     r=[-1.0] * 6 # initialise rates
@@ -436,10 +436,6 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         print("Reconstructing sites on tree")
     
     with SharedMemoryManager() as smm:
-    
-        # Declare global
-        global all_base_patterns
-        all_base_patterns = base_patterns
     
         # Convert alignment to shared memory numpy array
         new_aln_array_raw = smm.SharedMemory(size = new_aln_array.nbytes)

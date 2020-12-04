@@ -73,7 +73,7 @@ def main():
                                                          default = None,
                                                          choices=['raxml', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
-    modelGroup.add_argument('--seq-recon',    '-q', help='Application to use for marginal reconstruction [default = '
+    modelGroup.add_argument('--seq-recon',         '-q', help='Application to use for marginal reconstruction [default = '
                                                             'same as tree builder if possible, else raxml]',
                                                             default=None,
                                                             choices=['raxml', 'iqtree', None])

@@ -143,9 +143,23 @@ def create_rate_matrix(f, r):
     
     return rm
 
+# from https://stackoverflow.com/questions/32037893/numpy-fix-array-with-rows-of-different-lengths-by-filling-the-empty-elements-wi
+def convert_to_square_numpy_array(data):
+    # Get lengths of each row of data
+    lens = numpy.array([len(i) for i in data])
+
+    # Mask of valid places in each row
+    mask = numpy.arange(lens.max()) < lens[:,None]
+
+    # Setup output array and put elements from data into masked positions
+    out = numpy.full(mask.shape, -1, dtype = numpy.int32)
+    out[mask] = numpy.concatenate(data)
+    return out
+
 def get_base_patterns(alignment, verbose):
     if verbose:
         print("Finding unique base patterns")
+    # Identify unique base patterns
     base_patterns={}
     t1=time.process_time()
     for x in range(len(alignment[0])):
@@ -153,13 +167,22 @@ def get_base_patterns(alignment, verbose):
             base_patterns[alignment[:,x]].append(x)
         except KeyError:
             base_patterns[alignment[:,x]]=[x]
+    # Convert the list of base patterns into a numpy char array
+    base_pattern_bases_array = numpy.array(list(base_patterns.keys()), dtype = numpy.unicode_)
+    # Convert the list of lists of sites into a square numpy array
+    positions_list = []
+    for pattern in base_patterns:
+        positions_list.append(base_patterns[pattern])
+    base_pattern_positions_array = numpy.array(positions_list)
+    square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array)
+    # Finish
     t2=time.process_time()
     if verbose:
         print("Time taken to find unique base patterns:", t2-t1, "seconds")
         print("Unique base patterns:", len(base_patterns))
-    return base_patterns
+    return base_pattern_bases_array, square_base_pattern_positions_array
 
-def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names = None, ancestral_node_indices = None, base_patterns = None, base_matrix = None, base_frequencies = None, new_aln = None, verbose = False):
+def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence_names = None, ancestral_node_indices = None, base_patterns = None, base_pattern_positions = None, base_matrix = None, base_frequencies = None, new_aln = None, verbose = False):
     
     ### TIMING
     if verbose:
@@ -176,20 +199,30 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
     ancestrally_conserved = {b:list() for b in ["A", "C", "G", "T", "-"]}
     ancestrally_variable = {b:{ancestral_node_indices[x]:list() for x in ancestral_node_indices} for b in ["A", "C", "G", "T", "-"]}
 
+    # Load base pattern information
+    base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
+    base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
+    # Load base pattern position information
+    base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
+    base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
+
     ### TIMING
     if verbose:
         prep_time_end = time.process_time()
         prep_time = prep_time_end - prep_time_start
-
+    
     # Iterate over columns
-    for column in columns:
+    for column_index in column_indices:
     
         ### TIMING
         if verbose:
             calc_time_start = time.process_time()
         
-        base_pattern_columns = base_patterns[column]
-        
+        # Get column information
+        column = base_patterns[column_index]
+        base_pattern_columns_padded = base_pattern_positions[column_index]
+        base_pattern_columns = base_pattern_columns_padded[base_pattern_columns_padded >= 0]
+
         columnbases=set([])
         base={}
         unknown_base_count = 0
@@ -199,12 +232,12 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
                 columnbases.add(y)
             else:
                 unknown_base_count = unknown_base_count + 1
-        
+
         # Heuristic for speed: if all taxa are monomorphic, with a gap in only one sequence, then the ancestral states
         # will all be the observed base, as no ancestral node will have two child nodes with unknown bases at this site
         if unknown_base_count == 1 and len(columnbases) == 1:
             
-            ancestrally_conserved[columnbases.pop()].extend(base_patterns[column])
+            ancestrally_conserved[columnbases.pop()].extend(base_pattern_columns)
             
         else:
             # Otherwise perform a full ML inference
@@ -326,10 +359,10 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
             # If site is monomorphic - replace whole column; else replace specific entries
             reconstructed_allele_set = set(reconstructed_alleles.values())
             if len(reconstructed_allele_set) == 1:
-                ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_patterns[column])
+                ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_pattern_columns)
             else:
                 for taxon in reconstructed_alleles:
-                    ancestrally_variable[reconstructed_alleles[taxon]][ancestral_node_indices[taxon]].extend(base_patterns[column])
+                    ancestrally_variable[reconstructed_alleles[taxon]][ancestral_node_indices[taxon]].extend(base_pattern_columns)
             
             # iterate through tree
             for node in tree.preorder_node_iter():
@@ -357,7 +390,10 @@ def reconstruct_alignment_column(columns, tree = None, alignment_sequence_names 
             if len(ancestrally_variable[b][index]) > 0:
                 out_aln[ancestrally_variable[b][index],index] = b
 
+    # Close shared memory
     out_aln_shm.close()
+    base_patterns_shm.close()
+    base_pattern_positions_shm.close()
 
     ### TIMING
     if verbose:
@@ -375,7 +411,7 @@ def chunks(l, k):
     n = len(l)
     return [l[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
 
-def jar(alignment = None, base_patterns = None, tree_filename = None, info_filename = None, info_filetype = None, output_prefix = None, threads = 1, verbose = False):
+def jar(alignment = None, base_patterns = None, base_pattern_positions = None, tree_filename = None, info_filename = None, info_filetype = None, output_prefix = None, threads = 1, verbose = False):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T":3 }
@@ -443,9 +479,21 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
         new_aln_shared_array[:] = new_aln_array[:]
         new_aln_shared_array = NumpyShared(name = new_aln_array_raw.name, shape = new_aln_array.shape, dtype = new_aln_array.dtype)
 
+        # Convert base patterns to shared memory numpy array
+        base_patterns_raw = smm.SharedMemory(size = base_patterns.nbytes)
+        base_patterns_shared_array = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_raw.buf)
+        base_patterns_shared_array[:] = base_patterns[:]
+        base_patterns_shared_array = NumpyShared(name = base_patterns_raw.name, shape = base_patterns.shape, dtype = base_patterns.dtype)
+
+        # Convert base pattern positions to shared memory numpy array
+        base_pattern_positions_raw = smm.SharedMemory(size = base_pattern_positions.nbytes)
+        base_pattern_positions_shared_array = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_raw.buf)
+        base_pattern_positions_shared_array[:] = base_pattern_positions[:]
+        base_pattern_positions_shared_array = NumpyShared(name = base_pattern_positions_raw.name, shape = base_pattern_positions.shape, dtype = base_pattern_positions.dtype)
+
         # split list of sites into chunks per core
-        bp_list = list(base_patterns.keys())
-        base_pattern_lists = list(chunks(bp_list,threads))
+        bp_list = list(range(len(base_patterns)))
+        base_pattern_indices = list(chunks(bp_list,threads))
 
         # Parallelise reconstructions across alignment columns using multiprocessing
         with Pool(processes = threads) as pool:
@@ -454,12 +502,13 @@ def jar(alignment = None, base_patterns = None, tree_filename = None, info_filen
                                             tree = tree,
                                             alignment_sequence_names = alignment_sequence_names,
                                             ancestral_node_indices = ancestral_node_indices,
-                                            base_patterns = base_patterns,
+                                            base_patterns = base_patterns_shared_array,
+                                            base_pattern_positions = base_pattern_positions_shared_array,
                                             base_matrix = mb,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
                                             verbose = verbose),
-                                        base_pattern_lists
+                                        base_pattern_indices
                                     )
 
         # Write out alignment while shared memory manager still active

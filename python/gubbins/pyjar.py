@@ -182,7 +182,7 @@ def get_base_patterns(alignment, verbose):
         print("Unique base patterns:", len(base_patterns))
     return base_pattern_bases_array, square_base_pattern_positions_array
 
-def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence_names = None, ancestral_node_indices = None, base_patterns = None, base_pattern_positions = None, base_matrix = None, base_frequencies = None, new_aln = None, verbose = False):
+def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence_names = None, ancestral_node_indices = None, base_patterns = None, base_pattern_positions = None, base_matrix = None, base_frequencies = None, new_aln = None, threads = 1, verbose = False):
     
     ### TIMING
     if verbose:
@@ -207,8 +207,12 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
     base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
     
     # Extract information for iterations
-    columns = base_patterns[column_indices].tolist()
-    column_positions = numpy.vsplit(base_pattern_positions[column_indices,:],len(column_indices))
+    if threads == 1:
+        columns = base_patterns
+        column_positions = base_pattern_positions
+    else:
+        columns = base_patterns[column_indices]
+        column_positions = base_pattern_positions[column_indices,:]
 
     ### TIMING
     if verbose:
@@ -509,6 +513,7 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
                                             base_matrix = mb,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
+                                            threads = threads,
                                             verbose = verbose),
                                         base_pattern_indices
                                     )

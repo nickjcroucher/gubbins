@@ -54,9 +54,13 @@ def main():
     treeGroup.add_argument('--tree-builder',       '-t', help='Application to use for tree building',
                                                             default="raxml",
                                                             choices=['raxml', 'iqtree', 'fasttree', 'hybrid', 'rapidnj'])
+    treeGroup.add_argument('--tree-builder-args',        help='Further arguments passed to tree building algorithm',
+                                                            default=None)
     treeGroup.add_argument('--first-tree-builder', '-1', help='Application to use for building the first tree',
                                                                 default=None,
                                                                 choices=['raxml', 'iqtree', 'fasttree', 'rapidnj', 'star'])
+    treeGroup.add_argument('--first-tree-builder-args',  help='Further arguments passed to first tree building algorithm',
+                                                            default=None)
     treeGroup.add_argument('--outgroup',           '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                           'names can be used if they form a clade')
                                                           
@@ -65,9 +69,14 @@ def main():
                                                          'tree building algorithms',
                                                          default='GTRGAMMA',
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
-    modelGroup.add_argument('--first-model',        '-l', help='Nucleotide substitution model used for first tree',
+    modelGroup.add_argument('--custom-model',      '-k', help='String corresponding to a substitution model for the selected tree'
+                                                         ' building algorithm [default = None]', default = None)
+    modelGroup.add_argument('--first-model',       '-l', help='Nucleotide substitution model used for first tree',
                                                          default='GTRGAMMA',
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    modelGroup.add_argument('--custom-first-model','-j', help='String corresponding to a substitution model for the selected tree'
+                                                         ' building algorithm for the first iteration [default = None]',
+                                                         default = None)
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
                                                          ' tree builder if possible, else raxml]',
                                                          default = None,

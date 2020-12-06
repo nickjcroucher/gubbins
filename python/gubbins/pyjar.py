@@ -173,7 +173,7 @@ def get_base_patterns(alignment, verbose):
     positions_list = []
     for pattern in base_patterns:
         positions_list.append(base_patterns[pattern])
-    base_pattern_positions_array = numpy.array(positions_list)
+    base_pattern_positions_array = numpy.array(positions_list, dtype = object)
     square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array)
     # Finish
     t2=time.process_time()
@@ -205,6 +205,10 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
     # Load base pattern position information
     base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
     base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
+    
+    # Extract information for iterations
+    columns = base_patterns[column_indices].tolist()
+    column_positions = numpy.vsplit(base_pattern_positions[column_indices,:],len(column_indices))
 
     ### TIMING
     if verbose:
@@ -212,17 +216,15 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
         prep_time = prep_time_end - prep_time_start
     
     # Iterate over columns
-    for column_index in column_indices:
+    for column,base_pattern_columns_padded in zip(columns,column_positions):
     
         ### TIMING
         if verbose:
             calc_time_start = time.process_time()
         
         # Get column information
-        column = base_patterns[column_index]
-        base_pattern_columns_padded = base_pattern_positions[column_index]
-        base_pattern_columns = base_pattern_columns_padded[base_pattern_columns_padded >= 0]
-
+        base_pattern_columns = base_pattern_columns_padded[base_pattern_columns_padded > -1].tolist()
+        
         columnbases=set([])
         base={}
         unknown_base_count = 0

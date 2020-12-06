@@ -71,8 +71,7 @@ class RapidNJ:
         elif self.model == 'K2P':
             command.extend(["-a", "kim"])
         else:
-            sys.stderr.write('Model ' + self.model + ' cannot be used with rapidnj\n')
-            sys.exit()
+            command.extend(["-a", self.model])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
@@ -118,8 +117,7 @@ class FastTree:
         elif self.model == 'GTRCAT':
             command.extend(["-gtr"])
         else:
-            sys.stderr.write('Model ' + self.model + ' cannot be used with fasttree\n')
-            sys.exit()
+            command.extend([self.model])
         self.base_command = command
         
         # Set the number of threads for parallelisation
@@ -190,8 +188,7 @@ class IQTree:
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTR+G4"])
         else:
-            sys.stderr.write('Model ' + self.model + ' cannot be used with iqtree\n')
-            sys.exit()
+            command.extend(["-m",self.model])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
@@ -285,8 +282,7 @@ class RAxML:
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTRGAMMA"])
         else:
-            sys.stderr.write('Model ' + self.model + ' cannot be used with raxml\n')
-            sys.exit()
+            command.extend(["-m", self.model])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:

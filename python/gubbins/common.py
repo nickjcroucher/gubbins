@@ -435,20 +435,31 @@ def process_input_arguments(input_args):
         invalid_model = False
         # Check on first tree builder
         if input_args.first_tree_builder is not None:
-            # Check on first model in particular
+            # Raise error if first tree builder and starting tree
+            if input_args.starting_tree is not None:
+                sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+                sys.exit()
+        # Determine model to be used for first iteration
+        if input_args.custom_first_model:
+            input_args.first_model = input_args.custom_first_model
+            sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
+        else:
+            first_model = input_args.model
             if input_args.first_model is not None:
-                if input_args.first_model not in tree_models[input_args.first_tree_builder]:
-                    sys.stderr.write('First evolutionary model ' + input_args.first_model +
-                                    ' and algorithm ' + input_args.first_tree_builder +
-                                     ' are incompatible\n')
-                    invalid_model = True
-            else:
-                # Check on overall model
-                if input_args.model not in tree_models[input_args.first_tree_builder]:
-                    sys.stderr.write('Evolutionary model ' + input_args.model + ' and algorithm ' +
-                                    input_args.first_tree_builder + ' are incompatible\n')
-                    invalid_model = True
-        if input_args.model not in tree_models[input_args.tree_builder]:
+                first_model = input_args.first_model
+            first_tree_builder = input_args.tree_builder
+            if input_args.first_tree_builder is not None:
+                first_tree_builder = input_args.first_tree_builder
+            if first_model not in tree_models[first_tree_builder]:
+                sys.stderr.write('First evolutionary model ' + first_model +
+                                ' and algorithm ' + first_tree_builder +
+                                 ' are incompatible\n')
+                invalid_model = True
+        # Determine model to be used for subsequent iterations
+        if input_args.custom_model:
+            input_args.model = input_args.custom_model
+            sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
+        elif input_args.model not in tree_models[input_args.tree_builder]:
             sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
                         input_args.tree_builder + ' are incompatible\n')
             invalid_model = True

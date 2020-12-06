@@ -208,7 +208,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
     
     # Extract information for iterations
     columns = base_patterns[column_indices].tolist()
-    column_positions = numpy.vsplit(base_pattern_positions[column_indices,:],len(column_indices))
+    column_positions = base_pattern_positions[column_indices,:]
 
     ### TIMING
     if verbose:

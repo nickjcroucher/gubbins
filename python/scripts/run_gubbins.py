@@ -64,6 +64,9 @@ def main():
                                                             default = None)
     treeGroup.add_argument('--outgroup',           '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                           'names can be used if they form a clade')
+    treeGroup.add_argument('--bootstrap',          '-#', help='Number of bootstrap replicates to perform with final alignment '
+                                                         '[default = 0]', type = int, default = 0)
+
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
@@ -81,7 +84,7 @@ def main():
     modelGroup.add_argument('--custom-model',      '-k', help='String corresponding to a substitution model for the selected tree'
                                                          ' building algorithm [default = None]', default = None)
     modelGroup.add_argument('--first-model',       '-l', help='Nucleotide substitution model used for first tree',
-                                                         default='GTRGAMMA',
+                                                         default=None,
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--first-model-args',        help='Further arguments passed to model fitting algorithm used in first'
                                                          'iteration (default = same as --first-tree-builder-args)',

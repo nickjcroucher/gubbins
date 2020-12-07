@@ -20,11 +20,11 @@
 import sys
 import os
 import subprocess
+from random import randint
 
 from Bio import SeqIO
 
 from gubbins import utils
-
 
 class Star:
     """Class for constructing star phylogenies"""
@@ -274,7 +274,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', bootstrap = 0, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -286,6 +286,7 @@ class RAxML:
         self.asr_tree_prefix = "RAxML_nodeLabelledRootedTree."
         self.asr_tree_suffix = ""
         self.internal_node_prefix = internal_node_prefix
+        self.bootstrap = bootstrap
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
@@ -297,7 +298,8 @@ class RAxML:
         command = [self.executable]
         
         # Set parallelisation
-        command.extend(["-T", str(self.threads)])
+        if self.threads > 1:
+            command.extend(["-T", str(self.threads)])
 
         # Add flags
         command.extend(["-safe"])
@@ -323,8 +325,6 @@ class RAxML:
         command = self.base_command.copy()
         command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
-        if self.threads > 1:
-            command.extend(["-T", str(self.threads)])
         if input_tree:
             command.extend(["-t", input_tree])
         if not self.verbose:
@@ -381,4 +381,40 @@ class RAxML:
         command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
         command.extend(["-f e"])
         command.extend(["-w",os.path.dirname(basename)])
+        return " ".join(command)
+        
+    def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
+        
+        # Run bootstraps
+        command = self.base_command.copy()
+        command.extend(["-s", alignment_filename, "-n", basename + ".bootstrapped_trees"])
+        p_seed = str(randint(0, 10000))
+        command.extend(["-p",p_seed])
+        command.extend(["-x",p_seed])
+        command.extend(["-#",str(self.bootstrap)])
+        
+        # Output
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        command.extend([";"])
+
+        # Annotate tree with bootstraps
+        base_command = self.base_command.copy()
+        command.extend(base_command)
+        command.extend(["-p",p_seed])
+        command.extend(["-f","b"])
+        command.extend(["-t",input_tree])
+        command.extend(["-z","RAxML_bootstrap." + basename + ".bootstrapped_trees"])
+        command.extend(["-n",basename + ".bootstrapped"])
+        
+        # Output
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        command.extend([";"])
+        
+        # Rename final file
+        command.extend(["cp","RAxML_bipartitions." + basename + ".bootstrapped", basename + ".tre.bootstrapped"])
+        
+        print('BOOTSTRAP: ' + " ".join(command))
         return " ".join(command)

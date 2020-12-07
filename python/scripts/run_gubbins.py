@@ -43,50 +43,64 @@ def main():
     dataGroup.add_argument('--pairwise',        '-2', help='Compare two sequences (without using a tree)',
                                                         default = False, action = 'store_true') # fasttree model fit, star phylogeny, one iteration
     dataGroup.add_argument('--filter_percentage',  '-f', help='Filter out taxa with more than this percentage of gaps',
-                        type=int, default=25)
+                        type=float, default=25.0)
     dataGroup.add_argument('--remove_identical_sequences', '-d', help='Remove identical sequences', action='store_true')
     dataGroup.add_argument('--threads',            '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
                                                          'version is available', type=int,  default=1)
     dataGroup.add_argument('--verbose',            '-v', help='Turn on debugging', action='store_true')
-    dataGroup.add_argument('--no_cleanup',         '-n', help="Don't cleanup intermediate files", action='store_true')
+    dataGroup.add_argument('--no_cleanup',         '-n', help='Do not cleanup intermediate files', action='store_true')
 
     treeGroup = parser.add_argument_group('Tree building options')
     treeGroup.add_argument('--tree-builder',       '-t', help='Application to use for tree building',
-                                                            default="raxml",
+                                                            default='raxml',
                                                             choices=['raxml', 'iqtree', 'fasttree', 'hybrid', 'rapidnj'])
-    treeGroup.add_argument('--tree-builder-args',        help='Further arguments passed to tree building algorithm',
-                                                            default=None)
+    treeGroup.add_argument('--tree-args',        help='Quoted string of further arguments passed to tree building algorithm'
+                                                      ' (start string with a space if there is a risk of being interpreted as a flag)',
+                                                            default = None)
     treeGroup.add_argument('--first-tree-builder', '-1', help='Application to use for building the first tree',
                                                                 default=None,
                                                                 choices=['raxml', 'iqtree', 'fasttree', 'rapidnj', 'star'])
-    treeGroup.add_argument('--first-tree-builder-args',  help='Further arguments passed to first tree building algorithm',
-                                                            default=None)
+    treeGroup.add_argument('--first-tree-args',  help='Further arguments passed to first tree building algorithm',
+                                                            default = None)
     treeGroup.add_argument('--outgroup',           '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                           'names can be used if they form a clade')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
+    modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
+                                                         ' tree builder if possible, else raxml]',
+                                                         default = None,
+                                                         choices=['raxml', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--model',             '-g', help='Nucleotide substitution model (not all available for all'
                                                          'tree building algorithms',
                                                          default='GTRGAMMA',
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    modelGroup.add_argument('--model-args',              help='Quoted string of further arguments passed to model fitting algorithm'
+                                                         ' (start string with a space if there is a risk of being interpreted as a flag)'
+                                                         '(default = same as --tree-builder-args)',
+                                                         default=None)
     modelGroup.add_argument('--custom-model',      '-k', help='String corresponding to a substitution model for the selected tree'
                                                          ' building algorithm [default = None]', default = None)
     modelGroup.add_argument('--first-model',       '-l', help='Nucleotide substitution model used for first tree',
                                                          default='GTRGAMMA',
                                                          choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    modelGroup.add_argument('--first-model-args',        help='Further arguments passed to model fitting algorithm used in first'
+                                                         'iteration (default = same as --first-tree-builder-args)',
+                                                         default=None)
     modelGroup.add_argument('--custom-first-model','-j', help='String corresponding to a substitution model for the selected tree'
                                                          ' building algorithm for the first iteration [default = None]',
                                                          default = None)
-    modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'
-                                                         ' tree builder if possible, else raxml]',
-                                                         default = None,
-                                                         choices=['raxml', 'iqtree', 'fasttree', None])
-    modelGroup.add_argument('--mar',               '-M', help='Use marginal ancestral reconstruction', action='store_true')
-    modelGroup.add_argument('--seq-recon',         '-q', help='Application to use for marginal reconstruction [default = '
+
+    reconGroup = parser.add_argument_group('Ancestral sequence reconstruction options')
+    reconGroup.add_argument('--mar',               '-M', help='Use marginal, rather than joint, ancestral reconstruction',
+                                                         action='store_true')
+    reconGroup.add_argument('--seq-recon',         '-q', help='Algorithm to use for marginal reconstruction [default = '
                                                             'same as tree builder if possible, else raxml]',
                                                             default=None,
                                                             choices=['raxml', 'iqtree', None])
-    
+    reconGroup.add_argument('--seq-recon-args',          help='Further arguments passed to sequence reconstruction algorithm'
+                                                         ' (start string with a space if there is a risk of being interpreted as a flag)',
+                                                            default=None)
+                                                            
     gubbinsGroup = parser.add_argument_group('Recombination detection options')
     gubbinsGroup.add_argument('--min_snps',          '-m', help='Min SNPs to identify a recombination block', type=int,
                         default=3)

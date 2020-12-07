@@ -68,7 +68,7 @@ def parse_and_run(input_args, program_description=""):
         pass
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
-    # Initialize tree builder and ancestral sequence reconstructor; check if all required dependencies are available
+    # Initialize tree builder and check if all required dependencies are available
     printer.print("\nChecking dependencies...")
     current_tree_name = input_args.starting_tree
     tree_file_names = []
@@ -81,7 +81,11 @@ def parse_and_run(input_args, program_description=""):
         current_model = input_args.first_model
     else:
         current_model = input_args.model
-    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix)
+    if input_args.first_tree_args is not None:
+        extra_tree_arguments = input_args.first_tree_args
+    else:
+        extra_tree_arguments = input_args.tree_args
+    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" or current_tree_builder == "star":
         alignment_suffix = ".snp_sites.aln"
     elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
@@ -91,8 +95,13 @@ def parse_and_run(input_args, program_description=""):
         sys.exit()
 
     # Now initialise model fitting and sequence reconstruction algorithms
-    model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix)
-    sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
+    if input_args.first_model_args is not None:
+        extra_model_arguments = input_args.first_model_args
+    else:
+        extra_model_arguments = input_args.model_args
+    model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+    if input_args.mar:
+        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check if the input files exist and have the right format
@@ -178,7 +187,8 @@ def parse_and_run(input_args, program_description=""):
             # Switch to new tree/model combination
             current_tree_builder = input_args.tree_builder
             current_model = input_args.model
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix)
+            extra_arguments = input_args.tree_args
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_arguments)
             if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
                     or current_tree_builder == "star":
                 alignment_suffix = ".snp_sites.aln"
@@ -188,9 +198,11 @@ def parse_and_run(input_args, program_description=""):
                 sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
                 sys.exit()
             # Update model fitting and sequence reconstruction if required
-            if input_args.first_model is not None:
-                model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix)
-                sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
+            if input_args.first_model is not None or input_args.first_model_args is not None:
+                extra_model_arguments = input_args.model_args
+                model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+                if input_args.mar:
+                    sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -469,19 +481,26 @@ def process_input_arguments(input_args):
                 models = ', '.join(tree_models[algorithm])
                 sys.stderr.write(algorithm + ':\t' + models + '\n')
             sys.exit()
-        
+        # Determine model arguments
+        if input_args.model_args is None and input_args.tree_args is not None:
+           input_args.model_args = input_args.tree_args
+        if input_args.first_model_args is None:
+            if input_args.first_tree_args is not None:
+                input_args.first_model_args = input_args.first_tree_args
+            elif input_args.first_tree_builder is None and input_args.tree_args is not None:
+                input_args.first_model_args = input_args.tree_args
     return input_args
 
-def return_algorithm(algorithm_choice, model, input_args, node_labels = None):
+def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(input_args.threads, model, input_args.verbose)
+        initialised_algorithm = FastTree(input_args.threads, model, input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(input_args.threads, model, node_labels, input_args.verbose)
+        initialised_algorithm = RAxML(input_args.threads, model, node_labels, input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(input_args.threads, model, node_labels, input_args.verbose)
+        initialised_algorithm = IQTree(input_args.threads, model, node_labels, input_args.verbose, additional_args = extra)
     elif algorithm_choice == "rapidnj":
-        initialised_algorithm = RapidNJ(input_args.threads, model, input_args.verbose)
+        initialised_algorithm = RapidNJ(input_args.threads, model, input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":
         initialised_algorithm = Star()
     else:

@@ -52,13 +52,14 @@ class Star:
 class RapidNJ:
     """Class for operations with the rapidNJ executable"""
 
-    def __init__(self, threads: int, model='GTRCAT', verbose=False):
+    def __init__(self, threads: int, model='GTRCAT', verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
         self.model = model
+        self.additional_args = additional_args
 
         self.executable = "rapidnj"
         if utils.which(self.executable) is None:
@@ -72,6 +73,9 @@ class RapidNJ:
             command.extend(["-a", "kim"])
         else:
             command.extend(["-a", self.model])
+        # Additional arguments
+        if self.additional_args is not None:
+            command.extend([self.additional_args])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
@@ -91,13 +95,14 @@ class RapidNJ:
 class FastTree:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, threads: int, model='GTRCAT', verbose=False):
+    def __init__(self, threads: int, model='GTRCAT', verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
         self.model = model
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
+        self.additional_args = additional_args
 
         # Identify executable
         self.potential_executables = ["FastTree", "fasttree"]
@@ -118,6 +123,9 @@ class FastTree:
             command.extend(["-gtr"])
         else:
             command.extend([self.model])
+        # Additional arguments
+        if self.additional_args is not None:
+            command.extend([self.additional_args])
         self.base_command = command
         
         # Set the number of threads for parallelisation
@@ -153,7 +161,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, internal_node_prefix="", verbose=False):
+    def __init__(self, threads: 1, model: str, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -165,6 +173,7 @@ class IQTree:
         self.asr_tree_prefix = ""
         self.asr_tree_suffix = ".treefile"
         self.internal_node_prefix = internal_node_prefix
+        self.additional_args = additional_args
     
         # Construct base command
         self.executable = "iqtree"
@@ -189,6 +198,9 @@ class IQTree:
             command.extend(["-m","GTR+G4"])
         else:
             command.extend(["-m",self.model])
+        # Additional arguments
+        if self.additional_args is not None:
+            command.extend([self.additional_args])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
@@ -245,7 +257,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', internal_node_prefix="", verbose=False):
+    def __init__(self, threads: 1, model='GTRCAT', internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -257,6 +269,7 @@ class RAxML:
         self.asr_tree_prefix = "RAxML_nodeLabelledRootedTree."
         self.asr_tree_suffix = ""
         self.internal_node_prefix = internal_node_prefix
+        self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
         self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2', 'raxmlHPC-PTHREADS-AVX',
@@ -283,6 +296,9 @@ class RAxML:
             command.extend(["-m","GTRGAMMA"])
         else:
             command.extend(["-m", self.model])
+        # Additional arguments
+        if self.additional_args is not None:
+            command.extend([self.additional_args])
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:

@@ -333,7 +333,6 @@ def parse_and_run(input_args, program_description=""):
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
-            print('Raw internal: ' + raw_internal_rooted_tree_filename + '\nTemp: ' + temp_rooted_tree + '\nCurrent: ' + current_tree_name_with_internal_nodes + '\n')
             if input_args.seq_recon == 'raxml':
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
@@ -393,6 +392,15 @@ def parse_and_run(input_args, program_description=""):
         printer.print("Maximum number of iterations (" + str(input_args.iterations) + ") reached.")
     printer.print("\nExiting the main loop.")
 
+    # 6. Run bootstrap analysis if requested
+    if input_args.bootstrap > 0:
+        printer.print(["\nRunning bootstrap analysis"])
+        bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename)
+        try:
+            subprocess.check_call(bootstrap_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed while running bootstrap analysis.")
+
     # Create the final output
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
@@ -424,7 +432,7 @@ def process_input_arguments(input_args):
             if input_args.tree_builder in ['raxml', 'iqtree', 'fasttree']:
                 input_args.model_fitter = input_args.tree_builder
             else:
-                input_args.tree_builder = 'raxml'
+                input_args.model_fitter = 'raxml'
                 
         # Make sequence reconstruction consistent with tree building
         if input_args.seq_recon is None:
@@ -445,20 +453,20 @@ def process_input_arguments(input_args):
             'rapidnj': ['JC','K2P']
         }
         invalid_model = False
+        
         # Check on first tree builder
         if input_args.first_tree_builder is not None:
             # Raise error if first tree builder and starting tree
             if input_args.starting_tree is not None:
                 sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
                 sys.exit()
+
         # Determine model to be used for first iteration
-        if input_args.custom_first_model:
+        if input_args.custom_first_model is not None:
             input_args.first_model = input_args.custom_first_model
             sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
-        else:
-            first_model = input_args.model
-            if input_args.first_model is not None:
-                first_model = input_args.first_model
+        elif input_args.first_model is not None:
+            first_model = input_args.first_model
             first_tree_builder = input_args.tree_builder
             if input_args.first_tree_builder is not None:
                 first_tree_builder = input_args.first_tree_builder
@@ -467,8 +475,9 @@ def process_input_arguments(input_args):
                                 ' and algorithm ' + first_tree_builder +
                                  ' are incompatible\n')
                 invalid_model = True
+
         # Determine model to be used for subsequent iterations
-        if input_args.custom_model:
+        if input_args.custom_model is not None:
             input_args.model = input_args.custom_model
             sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
         elif input_args.model not in tree_models[input_args.tree_builder]:
@@ -481,6 +490,7 @@ def process_input_arguments(input_args):
                 models = ', '.join(tree_models[algorithm])
                 sys.stderr.write(algorithm + ':\t' + models + '\n')
             sys.exit()
+
         # Determine model arguments
         if input_args.model_args is None and input_args.tree_args is not None:
            input_args.model_args = input_args.tree_args
@@ -489,18 +499,19 @@ def process_input_arguments(input_args):
                 input_args.first_model_args = input_args.first_tree_args
             elif input_args.first_tree_builder is None and input_args.tree_args is not None:
                 input_args.first_model_args = input_args.tree_args
+
     return input_args
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(input_args.threads, model, input_args.verbose, additional_args = extra)
+        initialised_algorithm = FastTree(threads = input_args.threads, model = model, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(input_args.threads, model, node_labels, input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxML(threads = input_args.threads, model = model, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(input_args.threads, model, node_labels, input_args.verbose, additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "rapidnj":
-        initialised_algorithm = RapidNJ(input_args.threads, model, input_args.verbose, additional_args = extra)
+        initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":
         initialised_algorithm = Star()
     else:
@@ -912,6 +923,7 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix) + ".snp_sites.aln":   str(output_prefix) + ".filtered_polymorphic_sites.fasta",
         str(input_prefix) + ".phylip":          str(output_prefix) + ".filtered_polymorphic_sites.phylip",
         str(input_prefix) + ".internal":        str(output_prefix) + ".node_labelled.final_tree.tre",
+        str(input_prefix) + ".bootstrapped":    str(output_prefix) + ".final_bootstrapped_tree.tre",
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names

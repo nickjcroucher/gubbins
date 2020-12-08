@@ -395,25 +395,39 @@ def parse_and_run(input_args, program_description=""):
     # 6. Run bootstrap analysis if requested
     if input_args.bootstrap > 0:
         printer.print(["\nRunning bootstrap analysis"])
-        # Define a RAxML object for bootstrapping utilities
-        if current_tree_builder == "raxml":
-            bootstrap_utility = tree_builder
+        if current_tree_builder == "rapidnj":
+            # Generate bootstrap trees
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), temp_working_dir + "/" + current_basename)
+            try:
+                subprocess.check_call(bootstrap_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while running bootstrap analysis.")
+            transfer_bootstraps_to_tree(temp_working_dir + "/" + current_basename + ".tre.bootstrapped",
+                                                    os.path.abspath(current_tree_name),
+                                                    current_basename + ".tre.bootstrapped",
+                                                    outgroups = input_args.outgroup)
         else:
-            bootstrap_utility = return_algorithm("raxml", current_model, input_args, node_labels = "")
-        # Generate bootstrap trees
-        bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
-        try:
-            subprocess.check_call(bootstrap_command, shell=True)
-        except subprocess.SubprocessError:
-            sys.exit("Failed while running bootstrap analysis.")
-        # Annotate the final tree using the bootstraps
-        if current_tree_builder == "raxml":
-            bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
-        annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
-        try:
-            subprocess.check_call(annotation_command, shell=True)
-        except subprocess.SubprocessError:
-            sys.exit("Failed while annotating final tree with bootstrapping results.")
+            # Define a RAxML object for bootstrapping utilities
+            if current_tree_builder == "raxml":
+                bootstrap_utility = tree_builder
+            else:
+                bootstrap_utility = return_algorithm("raxml", current_model, input_args, node_labels = "")
+            # Generate bootstrap trees
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
+            try:
+                subprocess.check_call(bootstrap_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while running bootstrap analysis.")
+            # Annotate the final tree using the bootstraps
+            if current_tree_builder == "raxml":
+                bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
+            elif current_tree_builder == "iqtree":
+                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped.ufboot"
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
+            try:
+                subprocess.check_call(annotation_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while annotating final tree with bootstrapping results.")
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -926,6 +940,40 @@ def symmetric_difference(input_tree_name, output_tree_name):
     output_tree.encode_bipartitions()
     return dendropy.calculate.treecompare.symmetric_difference(input_tree, output_tree)
 
+
+def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename, outgroups = None):
+
+    # read source tree and extract bootstraps as node labels, match with bipartition
+    reroot_tree(source_tree_filename, outgroups = outgroups)
+    source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
+    source_bootstraps = {}
+    for source_internal_node in source_tree.internal_nodes():
+        leaves = []
+        for leaf in source_internal_node.leaf_iter():
+            leaves.append(leaf.taxon.label.replace("'",""))
+        descendant_taxa = frozenset(leaves)
+        if source_internal_node.label:
+            source_bootstraps[descendant_taxa] = source_internal_node.label
+        else:
+            source_bootstraps[descendant_taxa] = ''
+
+    # read original tree and add in the bootstrap values
+    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
+    for destination_internal_node in destination_tree.internal_nodes():
+        leaves = []
+        for descendant in destination_internal_node.leaf_iter():
+            leaves.append(descendant.taxon.label.replace("'",""))
+        descendant_taxa = frozenset(leaves)
+        if descendant_taxa in source_bootstraps:
+            destination_internal_node.label = source_bootstraps[descendant_taxa]
+        else:
+            sys.stderr.write('Cannot find the internal node with descendants ' + descendant_taxa + '\n')
+            sys.exit()
+
+    # output final tree
+    output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
+    with open(output_tree_filename, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {

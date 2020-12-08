@@ -21,7 +21,14 @@ import os
 import shutil
 import subprocess
 import re
-
+import numpy as np
+import collections
+try:
+    from multiprocessing.managers import SharedMemoryManager
+    NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
+except ImportError as e:
+    sys.stderr.write("This version of Gubbins requires python v3.8 or higher\n")
+    sys.exit(0)
 
 class VerbosePrinter:
     """Class printing messages if verbose argument is set"""
@@ -151,3 +158,11 @@ def rename_files(input_to_output_filenames):
     for input_file, output_file in input_to_output_filenames.items():
         if os.path.exists(input_file):
             shutil.move(input_file, output_file)
+
+def generate_shared_mem_array(in_array, smm):
+    """Generates a shared memory representation of a numpy array"""
+    array_raw = smm.SharedMemory(size = in_array.nbytes)
+    array_shared = np.ndarray(in_array.shape, dtype = in_array.dtype, buffer = array_raw.buf)
+    array_shared[:] = in_array[:]
+    array_shared = NumpyShared(name = array_raw.name, shape = in_array.shape, dtype = in_array.dtype)
+    return(array_shared)

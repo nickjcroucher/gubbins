@@ -22,6 +22,8 @@ except ImportError as e:
     sys.stderr.write("This version of Gubbins requires python v3.8 or higher\n")
     sys.exit(0)
 
+from gubbins.utils import generate_shared_mem_array
+
 ####################################################
 # Function to read an alignment in various formats #
 ####################################################
@@ -480,22 +482,13 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
-        new_aln_array_raw = smm.SharedMemory(size = new_aln_array.nbytes)
-        new_aln_shared_array = numpy.ndarray(new_aln_array.shape, dtype = new_aln_array.dtype, buffer = new_aln_array_raw.buf)
-        new_aln_shared_array[:] = new_aln_array[:]
-        new_aln_shared_array = NumpyShared(name = new_aln_array_raw.name, shape = new_aln_array.shape, dtype = new_aln_array.dtype)
+        new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
 
         # Convert base patterns to shared memory numpy array
-        base_patterns_raw = smm.SharedMemory(size = base_patterns.nbytes)
-        base_patterns_shared_array = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_raw.buf)
-        base_patterns_shared_array[:] = base_patterns[:]
-        base_patterns_shared_array = NumpyShared(name = base_patterns_raw.name, shape = base_patterns.shape, dtype = base_patterns.dtype)
+        base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
 
         # Convert base pattern positions to shared memory numpy array
-        base_pattern_positions_raw = smm.SharedMemory(size = base_pattern_positions.nbytes)
-        base_pattern_positions_shared_array = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_raw.buf)
-        base_pattern_positions_shared_array[:] = base_pattern_positions[:]
-        base_pattern_positions_shared_array = NumpyShared(name = base_pattern_positions_raw.name, shape = base_pattern_positions.shape, dtype = base_pattern_positions.dtype)
+        base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
 
         # split list of sites into chunks per core
         bp_list = list(range(len(base_patterns)))

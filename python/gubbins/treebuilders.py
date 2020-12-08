@@ -112,13 +112,14 @@ class RapidNJ:
 class FastTree:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, threads: int, model='GTRCAT', verbose=False, additional_args = None):
+    def __init__(self, threads: int, bootstrap = 0, model='GTRCAT', verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
         self.model = model
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
+        self.bootstrap = bootstrap
         self.additional_args = additional_args
 
         # Identify executable
@@ -173,6 +174,18 @@ class FastTree:
         command.extend(["-log", basename + ".log"])
         command.extend(["-out", basename + ".treefile"])
         command.extend([alignment_filename])
+        return " ".join(command)
+        
+    def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
+        command = self.base_command.copy()
+        output_tree = basename + self.tree_suffix
+        command.extend(["-out", tmp + "/" + basename + ".bootstrapped_trees"])
+        command.extend(["-log", basename + ".log"])
+        command.extend(["-n", str(self.bootstrap)])
+        command.append(alignment_filename + ".bootstrapping.aln")
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
 
 class IQTree:
@@ -276,7 +289,6 @@ class IQTree:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", tmp + "/" + basename + ".bootstrapped", "-B", str(self.bootstrap), "-wbt"])
-#        command.extend(["mv", basename + ".contree", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
 class RAxML:
@@ -390,7 +402,22 @@ class RAxML:
         command.extend(["-f e"])
         command.extend(["-w",os.path.dirname(basename)])
         return " ".join(command)
-        
+    
+    def generate_alignments_for_bootstrapping(self, alignment_filename: str, basename: str, tmp: str) -> str:
+        """Generates subsampled alignments for bootstrap analysis with FastTree"""
+        # Generate alignments
+        command = self.base_command.copy()
+        command.extend(["-s", os.path.basename(alignment_filename)])
+        command.extend(["-f j"])
+        p_seed = str(randint(0, 10000))
+        command.extend(["-b",p_seed])
+        command.extend(["-#",str(self.bootstrap)])
+        command.extend(["-n",basename + ".bootstrapping"])
+        command.extend(["-w",tmp])
+        # Then concatenate
+        command.extend(["; cat", tmp + "/" + os.path.basename(alignment_filename) + ".BS* >", tmp + "/" + basename + ".bootstrapping.aln"])
+        return " ".join(command)
+    
     def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         # Run bootstraps

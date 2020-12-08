@@ -130,7 +130,7 @@ class FastTree:
         
         # Function for returning base command
         command = [self.executable]
-        command.extend(["-nosupport", "-nt"])
+        command.extend(["-nt"])
         if self.model == 'JC':
             pass # default model
         elif self.model == 'GTR':
@@ -159,6 +159,7 @@ class FastTree:
         if input_tree:
             command.extend(["-intree", input_tree])
         output_tree = basename + self.tree_suffix
+        command.extend(["-nosupport"])
         command.extend(["-out", output_tree])
         command.extend(["-log", basename + '.log'])
         command.append(alignment_filename)
@@ -170,6 +171,7 @@ class FastTree:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         command = self.base_command.copy()
         command.extend(["-mllen","-nome"])
+        command.extend(["-nosupport"])
         command.extend(["-intree",input_tree])
         command.extend(["-log", basename + ".log"])
         command.extend(["-out", basename + ".treefile"])
@@ -180,10 +182,22 @@ class FastTree:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         command = self.base_command.copy()
         output_tree = basename + self.tree_suffix
+        command.extend(["-nosupport"])
         command.extend(["-out", tmp + "/" + basename + ".bootstrapped_trees"])
         command.extend(["-log", basename + ".log"])
         command.extend(["-n", str(self.bootstrap)])
         command.append(alignment_filename + ".bootstrapping.aln")
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
+    
+    def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a single branch support test"""
+        command = self.base_command.copy()
+        command.extend(["-mllen","-nome"])
+        command.extend(["-intree",input_tree])
+        command.extend(["-out",input_tree + ".sh_support"])
+        command.extend([alignment_filename])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
@@ -286,9 +300,20 @@ class IQTree:
         return " ".join(command)
     
     def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
-        """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
+        """Runs a bootstrapping analysis"""
         command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", tmp + "/" + basename + ".bootstrapped", "-B", str(self.bootstrap), "-wbt"])
+        return " ".join(command)
+
+    def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a single branch support test"""
+        command = self.base_command.copy()
+        command.extend(["-s", alignment_filename])
+        command.extend(["--prefix", tmp + "/" + input_tree + ".sh_support"])
+        command.extend(["-te", input_tree])
+        command.extend(["-alrt 0"])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
 
 class RAxML:
@@ -450,4 +475,17 @@ class RAxML:
         command.extend([";"])
         # Rename final file
         command.extend(["cp",tmp + "/RAxML_bipartitions." + basename + ".bootstrapped", basename + ".tre.bootstrapped"])
+        return " ".join(command)
+
+    def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a single branch support test"""
+        command = self.base_command.copy()
+        p_seed = str(randint(0, 10000))
+        command.extend(["-p",p_seed])
+        command.extend(["-f", "J"])
+        command.extend(["-s", alignment_filename, "-n", input_tree + ".sh_support"])
+        command.extend(["-t", input_tree])
+        command.extend(["-w",tmp])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)

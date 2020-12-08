@@ -393,9 +393,9 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nExiting the main loop.")
 
     # 6. Run bootstrap analysis if requested
+    final_aln = current_basename + ".tre" + alignment_suffix # For use with bootstrap and SH tests
     if input_args.bootstrap > 0:
         printer.print(["\nRunning bootstrap analysis..."])
-        final_aln = current_basename + ".tre" + alignment_suffix
         shutil.copyfile(final_aln, temp_working_dir + "/" + final_aln)
         if current_tree_builder == "rapidnj":
             # Bootstraps for NJ tree have to be run in a single command - deterministic algorithm means tree assumed to be the same
@@ -443,6 +443,18 @@ def parse_and_run(input_args, program_description=""):
             except subprocess.SubprocessError:
                 sys.exit("Failed while annotating final tree with bootstrapping results.")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+
+    # 7. Run node branch support analysis if requested
+    if input_args.sh_test:
+        sh_test_command = tree_builder.sh_test(final_aln, current_tree_name, current_basename, os.path.abspath(temp_working_dir))
+        try:
+            subprocess.check_call(sh_test_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed while running SH test.")
+        if current_tree_builder == "raxml":
+            reformat_raxml_sh_support(current_tree_name, os.path.abspath(temp_working_dir))
+        elif current_tree_builder == "iqtree":
+            shutil.copyfile(temp_working_dir + "/" + current_tree_name + ".sh_support.treefile", current_tree_name + ".sh_support")
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -957,7 +969,6 @@ def symmetric_difference(input_tree_name, output_tree_name):
 
 
 def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename, outgroups = None):
-
     # read source tree and extract bootstraps as node labels, match with bipartition
     reroot_tree(source_tree_filename, outgroups = outgroups)
     source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
@@ -971,7 +982,6 @@ def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename,
             source_bootstraps[descendant_taxa] = source_internal_node.label
         else:
             source_bootstraps[descendant_taxa] = ''
-
     # read original tree and add in the bootstrap values
     destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
     for destination_internal_node in destination_tree.internal_nodes():
@@ -984,11 +994,18 @@ def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename,
         else:
             sys.stderr.write('Cannot find the internal node with descendants ' + descendant_taxa + '\n')
             sys.exit()
-
     # output final tree
     output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
+
+def reformat_raxml_sh_support(tree_name, tmpdir):
+    intree_fn = tmpdir + "/RAxML_fastTreeSH_Support." + tree_name + ".sh_support"
+    outtree_fn = tree_name + ".sh_support"
+    with open(intree_fn,'r') as intree, open(outtree_fn,'w') as outtree:
+        for line in intree.readlines():
+            new_line = re.sub(':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+            outtree.write(new_line)
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {
@@ -1001,6 +1018,7 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix) + ".phylip":          str(output_prefix) + ".filtered_polymorphic_sites.phylip",
         str(input_prefix) + ".internal":        str(output_prefix) + ".node_labelled.final_tree.tre",
         str(input_prefix) + ".bootstrapped":    str(output_prefix) + ".final_bootstrapped_tree.tre",
+        str(input_prefix) + ".sh_support":      str(output_prefix) + ".final_SH_support_tree.tre",
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names

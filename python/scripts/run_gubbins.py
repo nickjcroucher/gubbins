@@ -66,7 +66,8 @@ def main():
                                                           'names can be used if they form a clade')
     treeGroup.add_argument('--bootstrap',          '-#', help='Number of bootstrap replicates to perform with final alignment '
                                                          '[default = 0]', type = int, default = 0)
-
+    treeGroup.add_argument('--sh-test',                  help='Perform an SH test of node likelihoods', default = False,
+                                                        action = 'store_true')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
     modelGroup.add_argument('--model-fitter',      '-r', help='Application to use for model fitting [default = same as'

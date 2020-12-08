@@ -452,9 +452,10 @@ def parse_and_run(input_args, program_description=""):
         except subprocess.SubprocessError:
             sys.exit("Failed while running SH test.")
         if current_tree_builder == "raxml":
-            reformat_raxml_sh_support(current_tree_name, os.path.abspath(temp_working_dir))
+            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "raxml")
         elif current_tree_builder == "iqtree":
-            shutil.copyfile(temp_working_dir + "/" + current_tree_name + ".sh_support.treefile", current_tree_name + ".sh_support")
+            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "iqtree")
+#            shutil.copyfile(temp_working_dir + "/" + current_tree_name + ".sh_support.treefile", current_tree_name + ".sh_support")
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -999,12 +1000,18 @@ def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename,
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
-def reformat_raxml_sh_support(tree_name, tmpdir):
-    intree_fn = tmpdir + "/RAxML_fastTreeSH_Support." + tree_name + ".sh_support"
+def reformat_sh_support(tree_name, tmpdir, algorithm = "raxml"):
+    if algorithm == "raxml":
+        intree_fn = tmpdir + "/RAxML_fastTreeSH_Support." + tree_name + ".sh_support"
+    elif algorithm == "iqtree":
+        intree_fn = tmpdir + "/" + tree_name + ".sh_support.treefile"
     outtree_fn = tree_name + ".sh_support"
     with open(intree_fn,'r') as intree, open(outtree_fn,'w') as outtree:
         for line in intree.readlines():
-            new_line = re.sub(':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+            if algorithm == "raxml":
+                new_line = re.sub(':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+            elif algorithm == "iqtree":
+                new_line = re.sub('\/', '', line)
             outtree.write(new_line)
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):

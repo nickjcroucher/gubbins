@@ -509,7 +509,7 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":

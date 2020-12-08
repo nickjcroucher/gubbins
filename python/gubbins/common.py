@@ -394,10 +394,13 @@ def parse_and_run(input_args, program_description=""):
 
     # 6. Run bootstrap analysis if requested
     if input_args.bootstrap > 0:
-        printer.print(["\nRunning bootstrap analysis"])
+        printer.print(["\nRunning bootstrap analysis..."])
+        final_aln = current_basename + ".tre" + alignment_suffix
+        shutil.copyfile(final_aln, temp_working_dir + "/" + final_aln)
         if current_tree_builder == "rapidnj":
-            # Generate bootstrap trees
-            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), temp_working_dir + "/" + current_basename)
+            # Bootstraps for NJ tree have to be run in a single command - deterministic algorithm means tree assumed to be the same
+            # as the final tree
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), temp_working_dir + "/" + current_basename)
             try:
                 subprocess.check_call(bootstrap_command, shell=True)
             except subprocess.SubprocessError:
@@ -407,13 +410,22 @@ def parse_and_run(input_args, program_description=""):
                                                     current_basename + ".tre.bootstrapped",
                                                     outgroups = input_args.outgroup)
         else:
-            # Define a RAxML object for bootstrapping utilities
+            # Define alignment and a RAxML object for bootstrapping utilities
+            bootstrap_aln = final_aln
             if current_tree_builder == "raxml":
                 bootstrap_utility = tree_builder
             else:
                 bootstrap_utility = return_algorithm("raxml", current_model, input_args, node_labels = "")
+            # Generate alignments for bootstrapping if FastTree being used
+            if current_tree_builder == "fasttree":
+                alignment_generation_command = bootstrap_utility.generate_alignments_for_bootstrapping(os.path.abspath(bootstrap_aln), current_basename, temp_working_dir)
+                try:
+                    subprocess.check_call(alignment_generation_command, shell=True)
+                except subprocess.SubprocessError:
+                    sys.exit("Failed while generating alignments for bootstrap analysis.")
+                bootstrap_aln = temp_working_dir + "/" + current_basename
             # Generate bootstrap trees
-            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(bootstrap_aln), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
             try:
                 subprocess.check_call(bootstrap_command, shell=True)
             except subprocess.SubprocessError:
@@ -423,11 +435,14 @@ def parse_and_run(input_args, program_description=""):
                 bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
             elif current_tree_builder == "iqtree":
                 bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped.ufboot"
-            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
+            elif current_tree_builder == "fasttree":
+                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped_trees"
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
             try:
                 subprocess.check_call(annotation_command, shell=True)
             except subprocess.SubprocessError:
                 sys.exit("Failed while annotating final tree with bootstrapping results.")
+        printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -533,7 +548,7 @@ def process_input_arguments(input_args):
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(threads = input_args.threads, model = model, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = FastTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":

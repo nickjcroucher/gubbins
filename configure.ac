@@ -29,7 +29,7 @@ PKG_CHECK_MODULES([zlib], [zlib])
 AC_CHECK_HEADERS([zlib.h math.h])
 
 # Check for Python
-AM_PATH_PYTHON([3.0],
+AM_PATH_PYTHON([3.8],
                [],
                [AC_MSG_WARN([Python not found. Python is required to build presage python binding. Python can be obtained from http://www.python.org])])
 

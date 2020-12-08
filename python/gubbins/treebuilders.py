@@ -272,11 +272,11 @@ class IQTree:
         command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, " -n 0 --mlrate", "-redo"])
         return " ".join(command)
     
-    def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+    def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         command = self.base_command.copy()
-        command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", basename, "-B", str(self.bootstrap), "-wbt"])
-        command.extend(["mv", basename + ".contree", basename + ".tre.bootstrapped"])
+        command.extend(["-s", alignment_filename, "-t", input_tree, "--prefix", tmp + "/" + basename + ".bootstrapped", "-B", str(self.bootstrap), "-wbt"])
+#        command.extend(["mv", basename + ".contree", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
 class RAxML:
@@ -405,20 +405,6 @@ class RAxML:
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         command.extend([";"])
-        # Annotate tree with bootstraps
-#        base_command = self.base_command.copy()
-#        command.extend(base_command)
-#        command.extend(["-p",p_seed])
-#        command.extend(["-f","b"])
-#        command.extend(["-t",input_tree])
-#        command.extend(["-z","RAxML_bootstrap." + basename + ".bootstrapped_trees"])
-#        command.extend(["-n",basename + ".bootstrapped"])
-#        # Output
-#        if not self.verbose:
-#            command.extend([">", "/dev/null", "2>&1"])
-#        command.extend([";"])
-        # Rename final file
-#        command.extend(["cp","RAxML_bipartitions." + basename + ".bootstrapped", basename + ".tre.bootstrapped"])
         return " ".join(command)
         
     def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str) -> str:
@@ -431,7 +417,6 @@ class RAxML:
         command.extend(["-z",bootstrapped_trees]) # "RAxML_bootstrap." + basename + ".bootstrapped_trees"
         command.extend(["-n",basename + ".bootstrapped"])
         command.extend(["-w",tmp])
-        print('BOOTSTRAP: ' + " ".join(command))
         # Output
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])

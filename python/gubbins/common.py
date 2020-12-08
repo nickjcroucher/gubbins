@@ -556,6 +556,14 @@ def process_input_arguments(input_args):
             elif input_args.first_tree_builder is None and input_args.tree_args is not None:
                 input_args.first_model_args = input_args.tree_args
 
+        # Check on arguments for measures of branch support
+        if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
+            sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
+            sys.exit()
+        if input_args.sh_test and input_args.tree_builder not in ["raxml","iqtree","fasttree"]:
+            sys.stderr.write("SH test only available for RAxML, IQtree or Fasttree\n")
+            sys.exit()
+
     return input_args
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):

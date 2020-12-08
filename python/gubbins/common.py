@@ -395,11 +395,25 @@ def parse_and_run(input_args, program_description=""):
     # 6. Run bootstrap analysis if requested
     if input_args.bootstrap > 0:
         printer.print(["\nRunning bootstrap analysis"])
-        bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename)
+        # Define a RAxML object for bootstrapping utilities
+        if current_tree_builder == "raxml":
+            bootstrap_utility = tree_builder
+        else:
+            bootstrap_utility = return_algorithm("raxml", current_model, input_args, node_labels = "")
+        # Generate bootstrap trees
+        bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
         try:
             subprocess.check_call(bootstrap_command, shell=True)
         except subprocess.SubprocessError:
             sys.exit("Failed while running bootstrap analysis.")
+        # Annotate the final tree using the bootstraps
+        if current_tree_builder == "raxml":
+            bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
+        annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(alignment_filename), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
+        try:
+            subprocess.check_call(annotation_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed while annotating final tree with bootstrapping results.")
 
     # Create the final output
     printer.print("\nCreating the final output...")

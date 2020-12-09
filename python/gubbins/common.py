@@ -532,6 +532,14 @@ def process_input_arguments(input_args):
                                  ' are incompatible\n')
                 invalid_model = True
 
+        # Check that at least 2 iterations will be run if customised options for 1st iteration
+        if input_args.iterations == 1:
+            if input_args.first_tree_builder is not None or input_args.first_model \
+                or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
+                sys.stderr.write('Please do not use options specific to the first iteration when'
+                                 ' only one iteration is to be run\n')
+                sys.exit()
+            
         # Determine model to be used for subsequent iterations
         if input_args.custom_model is not None:
             input_args.model = input_args.custom_model

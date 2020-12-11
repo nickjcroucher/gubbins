@@ -500,10 +500,10 @@ class RAxMLNG:
         self.model = model
         self.tree_prefix = ""
         self.tree_suffix = ".raxml.bestTree"
-        self.asr_prefix = "RAxML_marginalAncestralStates."
-        self.asr_suffix = ""
-        self.asr_tree_prefix = "RAxML_nodeLabelledRootedTree."
-        self.asr_tree_suffix = ""
+        self.asr_prefix = ""
+        self.asr_suffix = ".raxml.ancestralStates"
+        self.asr_tree_prefix = ""
+        self.asr_tree_suffix = ".raxml.ancestralTree"
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.additional_args = additional_args
@@ -584,10 +584,17 @@ class RAxMLNG:
         with open(input_filename, 'r') as infile:
             with open(output_filename, 'w+') as outfile:
                 for sequence_line in infile:
-                    [sequence_name, sequence_bases] = sequence_line.split(' ')
-                    sequence_bases = sequence_bases.replace('?', 'N')
+                    [sequence_name, sequence_bases] = sequence_line.split()
+                    sequence_bases = sequence_bases.translate(str.maketrans({'?': 'N',
+                                                                             'R': 'N',
+                                                                             'Y': 'N',
+                                                                             'S': 'N',
+                                                                             'W': 'N'
+                                                                            }
+                                                                     )
+                                                              )
                     outfile.write('>' + self.replace_internal_node_label(sequence_name) + '\n')
-                    outfile.write(sequence_bases)
+                    outfile.write(sequence_bases + '\n')
 
     def replace_internal_node_label(self, label):
         """Changes the label of internal nodes"""

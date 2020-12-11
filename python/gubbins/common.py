@@ -192,9 +192,10 @@ def parse_and_run(input_args, program_description=""):
             extra_arguments = input_args.tree_args
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_arguments)
             if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
-                    or current_tree_builder == "star":
+                or current_tree_builder == "star":
                 alignment_suffix = ".snp_sites.aln"
-            elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
+            elif current_tree_builder == "raxml" or current_tree_builder == "raxmlng" \
+                or current_tree_builder == "iqtree":
                 alignment_suffix = ".phylip"
             else:
                 sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
@@ -339,17 +340,17 @@ def parse_and_run(input_args, program_description=""):
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
-            if input_args.seq_recon == 'raxml':
+            if input_args.seq_recon == "raxml":
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
-            elif input_args.seq_recon == 'iqtree':
+            elif input_args.seq_recon == "iqtree" or current_tree_builder == "raxmlng":
                 # IQtree returns an unrooted tree
                 temp_unrooted_tree = temp_working_dir + "/" + current_tree_name + ".unrooted"
                 unroot_tree(temp_rooted_tree, temp_unrooted_tree)
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_unrooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
             else:
-                sys.stderr.write('Unrecognised sequencing reconstruction command: ' + input_args.seq_recon + '\n')
+                sys.stderr.write("Unrecognised sequence reconstruction command: " + input_args.seq_recon + '\n')
                 sys.exit()
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 

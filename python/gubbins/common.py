@@ -419,10 +419,10 @@ def parse_and_run(input_args, program_description=""):
         else:
             # Define alignment and a RAxML object for bootstrapping utilities
             bootstrap_aln = final_aln
-            if current_tree_builder == "raxml":
+            if current_tree_builder == "raxmlng":
                 bootstrap_utility = tree_builder
             else:
-                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
+                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "", transfer = input_args.transfer_bootstrap)
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
                 alignment_generation_command = bootstrap_utility.generate_alignments_for_bootstrapping(os.path.abspath(bootstrap_aln), current_basename, temp_working_dir)

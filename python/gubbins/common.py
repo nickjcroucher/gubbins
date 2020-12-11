@@ -39,7 +39,7 @@ from gubbins.pyjar import jar, read_alignment, get_base_patterns
 
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RapidNJ, Star
+from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins import utils
 
 
@@ -86,9 +86,11 @@ def parse_and_run(input_args, program_description=""):
     else:
         extra_tree_arguments = input_args.tree_args
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-    if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" or current_tree_builder == "star":
+    if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
+        or current_tree_builder == "star":
         alignment_suffix = ".snp_sites.aln"
-    elif current_tree_builder == "raxml" or current_tree_builder == "iqtree":
+    elif current_tree_builder == "raxml" or current_tree_builder == "raxmlng" \
+        or current_tree_builder == "iqtree":
         alignment_suffix = ".phylip"
     else:
         sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
@@ -504,6 +506,7 @@ def process_input_arguments(input_args):
         # Check substitution model consistent with tree building algorithm
         tree_models = {
             'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+            'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
             'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
             'fasttree': ['JC','GTRCAT','GTRGAMMA'],
             'rapidnj': ['JC','K2P']
@@ -580,6 +583,8 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         initialised_algorithm = FastTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "raxmlng":
+        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
         initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "rapidnj":

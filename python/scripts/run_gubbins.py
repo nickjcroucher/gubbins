@@ -68,6 +68,8 @@ def main():
                                                       'names can be used if they form a clade')
     treeGroup.add_argument('--bootstrap',       '-#', help='Number of bootstrap replicates to perform with final alignment '
                                                       '[default = 0]', type = int, default = 0)
+    treeGroup.add_argument('--transfer-bootstrap',    help='Calculate bootstrap supporting transfer bootstrap expectation '
+                                                      '[default = False]', default = False, action = 'store_true')
     treeGroup.add_argument('--sh-test',               help='Perform an SH test of node likelihoods', default = False,
                                                       action = 'store_true')
                                                           

@@ -633,13 +633,15 @@ class RAxMLNG:
         command.extend([";"])
         return " ".join(command)
         
-    def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str) -> str:
+    def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str, transfer = False) -> str:
         # Annotate tree with bootstraps
         command = self.base_command.copy()
         command.extend(["--support"])
         command.extend(["--bs-trees",bootstrapped_trees])
         command.extend(["--tree",input_tree])
         command.extend(["--prefix",tmp + "/" + basename + ".bootstrapped"])
+        if transfer:
+            command.extend(["--bs-metric tbe"])
         # Output
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])

@@ -279,6 +279,10 @@ def parse_and_run(input_args, program_description=""):
                 info_filename = temp_working_dir + '/RAxML_info.' + current_basename + '_reconstruction'
                 info_filetype = 'raxml'
                 recontree_filename = temp_working_dir + '/RAxML_result.' + current_basename + '_reconstruction'
+            elif input_args.model_fitter == "raxmlng":
+                info_filename = temp_working_dir + '/' + current_basename + '.raxml.bestModel'
+                info_filetype = 'raxmlng'
+                recontree_filename = temp_working_dir + '/' + current_basename + '.raxml.bestTree'
             elif input_args.model_fitter == "iqtree":
                 info_filename = temp_working_dir + '/' + current_basename + '.log'
                 info_filetype = 'iqtree'
@@ -487,14 +491,14 @@ def process_input_arguments(input_args):
     else:
         # Make model fitting consistent with tree building
         if input_args.model_fitter is None:
-            if input_args.tree_builder in ['raxml', 'iqtree', 'fasttree']:
+            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
                 input_args.model_fitter = input_args.tree_builder
             else:
                 input_args.model_fitter = 'raxml'
                 
         # Make sequence reconstruction consistent with tree building
         if input_args.seq_recon is None:
-            if input_args.tree_builder in ['raxml', 'iqtree']:
+            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
                 input_args.seq_recon = input_args.tree_builder
             else:
                 input_args.seq_recon = 'raxml'

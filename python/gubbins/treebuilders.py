@@ -625,7 +625,7 @@ class RAxMLNG:
         # Run bootstraps
         command = self.base_command.copy()
         command.extend(["--bootstrap"])
-        command.extend(["-s", alignment_filename, "-n", tmp + "/" + basename + ".bootstrapped_trees"])
+        command.extend(["--msa", alignment_filename, "--prefix", tmp + "/" + basename])
         command.extend(["--bs-trees",str(self.bootstrap)])
         # Output
         if not self.verbose:

@@ -440,6 +440,8 @@ def parse_and_run(input_args, program_description=""):
             # Annotate the final tree using the bootstraps
             if current_tree_builder == "raxml":
                 bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
+            elif current_tree_builder == "raxmlng":
+                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".raxml.bootstraps"
             elif current_tree_builder == "iqtree":
                 bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped.ufboot"
             elif current_tree_builder == "fasttree":

@@ -509,10 +509,10 @@ class RAxMLNG:
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxml-ng']
-        self.multi_threaded_executables = ['raxml-ng']
+        self.multi_threaded_executables = ['raxml-ng-mpi','raxml-ng']
         self.executable = self.select_executable_based_on_threads()
         if self.executable is None:
-            sys.exit("No usable version of RAxML could be found.")
+            sys.exit("No usable version of RAxML-NG could be found.")
         command = [self.executable]
         
         # Set parallelisation
@@ -539,7 +539,7 @@ class RAxMLNG:
         self.base_command = command
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
-        """Constructs the command to call the RAxML executable for tree building"""
+        """Constructs the command to call the RAxMLNG executable for tree building"""
         command = self.base_command.copy()
         command.extend(["--search"])
         command.extend(["--msa", alignment_filename, "--prefix", basename])
@@ -550,7 +550,7 @@ class RAxMLNG:
         return " ".join(command)
 
     def internal_sequence_reconstruction_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
-        """Constructs the command to call the RAxML executable for ancestral sequence reconstruction"""
+        """Constructs the command to call the RAxMLNG executable for ancestral sequence reconstruction"""
         command = self.base_command.copy()
         command.extend(["--ancestral"])
         command.extend(["--msa", alignment_filename, "--prefix", basename])
@@ -567,7 +567,7 @@ class RAxMLNG:
             if single_threaded_exec is not None:
                 return single_threaded_exec
             else:
-                print("Trying multithreaded version of RAxML because no single threaded version of RAxML could be "
+                print("Trying multithreaded version because no single threaded version could be "
                       "found. Just to warn you, this requires 2 threads.\n")
                 self.threads = 2
 

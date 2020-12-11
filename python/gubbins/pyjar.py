@@ -65,7 +65,7 @@ def read_info(infofile, type = 'raxml'):
         print("Error: model information file " + infofile + " does not exist")
         sys.exit()
     
-    if type not in ['raxml','iqtree','fasttree']:
+    if type not in ['raxml', 'raxmlng', 'iqtree','fasttree']:
         sys.stderr.write('Only able to parse GTR-type models from raxml, iqtree or fasttree')
         sys.exit()
     
@@ -108,6 +108,22 @@ def read_info(infofile, type = 'raxml'):
                     # order is ac ag at cg ct gt
                     words=line.split()
                     r=[float(words[9]), float(words[10]), float(words[11]), float(words[12]), float(words[13]), float(words[14])]
+            elif type == 'raxmlng':
+                sep_by_braces = line.replace('{','}').split('}')
+                if sep_by_braces[0] == "GTR":
+                    r = [float(rate) for rate in sep_by_braces[1].split('/')]
+                    f = [float(rate) for rate in sep_by_braces[3].split('/')]
+                elif sep_by_braces[0] == "K80":
+                    sep_rates = [float(rate) for rate in sep_by_braces[1].split('/')]
+                    r = [sep_rates[0], sep_rates[1], sep_rates[0], sep_rates[0], sep_rates[1], sep_rates[0]]
+                    f = [0.25,0.25,0.25,0.25]
+                elif sep_by_braces[0] == "HKY":
+                    sep_rates = [float(rate) for rate in sep_by_braces[1].split('/')]
+                    r = [sep_rates[0], sep_rates[1], sep_rates[0], sep_rates[0], sep_rates[1], sep_rates[0]]
+                    f = [float(rate) for rate in sep_by_braces[3].split('/')]
+                elif line.startswith("JC"):
+                    f = [0.25,0.25,0.25,0.25]
+                    r = [1.0,1.0,1.0,1.0,1.0,1.0]
             elif type == 'iqtree':
                 if line.startswith('Base frequencies:'):
                     words=line.split()

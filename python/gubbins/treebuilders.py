@@ -639,11 +639,11 @@ class RAxMLNG:
         command.extend(["--support"])
         command.extend(["--bs-trees",bootstrapped_trees])
         command.extend(["--tree",input_tree])
-        command.extend(["-n",tmp + "/" + basename + ".bootstrapped"])
+        command.extend(["--prefix",tmp + "/" + basename + ".bootstrapped"])
         # Output
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         command.extend([";"])
         # Rename final file
-        command.extend(["cp",tmp + "/RAxML_bipartitions." + basename + ".bootstrapped", basename + ".tre.bootstrapped"])
+        command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)

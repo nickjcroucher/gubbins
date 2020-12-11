@@ -86,15 +86,7 @@ def parse_and_run(input_args, program_description=""):
     else:
         extra_tree_arguments = input_args.tree_args
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-    if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
-        or current_tree_builder == "star":
-        alignment_suffix = ".snp_sites.aln"
-    elif current_tree_builder == "raxml" or current_tree_builder == "raxmlng" \
-        or current_tree_builder == "iqtree":
-        alignment_suffix = ".phylip"
-    else:
-        sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
-        sys.exit()
+    alignment_suffix = tree_builder.alignment_suffix
 
     # Now initialise model fitting and sequence reconstruction algorithms
     if input_args.first_model_args is not None:
@@ -191,15 +183,7 @@ def parse_and_run(input_args, program_description=""):
             current_model = input_args.model
             extra_arguments = input_args.tree_args
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_arguments)
-            if current_tree_builder == "fasttree" or current_tree_builder == "rapidnj" \
-                or current_tree_builder == "star":
-                alignment_suffix = ".snp_sites.aln"
-            elif current_tree_builder == "raxml" or current_tree_builder == "raxmlng" \
-                or current_tree_builder == "iqtree":
-                alignment_suffix = ".phylip"
-            else:
-                sys.stderr.write("Unrecognised tree building algorithm: " + input_args.tree_builder)
-                sys.exit()
+            alignment_suffix = tree_builder.alignment_suffix
             # Update model fitting and sequence reconstruction if required
             if input_args.first_model is not None or input_args.first_model_args is not None:
                 extra_model_arguments = input_args.model_args

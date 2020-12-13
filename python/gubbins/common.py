@@ -282,7 +282,7 @@ def parse_and_run(input_args, program_description=""):
 
         else:
 
-            # 3.2b. Marginal ancestral reconstruction with RAxML or IQTree
+            # 3.2b. Marginal ancestral reconstruction with RAxML, RAxML-NG or IQTree
             sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
                 os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
                 ancestral_sequence_basename)
@@ -374,6 +374,7 @@ def parse_and_run(input_args, program_description=""):
     if input_args.bootstrap > 0:
         printer.print(["\nRunning bootstrap analysis..."])
         shutil.copyfile(final_aln, temp_working_dir + "/" + final_aln)
+        # NJ bootstraps
         if current_tree_builder == "rapidnj":
             # Bootstraps for NJ tree have to be run in a single command - deterministic algorithm means tree assumed to be the same
             # as the final tree
@@ -386,13 +387,14 @@ def parse_and_run(input_args, program_description=""):
                                                     os.path.abspath(current_tree_name),
                                                     current_basename + ".tre.bootstrapped",
                                                     outgroups = input_args.outgroup)
+        # ML bootstraps
         else:
             # Define alignment and a RAxML object for bootstrapping utilities
             bootstrap_aln = final_aln
             if current_tree_builder == "raxmlng":
                 bootstrap_utility = tree_builder
             else:
-                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "", transfer = input_args.transfer_bootstrap)
+                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
                 alignment_generation_command = bootstrap_utility.generate_alignments_for_bootstrapping(os.path.abspath(bootstrap_aln), current_basename, temp_working_dir)
@@ -408,15 +410,8 @@ def parse_and_run(input_args, program_description=""):
             except subprocess.SubprocessError:
                 sys.exit("Failed while running bootstrap analysis.")
             # Annotate the final tree using the bootstraps
-            if current_tree_builder == "raxml":
-                bootstrapped_trees_file = temp_working_dir + "/RAxML_bootstrap." + current_basename + ".bootstrapped_trees"
-            elif current_tree_builder == "raxmlng":
-                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".raxml.bootstraps"
-            elif current_tree_builder == "iqtree":
-                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped.ufboot"
-            elif current_tree_builder == "fasttree":
-                bootstrapped_trees_file = temp_working_dir + "/" + current_basename + ".bootstrapped_trees"
-            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir))
+            bootstrapped_trees_file = tree_builder.get_bootstrapped_trees_file(temp_working_dir,current_basename)
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir), transfer = input_args.transfer_bootstrap)
             try:
                 subprocess.check_call(annotation_command, shell=True)
             except subprocess.SubprocessError:
@@ -434,7 +429,6 @@ def parse_and_run(input_args, program_description=""):
             reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "raxml")
         elif current_tree_builder == "iqtree":
             reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "iqtree")
-#            shutil.copyfile(temp_working_dir + "/" + current_tree_name + ".sh_support.treefile", current_tree_name + ".sh_support")
 
     # Create the final output
     printer.print("\nCreating the final output...")

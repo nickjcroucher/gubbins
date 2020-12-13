@@ -74,11 +74,11 @@ def main():
                                                       action = 'store_true')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
-    modelGroup.add_argument('--model-fitter',         help='Application to use for model fitting [default = same as'
+    modelGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting [default = same as'
                                                       ' tree builder if possible, else raxml]',
                                                       default = None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
-    modelGroup.add_argument('--model',                help='Nucleotide substitution model (not all available for all'
+    modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all'
                                                       'tree building algorithms',
                                                       default='GTRGAMMA',
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
@@ -110,8 +110,9 @@ def main():
                                                       default=None)
                                                             
     gubbinsGroup = parser.add_argument_group('Recombination detection options')
-    gubbinsGroup.add_argument('--min-snps',     '-m', help='Min SNPs to identify a recombination block', type=int,
-                        default=3)
+    gubbinsGroup.add_argument('--min-snps',     '-m', help='Min SNPs to identify a recombination block',
+                                                      type=int,
+                                                      default = 3)
     gubbinsGroup.add_argument('--min-window-size','-a',
                                                       help='Minimum window size', type=int, default=100)
     gubbinsGroup.add_argument('--max-window-size','-b',

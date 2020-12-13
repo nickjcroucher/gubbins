@@ -216,6 +216,11 @@ class FastTree:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
 
+    def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
+        """Return bootstrapped tree files name"""
+        file_name = tmp + "/" + basename + ".bootstrapped_trees"
+        return file_name
+
 class IQTree:
     """Class for operations with the IQTree executable"""
 
@@ -340,6 +345,11 @@ class IQTree:
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
+        
+    def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
+        """Return bootstrapped tree files name"""
+        file_name = tmp + "/" + basename + ".bootstrapped.ufboot"
+        return file_name
 
 class RAxML:
     """Class for operations with the RAxML executable"""
@@ -526,6 +536,11 @@ class RAxML:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)
 
+    def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
+        """Return bootstrapped tree files name"""
+        file_name = tmp + "/RAxML_bootstrap." + basename + ".bootstrapped_trees"
+        return file_name
+
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
@@ -695,3 +710,8 @@ class RAxMLNG:
         # Rename final file
         command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)
+
+    def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
+        """Return bootstrapped tree files name"""
+        file_name = tmp + "/" + basename + ".raxml.bootstraps"
+        return file_name

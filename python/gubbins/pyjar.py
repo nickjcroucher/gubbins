@@ -335,7 +335,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             max_root_base=None
             max_root_base_likelihood=float("-inf")
             for root_base in columnbases:
-                if node.L[root_base]>max_root_base_likelihood:
+                if node.L[root_base] > max_root_base_likelihood:
                     max_root_base_likelihood=node.L[root_base]
                     max_root_base=node.C[root_base]
             node.r=max_root_base
@@ -345,7 +345,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             
                 try:
                     #5a. Visit an unreconstructed internal node x whose father y has already been reconstructed. Denote by i the reconstructed amino acid at node y.
-                    i=node.parent_node.r
+                    i = node.parent_node.r
                 except AttributeError:
                     continue
                 #5b. Reconstruct node x by choosing Cx(i).
@@ -368,9 +368,9 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             reconstructed_alleles = {}
             for node in tree.postorder_node_iter():
                 if node.is_leaf():
-                    node.r=base[node.taxon.label]
+                    node.r = base[node.taxon.label]
                 else:
-                    has_child_base=False
+                    has_child_base = False
                     for child in node.child_node_iter():
                         if child.r in bases:
                             has_child_base=True
@@ -452,10 +452,10 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
     tree=read_tree(tree_filename)
     
     # Read the info file and get frequencies and rates
-    if info_filename!="":
+    if info_filename != "":
         if verbose:
             print("Reading info file:", info_filename)
-        f, r=read_info(info_filename, type = info_filetype)
+        f,r = read_info(info_filename, type = info_filetype)
     else:
         if verbose:
             print("Using default JC rates and frequencies")
@@ -534,10 +534,10 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output:
             for taxon in alignment:
-                print(">"+taxon.id, file=asr_output)
+                print(">" + taxon.id, file = asr_output)
                 print(taxon.seq, file=asr_output)
             for taxon in ancestral_node_indices:
-                print(">"+taxon, file=asr_output)
+                print(">" + taxon, file = asr_output)
                 print(''.join(out_aln[:,ancestral_node_indices[taxon]]), file=asr_output)
 
         # Combine results for each base across the alignment

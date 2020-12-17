@@ -88,6 +88,10 @@ def main():
                                                       default=None)
     modelGroup.add_argument('--custom-model',         help='String corresponding to a substitution model for the selected tree'
                                                       ' building algorithm [default = None]', default = None)
+    modelGroup.add_argument('--first-model-fitter',   help='Application to use for model fitting in first iteration'
+                                                      ' [default = same as tree builder if possible, else raxml]',
+                                                      default = None,
+                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--first-model',          help='Nucleotide substitution model used for first tree',
                                                       default=None,
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])

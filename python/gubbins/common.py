@@ -94,7 +94,7 @@ def parse_and_run(input_args, program_description=""):
         extra_tree_arguments = input_args.tree_args
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
-    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'First tree constructor')
+    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
 
     # Now initialise model fitting and sequence reconstruction algorithms
     if input_args.first_model_args is not None:
@@ -102,7 +102,7 @@ def parse_and_run(input_args, program_description=""):
     else:
         extra_model_arguments = input_args.model_args
     model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'First tree model fitter')
+    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
     if input_args.mar:
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
@@ -203,7 +203,7 @@ def parse_and_run(input_args, program_description=""):
                     sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
             
             # Record later tree builder
-            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Later tree constructor')
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -498,7 +498,7 @@ def process_input_arguments(input_args):
             'rapidnj': ['JC','K2P']
         }
         invalid_model = False
-        
+
         # Check on first tree builder
         if input_args.first_tree_builder is not None:
             # Raise error if first tree builder and starting tree

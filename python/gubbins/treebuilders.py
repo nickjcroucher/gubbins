@@ -34,6 +34,9 @@ class Star:
         self.tree_prefix = ""
         self.tree_suffix = ".tre"
         self.alignment_suffix = ".snp_sites.aln"
+        # Reproducibility
+        self.version = "unspecified"
+        self.citation = "no citation"
     
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         # Extract taxon names from alignment
@@ -68,6 +71,11 @@ class RapidNJ:
         self.executable = "rapidnj"
         if utils.which(self.executable) is None:
             sys.exit("No usable version of rapidnj could be found.")
+
+        # Reproducibility
+        self.version = "unspecified"
+        self.citation = "https://doi.org/10.1007/978-3-540-87361-7_10"
+
         command = [self.executable]
         command.extend(["-i fa", "-t d", "-n"])
         command.extend(["-c", str(self.threads)])
@@ -131,7 +139,11 @@ class FastTree:
         self.executable = utils.choose_executable(self.potential_executables)
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")
-        
+
+        # Reproducibility
+        self.version = self.get_version(self.executable)
+        self.citation = "https://doi.org/10.1371/journal.pone.0009490"
+
         # Function for returning base command
         command = [self.executable]
         command.extend(["-nt"])
@@ -156,6 +168,18 @@ class FastTree:
             subprocess.check_call(omp_threads_command, shell=True)
         except subprocess.SubprocessError:
             sys.exit("Failed to set number of threads for fasttree with command " + omp_threads_command)
+
+    def get_version(self,exe) -> str:
+        """Gets the version of the tree building algorithm being used"""
+        version = "Not determined"
+        version_message = subprocess.run([exe], capture_output=True)
+        for line in version_message.stderr.decode().splitlines():
+            if line.startswith('Usage'):
+                info = line.split()
+                if len(info) >= 5:
+                    version = info[4]
+                break
+        return version
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the FastTree executable"""
@@ -245,7 +269,11 @@ class IQTree:
         if utils.which(self.executable) is None:
             sys.exit("No usable version of IQTree could be found.")
         command = [self.executable]
-        
+
+        # Reproducibility
+        self.version = self.get_version(self.executable)
+        self.citation = "https://doi.org/10.1093/molbev/msaa015"
+
         # Set parallelisation
         command.extend(["-nt", str(self.threads)])
 
@@ -267,6 +295,18 @@ class IQTree:
         if self.additional_args is not None:
             command.extend([self.additional_args])
         self.base_command = command
+
+    def get_version(self,exe) -> str:
+        """Gets the version of the tree building algorithm being used"""
+        version = "Not determined"
+        version_message = subprocess.run([exe], capture_output=True)
+        for line in version_message.stdout.decode().splitlines():
+            if line.startswith('IQ-TREE'):
+                info = line.split()
+                if len(info) >= 4:
+                    version = info[3]
+                break
+        return version
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the IQTree executable"""
@@ -378,6 +418,10 @@ class RAxML:
             sys.exit("No usable version of RAxML could be found.")
         command = [self.executable]
         
+        # Reproducibility
+        self.version = self.get_version(self.executable)
+        self.citation = "https://doi.org/10.1093/bioinformatics/btu033"
+
         # Set parallelisation
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
@@ -400,6 +444,18 @@ class RAxML:
         if self.additional_args is not None:
             command.extend([self.additional_args])
         self.base_command = command
+
+    def get_version(self,exe) -> str:
+        """Gets the version of the tree building algorithm being used"""
+        version = "Not determined"
+        version_message = subprocess.run([exe,'-v'], capture_output=True)
+        for line in version_message.stdout.decode().splitlines():
+            if line.startswith('This'):
+                info = line.split()
+                if len(info) >= 5:
+                    version = info[4]
+                break
+        return version
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
@@ -567,6 +623,10 @@ class RAxMLNG:
             sys.exit("No usable version of RAxML-NG could be found.")
         command = [self.executable]
         
+        # Reproducibility
+        self.version = self.get_version(self.executable)
+        self.citation = "https://doi.org/10.1093/bioinformatics/btz305"
+        
         # Set parallelisation
         if self.threads > 1:
             command.extend(["--threads", str(self.threads)])
@@ -589,6 +649,18 @@ class RAxMLNG:
         if self.additional_args is not None:
             command.extend([self.additional_args])
         self.base_command = command
+
+    def get_version(self,exe) -> str:
+        """Gets the version of the tree building algorithm being used"""
+        version = "Not determined"
+        version_message = subprocess.run([exe,'-v'], capture_output=True)
+        for line in version_message.stdout.decode().splitlines():
+            if line.startswith('RAxML-NG'):
+                info = line.split()
+                if len(info) >= 3:
+                    version = info[2]
+                break
+        return version
 
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxMLNG executable for tree building"""

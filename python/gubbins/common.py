@@ -68,6 +68,13 @@ def parse_and_run(input_args, program_description=""):
         pass
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
+    # Log algorithms used
+    methods_log = {property:[] for property in ['citation','process','version','algorithm']}
+    methods_log['algorithm'].append("Gubbins")
+    methods_log['citation'].append("https://doi.org/10.1093/nar/gku1196")
+    methods_log['process'].append("Overall")
+    methods_log['version'].append(program_version)
+
     # Initialize tree builder and check if all required dependencies are available
     printer.print("\nChecking dependencies...")
     current_tree_name = input_args.starting_tree
@@ -87,6 +94,7 @@ def parse_and_run(input_args, program_description=""):
         extra_tree_arguments = input_args.tree_args
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
+    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'First tree constructor')
 
     # Now initialise model fitting and sequence reconstruction algorithms
     if input_args.first_model_args is not None:
@@ -94,8 +102,10 @@ def parse_and_run(input_args, program_description=""):
     else:
         extra_model_arguments = input_args.model_args
     model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'First tree model fitter')
     if input_args.mar:
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
+        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check if the input files exist and have the right format
@@ -184,12 +194,16 @@ def parse_and_run(input_args, program_description=""):
             extra_arguments = input_args.tree_args
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_arguments)
             alignment_suffix = tree_builder.alignment_suffix
+            
             # Update model fitting and sequence reconstruction if required
             if input_args.first_model is not None or input_args.first_model_args is not None:
                 extra_model_arguments = input_args.model_args
                 model_fitter = return_algorithm(input_args.model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
                 if input_args.mar:
                     sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix)
+            
+            # Record later tree builder
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Later tree constructor')
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -434,6 +448,7 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
+    print_log(methods_log, input_args.prefix)
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
@@ -1005,6 +1020,22 @@ def reformat_sh_support(tree_name, tmpdir, algorithm = "raxml"):
             elif algorithm == "iqtree":
                 new_line = re.sub('\/', '', line)
             outtree.write(new_line)
+
+def update_methods_log(log, method = None, step = ''):
+    """Record methods used at each step"""
+    log['citation'].append(method.citation)
+    log['process'].append(step)
+    log['version'].append(method.version)
+    log['algorithm'].append(method.executable)
+    return log
+
+def print_log(log, prefix):
+    """Print a records of the methods used"""
+    log_file_name = prefix + ".log"
+    with open(log_file_name,'w') as log_file:
+        log_file.write("Process,Algorithm,Version,Citation\n")
+        for index,process in enumerate(log['process']):
+            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['citation'][index] + "\n")
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {

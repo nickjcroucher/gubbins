@@ -4,7 +4,7 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
 PLEASE NOTE: we currently do not have the resources to provide support for Gubbins, so please do not expect a reply if you flag any issue.
 
 [![Unmaintained](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)   
-[![Build Status](https://travis-ci.org/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.org/sanger-pathogens/gubbins)   
+[![Build Status](https://travis-ci.com/sanger-pathogens/gubbins.svg?branch=master)](https://travis-ci.com/sanger-pathogens/gubbins)   
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  

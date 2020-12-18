@@ -53,6 +53,7 @@ def parse_and_run(input_args, program_description=""):
     input_args = process_input_arguments(input_args)
 
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
+    os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
     if utils.which(gubbins_exec) is None:
         # Check if the Gubbins C-program is available in its source directory (for tests/Travis)

@@ -31,7 +31,9 @@ RUN pip3 install certifi \
   && pip3 install nose \
   && pip3 install pillow \
   && pip3 install dendropy \
-  && pip3 install biopython
+  && pip3 install biopython \
+  && pip3 install functools \
+  && pip3 install multiprocess
   
 # Install RAxML
 ARG raxml_version='8.2.12'
@@ -58,6 +60,22 @@ RUN curl -L https://github.com/Cibiv/IQ-TREE/releases/download/v${iqtree_version
   && tar xzf iqtree-${iqtree_version}-Linux.tar.gz \
   && cp iqtree-${iqtree_version}-Linux/bin/iqtree /usr/local/bin \
   && rm -rf iqtree-${iqtree_version}-Linux
+
+# Install RAxML-NG
+ARG raxmlng_version='1.0.1'
+RUN curl https://github.com/amkozlov/raxml-ng/releases/download/${raxmlng_version}/raxml-ng_v${raxmlng_version}_linux_x86_64.zip \
+  && unzip raxml-ng_v${raxmlng_version}_linux_x86_64.zip \
+  && cp raxml-ng /usr/local/bin
+
+# Install RapidNJ
+ARG rapidnj_version=2.3.2
+RUN curl https://github.com/johnlees/rapidnj/archive/${rapidnj_version}.zip \
+  && unzip ${rapidnj_version}.zip \
+  && cd rapidnj-${rapidnj_version} \
+  && make \
+  && cp bin/rapidnj /usr/local/bin \
+  && cd .. \
+  && rm -rf rapidnj-${rapidnj_version}
 
 # Install Gubbins
 ENV BUILD_DIR /opt/gubbins

@@ -34,9 +34,15 @@ RUN pip3 install certifi \
   && pip3 install biopython \
   && pip3 install functools \
   && pip3 install multiprocess
-  
-# Install RAxML
+
+# Get tree builder versions
 ARG raxml_version='8.2.12'
+ARG fasttree_version='2.1.11'
+ARG iqtree_version='2.0.3'
+ARG raxmlng_version='1.0.1'
+ARG rapidnj_version='2.3.2'
+
+# Install RAxML
 RUN curl -L https://github.com/stamatak/standard-RAxML/archive/v${raxml_version}.tar.gz -o standard-RAxML-${raxml_version}.tar.gz \
   && tar xzf standard-RAxML-${raxml_version}.tar.gz \
   && cd standard-RAxML-${raxml_version} \
@@ -48,27 +54,23 @@ RUN curl -L https://github.com/stamatak/standard-RAxML/archive/v${raxml_version}
   && rm -rf standard-RAxML-${raxml_version}
 
 # Install FastTree
-ARG fasttree_version='2.1.10'
 RUN curl http://www.microbesonline.org/fasttree/FastTree-${fasttree_version}.c -o FastTree.c \
   && gcc -O3 -finline-functions -funroll-loops -Wall -o FastTree FastTree.c -lm \
   && mv FastTree /usr/local/bin/ \
   && rm FastTree.c
   
 # Install IQTree
-ARG iqtree_version='1.6.6'
 RUN curl -L https://github.com/Cibiv/IQ-TREE/releases/download/v${iqtree_version}/iqtree-${iqtree_version}-Linux.tar.gz -o iqtree-${iqtree_version}-Linux.tar.gz \
   && tar xzf iqtree-${iqtree_version}-Linux.tar.gz \
   && cp iqtree-${iqtree_version}-Linux/bin/iqtree /usr/local/bin \
   && rm -rf iqtree-${iqtree_version}-Linux
 
 # Install RAxML-NG
-ARG raxmlng_version='1.0.1'
 RUN curl https://github.com/amkozlov/raxml-ng/releases/download/${raxmlng_version}/raxml-ng_v${raxmlng_version}_linux_x86_64.zip \
   && unzip raxml-ng_v${raxmlng_version}_linux_x86_64.zip \
   && cp raxml-ng /usr/local/bin
 
 # Install RapidNJ
-ARG rapidnj_version=2.3.2
 RUN curl https://github.com/johnlees/rapidnj/archive/${rapidnj_version}.zip \
   && unzip ${rapidnj_version}.zip \
   && cd rapidnj-${rapidnj_version} \

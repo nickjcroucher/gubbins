@@ -59,7 +59,7 @@ int check_file_exists_or_exit(char * filename)
   if( access( filename, F_OK ) != -1 ) {
 		return 1;
   } else {
-		printf("Error: File '%s' doesnt exist\n",filename);
+		printf("Error: File '%s' does not exist\n",filename);
 		print_usage(stderr, EXIT_FAILURE);
 		return 0;
   }

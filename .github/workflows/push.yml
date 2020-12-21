@@ -21,9 +21,6 @@ build-linux:
   - name: Run C++ tests
     run: |
         autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
-- name: Run python tests
-  run: |
-      pip install codecov
-      cd python && coverage run setup.py test
-      bash <(curl -s https://codecov.io/bash)
-      codecov
+  - name: Run python tests
+    run: |
+      pip install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov

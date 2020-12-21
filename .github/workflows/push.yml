@@ -1,0 +1,29 @@
+on:
+    push:
+        branches:
+        - ci_switch
+
+name: Push test
+
+jobs:
+build-linux:
+  runs-on: ubuntu-latest
+
+  steps:
+  - uses: actions/checkout@v2
+  - name: Set up Python 3.8
+    uses: actions/setup-python@v2
+    with:
+      python-version: 3.8
+  - name: Install dependencies
+    run: |
+        $CONDA/bin/conda env update --file environment.yml --name base
+  - name: Run C++ tests
+    run: |
+        autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+- name: Run python tests
+  run: |
+      pip install codecov
+      cd python && coverage run setup.py test
+      bash <(curl -s https://codecov.io/bash)
+      codecov

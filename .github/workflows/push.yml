@@ -23,7 +23,7 @@ jobs:
             git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install subunit
         run: |
-            git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..
+            conda install -c conda-forge cppunit && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..
       - name: Run C++ tests
         run: |
             autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check

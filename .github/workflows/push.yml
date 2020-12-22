@@ -20,7 +20,7 @@ jobs:
             $CONDA/bin/conda env update --file environment.yml --name base
       - name: Install check
         run: |
-            git clone https://github.com/libcheck/check.git && cd check && ./configure && make && make check && sudo make install && cd ..
+            git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Run C++ tests
         run: |
             autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check

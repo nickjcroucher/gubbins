@@ -20,7 +20,7 @@ jobs:
             $CONDA/bin/conda env update --file environment.yml --name base
       - name: Install subunit
         run: |
-            git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && ./configure && make && make check && sudo make install && cd ..
+            git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install subunit
         run: |
             git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..

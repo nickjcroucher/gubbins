@@ -92,25 +92,25 @@ END_TEST
 
 START_TEST (valid_genome_length)
 {
-  ck_assert_msg( genome_length("../tests/data/alignment_file_one_line_per_sequence.aln") == 2000 );
+  ck_assert( genome_length("../tests/data/alignment_file_one_line_per_sequence.aln") == 2000 );
 }
 END_TEST
 
 START_TEST (valid_genome_length_with_multiple_lines_per_sequence)
 {
-  ck_assert_msg( genome_length("../tests/data/alignment_file_multiple_lines_per_sequence.aln") == 2000 );
+  ck_assert( genome_length("../tests/data/alignment_file_multiple_lines_per_sequence.aln") == 2000 );
 }
 END_TEST
 
 START_TEST (valid_number_of_sequences_in_file)
 {
-  ck_assert_msg( number_of_sequences_in_file("../tests/data/alignment_file_one_line_per_sequence.aln") == 109 );
+  ck_assert( number_of_sequences_in_file("../tests/data/alignment_file_one_line_per_sequence.aln") == 109 );
 }
 END_TEST
 
 START_TEST (valid_number_of_sequences_in_file_with_multiple_lines_per_sequence)
 {
-  ck_assert_msg( number_of_sequences_in_file("../tests/data/alignment_file_multiple_lines_per_sequence.aln") == 109 );
+  ck_assert( number_of_sequences_in_file("../tests/data/alignment_file_multiple_lines_per_sequence.aln") == 109 );
 }
 END_TEST
 
@@ -119,7 +119,7 @@ START_TEST (valid_initial_reference_sequence)
   char actual_reference_sequence[2001];
   char *expected_reference_sequence = "-------------------------CTATATAGAGATCTTTTTATTAGATCTACTATTAAGGAGCAGGATCTTTGTGGATAAGTGAAAAATGATCAACAAGATCATGCGATTCAGAAGGATCAGATCGTGTGATCAACCACTGATCTGTTCAAGGATTAGCTGGGATCAAAAACCTATGTTATACACAGCCACCTTGGGATCTAAAACTTGTTATATGGATAACTATAGGAAGATCACCGGATAATCGTATAGTTATCCACATGAGATTTGATTGAAAAAGCATCAATCAATTTTTTCACTACCGTTAAATTTATCCACAATCCAAAAAAAAGAGCGGCATTAAGCCGCTCTGCATGGAATAGGTCATTATTTAGAAGCGATTGATGACGCGTTTGAGCCAAGCTTCAGCGGCATCTTCAGGCACTGGGTGCTCTTGTACATCGATGGTAAAGCAGTTGGCCAGAGGTTTAGCACCAATATCCCCCAGCAGCTGATAGGCATGTTTACCTGCCGCGCAGAAAGTATCGTAGCTTGAATCACCAATCGCGACCACGGCATAACGTAGTGCAGAGGTATTCGGTGGTGTATTCTGCAGAGCCTGAATAAAGGGCTGGATATTATCCGGGTACTCACCAGCCCCGTGGGTTGAGGTGATGATCAGCCAAGTCCCTTTAGCAGGGATCTCACTCATGTTGGGCTGGTTATGAATTTTGGTGTCAAAGCCTTGTTCTTGCAGTAAATCACTCAGGTGGTCACCCACATATTCCGCACCGCCTAGGGTGCTGCCAGTAATGATATGAATCATAGCGTTACTCTATTTCCCAATACAGAATGATGAAAAAATGCGGCCAAGCAGATCATCGGAGCTGAACTCGCCCGTAATTTCGTTAAGGTGTTGCTGGGCTATACGCAGCTCTTCGGCGAGGATTTCTCCGGCCATATAGCCTTCAAGTTGTTGCTGGCCAATCGCTAAGTGCTCTGCGGCTCGCTCTAGGGCATCGAGATGACGGCGGCGTGCCATAAAGCCACCTTCCTGATTGCCTGAAAAACCCATGCACTCTTTGAGGTGCTGACGCAAGGCATCGACCCCTTGGCCTGTTTTGGCTGATAGGCGGATCAAGGTGGGTTGATTAACATGGCAGATCCCAAGGGGCTCACCAGTTTGATCGGCTTTATTACGGATCACAGTGATCCCAATATTCTCTGGCAGTTTGTCAACAAAATCAGGCCAGATGTCCTGTGGATCGGTGGCCTCTGTGGTGGTGCCATCGACCATAAACAGTACGCGATCGGCTTGGCGGATCTCTTCCCATGCGCGCTCAATACCAATTTTTTCTACCGCATCAGAAGCGTCTCGTAGTCCCGCAGTATCGATGATGTGCAGCGGCATCCCATCAATATGGATATGCTCACGCAGAACATCACGGGTGGTACCGGCAATGTCGGTAACGATGGCAGACTCTTTACCTGAAAGCGCATTGAGTAGGCTCGATTTACCCGCATTAGGACGCCCAGCAATCACCACCTTCATCCCTTCGCGCATAATGGCGCCTTGGTTGGCTTCACGGCGCACTGCGGCAAGATTATCTATGATGGTTTGCAGATCAGCGGAAACCTTACCATCGGCCAGAAAATCGATCTCTTCTTCTGGGAAATCAATTGCGGCTTCAACATAGATGCGCAGGTGAATCAGCGATTCCACCAAGGTATGGATGCGTTTAGAAAACTCGCCTTGCAGTGATTGCAGCGCGGATTTCGCGGCTTGCTCAGAGCTGGCATCAATCAGGTCTGCGATGGCTTCCGCTTGGGTTAAATCCATCTTGTCATTGAGGAAAGCGCGTTCTGAGAATTCACCGGGACGGGCTGGGCGCACTCCTTTAATCTGCAAAATACGGCGGATCAGCATATCCATGACGACCGGGCCACCGTGACCTTGCAGCTCAAGCACATCTTCACCGGTAAATGAATGAGGATTGGGGAAAAACAGCGCAATGCCTTG";
   build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
-  ck_assert_msg( strcmp(actual_reference_sequence,expected_reference_sequence) == 0 );
+  ck_assert( strcmp(actual_reference_sequence,expected_reference_sequence) == 0 );
 }
 END_TEST  
 
@@ -127,7 +127,7 @@ START_TEST (number_of_snps_detected)
 {
   char actual_reference_sequence[2001];
   build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
-  ck_assert_msg(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,1) == 5);
+  ck_assert(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,1) == 5);
 }
 END_TEST
 
@@ -135,7 +135,7 @@ START_TEST (number_of_snps_detected_include_gaps)
 {
   char actual_reference_sequence[2001];
   build_reference_sequence(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln") ;
-  ck_assert_msg(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,0) == 1975);
+  ck_assert(  detect_snps(actual_reference_sequence, "../tests/data/alignment_file_multiple_lines_per_sequence.aln", 2000,0) == 1975);
 }
 END_TEST
 
@@ -143,7 +143,7 @@ START_TEST (number_of_snps_detected_small)
 {
   char actual_reference_sequence[9];
   build_reference_sequence(actual_reference_sequence, "../tests/data/small_alignment.aln");
-  ck_assert_msg(  detect_snps(actual_reference_sequence, "../tests/data/small_alignment.aln", 8,0) == 1);
+  ck_assert(  detect_snps(actual_reference_sequence, "../tests/data/small_alignment.aln", 8,0) == 1);
 }
 END_TEST
 
@@ -162,7 +162,7 @@ START_TEST (sample_names_from_alignment_file)
   
   for(i =0; i< 3; i++)
   {
-    ck_assert_msg( strcmp(expected_sequence_names[i], sequence_names[i]) ==0 );
+    ck_assert( strcmp(expected_sequence_names[i], sequence_names[i]) ==0 );
   }
 }
 END_TEST
@@ -172,7 +172,7 @@ START_TEST (check_strip_directory_from_filename_without_directory)
 	char *input_filename_without_directory =  "my_file_name.aln";
 	char output_filename[30];
 	strip_directory_from_filename(input_filename_without_directory, output_filename);
-	ck_assert_msg( strcmp(input_filename_without_directory, output_filename) ==0 );
+	ck_assert( strcmp(input_filename_without_directory, output_filename) ==0 );
 }
 END_TEST
 
@@ -181,7 +181,7 @@ START_TEST (check_strip_directory_from_filename_with_directory)
 	char *input_filename_without_directory =  "/some/directory/name/my_file_name.aln";
 	char output_filename[30];
 	strip_directory_from_filename(input_filename_without_directory, output_filename);
-	ck_assert_msg( strcmp("my_file_name.aln", output_filename) ==0 );
+	ck_assert( strcmp("my_file_name.aln", output_filename) ==0 );
 }
 END_TEST
 

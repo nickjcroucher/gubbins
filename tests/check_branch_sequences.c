@@ -27,10 +27,10 @@ START_TEST (check_exclude_snp_sites_in_block)
 	snp_sites[6] = 10;
 	snp_sites[7] = 11;
 	
-	ck_assert_msg(exclude_snp_sites_in_block(0,2,  snp_sites, number_of_branch_snps)   == 7);
-	ck_assert_msg(exclude_snp_sites_in_block(5,7,  snp_sites, number_of_branch_snps-1) == 4);
-	ck_assert_msg(exclude_snp_sites_in_block(8,11, snp_sites, number_of_branch_snps-4) == 1);
-	ck_assert_msg(exclude_snp_sites_in_block(3,3,  snp_sites, number_of_branch_snps-7) == 0);
+	ck_assert(exclude_snp_sites_in_block(0,2,  snp_sites, number_of_branch_snps)   == 7);
+	ck_assert(exclude_snp_sites_in_block(5,7,  snp_sites, number_of_branch_snps-1) == 4);
+	ck_assert(exclude_snp_sites_in_block(8,11, snp_sites, number_of_branch_snps-4) == 1);
+	ck_assert(exclude_snp_sites_in_block(3,3,  snp_sites, number_of_branch_snps-7) == 0);
 }
 END_TEST
 
@@ -65,13 +65,13 @@ START_TEST (check_copy_and_concat_2d_integer_arrays)
 	
 	int output_size = 0;
 	output_size = copy_and_concat_2d_integer_arrays(block_coords, 3, block_coords_2, 2, block_coords_out) ;
-	ck_assert_msg(output_size == 5);
-	ck_assert_msg(block_coords_out[0][0] == 5);
-	ck_assert_msg(block_coords_out[1][0] == 10);
-	ck_assert_msg(block_coords_out[0][2] == 7);
-	ck_assert_msg(block_coords_out[1][2] == 15);
-	ck_assert_msg(block_coords_out[0][4] == 2);
-	ck_assert_msg(block_coords_out[1][4] == 8);
+	ck_assert(output_size == 5);
+	ck_assert(block_coords_out[0][0] == 5);
+	ck_assert(block_coords_out[1][0] == 10);
+	ck_assert(block_coords_out[0][2] == 7);
+	ck_assert(block_coords_out[1][2] == 15);
+	ck_assert(block_coords_out[0][4] == 2);
+	ck_assert(block_coords_out[1][4] == 8);
 	
 }
 END_TEST
@@ -117,15 +117,15 @@ int test_bases_in_recombinations_with_gaps(int block_size)
 
 START_TEST (check_calculate_number_of_bases_in_recombations)
 {
-	ck_assert_msg(test_bases_in_recombinations(4) == 25);
-	ck_assert_msg(test_bases_in_recombinations(3) == 20);
-	ck_assert_msg(test_bases_in_recombinations(2) == 15);
-	ck_assert_msg(test_bases_in_recombinations(1) == 5);
+	ck_assert(test_bases_in_recombinations(4) == 25);
+	ck_assert(test_bases_in_recombinations(3) == 20);
+	ck_assert(test_bases_in_recombinations(2) == 15);
+	ck_assert(test_bases_in_recombinations(1) == 5);
 	
-	ck_assert_msg(test_bases_in_recombinations_with_gaps(4) == 22);
-	ck_assert_msg(test_bases_in_recombinations_with_gaps(3) == 17);
-	ck_assert_msg(test_bases_in_recombinations_with_gaps(2) == 12);
-	ck_assert_msg(test_bases_in_recombinations_with_gaps(1) == 2);
+	ck_assert(test_bases_in_recombinations_with_gaps(4) == 22);
+	ck_assert(test_bases_in_recombinations_with_gaps(3) == 17);
+	ck_assert(test_bases_in_recombinations_with_gaps(2) == 12);
+	ck_assert(test_bases_in_recombinations_with_gaps(1) == 2);
 }
 END_TEST
 	
@@ -142,9 +142,9 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
     int * snps_in_recombinations = (int *) calloc((4 +1),sizeof(int));
 	int num_snps_in_recombinations = 0;
     num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(block_coords,1,snp_locations,4, snps_in_recombinations);
-    ck_assert_msg(num_snps_in_recombinations == 2);
-	ck_assert_msg(snps_in_recombinations[0] == 1);
-	ck_assert_msg(snps_in_recombinations[1] == 2);
+    ck_assert(num_snps_in_recombinations == 2);
+	ck_assert(snps_in_recombinations[0] == 1);
+	ck_assert(snps_in_recombinations[1] == 2);
 }
 END_TEST
 	
@@ -165,14 +165,14 @@ START_TEST (check_get_list_of_snp_indices_which_fall_in_downstream_recombination
   int * snps_in_recombinations = (int *) calloc((16 +1),sizeof(int));
 	int num_snps_in_recombinations = 0;
   num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(block_coords,2,snp_locations,16, snps_in_recombinations);
-  ck_assert_msg(num_snps_in_recombinations == 6);
+  ck_assert(num_snps_in_recombinations == 6);
 	
-	ck_assert_msg(snps_in_recombinations[0] == 2);
-	ck_assert_msg(snps_in_recombinations[1] == 3);
-	ck_assert_msg(snps_in_recombinations[2] == 4);
-	ck_assert_msg(snps_in_recombinations[3] == 5);
-	ck_assert_msg(snps_in_recombinations[4] == 11);
-	ck_assert_msg(snps_in_recombinations[5] == 12);
+	ck_assert(snps_in_recombinations[0] == 2);
+	ck_assert(snps_in_recombinations[1] == 3);
+	ck_assert(snps_in_recombinations[2] == 4);
+	ck_assert(snps_in_recombinations[3] == 5);
+	ck_assert(snps_in_recombinations[4] == 11);
+	ck_assert(snps_in_recombinations[5] == 12);
 }
 END_TEST
 
@@ -187,7 +187,7 @@ START_TEST (check_calculate_genome_length_clonal_frame_single_recomb)
 	block_coords[0][0] = 5;
 	block_coords[1][0] = 10;
 	
-	ck_assert_msg(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 14);
+	ck_assert(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 14);
 }
 END_TEST
 	
@@ -199,7 +199,7 @@ START_TEST (check_calculate_genome_length_clonal_frame_only_gaps)
 	block_coords[0] = (int*) malloc((4)*sizeof(int ));
 	block_coords[1] = (int*) malloc((4)*sizeof(int ));
 
-	ck_assert_msg(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 0) == 11);
+	ck_assert(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 0) == 11);
 }
 END_TEST
 	
@@ -215,7 +215,7 @@ START_TEST (check_calculate_genome_length_clonal_frame_overlapping_blocks)
 	block_coords[0][1] = 7;
 	block_coords[1][1] = 15;
 
-	ck_assert_msg(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 2) == 9);
+	ck_assert(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 2) == 9);
 }
 END_TEST
 	
@@ -229,7 +229,7 @@ START_TEST (check_calculate_genome_length_clonal_frame_gaps_within_block)
 	block_coords[0][0] = 5;
 	block_coords[1][0] = 15;
 
-	ck_assert_msg(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 9);
+	ck_assert(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 1) == 9);
 }
 END_TEST
 
@@ -249,7 +249,7 @@ START_TEST (check_calculate_genome_length_clonal_frame_complex)
 	block_coords[0][3] = 16;
 	block_coords[1][3] = 20;
 	
-	ck_assert_msg(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 4) == 5);
+	ck_assert(calculate_genome_length_excluding_blocks_and_gaps(sequence, 20, block_coords, 4) == 5);
 }
 END_TEST
 

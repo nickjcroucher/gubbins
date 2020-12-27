@@ -18,7 +18,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml --name base && conda install automake autoconf libtool pkg-config openssl libevent
+            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml --name base && conda install automake autoconf libtool pkg-config openssl libevent berkeley-db4 boost boost-build
       - name: Install cppunit
         run: |
             git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..

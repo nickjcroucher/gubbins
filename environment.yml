@@ -10,6 +10,7 @@ dependencies:
   - check
   - libtool
   - pkg-config
+  - wheel
   - raxml
   - iqtree
   - rapidnj

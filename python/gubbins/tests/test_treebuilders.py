@@ -17,7 +17,7 @@ data_dir = os.path.join(modules_dir, 'tests', 'data')
 class TestStringConstruction(unittest.TestCase):
 
     def test_fasttree_treebuilding_command(self):
-        fasttree = treebuilders.FastTree()
+        fasttree = treebuilders.FastTree(8)
         fasttree.executable = 'DDD'
         fasttree.tree_building_parameters = ['EEE']
         assert fasttree.tree_building_command('AAA', '', 'CCC') == 'DDD EEE -out CCC.tre AAA > /dev/null 2>&1'

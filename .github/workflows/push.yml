@@ -18,7 +18,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-            $CONDA/bin/conda env update --file environment.yml --name base
+            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml --name base
       - name: Install cppunit
         run: |
             git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..

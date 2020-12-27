@@ -6,6 +6,35 @@ on:
 name: Push test
 
 jobs:
+
+    test-osx:
+      runs-on: macos-latest
+
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+            $CONDA/bin/conda env update --file environment.yml --name base
+      - name: Install cppunit
+        run: |
+            git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
+      - name: Install check
+        run: |
+            git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
+      - name: Install subunit
+        run: |
+            git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..
+      - name: Run C++ tests
+        run: |
+            autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+      - name: Run python tests
+        run: |
+          pip install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov
+
     test-linux:
       runs-on: ubuntu-latest
 

@@ -18,7 +18,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml && conda install automake autoconf libtool pkg-config openssl libevent boost gettext && brew install autoconf libtool automake && pip install wheel scipy
+            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml
       - name: Install cppunit
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
@@ -46,19 +46,19 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-            $CONDA/bin/conda env update --file environment.yml
+            $CONDA/bin/conda env update --file environment.yml && conda init
       - name: Install cppunit
         run: |
-            conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
+            source activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install check
         run: |
-            conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
+            source activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install subunit
         run: |
-            conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..
+            source activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && ./configure && sudo make install && cd ..
       - name: Run C++ and python tests
         run: |
-            conda activate gubbins_env && autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
+            source activate gubbins_env && autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check
       - name: Run python code coverage analysis
         run: |
-          conda activate gubbins_env && pip install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov
+          source activate gubbins_env && pip install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov

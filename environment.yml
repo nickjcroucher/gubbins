@@ -7,10 +7,18 @@ channels:
 dependencies:
   - python>=3.8
   - autoconf
+  - automake
   - pytest
   - check
   - libtool
+  - libevent
+  - gettext
+  - openssl
+  - boost
+  - gettext
   - pkg-config
+  - wheel
+  - scipy
   - raxml
   - iqtree
   - rapidnj

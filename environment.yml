@@ -13,6 +13,7 @@ dependencies:
   - libtool
   - libevent
   - gettext
+  - cppunit
   - openssl
   - boost
   - gettext

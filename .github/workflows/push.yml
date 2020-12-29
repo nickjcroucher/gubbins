@@ -24,7 +24,7 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install check from source
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure --prefix=/usr && make && make check && sudo make install && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure --prefix=$CONDA_PREFIX && make && make check && sudo make install && cd ..
       - name: Install subunit from source
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I $CONDA_PREFIX/include/" && export CPPUNIT_LIBS="-L $CONDA_PREFIX/lib/" && ./configure && sudo make install && cd ..
@@ -52,7 +52,7 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
       - name: Install check
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure  --prefix=/usr && make && make check && sudo make install && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure  --prefix=$CONDA_PREFIX && make && make check && sudo make install && cd ..
       - name: Install subunit
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I $CONDA_PREFIX/include/" && export CPPUNIT_LIBS="-L $CONDA_PREFIX/lib/" && ./configure && sudo make install && cd ..

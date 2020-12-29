@@ -19,12 +19,15 @@ jobs:
       - name: Install dependencies with conda
         run: |
             sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml
+      - name: Install check
+        run: |
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure --prefix=$CONDA_PREFIX && make && make check && sudo make install && cd ..
       - name: Install cppunit from source
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure --prefix=$CONDA_PREFIX && make && make check && sudo make install && cd ..
       - name: Install subunit from source
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/" && ./configure && sudo make install && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/" && ./configure --prefix=$CONDA_PREFIX && sudo make install && cd ..
       - name: Run C++ and python tests
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check

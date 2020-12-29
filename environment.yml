@@ -26,3 +26,10 @@ dependencies:
   - rapidnj
   - raxml-ng
   - fasttree
+  - wheel
+  - nose
+  - pillow
+  - dendropy
+  - biopython
+  - functools
+  - multiprocess

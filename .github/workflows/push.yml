@@ -24,7 +24,7 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/" && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && CXXFLAGS="${CXXFLAGS} -I${CONDA_PREFIX}/include/" LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX}/lib/ -lcppunit" ./configure --prefix=$CONDA_PREFIX && sudo make install && cd ..
       - name: Run C++ and python tests
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage -I${CONDA_PREFIX}/include/' LDFLAGS="-L${CONDA_PREFIX}/lib/ -lcppunit" && make && make check
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS="-O0 --coverage -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-apple-darwin --build=x86_64-apple-darwin && make && make check
       - name: Run python code coverage analysis
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && conda install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov
@@ -38,21 +38,15 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install dependencies
+      - name: Install dependencies with conda
         run: |
             $CONDA/bin/conda env update --file environment.yml && conda init
-      - name: Install cppunit
-        run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/Ultimaker/CppUnit.git && cd CppUnit && autoreconf --install && ./configure && make && make check && sudo make install && cd ..
-      - name: Install check
-        run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/libcheck/check.git && cd check && autoreconf --install && ./configure  --prefix=$CONDA_PREFIX && make && make check && sudo make install && cd ..
-      - name: Install subunit
+      - name: Install subunit from source
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I $CONDA_PREFIX/include/" && export CPPUNIT_LIBS="-L $CONDA_PREFIX/lib/" && ./configure && sudo make install && cd ..
       - name: Run C++ and python tests
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && autoreconf -i && ./configure --enable-maintainer-mode CFLAGS='-O0 --coverage' && make && make check  || cat src/test-suite.log
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS="-O0 --coverage -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-unknown-linux-gnu --build=x86_64-unknown-linux-gnu && make && make check
       - name: Run python code coverage analysis
         run: |
           source activate gubbins_env && conda install codecov && cd python && coverage run setup.py test && bash <(curl -s https://codecov.io/bash) && codecov

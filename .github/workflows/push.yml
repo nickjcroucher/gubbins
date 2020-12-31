@@ -43,7 +43,7 @@ jobs:
             $CONDA/bin/conda env update --file environment.yml && conda init
       - name: Install subunit from source
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && export CPPUNIT_CFLAGS="-I $CONDA_PREFIX/include/" && export CPPUNIT_LIBS="-L $CONDA_PREFIX/lib/" && ./configure && sudo make install && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/" && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && CXXFLAGS="${CXXFLAGS} -I${CONDA_PREFIX}/include/" LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX}/lib/ -lcppunit" ./configure --prefix=$CONDA_PREFIX && sudo make install && cd ..
       - name: Run C++ and python tests
         run: |
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS="-O0 --coverage -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-unknown-linux-gnu --build=x86_64-unknown-linux-gnu && make && make check

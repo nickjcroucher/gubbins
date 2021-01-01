@@ -5,7 +5,9 @@ channels:
   - defaults
   - r
 dependencies:
+# python
   - python>=3.8
+# installation
   - autoconf
   - automake
   - pytest
@@ -19,16 +21,16 @@ dependencies:
   - gettext
   - pkg-config
   - wheel
+  - nose
+  - pillow
+# algorithm
   - scipy
   - dendropy
+  - biopython
+  - multiprocess
+# phylogenetics
   - raxml
   - iqtree
   - rapidnj
   - raxml-ng
   - fasttree
-  - wheel
-  - nose
-  - pillow
-  - dendropy
-  - biopython
-  - multiprocess

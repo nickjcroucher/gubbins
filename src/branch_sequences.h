@@ -32,6 +32,7 @@ int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, i
 double reduce_factorial(int l, int i);
 void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinations, int parent_num_recombinations, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations, int number_of_snps);
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array);
+int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** array_2, int array_2_size, int ** output_array);
 double snp_density(int length_of_sequence, int number_of_snps);
 int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps);
 int get_smallest_log_likelihood(double * candidate_blocks, int number_of_candidate_blocks);

@@ -16,7 +16,8 @@ setuptools.setup(
     },
     test_suite='nose.collector',
     tests_require=[
-        "nose >= 1.3"
+        "nose >= 1.3",
+        "wheel >= 0.34"
     ],
     long_description="""\
       Gubbins is a tool for BioInformaticians that takes in a multi

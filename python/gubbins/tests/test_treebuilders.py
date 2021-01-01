@@ -17,7 +17,7 @@ data_dir = os.path.join(modules_dir, 'tests', 'data')
 class TestStringConstruction(unittest.TestCase):
 
     def test_iqtree_convert_raw_ancestral_states_to_fasta(self):
-        iqtree = treebuilders.IQTree(1)
+        iqtree = treebuilders.IQTree(1, model = 'GTRGAMMA')
         iqtree.convert_raw_ancestral_states_to_fasta(os.path.join(data_dir, 'iqtree_ancestral.state'),
                                                      os.path.join(data_dir, 'iqtree_ancestral.fasta.actual'))
         assert filecmp.cmp(os.path.join(data_dir, 'iqtree_ancestral.fasta.actual'),
@@ -25,27 +25,14 @@ class TestStringConstruction(unittest.TestCase):
         os.remove(os.path.join(data_dir, 'iqtree_ancestral.fasta.actual'))
 
     def test_iqtree_replace_internal_node_label(self):
-        iqtree = treebuilders.IQTree(8, 'AAA')
+        iqtree = treebuilders.IQTree(1, model = 'GTRGAMMA', internal_node_prefix='AAA')
         assert iqtree.replace_internal_node_label('Node20') == 'AAA20'
 
-    @unittest.mock.patch('gubbins.utils.choose_executable_based_on_processor')
-    def test_raxml_select_executable_based_on_threads(self, mock_choice):
-        self.assertIs(mock_choice, utils.choose_executable_based_on_processor)
+    def test_raxml_select_executable_based_on_threads(self):
 
-        raxml = treebuilders.RAxML(8)
-        raxml.single_threaded_executables = ['BBB', 'CCC']
-        raxml.multi_threaded_executables = ['DDD', 'EEE']
-
-        mock_choice.return_value = 'AAA'
-        assert raxml.select_executable_based_on_threads() == 'AAA'
-        mock_choice.assert_called_with(['DDD', 'EEE'])
-
-        raxml.threads = 1
-        mock_choice.reset_mock()
-        mock_choice.return_value = None
-        assert raxml.select_executable_based_on_threads() is None
-        mock_choice.assert_any_call(['BBB', 'CCC'])
-        mock_choice.assert_any_call(['DDD', 'EEE'])
+        raxml_st = treebuilders.RAxML(1, model = 'GTRGAMMA')
+        raxml_mt = treebuilders.RAxML(8, model = 'GTRGAMMA')
+        assert raxml_st.select_executable_based_on_threads() != raxml_mt.select_executable_based_on_threads()
 
     def test_raxml_convert_raw_ancestral_states_to_fasta(self):
         raxml = treebuilders.RAxML(8)

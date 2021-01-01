@@ -33,7 +33,9 @@ class TestUtilities(unittest.TestCase):
             'AAA.snp_sites.aln':   'test.filtered_polymorphic_sites.fasta',
             'AAA.phylip':          'test.filtered_polymorphic_sites.phylip',
             'AAA.internal':        'test.node_labelled.final_tree.tre',
-            'AAA':                 'test.final_tree.tre'
+            'AAA':                 'test.final_tree.tre',
+            'AAA.bootstrapped':    'test.final_bootstrapped_tree.tre',
+            'AAA.sh_support':      'test.final_SH_support_tree.tre'
         }
 
     def test_check_and_fix_window_size(self):

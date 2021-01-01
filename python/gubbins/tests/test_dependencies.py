@@ -92,8 +92,6 @@ class TestExternalDependencies(unittest.TestCase):
         ioGroup.add_argument('--prefix',            '-p', help='Add a prefix to the final output filenames')
         ioGroup.add_argument('--starting-tree',     '-s', help='Starting tree')
         ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
-        ioGroup.add_argument('--version',                 action='version',
-                                                          version=str(pkg_resources.get_distribution("gubbins").version))
                             
         dataGroup = parser.add_argument_group('Data processing options')
         dataGroup.add_argument('--pairwise',              help='Compare two sequences (without using a tree)',

@@ -42,38 +42,38 @@ class TestTreeMethods(unittest.TestCase):
 
     def test_reroot_tree(self):
         shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre',
-                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
-        common.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',
+                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test')
+        common.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test',
                            'sequence_4')
-        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',
+        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test',
                            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4')
-        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test')
 
         shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre',
-                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual')
-        common.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual', '')
-        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual',
+                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_test')
+        common.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_test', '')
+        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_test',
                            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_expected')
-        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_actual')
+        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_tree_at_midpoint_test')
 
     def test_reroot_tree_with_outgroup(self):
         shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre',
-                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test')
         common.reroot_tree_with_outgroup(
-            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual', ['sequence_4'])
-        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',
+            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test', ['sequence_4'])
+        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test',
                            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4')
-        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test')
 
     def test_reroot_tree_with_outgroups(self):
         shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre',
-                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+                        'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test')
         common.reroot_tree_with_outgroup(
-            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',
+            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test',
             ['sequence_4', 'sequence_2'])
-        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual',
+        assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test',
                            'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2')
-        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_actual')
+        os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test')
 
     def test_reroot_tree_with_outgroups_all_in_one_clade(self):
         outgroups = ['A', 'B']

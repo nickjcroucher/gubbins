@@ -46,7 +46,7 @@ class TestTreeMethods(unittest.TestCase):
         common.reroot_tree('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test',
                            'sequence_4')
         assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test',
-                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4')
+                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_expected')
         os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_test')
 
         shutil.copyfile('gubbins/tests/data/robinson_foulds_distance_tree1.tre',
@@ -62,7 +62,7 @@ class TestTreeMethods(unittest.TestCase):
         common.reroot_tree_with_outgroup(
             'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test', ['sequence_4'])
         assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test',
-                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4')
+                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_expected')
         os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_list_test')
 
     def test_reroot_tree_with_outgroups(self):
@@ -72,7 +72,7 @@ class TestTreeMethods(unittest.TestCase):
             'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test',
             ['sequence_4', 'sequence_2'])
         assert filecmp.cmp('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test',
-                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2')
+                           'gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_expected')
         os.remove('gubbins/tests/data/robinson_foulds_distance_tree1.tre.reroot_at_sequence_4_2_test')
 
     def test_reroot_tree_with_outgroups_all_in_one_clade(self):

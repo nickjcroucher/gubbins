@@ -139,7 +139,7 @@ class TestTreeMethods(unittest.TestCase):
         os.remove('gubbins/tests/data/tree_with_internal_nodes.tre_actual')
 
     def test_transfer_internal_node_labels_to_tree(self):
-        reconstructor = treebuilders.IQTree(1, "internal_")
+        reconstructor = treebuilders.IQTree(1, model = 'GTRGAMMA', internal_node_prefix = 'internal_')
         common.transfer_internal_node_labels_to_tree('gubbins/tests/data/source_tree.tre',
                                                      'gubbins/tests/data/destination_tree.tre',
                                                      'gubbins/tests/data/renamed_output_tree', reconstructor)

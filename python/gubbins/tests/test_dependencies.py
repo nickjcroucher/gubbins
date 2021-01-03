@@ -19,7 +19,6 @@ data_dir = os.path.join(modules_dir, 'tests', 'data')
 class TestExternalDependencies(unittest.TestCase):
 
     def test_fasttree(self):
-        self.assertEqual(2, 1+1)
         parser = self.default_arg_parse()
         common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
@@ -40,13 +39,6 @@ class TestExternalDependencies(unittest.TestCase):
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
 
-    def test_hybrid(self):
-        parser = self.default_arg_parse()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "hybrid",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
-        self.cleanup('multiple_recombinations')
-
     def test_rename_final_output(self):
         parser = self.default_arg_parse()
         common.parse_and_run(parser.parse_args(["--prefix", "different_prefix",
@@ -57,9 +49,9 @@ class TestExternalDependencies(unittest.TestCase):
     def test_cleanup(self):
         parser = self.default_arg_parse()
         common.parse_and_run(parser.parse_args([os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        self.cleanup('multiple_recombinations')
         assert not glob.glob('multiple_recombinations.aln.*')
         assert not glob.glob('multiple_recombinations.iteration*')
-        self.cleanup('multiple_recombinations')
 
     @staticmethod
     def check_for_output_files(prefix):

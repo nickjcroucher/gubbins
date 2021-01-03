@@ -32,8 +32,8 @@ except OSError:
 except:
     __homedir__ = None
 
-__author__ = "Andrew J. Page, Nicholas Croucher, Aidan Delaney and Simon Harris"
-__copyright__ = "Copyright 2013 Wellcome Trust Sanger Institutue"
+__author__ = "Andrew J. Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris"
+__copyright__ = "Copyright 2020 Wellcome Trust Sanger Institute and Imperial College London"
 __license__ = """
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

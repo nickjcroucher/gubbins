@@ -52,11 +52,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 PACKAGE_VERSION = __version__
 
 def description():
-    if __revision__.is_available:
-        revision_text = " (%s)" % str(__revision__)
-    else:
-        revision_text = ""
-    return "%s %s%s" % (__project__, __version__, revision_text)
+    return "%s %s" % (__project__, __version__)
 
 if __name__ == "__main__":
     sys.stdout.write("%s\n" % description())

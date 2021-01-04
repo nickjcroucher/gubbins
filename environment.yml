@@ -14,7 +14,6 @@ dependencies:
   - check
   - libtool
   - cppunit
-  - pkg-config
   - wheel
   - nose
   - pillow

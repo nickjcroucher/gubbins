@@ -62,11 +62,7 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    program_version = ""
-    try:
-        program_version = metadata.version('gubbins')
-    except pkg_resources.RequirementParseError:
-        pass
+    program_version = metadata.version('gubbins')
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Log algorithms used

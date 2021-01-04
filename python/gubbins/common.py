@@ -839,7 +839,7 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
         for vcf_line in vcf_file:
             if re.match('^#CHROM', vcf_line) is not None:
                 sample_names = vcf_line.rstrip().split('\t')[9:]
-            elif re.match('^\d', vcf_line) is not None:
+            elif re.match(r'^\d', vcf_line) is not None:
                 # If the alternate is only a gap it wont have a base in this column
                 if re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) is not None:
                     m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)
@@ -914,14 +914,14 @@ def extract_recombinations_from_embl(filename):
         start_coord = -1
         end_coord = -1
         for line in fh:
-            search_obj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
+            search_obj = re.search(r'misc_feature    ([\d]+)..([\d]+)$', line)
             if search_obj is not None:
                 start_coord = int(search_obj.group(1))
                 end_coord = int(search_obj.group(2))
                 continue
 
             if start_coord >= 0 and end_coord >= 0:
-                search_taxa = re.search('taxa\=\"([^"]+)\"', line)
+                search_taxa = re.search(r'taxa\=\"([^"]+)\"', line)
                 if search_taxa is not None:
                     taxa_names = search_taxa.group(1).strip().split(' ')
                     for taxa_name in taxa_names:
@@ -1020,9 +1020,9 @@ def reformat_sh_support(tree_name, tmpdir, algorithm = "raxml"):
     with open(intree_fn,'r') as intree, open(outtree_fn,'w') as outtree:
         for line in intree.readlines():
             if algorithm == "raxml":
-                new_line = re.sub(':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+                new_line = re.sub(r':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
             elif algorithm == "iqtree":
-                new_line = re.sub('\/', '', line)
+                new_line = re.sub(r'\/', '', line)
             outtree.write(new_line)
 
 def update_methods_log(log, method = None, step = ''):

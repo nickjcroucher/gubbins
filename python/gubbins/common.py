@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
+# Generic imports
 import os
 import sys
 import shutil
@@ -25,23 +26,22 @@ import subprocess
 import re
 import tempfile
 from importlib import metadata
-
+# Phylogenetic imports
 import dendropy
 from dendropy.calculate import treecompare
-
+# Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
-
-from gubbins.pyjar import jar, read_alignment, get_base_patterns
-
+# Gubbins imports
+from gubbins.__init__ import description
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.pyjar import jar, read_alignment, get_base_patterns
 from gubbins import utils
-
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -62,7 +62,8 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    program_version = metadata.version('gubbins')
+#    program_version = metadata.version('gubbins')
+    program_version = description()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Log algorithms used

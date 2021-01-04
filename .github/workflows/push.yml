@@ -27,7 +27,7 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && conda install pytest-cov && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS="-O0 --coverage -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-apple-darwin --build=x86_64-apple-darwin && make && make check
       - name: Run python code coverage analysis
         run: |
-            bash <(curl -s https://codecov.io/bash) && codecov
+            bash <(curl -s https://codecov.io/bash)
 
     test-linux:
       runs-on: ubuntu-latest
@@ -49,4 +49,4 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && conda install pytest-cov && autoreconf -i &&  ./configure --enable-maintainer-mode CFLAGS="-O0 --coverage -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-linux-gnu --build=x86_64-linux-gnu && make && make check
       - name: Run python code coverage analysis
         run: |
-          bash <(curl -s https://codecov.io/bash) && codecov
+          bash <(curl -s https://codecov.io/bash)

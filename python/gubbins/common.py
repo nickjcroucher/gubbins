@@ -232,7 +232,7 @@ def parse_and_run(input_args, program_description=""):
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
         current_tree_name_with_internal_nodes = current_tree_name + ".internal"
-        
+
         if not input_args.mar:
         
             # 3.2a. Joint ancestral reconstruction
@@ -306,7 +306,7 @@ def parse_and_run(input_args, program_description=""):
             if input_args.seq_recon == "raxml":
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
-            elif input_args.seq_recon == "iqtree" or current_tree_builder == "raxmlng":
+            elif input_args.seq_recon == "iqtree" or input_args.seq_recon == "raxmlng":
                 # IQtree returns an unrooted tree
                 temp_unrooted_tree = temp_working_dir + "/" + current_tree_name + ".unrooted"
                 unroot_tree(temp_rooted_tree, temp_unrooted_tree)

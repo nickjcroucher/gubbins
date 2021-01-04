@@ -4,14 +4,14 @@ import setuptools
 
 setuptools.setup(
     name='gubbins',
-    version='2.4.1',
+    version='3.0.0',
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     url='https://github.com/sanger-pathogens/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
-            "run_gubbins.py = scripts.run_gubbins:main",
+            "run_gubbins.py = gubbins.run_gubbins:main",
         ]
     },
     test_suite='nose.collector',

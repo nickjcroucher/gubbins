@@ -23,7 +23,7 @@ import argparse
 from importlib import metadata
 import gubbins.common
 
-def main():
+def parse_input_args():
 
     parser = argparse.ArgumentParser(
         description='Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., '
@@ -126,5 +126,13 @@ def main():
     stopGroup.add_argument('--converge-method', '-z', help='Criteria to use to know when to halt iterations',
                         default='weighted_robinson_foulds', choices=['weighted_robinson_foulds', 'robinson_foulds',
                                                                      'recombination'])
+    return parser
 
+
+def main():
+    parser = parse_input_args()
     gubbins.common.parse_and_run(parser.parse_args(), parser.description)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)

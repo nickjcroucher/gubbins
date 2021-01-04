@@ -20,7 +20,7 @@
 #
 
 import argparse
-from importlib import metadata
+from gubbins.__init__ import version
 import gubbins.common
 
 def parse_input_args():
@@ -36,7 +36,7 @@ def parse_input_args():
     ioGroup.add_argument('--starting-tree',     '-s', help='Starting tree')
     ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
     ioGroup.add_argument('--version',                 action='version',
-                                                      version = metadata.version('gubbins'))
+                                                      version = version())
                         
     dataGroup = parser.add_argument_group('Data processing options')
     dataGroup.add_argument('--pairwise',              help='Compare two sequences (without using a tree)',

@@ -25,7 +25,6 @@ import time
 import subprocess
 import re
 import tempfile
-from importlib import metadata
 # Phylogenetic imports
 import dendropy
 from dendropy.calculate import treecompare
@@ -62,7 +61,6 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-#    program_version = metadata.version('gubbins')
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
@@ -251,7 +249,7 @@ def parse_and_run(input_args, program_description=""):
                                                                 temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
             subprocess.check_call(model_fitting_command, shell = True)
-            
+
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
             recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)

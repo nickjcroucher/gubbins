@@ -20,11 +20,11 @@
 import os
 import sys
 import shutil
-import pkg_resources
 import time
 import subprocess
 import re
 import tempfile
+from importlib import metadata
 
 import dendropy
 from dendropy.calculate import treecompare
@@ -64,7 +64,7 @@ def parse_and_run(input_args, program_description=""):
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
     program_version = ""
     try:
-        program_version = str(pkg_resources.get_distribution("gubbins").version)
+        program_version = metadata.version('gubbins')
     except pkg_resources.RequirementParseError:
         pass
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])

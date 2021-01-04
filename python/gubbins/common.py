@@ -36,7 +36,7 @@ from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 # Gubbins imports
-from gubbins.__init__ import description
+from gubbins.__init__ import version
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
@@ -63,7 +63,7 @@ def parse_and_run(input_args, program_description=""):
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
 #    program_version = metadata.version('gubbins')
-    program_version = description()
+    program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Log algorithms used

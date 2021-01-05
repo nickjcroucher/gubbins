@@ -7,6 +7,7 @@ Integration testing of external dependencies. Likely to be the most brittle test
 
 import unittest
 import os
+import sys
 import glob
 import argparse
 import pkg_resources
@@ -191,6 +192,11 @@ class TestExternalDependencies(unittest.TestCase):
         regex_to_remove = prefix + ".*"
         for file in glob.glob(regex_to_remove):
             os.remove(file)
+        try:
+            os.remove("tmp*/*")
+            os.rmdir("tmp*")
+        except:
+            sys.stderr.write("No tmp directory to remove\n")
 
 if __name__ == "__main__":
     unittest.main(buffer=True)

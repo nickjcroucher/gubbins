@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.x
       - name: Install dependencies with conda
         run: |
             sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.x
       - name: Install dependencies with conda
         run: |
             $CONDA/bin/conda env update --file environment.yml && conda init

@@ -32,7 +32,7 @@ class TestStringConstruction(unittest.TestCase):
 
         raxml_st = treebuilders.RAxML(1, model = 'GTRGAMMA')
         raxml_mt = treebuilders.RAxML(8, model = 'GTRGAMMA')
-        assert raxml_st.select_executable_based_on_threads() != raxml_mt.select_executable_based_on_threads()
+        assert (raxml_st.select_executable_based_on_threads() != raxml_mt.select_executable_based_on_threads() or raxml_st.threads > 1)
 
     def test_raxml_convert_raw_ancestral_states_to_fasta(self):
         raxml = treebuilders.RAxML(8)

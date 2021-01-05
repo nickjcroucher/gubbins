@@ -295,7 +295,7 @@ class TestExternalDependencies(unittest.TestCase):
 
     def test_cleanup(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args("--verbose", [os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--verbose", os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.cleanup('multiple_recombinations')
         assert not glob.glob('multiple_recombinations.aln.*')
         assert not glob.glob('multiple_recombinations.iteration*')

@@ -55,8 +55,9 @@ def parse_and_run(input_args, program_description=""):
     os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
     if utils.which(gubbins_exec) is None:
-        # Check if the Gubbins C-program is available in its source directory (for tests/Travis)
-        gubbins_bundled_exec = os.path.abspath(os.path.join(current_directory, '../src/gubbins'))
+        # Check if the Gubbins C-program is available in its source directory (for tests/CI)
+        gubbins_python_dir = os.path.dirname(os.path.abspath(utils.__file__))
+        gubbins_bundled_exec = os.path.abspath(os.path.join(gubbins_python_dir, '../../src/gubbins'))
         if utils.which(gubbins_bundled_exec) is None:
             sys.exit(gubbins_exec + " is not in your path")
         else:

@@ -322,7 +322,7 @@ class TestExternalDependencies(unittest.TestCase):
         for file in glob.glob(tmp_to_remove):
             os.remove(file)
         for dir in glob.glob("./tmp*"):
-            if os.isdir(dir):
+            if os.path.isdir(dir):
                 os.rmdir(dir)
 
 if __name__ == "__main__":

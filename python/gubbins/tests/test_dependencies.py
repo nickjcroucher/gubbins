@@ -23,6 +23,7 @@ class TestExternalDependencies(unittest.TestCase):
     def test_fasttree(self):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -30,6 +31,7 @@ class TestExternalDependencies(unittest.TestCase):
     def test_iqtree(self):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -37,6 +39,7 @@ class TestExternalDependencies(unittest.TestCase):
     def test_raxml(self):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -44,6 +47,7 @@ class TestExternalDependencies(unittest.TestCase):
     def test_raxmlng(self):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -52,6 +56,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
                                                 "--model","JC",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -61,6 +66,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                 "--tree-builder", "fasttree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -69,6 +75,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                 "--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -77,6 +84,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                 "--tree-builder", "raxml",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -85,7 +93,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                 "--tree-builder", "raxmlng",
-                                                "--verbose",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -95,6 +103,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                 "--tree-builder", "rapidnj",
                                                 "--model","JC",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -105,6 +114,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--seq-recon", "raxml",
                                                 "--mar",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -114,6 +124,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--seq-recon", "iqtree",
                                                 "--mar",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -123,6 +134,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--seq-recon", "raxmlng",
                                                 "--mar",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -132,6 +144,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--model-fitter", "fasttree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -140,6 +153,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--model-fitter", "iqtree",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -148,6 +162,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--model-fitter", "raxml",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -156,6 +171,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                 "--model-fitter", "raxmlng",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
@@ -164,6 +180,7 @@ class TestExternalDependencies(unittest.TestCase):
     def test_rename_final_output(self):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--prefix", "different_prefix",
+                                                "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         self.check_for_output_files('different_prefix')
         self.cleanup('different_prefix')

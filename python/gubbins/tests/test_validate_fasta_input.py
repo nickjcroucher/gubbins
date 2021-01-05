@@ -5,9 +5,13 @@
 Tests the validation of the input fasta file. It must be a multifasta alignment with sensible data
 """
 
+import os
 import unittest
+from gubbins import common
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 
+modules_dir = os.path.dirname(os.path.abspath(common.__file__))
+data_dir = os.path.join(modules_dir, 'tests', 'data')
 
 class TestValidateInputFastaFile(unittest.TestCase):
 
@@ -42,10 +46,6 @@ class TestValidateInputFastaFile(unittest.TestCase):
         validate_fasta = ValidateFastaAlignment('gubbins/tests/data/non_unique_sequence_names.fa')
         self.assertFalse(validate_fasta.are_sequence_names_unique())
         self.assertFalse(validate_fasta.is_input_fasta_file_valid())
-
-#    def test_are_there_enough_sequences_to_build_a_tree(self):
-#        validate_fasta = ValidateFastaAlignment('gubbins/tests/data/alignment_with_3_sequences.aln')
-#        self.assertFalse(validate_fasta.is_input_fasta_file_valid())
 
 if __name__ == "__main__":
     unittest.main()

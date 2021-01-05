@@ -102,19 +102,27 @@ def choose_executable_based_on_processor(list_of_executables: list):
         cpu_info = True
         output = subprocess.Popen('grep flags /proc/cpuinfo', stdout=subprocess.PIPE,
                                   shell=True).communicate()[0].decode("utf-8")
-        flags = output.split()
-
-    for executable in list_of_executables:
-        if cpu_info:
-            if 'AVX2' in executable and 'avx2' not in flags:
-                continue
-            elif 'AVX' in executable and 'avx' not in flags:
-                continue
-            elif 'SSE3' in executable and 'ssse3' not in flags:
-                continue
-
-        if which(executable) is not None:
-            return executable
+    elif which("sysctl") is not None:
+        cpu_info = True
+        output = subprocess.Popen('sysctl -a | grep machdep.cpu.features',
+                                  stdout=subprocess.PIPE,
+                                  shell=True).communicate()[0].decode("utf-8")
+    flags = output.lower().split()
+    if cpu_info:
+        # Iterate through list to match with CPU features
+        for executable in list_of_executables:
+            if 'AVX2' in executable and 'avx2' in flags:
+                break
+            elif 'AVX' in executable and 'avx' in flags:
+                break
+            elif 'SSE3' in executable and 'sse3' in flags:
+                break
+    else:
+        # Final executable on list is generic
+        executable = list_of_executables[-1]
+    
+    if which(executable) is not None:
+        return executable
 
     return None
 

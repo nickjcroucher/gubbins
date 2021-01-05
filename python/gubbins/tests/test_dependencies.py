@@ -22,167 +22,221 @@ class TestExternalDependencies(unittest.TestCase):
     # Test individual tree builders
     def test_fasttree(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_iqtree(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                 "--verbose", "--iterations", "3",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_raxml(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_raxmlng(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_rapidnj(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
-                                                "--model","JC",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
+                                                    "--model","JC",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     # Test initial star tree
     def test_starting_star_fasttree(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
-                                                "--tree-builder", "fasttree",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_starting_star_iqtree(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
-                                                "--tree-builder", "iqtree",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_starting_star_raxml(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
-                                                "--tree-builder", "raxml",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_starting_star_raxmlng(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
-                                                "--tree-builder", "raxmlng",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_starting_star_rapidnj(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
-                                                "--tree-builder", "rapidnj",
-                                                "--model","JC",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "rapidnj",
+                                                    "--model","JC",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
         
     # Test sequence reconstruction
     def test_raxml_seq_recon(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--seq-recon", "raxml",
-                                                "--mar",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--seq-recon", "raxml",
+                                                    "--mar",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_iqtree_seq_recon(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--seq-recon", "iqtree",
-                                                "--mar",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--seq-recon", "iqtree",
+                                                    "--mar",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_raxmlng_seq_recon(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--seq-recon", "raxmlng",
-                                                "--mar",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--seq-recon", "raxmlng",
+                                                    "--mar",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     # Test model fitting
     def test_fasttree_model_fit(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--model-fitter", "fasttree",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model-fitter", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_iqtree_model_fit(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--model-fitter", "iqtree",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model-fitter", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_raxml_model_fit(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--model-fitter", "raxml",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model-fitter", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     def test_raxmlng_model_fit(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
-                                                "--model-fitter", "raxmlng",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('multiple_recombinations')
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model-fitter", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('multiple_recombinations')
 
     # Test renaming of final output
     def test_rename_final_output(self):
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--prefix", "different_prefix",
-                                                "--verbose", "--iterations", "3",
-                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        self.check_for_output_files('different_prefix')
+        try:
+            common.parse_and_run(parser.parse_args(["--prefix", "different_prefix",
+                                                    "--verbose", "--iterations", "3",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('different_prefix')
+        except:
+            sys.stderr.write("Test failed")
         self.cleanup('different_prefix')
 
     def test_cleanup(self):

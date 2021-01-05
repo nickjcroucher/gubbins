@@ -496,7 +496,8 @@ class RAxML:
             if multi_threaded_exec is not None:
                 return multi_threaded_exec
             else:
-                return None
+                sys.stderr.write("No suitable RAxML version could be identified. Please try reinstalling the software\n")
+                sys.exit(1)
 
     def convert_raw_ancestral_states_to_fasta(self, input_filename, output_filename):
         """Converts the file containing ancestral sequences into FASTA format"""

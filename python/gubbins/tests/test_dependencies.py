@@ -319,13 +319,12 @@ class TestExternalDependencies(unittest.TestCase):
         for file in glob.glob(regex_to_remove):
             os.remove(file)
         try:
-            tmp_to_remove = "tmp*/*"
+            tmp_to_remove = "./tmp*/*"
             for file in glob.glob(tmp_to_remove):
                 os.remove(file)
-            if os.isdir("tmp*"):
-                os.rmdir("tmp*")
-        except:
-            sys.stderr.write("No tmp directory to remove\n")
+            for dir in glob.glob("./tmp*"):
+                if os.isdir(dir):
+                    os.rmdir(dir)
 
 if __name__ == "__main__":
     unittest.main(buffer=True)

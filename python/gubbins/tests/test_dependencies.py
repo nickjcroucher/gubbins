@@ -15,7 +15,7 @@ from gubbins import common, run_gubbins
 
 modules_dir = os.path.dirname(os.path.abspath(common.__file__))
 data_dir = os.path.join(modules_dir, 'tests', 'data')
-
+working_dir = os.path.join(modules_dir, 'tests')
 
 class TestExternalDependencies(unittest.TestCase):
 
@@ -314,6 +314,7 @@ class TestExternalDependencies(unittest.TestCase):
 
     @staticmethod
     def cleanup(prefix):
+        os.chdir(working_dir)
         regex_to_remove = prefix + ".*"
         for file in glob.glob(regex_to_remove):
             os.remove(file)

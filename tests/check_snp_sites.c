@@ -153,7 +153,7 @@ START_TEST (sample_names_from_alignment_file)
   char *expected_sequence_names[] ={"reference_sequence","comparison_sequence","another_comparison_sequence"};
   char* sequence_names[3];
   int i = 0;
-	sequence_names[3-1] = '\0';
+	sequence_names[3-1] = NULL;
   for(i = 0; i < 3; i++)
 	{
 		sequence_names[i] = malloc(30*sizeof(char));

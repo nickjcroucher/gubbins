@@ -1,4 +1,4 @@
-EXTRA_DIST=gubbins/* setup.py scripts/*
+EXTRA_DIST=gubbins/*
 
 all-local:
 	${PYTHON} setup.py build

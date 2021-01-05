@@ -540,6 +540,9 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
                 print(">" + taxon, file = asr_output)
                 print(''.join(out_aln[:,ancestral_node_indices[taxon]]), file=asr_output)
 
+        # Release pool nodes
+        pool.join()
+
         # Combine results for each base across the alignment
         for node in tree.preorder_node_iter():
             node.edge_length = 0.0 # reset lengths to convert to SNPs

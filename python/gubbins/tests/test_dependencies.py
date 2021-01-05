@@ -26,6 +26,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -40,6 +41,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                 "--verbose", "--iterations", "3",
+                                                "--threads", "2",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -54,6 +56,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -68,6 +71,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -83,6 +87,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
                                                     "--model","JC",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -99,6 +104,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "fasttree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -114,6 +120,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -129,6 +136,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -144,6 +152,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "raxmlng",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -160,6 +169,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--tree-builder", "rapidnj",
                                                     "--model","JC",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -177,6 +187,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "raxml",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -193,6 +204,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "iqtree",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -209,6 +221,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "raxmlng",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -225,6 +238,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "fasttree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -240,6 +254,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -255,6 +270,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -270,6 +286,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "raxmlng",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "2",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:

@@ -32,7 +32,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_iqtree(self):
         exit_code = 0
@@ -46,7 +46,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_raxml(self):
         exit_code = 0
@@ -60,7 +60,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_raxmlng(self):
         exit_code = 0
@@ -74,7 +74,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_rapidnj(self):
         exit_code = 0
@@ -89,7 +89,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     # Test initial star tree
     def test_starting_star_fasttree(self):
@@ -105,7 +105,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_starting_star_iqtree(self):
         exit_code = 0
@@ -120,7 +120,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_starting_star_raxml(self):
         exit_code = 0
@@ -135,7 +135,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_starting_star_raxmlng(self):
         exit_code = 0
@@ -150,7 +150,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_starting_star_rapidnj(self):
         exit_code = 0
@@ -166,7 +166,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     # Test sequence reconstruction
     def test_raxml_seq_recon(self):
@@ -183,7 +183,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_iqtree_seq_recon(self):
         exit_code = 0
@@ -199,7 +199,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_raxmlng_seq_recon(self):
         exit_code = 0
@@ -215,7 +215,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     # Test model fitting
     def test_fasttree_model_fit(self):
@@ -231,7 +231,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_iqtree_model_fit(self):
         exit_code = 0
@@ -246,7 +246,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_raxml_model_fit(self):
         exit_code = 0
@@ -261,7 +261,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     def test_raxmlng_model_fit(self):
         exit_code = 0
@@ -276,7 +276,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
-        return exit_code
+        assert exit_code == 0
 
     # Test renaming of final output
     def test_rename_final_output(self):
@@ -291,7 +291,7 @@ class TestExternalDependencies(unittest.TestCase):
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('different_prefix')
-        return exit_code
+        assert exit_code == 0
 
     def test_cleanup(self):
         parser = run_gubbins.parse_input_args()

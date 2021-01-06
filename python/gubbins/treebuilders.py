@@ -562,7 +562,7 @@ class RAxML:
         command.extend([";"])
         return " ".join(command)
         
-    def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str) -> str:
+    def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str, transfer = False) -> str:
         # Annotate tree with bootstraps
         command = self.base_command.copy()
         p_seed = str(randint(0, 10000))
@@ -750,7 +750,7 @@ class RAxMLNG:
         command.extend(["--msa", alignment_filename, "--prefix", tmp + "/" + basename + ".bootstrapping"])
         command.extend(["--bs-trees",str(self.bootstrap)])
         # Then concatenate
-        command.extend(["; cat", tmp + "/" + os.path.basename(alignment_filename) + ".BS* >", tmp + "/" + basename + ".bootstrapping.aln"])
+        command.extend(["; cat", tmp + "/" + basename + ".bootstrapping.raxml.bootstrapMSA.*.phy >", tmp + "/" + basename + ".bootstrapping.aln"])
         return " ".join(command)
 
     def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
@@ -785,5 +785,5 @@ class RAxMLNG:
 
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
         """Return bootstrapped tree files name"""
-        file_name = tmp + "/" + basename + ".raxml.bootstraps"
+        file_name = tmp + "/" + basename + ".bootstrapped_trees"
         return file_name

@@ -26,7 +26,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -41,7 +41,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                 "--verbose", "--iterations", "3",
-                                                "--threads", "2",
+                                                "--threads", "1",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -56,7 +56,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -71,7 +71,7 @@ class TestExternalDependencies(unittest.TestCase):
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -87,7 +87,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
                                                     "--model","JC",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -104,7 +104,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "fasttree",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -120,7 +120,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -136,7 +136,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -152,7 +152,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "raxmlng",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -169,7 +169,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--tree-builder", "rapidnj",
                                                     "--model","JC",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -187,7 +187,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "raxml",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -204,7 +204,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "iqtree",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -221,7 +221,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--seq-recon", "raxmlng",
                                                     "--mar",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -238,7 +238,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "fasttree",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -254,7 +254,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "iqtree",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -270,7 +270,7 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "raxml",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
@@ -286,13 +286,179 @@ class TestExternalDependencies(unittest.TestCase):
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--model-fitter", "raxmlng",
                                                     "--verbose", "--iterations", "3",
-                                                    "--threads", "2",
+                                                    "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
             sys.stderr.write("Test failed")
             exit_code = 1
         self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test bootstrapping
+    def test_raxml_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","10",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_iqtree_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","1000",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_rapidnj_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
+                                                    "--model","JC",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","10",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_raxmlng_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","100",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_fasttree_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","10",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_raxmlng_transfer_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","100",
+                                                    "--threads", "1",
+                                                    "--transfer-bootstrap",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_raxml_transfer_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","10",
+                                                    "--threads", "1",
+                                                    "--transfer-bootstrap",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_iqtree_transfer_bootstrapping(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","1000",
+                                                    "--threads", "1",
+                                                    "--transfer-bootstrap",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    # Test SH tests
+    def test_iqtree_sh_test(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--sh-test",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_raxml_sh_test(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--sh-test",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
         assert exit_code == 0
 
     # Test renaming of final output

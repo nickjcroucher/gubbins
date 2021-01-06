@@ -785,5 +785,5 @@ class RAxMLNG:
 
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
         """Return bootstrapped tree files name"""
-        file_name = tmp + "/" + basename + ".bootstrapped_trees"
+        file_name = tmp + "/" + basename + ".raxml.bootstraps"
         return file_name

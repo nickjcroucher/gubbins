@@ -65,46 +65,45 @@ def parse_input_args():
                                                       default = None)
     treeGroup.add_argument('--outgroup',        '-o', help='Outgroup name for rerooting. A list of comma separated '
                                                       'names can be used if they form a clade')
-    treeGroup.add_argument('--bootstrap',       '-#', help='Number of bootstrap replicates to perform with final alignment '
-                                                      '[default = 0]', type = int, default = 0)
-    treeGroup.add_argument('--transfer-bootstrap',    help='Calculate bootstrap supporting transfer bootstrap expectation '
-                                                      '[default = False]', default = False, action = 'store_true')
+    treeGroup.add_argument('--bootstrap',       '-#', help='Number of bootstrap replicates to perform with final alignment',
+                                                      type = int, default = 0)
+    treeGroup.add_argument('--transfer-bootstrap',    help='Calculate bootstrap supporting transfer bootstrap expectation',
+                                                      default = False, action = 'store_true')
     treeGroup.add_argument('--sh-test',               help='Perform an SH test of node likelihoods', default = False,
                                                       action = 'store_true')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
-    modelGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting [default = same as'
+    modelGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting [if unspecified: same as'
                                                       ' tree builder if possible, else raxml]',
                                                       default = None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
-    modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all'
-                                                      'tree building algorithms',
+    modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all '
+                                                      'tree building algorithms)',
                                                       default='GTRGAMMA',
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--model-args',           help='Quoted string of further arguments passed to model fitting algorithm'
-                                                      ' (start string with a space if there is a risk of being interpreted as a flag)'
-                                                      '(default = same as --tree-builder-args)',
+                                                      ' (start string with a space if there is a risk of being interpreted as a flag)',
                                                       default=None)
     modelGroup.add_argument('--custom-model',         help='String corresponding to a substitution model for the selected tree'
-                                                      ' building algorithm [default = None]', default = None)
+                                                      ' building algorithm', default = None)
     modelGroup.add_argument('--first-model-fitter',   help='Application to use for model fitting in first iteration'
-                                                      ' [default = same as tree builder if possible, else raxml]',
+                                                      ' [if unspecified: same as tree builder if possible, else raxml]',
                                                       default = None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--first-model',          help='Nucleotide substitution model used for first tree',
                                                       default=None,
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--first-model-args',     help='Further arguments passed to model fitting algorithm used in first'
-                                                      'iteration (default = same as --first-tree-builder-args)',
+                                                      'iteration (if unspecified: same as --first-tree-builder-args)',
                                                       default=None)
     modelGroup.add_argument('--custom-first-model',   help='String corresponding to a substitution model for the selected tree'
-                                                      ' building algorithm for the first iteration [default = None]',
+                                                      ' building algorithm for the first iteration',
                                                       default = None)
 
     reconGroup = parser.add_argument_group('Ancestral sequence reconstruction options')
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',
                                                       action='store_true')
-    reconGroup.add_argument('--seq-recon',            help='Algorithm to use for marginal reconstruction [default = '
+    reconGroup.add_argument('--seq-recon',            help='Algorithm to use for marginal reconstruction [if unspecified: '
                                                       'same as tree builder if possible, else raxml]',
                                                       default=None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', None])

@@ -209,7 +209,8 @@ def parse_and_run(input_args, program_description=""):
                            tree_building_command])
             if current_tree_builder == "star":
                 # Move star tree into temp dir
-                subprocess.check_call(["mv", tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix, built_tree])
+                shutil.move(tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix,
+                            built_tree)
             else:
                 try:
                     os.chdir(temp_working_dir)

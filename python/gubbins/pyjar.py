@@ -19,7 +19,7 @@ try:
     from multiprocessing.managers import SharedMemoryManager
     NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
 except ImportError as e:
-    sys.stderr.write("This version of Gubbins requires python v3.8 or higher\n")
+    sys.stderr.write("This version of Gubbins requires the multiprocessing library and python v3.8 or higher for memory management\n")
     sys.exit(0)
 
 from gubbins.utils import generate_shared_mem_array

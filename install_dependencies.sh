@@ -84,18 +84,16 @@ download $RAXMLNG_DOWNLOAD_URL $RAXMLNG_ZIP_FILE
 download $RAPIDNJ_DOWNLOAD_URL $RAPIDNJ_ZIP_FILE
 
 # Update dependencies
-#if [ "$TRAVIS" = 'true' ]; then
-#  echo "Using Travis's apt plugin"
-#else
-#  sudo apt-get update -q
-#  sudo apt-get install -y -q autoconf \
-#                             check \
-#                             g++ \
-#                             libtool \
-#                             libsubunit-dev \
-#                             pkg-config \
-#                             python-dev
-#fi
+if [[ "$OS" == 'Linux' ]]; then
+  sudo apt-get update -q
+  sudo apt-get install -y -q autoconf \
+                             check \
+                             g++ \
+                             libtool \
+                             libsubunit-dev \
+                             pkg-config \
+                             python-dev
+fi
 
 # Build all the things
 

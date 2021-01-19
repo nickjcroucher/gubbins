@@ -91,3 +91,6 @@ RUN cd ${BUILD_DIR} \
   && make install \
   && cd python \
   && python3 setup.py install
+
+# Remove downloaded files
+RUN rm standard-RAxML-${raxml_version}.tar.gz iqtree-${iqtree_version}-Linux.tar.gz iqtree-${iqtree_version}-Linux.tar.gz raxml-ng_v${raxmlng_version}_linux_x86_64.zip ${rapidnj_version}.zip

@@ -70,6 +70,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--model","GTR",
                                                     "--verbose", "--iterations", "3",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))

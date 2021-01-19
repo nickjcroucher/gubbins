@@ -37,7 +37,11 @@ def parse_input_args():
     ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
     ioGroup.add_argument('--version',                 action='version',
                                                       version = version())
-                        
+    ioGroup.add_argument('--threads',           '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
+                                                      'version is available', type=int,  default=1)
+    ioGroup.add_argument('--verbose',           '-v', help='Turn on debugging', action='store_true')
+    ioGroup.add_argument('--no-cleanup',        '-n', help='Do not cleanup intermediate files', action='store_true')
+
     dataGroup = parser.add_argument_group('Data processing options')
     dataGroup.add_argument('--pairwise',              help='Compare two sequences (without using a tree)',
                                                       default = False, action = 'store_true') # fasttree model fit, star phylogeny, one iteration
@@ -46,10 +50,6 @@ def parse_input_args():
                                                       type=float, default=25.0)
     dataGroup.add_argument('--remove-identical-sequences',
                                                 '-d', help='Remove identical sequences', action='store_true')
-    dataGroup.add_argument('--threads',         '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
-                                                      'version is available', type=int,  default=1)
-    dataGroup.add_argument('--verbose',         '-v', help='Turn on debugging', action='store_true')
-    dataGroup.add_argument('--no-cleanup',      '-n', help='Do not cleanup intermediate files', action='store_true')
 
     treeGroup = parser.add_argument_group('Tree building options')
     treeGroup.add_argument('--tree-builder',    '-t', help='Application to use for tree building',

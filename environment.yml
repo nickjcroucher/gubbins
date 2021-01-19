@@ -24,8 +24,8 @@ dependencies:
   - biopython
   - multiprocess
 # phylogenetics
-  - raxml
-  - iqtree
+  - raxml=8.2.12
+  - iqtree=2.0.3
   - rapidnj
-  - raxml-ng
-  - fasttree
+  - raxml-ng=1.0.1
+  - fasttree=2.1.10

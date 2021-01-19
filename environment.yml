@@ -23,6 +23,7 @@ dependencies:
   - dendropy
   - biopython
   - multiprocess
+  - numpy
 # phylogenetics
   - raxml=8.2.12
   - iqtree=2.0.3

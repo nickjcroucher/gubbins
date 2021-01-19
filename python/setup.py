@@ -34,7 +34,9 @@ setuptools.setup(
     install_requires=[
         'biopython >= 1.59',
         'dendropy  >= 4.0.2',
-        'multiprocess >= 0.70'
+        'multiprocess >= 0.70',
+        'scipy >= 1.5.3',
+        'numpy >= 1.19'
     ],
     license='GPL'
 )

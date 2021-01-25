@@ -51,6 +51,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 def version():
+    os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
     program_version = ""
     try:

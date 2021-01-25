@@ -21,6 +21,7 @@
 import os
 import sys
 import shutil
+import pkg_resources
 import time
 import subprocess
 import re
@@ -35,7 +36,6 @@ from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
 # Gubbins imports
-from gubbins.__init__ import version
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
@@ -62,7 +62,11 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    program_version = version()
+    program_version = ""
+    try:
+        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
+    except pkg_resources.RequirementParseError:
+        pass
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Log algorithms used

@@ -8,6 +8,7 @@ for usage by client code.
 
 import sys
 import os
+import pkg_resources
 
 ###############################################################################
 ## Populate the 'gubbins' namespace
@@ -18,7 +19,6 @@ from gubbins import common
 ## PACKAGE METADATA
 
 __project__ = "Gubbins"
-__version__ = "3.0"
 
 try:
     try:
@@ -49,10 +49,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-PACKAGE_VERSION = __version__
 
 def version():
-    return "%s" % (__version__)
+    gubbins_exec = 'gubbins'
+    program_version = ""
+    try:
+        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
+    except pkg_resources.RequirementParseError:
+        pass
+    return "%s" % program_version
+
+__version__ = version()
 
 def description():
     return "%s %s" % (__project__, version())

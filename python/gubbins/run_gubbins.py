@@ -37,8 +37,8 @@ def parse_input_args():
     ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
     ioGroup.add_argument('--version',                 action='version',
                                                       version = version())
-    ioGroup.add_argument('--threads',           '-c', help='Number of threads to run with RAXML, but only if a PTHREADS '
-                                                      'version is available', type=int,  default=1)
+    ioGroup.add_argument('--threads',           '-c', help='Number of threads to use for parallelisation',
+                                                      type=int,  default=1)
     ioGroup.add_argument('--verbose',           '-v', help='Turn on debugging', action='store_true')
     ioGroup.add_argument('--no-cleanup',        '-n', help='Do not cleanup intermediate files', action='store_true')
 

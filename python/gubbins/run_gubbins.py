@@ -104,7 +104,7 @@ def parse_input_args():
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',
                                                       action='store_true')
     reconGroup.add_argument('--seq-recon',            help='Algorithm to use for marginal reconstruction [if unspecified: '
-                                                      'same as tree builder if possible, else raxml]',
+                                                      'same as tree builder if possible, else raxml; requires --mar flag]',
                                                       default=None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', None])
     reconGroup.add_argument('--seq-recon-args',       help='Further arguments passed to sequence reconstruction algorithm'

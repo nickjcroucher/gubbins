@@ -41,6 +41,7 @@ from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, read_alignment, get_base_patterns
 from gubbins import utils
+from gubbins.__init__ import version
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -62,11 +63,7 @@ def parse_and_run(input_args, program_description=""):
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    program_version = ""
-    try:
-        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
-    except pkg_resources.RequirementParseError:
-        pass
+    program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
     # Log algorithms used

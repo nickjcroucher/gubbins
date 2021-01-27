@@ -4,24 +4,26 @@ import setuptools
 
 setuptools.setup(
     name='gubbins',
-    version='2.4.1',
+    version = open('VERSION').read().strip(),
     description='Frontend to the Gubbins BioInformatics tool',
-    author='Andrew J. Page',
+    author='Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris',
     url='https://github.com/sanger-pathogens/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
-            "run_gubbins.py = scripts.run_gubbins:main",
+            "run_gubbins.py = gubbins.run_gubbins:main",
         ]
     },
     test_suite='nose.collector',
     tests_require=[
-        "nose >= 1.3"
+        "nose >= 1.3",
+        "wheel >= 0.34"
     ],
     long_description="""\
-      Gubbins is a tool for BioInformaticians that takes in a multi
-      fasta alignment and detects recombination regions.  This package provides
-      a simple front end to the Gubbins tool.
+      Gubbins is a tool that generates a reconstruction of
+      a microbial strain's recent evolutionary history through
+      identifying imports of divergent sequence through recombination
+      and generating a phylogeny from the remaining clonal frame.
       """,
     classifiers=[
         "License :: OSI Approved :: GNU General Public License (GPL)",
@@ -31,8 +33,11 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     install_requires=[
-        'biopython >= 1.59, < 1.78',
-        'dendropy  >= 4.0.2'
+        'biopython >= 1.59',
+        'dendropy  >= 4.0.2',
+        'multiprocess >= 0.70',
+        'scipy >= 1.5.3',
+        'numpy >= 1.19'
     ],
     license='GPL'
 )

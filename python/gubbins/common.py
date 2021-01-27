@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
+# Generic imports
 import os
 import sys
 import shutil
@@ -25,21 +26,22 @@ import time
 import subprocess
 import re
 import tempfile
-
+# Phylogenetic imports
 import dendropy
 from dendropy.calculate import treecompare
-
+# Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
-
+# Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML
+from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.pyjar import jar, read_alignment, get_base_patterns
 from gubbins import utils
-
+from gubbins.__init__ import version
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -47,40 +49,49 @@ def parse_and_run(input_args, program_description=""):
     current_directory = os.getcwd()
     printer = utils.VerbosePrinter(True, "\n")
 
+    # Process input options
+    input_args = process_input_arguments(input_args)
+
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
+    os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
     if utils.which(gubbins_exec) is None:
-        # Check if the Gubbins C-program is available in its source directory (for tests/Travis)
-        gubbins_bundled_exec = os.path.abspath(os.path.join(current_directory, '../src/gubbins'))
+        # Check if the Gubbins C-program is available in its source directory (for tests/CI)
+        gubbins_python_dir = os.path.dirname(os.path.abspath(utils.__file__))
+        gubbins_bundled_exec = os.path.abspath(os.path.join(gubbins_python_dir, '../../src/gubbins'))
         if utils.which(gubbins_bundled_exec) is None:
             sys.exit(gubbins_exec + " is not in your path")
         else:
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
-    program_version = ""
-    try:
-        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
-    except pkg_resources.RequirementParseError:
-        pass
+    program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
 
-    # Initialize tree builder and ancestral sequence reconstructor; check if all required dependencies are available
+    # Log algorithms used
+    methods_log = {property:[] for property in ['citation','process','version','algorithm']}
+    methods_log['algorithm'].append("Gubbins")
+    methods_log['citation'].append("https://doi.org/10.1093/nar/gku1196")
+    methods_log['process'].append("Overall")
+    methods_log['version'].append(program_version)
+
+    # Initialize tree builder and check if all required dependencies are available
     printer.print("\nChecking dependencies...")
     current_tree_name = input_args.starting_tree
     tree_file_names = []
     internal_node_label_prefix = "internal_"
-    if input_args.tree_builder == "fasttree" or input_args.tree_builder == "hybrid":
-        tree_builder = FastTree(input_args.verbose)
-        sequence_reconstructor = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix,
-                                       input_args.verbose)
-        alignment_suffix = ".snp_sites.aln"
-    elif input_args.tree_builder == "raxml":
-        tree_builder = RAxML(input_args.threads, input_args.raxml_model, internal_node_label_prefix, input_args.verbose)
-        sequence_reconstructor = tree_builder
-        alignment_suffix = ".phylip"
-    else:
-        tree_builder = IQTree(input_args.threads, internal_node_label_prefix, input_args.verbose)
-        sequence_reconstructor = tree_builder
-        alignment_suffix = ".phylip"
+    
+    # Select the algorithms used for the first iteration
+    current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
+    # Initialise tree builder
+    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+    alignment_suffix = tree_builder.alignment_suffix
+    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
+    # Initialise model fitter
+    model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
+    # Initialise sequence reconstruction if MAR
+    if input_args.mar:
+        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
+        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check if the input files exist and have the right format
@@ -94,8 +105,14 @@ def parse_and_run(input_args, program_description=""):
     if input_args.starting_tree is not None and input_args.starting_tree != "" \
             and not do_the_names_match_the_fasta_file(input_args.starting_tree, input_args.alignment_filename):
         sys.exit("The names in the starting tree do not match the names in the alignment file")
-    if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
-        sys.exit("3 or more sequences are required.")
+
+    # Check on number of sequences in alignment
+    if input_args.pairwise:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+            sys.exit("Pairwise mode should only be used for two sequences.")
+    else:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -156,10 +173,16 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2 and input_args.tree_builder == "hybrid":
-            # Switch to RAxML
-            tree_builder = sequence_reconstructor
-            alignment_suffix = ".phylip"
+        if i == 2:
+            # Select the algorithms used for the subsequent iterations
+            current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
+            # Initialise tree builder
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            alignment_suffix = tree_builder.alignment_suffix
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
+            # Initialise model fitter
+            model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+            methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -170,7 +193,7 @@ def parse_and_run(input_args, program_description=""):
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
-        if previous_tree_name:
+        if previous_tree_name and input_args.first_tree_builder != "star":
             tree_building_command = tree_builder.tree_building_command(
                 os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
         else:
@@ -185,12 +208,17 @@ def parse_and_run(input_args, program_description=""):
         else:
             printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
                            tree_building_command])
-            os.chdir(temp_working_dir)
-            try:
-                subprocess.check_call(tree_building_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while building the tree.")
-            os.chdir(current_directory)
+            if current_tree_builder == "star":
+                # Move star tree into temp dir
+                shutil.move(tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix,
+                            built_tree)
+            else:
+                try:
+                    os.chdir(temp_working_dir)
+                    subprocess.check_call(tree_building_command, shell=True)
+                except subprocess.SubprocessError:
+                    sys.exit("Failed while building the tree.")
+                os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
@@ -204,48 +232,105 @@ def parse_and_run(input_args, program_description=""):
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
-        sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
-            os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
-            ancestral_sequence_basename)
-        raw_internal_sequence_filename \
-            = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
-            + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
-        processed_internal_sequence_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".aln"
-        raw_internal_rooted_tree_filename \
-            = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
-            + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
-
-        # 3.2. Reconstruct the ancestral sequence
-        printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
-                       sequence_reconstruction_command])
-        os.chdir(temp_working_dir)
-        try:
-            subprocess.check_call(sequence_reconstruction_command, shell=True)
-        except subprocess.SubprocessError:
-            sys.exit("Failed while reconstructing the ancestral sequences.")
-        os.chdir(current_directory)
-
-        # 3.3. Join ancestral sequences with given sequences
         current_tree_name_with_internal_nodes = current_tree_name + ".internal"
-        sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
-                                                                     processed_internal_sequence_filename)
-        concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
-                                joint_sequences_filename)
-        transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
-                                              current_tree_name_with_internal_nodes, sequence_reconstructor)
+
+        if not input_args.mar:
+        
+            # 3.2a. Joint ancestral reconstruction
+            printer.print(["\nReconstructing ancestral sequences with pyjar..."])
+            if i == 1:
+
+                # 3.3a. Read alignment and identify unique base patterns in first iteration only
+                alignment_filename = base_filename + ".start"
+                alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
+                polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
+                base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(polymorphism_alignment, input_args.verbose)
+
+            # 3.4a. Re-fit full polymorphism alignment to new tree
+            model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
+                                                                os.path.abspath(temp_rooted_tree),
+                                                                temp_working_dir + '/' + current_basename)
+            printer.print(["\nFitting substitution model to tree...", model_fitting_command])
+            subprocess.check_call(model_fitting_command, shell = True)
+
+            # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
+            info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
+            recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)
+            # Arbitrary rooting of tree
+            reroot_tree_at_midpoint(recontree_filename)
+            
+            printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
+            jar(alignment = polymorphism_alignment, # complete polymorphism alignment
+                base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
+                base_pattern_positions = base_pattern_positions_array, # nparray of positions of unique base patterns in alignment
+                tree_filename = recontree_filename, # tree generated by model fit
+                info_filename = info_filename, # file containing evolutionary model parameters
+                info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
+                output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
+                threads = input_args.threads, # number of cores to use
+                verbose = input_args.verbose)
+            gaps_alignment_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.aln"
+            raw_internal_rooted_tree_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.tre"
+            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes, "pyjar")
+
+        else:
+
+            # 3.2b. Marginal ancestral reconstruction with RAxML, RAxML-NG or IQTree
+            sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
+                os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
+                ancestral_sequence_basename)
+            raw_internal_sequence_filename \
+                = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
+                + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
+            processed_internal_sequence_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".aln"
+            raw_internal_rooted_tree_filename \
+                = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
+                + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
+
+            # 3.3b. Reconstruct the ancestral sequence
+            printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
+                           sequence_reconstruction_command])
+            os.chdir(temp_working_dir)
+            try:
+                subprocess.check_call(sequence_reconstruction_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while reconstructing the ancestral sequences.")
+            os.chdir(current_directory)
+
+            # 3.4b. Join ancestral sequences with given sequences
+            current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+            sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
+                                                                         processed_internal_sequence_filename)
+            concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
+                                    joint_sequences_filename)
+            if input_args.seq_recon == "raxml":
+                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes, sequence_reconstructor)
+            elif input_args.seq_recon == "iqtree" or input_args.seq_recon == "raxmlng":
+                # IQtree returns an unrooted tree
+                temp_unrooted_tree = temp_working_dir + "/" + current_tree_name + ".unrooted"
+                unroot_tree(temp_rooted_tree, temp_unrooted_tree)
+                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_unrooted_tree,
+                                                  current_tree_name_with_internal_nodes, sequence_reconstructor)
+            else:
+                sys.stderr.write("Unrecognised sequence reconstruction command: " + input_args.seq_recon + '\n')
+                sys.exit()
+            printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+
+            # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
+            printer.print("\nReinserting gaps into the alignment...")
+            shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
+            reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
+            if not os.path.exists(gaps_alignment_filename) \
+                    or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
+                sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
+                         "Please check this intermediate file is valid: " + gaps_alignment_filename)
+
+        # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-        # 4. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
-        printer.print("\nReinserting gaps into the alignment...")
-        shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
-        reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
-        if not os.path.exists(gaps_alignment_filename) \
-                or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
-            sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
-                     "Please check this intermediate file is valid: " + gaps_alignment_filename)
-        printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
-        # 5. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
+        # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
@@ -259,7 +344,7 @@ def parse_and_run(input_args, program_description=""):
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
 
-        # 6. Check for convergence
+        # 5. Check for convergence
         printer.print("\nChecking for convergence...")
         remove_internal_node_labels_from_tree(current_tree_name_with_internal_nodes, current_tree_name)
         tree_file_names.append(current_tree_name)
@@ -278,10 +363,72 @@ def parse_and_run(input_args, program_description=""):
         printer.print("Maximum number of iterations (" + str(input_args.iterations) + ") reached.")
     printer.print("\nExiting the main loop.")
 
+    # 6. Run bootstrap analysis if requested
+    final_aln = current_basename + ".tre" + alignment_suffix # For use with bootstrap and SH tests
+    if input_args.bootstrap > 0:
+        printer.print(["\nRunning bootstrap analysis..."])
+        shutil.copyfile(final_aln, temp_working_dir + "/" + final_aln)
+        # NJ bootstraps
+        if current_tree_builder == "rapidnj":
+            # Bootstraps for NJ tree have to be run in a single command - deterministic algorithm means tree assumed to be the same
+            # as the final tree
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), temp_working_dir + "/" + current_basename)
+            try:
+                subprocess.check_call(bootstrap_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while running bootstrap analysis.")
+            transfer_bootstraps_to_tree(temp_working_dir + "/" + current_basename + ".tre.bootstrapped",
+                                                    os.path.abspath(current_tree_name),
+                                                    current_basename + ".tre.bootstrapped",
+                                                    outgroups = input_args.outgroup)
+        # ML bootstraps
+        else:
+            # Define alignment and a RAxML object for bootstrapping utilities
+            bootstrap_aln = final_aln
+            if current_tree_builder == "raxmlng":
+                bootstrap_utility = tree_builder
+            else:
+                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
+            # Generate alignments for bootstrapping if FastTree being used
+            if current_tree_builder == "fasttree":
+                alignment_generation_command = bootstrap_utility.generate_alignments_for_bootstrapping(os.path.abspath(bootstrap_aln), current_basename, temp_working_dir)
+                try:
+                    subprocess.check_call(alignment_generation_command, shell=True)
+                except subprocess.SubprocessError:
+                    sys.exit("Failed while generating alignments for bootstrap analysis.")
+                bootstrap_aln = temp_working_dir + "/" + current_basename
+            # Generate bootstrap trees
+            bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(bootstrap_aln), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
+            try:
+                subprocess.check_call(bootstrap_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while running bootstrap analysis.")
+            # Annotate the final tree using the bootstraps
+            bootstrapped_trees_file = tree_builder.get_bootstrapped_trees_file(temp_working_dir,current_basename)
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir), transfer = input_args.transfer_bootstrap)
+            try:
+                subprocess.check_call(annotation_command, shell=True)
+            except subprocess.SubprocessError:
+                sys.exit("Failed while annotating final tree with bootstrapping results.")
+        printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+
+    # 7. Run node branch support analysis if requested
+    if input_args.sh_test:
+        sh_test_command = tree_builder.sh_test(final_aln, current_tree_name, current_basename, os.path.abspath(temp_working_dir))
+        try:
+            subprocess.check_call(sh_test_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed while running SH test.")
+        if current_tree_builder == "raxml":
+            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "raxml")
+        elif current_tree_builder == "iqtree":
+            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "iqtree")
+
     # Create the final output
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
+    print_log(methods_log, input_args.prefix)
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
@@ -293,6 +440,149 @@ def parse_and_run(input_args, program_description=""):
         utils.delete_files(".", [base_filename], starting_files_regex(), input_args.verbose)
     printer.print("...finished. Total run time: {:.2f} s".format(time.time() - start_time))
 
+#############
+# Functions #
+#############
+
+def process_input_arguments(input_args):
+    # Alter settings if pairwise comparison of sequences
+    if input_args.pairwise:
+        input_args.iterations = 1
+        input_args.model_fitter = 'fasttree'
+        input_args.first_tree_builder = 'star'
+    else:
+        # Make model fitting consistent with tree building
+        if input_args.model_fitter is None:
+            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
+                input_args.model_fitter = input_args.tree_builder
+            else:
+                # Else use RAxML where not possible
+                input_args.model_fitter = 'raxml'
+        # Make sequence reconstruction consistent with tree building where possible
+        if input_args.seq_recon is None:
+            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
+                input_args.seq_recon = input_args.tree_builder
+            else:
+                # Else use RAxML where not possible
+                input_args.seq_recon = 'raxml'
+        elif not input_args.mar:
+            sys.stderr.write('Sequence reconstruction uses pyjar unless the '
+            '--mar flag is specified\n')
+            sys.exit()
+        # Check substitution model consistent with tree building algorithm
+        tree_models = {
+            'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+            'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+            'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+            'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+            'rapidnj': ['JC','K2P']
+        }
+        invalid_model = False
+        # Check on first tree builder
+        if input_args.first_tree_builder is not None:
+            # Raise error if first tree builder and starting tree
+            if input_args.starting_tree is not None:
+                sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+                sys.exit()
+        # Determine model to be used for first iteration, if specified
+        if input_args.custom_first_model is not None:
+            input_args.first_model = input_args.custom_first_model
+            sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
+        elif input_args.first_model is not None:
+            first_model = input_args.first_model
+            first_tree_builder = input_args.tree_builder
+            if input_args.first_tree_builder is not None:
+                first_tree_builder = input_args.first_tree_builder
+            first_model_fitter = input_args.model_fitter
+            if input_args.first_model_fitter is not None:
+                first_model_fitter = input_args.first_model_fitter
+            if first_model not in tree_models[first_tree_builder]:
+                sys.stderr.write('First evolutionary model ' + first_model +
+                                ' and algorithm ' + first_tree_builder +
+                                 ' are incompatible\n')
+                invalid_model = True
+            elif first_model not in tree_models[first_model_fitter]:
+                sys.stderr.write('First evolutionary model ' + first_model +
+                                ' and algorithm ' + first_model_fitter +
+                                 ' are incompatible\n')
+                invalid_model = True
+        # Check that at least 2 iterations will be run if customised options for 1st iteration
+        if input_args.iterations == 1:
+            if input_args.first_tree_builder is not None or input_args.first_model \
+                or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
+                sys.stderr.write('Please do not use options specific to the first iteration when'
+                                 ' only one iteration is to be run\n')
+                sys.exit()
+        # Determine model to be used for subsequent iterations
+        if input_args.custom_model is not None:
+            input_args.model = input_args.custom_model
+            sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
+        elif input_args.model not in tree_models[input_args.tree_builder]:
+            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
+                        input_args.tree_builder + ' are incompatible\n')
+            invalid_model = True
+        elif input_args.model not in tree_models[input_args.model_fitter]:
+            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
+                        input_args.model_fitter + ' are incompatible\n')
+            invalid_model = True
+        # Information for rectifying incompatible combinations
+        if invalid_model:
+            sys.stderr.write('Available combinations are:\n')
+            for algorithm in tree_models:
+                models = ', '.join(tree_models[algorithm])
+                sys.stderr.write(algorithm + ':\t' + models + '\n')
+            sys.exit()
+        # Check on arguments for measures of branch support
+        if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
+            sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
+            sys.exit()
+        if input_args.sh_test and input_args.tree_builder not in ["raxml","iqtree","fasttree"]:
+            sys.stderr.write("SH test only available for RAxML, IQtree or Fasttree\n")
+            sys.exit()
+    return input_args
+
+def return_algorithm_choices(args,i):
+    # Pick tree builder
+    current_tree_builder = args.tree_builder
+    if args.first_tree_builder is not None and i==1:
+        current_tree_builder = args.first_tree_builder
+    # Pick model
+    current_model = args.model
+    if args.first_model is not None and i==1:
+        current_model = args.first_model
+    # Get tree builder arguments
+    extra_tree_arguments = args.tree_args
+    if args.first_tree_args is not None and i==1:
+        extra_tree_arguments = args.first_tree_args
+    # Pick model fitter
+    current_model_fitter = args.model_fitter
+    if args.first_model_fitter is not None and i==1:
+        current_model_fitter = args.first_model_fitter
+    # Get model fitter arguments
+    extra_model_arguments = args.model_args
+    if args.first_model_args is not None and i==1:
+        extra_model_arguments = args.first_model_args
+    # Return choices
+    return current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments
+
+def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
+    initialised_algorithm = None
+    if algorithm_choice == "fasttree":
+        initialised_algorithm = FastTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "raxml":
+        initialised_algorithm = RAxML(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "raxmlng":
+        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "iqtree":
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "rapidnj":
+        initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "star":
+        initialised_algorithm = Star()
+    else:
+        sys.stderr.write("Unrecognised algorithm: " + algorithm_choice + "\n")
+        sys.exit()
+    return initialised_algorithm
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size):
@@ -414,13 +704,19 @@ def reroot_tree_at_midpoint(tree_name):
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
     split_all_non_bi_nodes(tree.seed_node)
     tree.update_bipartitions()
-    tree.reroot_at_midpoint()
     tree.deroot()
+    tree.reroot_at_midpoint()
     tree.update_bipartitions()
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
+def unroot_tree(input_filename, output_filename):
+    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
+    tree.deroot()
+    output_tree_string = tree_as_string(tree, suppress_internal=False)
+    with open(output_filename, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
 
 def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
@@ -496,6 +792,8 @@ def get_monophyletic_outgroup(tree_name, outgroups):
 
 def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename,
                                           sequence_reconstructor):
+
+    # read source tree and extract node labels, to match with the ancestral sequence reconstruction
     source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
     source_internal_node_labels = []
     for source_internal_node in source_tree.internal_nodes():
@@ -504,12 +802,17 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
         else:
             source_internal_node_labels.append('')
 
+    # read original tree and add in the labels from the ancestral sequence reconstruction
     destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
     for index, destination_internal_node in enumerate(destination_tree.internal_nodes()):
-        new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_labels[index]))
+        if sequence_reconstructor == 'pyjar':
+            new_label = str(source_internal_node_labels[index])
+        else:
+            new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_labels[index]))
         destination_internal_node.label = None
         destination_internal_node.taxon = dendropy.Taxon(new_label)
 
+    # output final tree
     output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
@@ -534,7 +837,7 @@ def reinsert_gaps_into_fasta_file(input_fasta_filename, input_vcf_file, output_f
         for vcf_line in vcf_file:
             if re.match('^#CHROM', vcf_line) is not None:
                 sample_names = vcf_line.rstrip().split('\t')[9:]
-            elif re.match('^\d', vcf_line) is not None:
+            elif re.match(r'^\d', vcf_line) is not None:
                 # If the alternate is only a gap it wont have a base in this column
                 if re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line) is not None:
                     m = re.match('^([^\t]+\t){3}([ACGTacgt])\t([^ACGTacgt])\t', vcf_line)
@@ -609,14 +912,14 @@ def extract_recombinations_from_embl(filename):
         start_coord = -1
         end_coord = -1
         for line in fh:
-            search_obj = re.search('misc_feature    ([\d]+)..([\d]+)$', line)
+            search_obj = re.search(r'misc_feature    ([\d]+)..([\d]+)$', line)
             if search_obj is not None:
                 start_coord = int(search_obj.group(1))
                 end_coord = int(search_obj.group(2))
                 continue
 
             if start_coord >= 0 and end_coord >= 0:
-                search_taxa = re.search('taxa\=\"([^"]+)\"', line)
+                search_taxa = re.search(r'taxa\=\"([^"]+)\"', line)
                 if search_taxa is not None:
                     taxa_names = search_taxa.group(1).strip().split(' ')
                     for taxa_name in taxa_names:
@@ -675,6 +978,67 @@ def symmetric_difference(input_tree_name, output_tree_name):
     return dendropy.calculate.treecompare.symmetric_difference(input_tree, output_tree)
 
 
+def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename, outgroups = None):
+    # read source tree and extract bootstraps as node labels, match with bipartition
+    reroot_tree(source_tree_filename, outgroups = outgroups)
+    source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
+    source_bootstraps = {}
+    for source_internal_node in source_tree.internal_nodes():
+        leaves = []
+        for leaf in source_internal_node.leaf_iter():
+            leaves.append(leaf.taxon.label.replace("'",""))
+        descendant_taxa = frozenset(leaves)
+        if source_internal_node.label:
+            source_bootstraps[descendant_taxa] = source_internal_node.label
+        else:
+            source_bootstraps[descendant_taxa] = ''
+    # read original tree and add in the bootstrap values
+    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
+    for destination_internal_node in destination_tree.internal_nodes():
+        leaves = []
+        for descendant in destination_internal_node.leaf_iter():
+            leaves.append(descendant.taxon.label.replace("'",""))
+        descendant_taxa = frozenset(leaves)
+        if descendant_taxa in source_bootstraps:
+            destination_internal_node.label = source_bootstraps[descendant_taxa]
+        else:
+            sys.stderr.write('Cannot find the internal node with descendants ' + str(descendant_taxa) + '\n')
+            destination_internal_node.label = "NA"
+    # output final tree
+    output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
+    with open(output_tree_filename, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
+
+def reformat_sh_support(tree_name, tmpdir, algorithm = "raxml"):
+    if algorithm == "raxml":
+        intree_fn = tmpdir + "/RAxML_fastTreeSH_Support." + tree_name + ".sh_support"
+    elif algorithm == "iqtree":
+        intree_fn = tmpdir + "/" + tree_name + ".sh_support.treefile"
+    outtree_fn = tree_name + ".sh_support"
+    with open(intree_fn,'r') as intree, open(outtree_fn,'w') as outtree:
+        for line in intree.readlines():
+            if algorithm == "raxml":
+                new_line = re.sub(r':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+            elif algorithm == "iqtree":
+                new_line = re.sub(r'\/', '', line)
+            outtree.write(new_line)
+
+def update_methods_log(log, method = None, step = ''):
+    """Record methods used at each step"""
+    log['citation'].append(method.citation)
+    log['process'].append(step)
+    log['version'].append(method.version)
+    log['algorithm'].append(method.executable)
+    return log
+
+def print_log(log, prefix):
+    """Print a records of the methods used"""
+    log_file_name = prefix + ".log"
+    with open(log_file_name,'w') as log_file:
+        log_file.write("Process,Algorithm,Version,Citation\n")
+        for index,process in enumerate(log['process']):
+            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['citation'][index] + "\n")
+
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {
         str(input_prefix) + ".vcf":             str(output_prefix) + ".summary_of_snp_distribution.vcf",
@@ -685,6 +1049,8 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix) + ".snp_sites.aln":   str(output_prefix) + ".filtered_polymorphic_sites.fasta",
         str(input_prefix) + ".phylip":          str(output_prefix) + ".filtered_polymorphic_sites.phylip",
         str(input_prefix) + ".internal":        str(output_prefix) + ".node_labelled.final_tree.tre",
+        str(input_prefix) + ".bootstrapped":    str(output_prefix) + ".final_bootstrapped_tree.tre",
+        str(input_prefix) + ".sh_support":      str(output_prefix) + ".final_SH_support_tree.tre",
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names

@@ -8,6 +8,7 @@ for usage by client code.
 
 import sys
 import os
+import pkg_resources
 
 ###############################################################################
 ## Populate the 'gubbins' namespace
@@ -18,7 +19,6 @@ from gubbins import common
 ## PACKAGE METADATA
 
 __project__ = "Gubbins"
-__version__ = "0.1"
 
 try:
     try:
@@ -32,8 +32,8 @@ except OSError:
 except:
     __homedir__ = None
 
-__author__ = "Andrew J. Page, Nicholas Croucher, Aidan Delaney and Simon Harris"
-__copyright__ = "Copyright 2013 Wellcome Trust Sanger Institutue"
+__author__ = "Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris"
+__copyright__ = "Copyright 2020 Wellcome Trust Sanger Institute and Imperial College London"
 __license__ = """
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -49,14 +49,20 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-PACKAGE_VERSION = __version__
+
+def version():
+    os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
+    program_version = ""
+    try:
+        program_version = str(pkg_resources.get_distribution(__project__).version)
+    except pkg_resources.RequirementParseError:
+        pass
+    return "%s" % program_version
+
+__version__ = version()
 
 def description():
-    if __revision__.is_available:
-        revision_text = " (%s)" % str(__revision__)
-    else:
-        revision_text = ""
-    return "%s %s%s" % (__project__, __version__, revision_text)
+    return "%s %s" % (__project__, version())
 
 if __name__ == "__main__":
     sys.stdout.write("%s\n" % description())

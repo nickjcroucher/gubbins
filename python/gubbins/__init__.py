@@ -32,7 +32,7 @@ except OSError:
 except:
     __homedir__ = None
 
-__author__ = "Andrew J. Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris"
+__author__ = "Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris"
 __copyright__ = "Copyright 2020 Wellcome Trust Sanger Institute and Imperial College London"
 __license__ = """
 This program is free software; you can redistribute it and/or
@@ -52,10 +52,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 def version():
     os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
-    gubbins_exec = 'gubbins'
     program_version = ""
     try:
-        program_version = str(pkg_resources.get_distribution(gubbins_exec).version)
+        program_version = str(pkg_resources.get_distribution(__project__).version)
     except pkg_resources.RequirementParseError:
         pass
     return "%s" % program_version

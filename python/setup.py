@@ -6,7 +6,7 @@ setuptools.setup(
     name='gubbins',
     version = open('VERSION').read().strip(),
     description='Frontend to the Gubbins BioInformatics tool',
-    author='Andrew J. Page',
+    author='Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris',
     url='https://github.com/sanger-pathogens/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={
@@ -20,9 +20,10 @@ setuptools.setup(
         "wheel >= 0.34"
     ],
     long_description="""\
-      Gubbins is a tool for BioInformaticians that takes in a multi
-      fasta alignment and detects recombination regions.  This package provides
-      a simple front end to the Gubbins tool.
+      Gubbins is a tool that generates a reconstruction of
+      a microbial strain's recent evolutionary history through
+      identifying imports of divergent sequence through recombination
+      and generating a phylogeny from the remaining clonal frame.
       """,
     classifiers=[
         "License :: OSI Approved :: GNU General Public License (GPL)",

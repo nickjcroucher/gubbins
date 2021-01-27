@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
     name='gubbins',
-    version='3.0.0',
+    version = open('VERSION').read().strip(),
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew J. Page',
     url='https://github.com/sanger-pathogens/gubbins/',

@@ -21,7 +21,14 @@ import os
 import shutil
 import subprocess
 import re
-
+import numpy as np
+import collections
+try:
+    from multiprocessing.managers import SharedMemoryManager
+    NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
+except ImportError as e:
+    sys.stderr.write("This version of Gubbins requires python v3.8 or higher\n")
+    sys.exit(0)
 
 class VerbosePrinter:
     """Class printing messages if verbose argument is set"""
@@ -95,19 +102,27 @@ def choose_executable_based_on_processor(list_of_executables: list):
         cpu_info = True
         output = subprocess.Popen('grep flags /proc/cpuinfo', stdout=subprocess.PIPE,
                                   shell=True).communicate()[0].decode("utf-8")
-        flags = output.split()
-
-    for executable in list_of_executables:
-        if cpu_info:
-            if 'AVX2' in executable and 'avx2' not in flags:
-                continue
-            elif 'AVX' in executable and 'avx' not in flags:
-                continue
-            elif 'SSE3' in executable and 'ssse3' not in flags:
-                continue
-
-        if which(executable) is not None:
-            return executable
+    elif which("sysctl") is not None:
+        cpu_info = True
+        output = subprocess.Popen('sysctl -a | grep machdep.cpu.features',
+                                  stdout=subprocess.PIPE,
+                                  shell=True).communicate()[0].decode("utf-8")
+    flags = output.lower().split()
+    if cpu_info:
+        # Iterate through list to match with CPU features
+        for executable in list_of_executables:
+            if 'AVX2' in executable and 'avx2' in flags:
+                break
+            elif 'AVX' in executable and 'avx' in flags:
+                break
+            elif 'SSE3' in executable and 'sse3' in flags:
+                break
+    else:
+        # Final executable on list is generic
+        executable = list_of_executables[-1]
+    
+    if which(executable) is not None:
+        return executable
 
     return None
 
@@ -151,3 +166,11 @@ def rename_files(input_to_output_filenames):
     for input_file, output_file in input_to_output_filenames.items():
         if os.path.exists(input_file):
             shutil.move(input_file, output_file)
+
+def generate_shared_mem_array(in_array, smm):
+    """Generates a shared memory representation of a numpy array"""
+    array_raw = smm.SharedMemory(size = in_array.nbytes)
+    array_shared = np.ndarray(in_array.shape, dtype = in_array.dtype, buffer = array_raw.buf)
+    array_shared[:] = in_array[:]
+    array_shared = NumpyShared(name = array_raw.name, shape = in_array.shape, dtype = in_array.dtype)
+    return(array_shared)

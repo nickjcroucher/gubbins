@@ -11,11 +11,15 @@ import subprocess
 import filecmp
 import pprint
 from gubbins.PreProcessFasta import PreProcessFasta
+from gubbins import utils
+
+modules_dir = os.path.dirname(os.path.abspath(utils.__file__))
+data_dir = os.path.join(modules_dir, 'tests', 'data')
 
 class TestPreProcessFasta(unittest.TestCase):
       
   def test_input_file_with_no_duplicate_sequences(self):   
-      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/no_duplicates.aln')
+      preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/no_duplicates.aln'))
       self.assertEqual(preprocessfasta.hash_sequences(), 
        {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1'],
         b'\x9c\xe6\x8b\xf7\xae\xe2\x1f\xf5j\xcfu\xf4\xfdO\x8b\xec': ['sample4'],
@@ -29,10 +33,10 @@ class TestPreProcessFasta(unittest.TestCase):
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),[])
 
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
-      self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/no_duplicates.aln'))
+      self.assertTrue(filecmp.cmp('output.aln', os.path.join(data_dir, 'preprocessfasta/no_duplicates.aln')))
 
   def test_input_file_with_one_duplicate_sequences(self):   
-      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/one_duplicate.aln')
+      preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/one_duplicate.aln'))
       self.assertEqual(preprocessfasta.hash_sequences(), 
        {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1', 'sample3'],
         b'\x9c\xe6\x8b\xf7\xae\xe2\x1f\xf5j\xcfu\xf4\xfdO\x8b\xec': ['sample4'],
@@ -41,10 +45,10 @@ class TestPreProcessFasta(unittest.TestCase):
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1'])
       
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
-      self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_one_duplicate.aln'))
+      self.assertTrue(filecmp.cmp('output.aln', os.path.join(data_dir, 'preprocessfasta/expected_one_duplicate.aln')))
  
   def test_input_file_with_multiple_duplicate_sequences(self):   
-      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/multiple_duplicates.aln')
+      preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/multiple_duplicates.aln'))
       self.assertEqual(preprocessfasta.hash_sequences(), 
        {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1', 'sample3'],
         b'\x9c\xe6\x8b\xf7\xae\xe2\x1f\xf5j\xcfu\xf4\xfdO\x8b\xec': ['sample2', 'sample4']})
@@ -52,11 +56,11 @@ class TestPreProcessFasta(unittest.TestCase):
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1','sample2'])
       
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
-      self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/expected_multiple_duplicates.aln'))
+      self.assertTrue(filecmp.cmp('output.aln', os.path.join(data_dir, 'preprocessfasta/expected_multiple_duplicates.aln')))
       
       
   def test_dont_filter_input_file_with_multiple_duplicate_sequences(self):   
-      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/multiple_duplicates.aln')
+      preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/multiple_duplicates.aln'))
       self.assertEqual(preprocessfasta.hash_sequences(), 
        {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1', 'sample3'],
         b'\x9c\xe6\x8b\xf7\xae\xe2\x1f\xf5j\xcfu\xf4\xfdO\x8b\xec': ['sample2', 'sample4']})
@@ -64,12 +68,12 @@ class TestPreProcessFasta(unittest.TestCase):
       self.assertEqual(preprocessfasta.taxa_of_duplicate_sequences(),['sample1','sample2'])
       
       preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',0)
-      self.assertTrue(filecmp.cmp('output.aln', 'gubbins/tests/data/preprocessfasta/multiple_duplicates.aln'))    
+      self.assertTrue(filecmp.cmp('output.aln', os.path.join(data_dir, 'preprocessfasta/multiple_duplicates.aln')))
       
       
  
   def test_input_file_with_all_duplicate_sequences(self):   
-      preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/all_same_sequence.aln')
+      preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/all_same_sequence.aln'))
       self.assertEqual(preprocessfasta.hash_sequences(), 
        {b"\x840\x89L\xfe\xb5J6%\xf1\x8f\xe2O\xce'.": ['sample1',
                                                       'sample2',
@@ -81,9 +85,9 @@ class TestPreProcessFasta(unittest.TestCase):
                                                       'sample3'])
                                                       
   def test_filter_out_alignments_with_too_much_missing_data(self):
-    preprocessfasta = PreProcessFasta('gubbins/tests/data/preprocessfasta/missing_data.aln', False, 5)
+    preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'preprocessfasta/missing_data.aln'), False, 5)
     preprocessfasta.remove_duplicate_sequences_and_sequences_missing_too_much_data('output.aln',1)
-    self.assertTrue(filecmp.cmp('output.aln','gubbins/tests/data/preprocessfasta/expected_missing_data.aln'))        
+    self.assertTrue(filecmp.cmp('output.aln',os.path.join(data_dir, 'preprocessfasta/expected_missing_data.aln')))
       
   def tearDown(self):
       for file_to_delete in ['output.aln']:

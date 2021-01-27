@@ -1,4 +1,4 @@
-EXTRA_DIST=gubbins/* setup.py scripts/*
+EXTRA_DIST=gubbins/*
 
 all-local:
 	${PYTHON} setup.py build
@@ -14,4 +14,4 @@ clean-local:
 	$(PYTHON) setup.py clean --all
 
 check-local:
-	$(PYTHON) setup.py test
+	pytest --cov=gubbins gubbins/tests/

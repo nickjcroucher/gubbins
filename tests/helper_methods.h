@@ -23,6 +23,7 @@
 int compare_files(char expected_output_filename[],char actual_output_filename[] );
 int file_exists(char * fileName);
 int cp(const char *to, const char *from);
+int number_of_recombinations_in_file(char * fileName);
 #endif
 
 

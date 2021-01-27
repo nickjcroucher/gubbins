@@ -1,0 +1,32 @@
+name: gubbins_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
+dependencies:
+# python
+  - python>=3.8
+# installation
+  - autoconf
+  - automake
+  - pytest
+  - check
+  - libtool
+  - cppunit
+  - pkg-config
+  - wheel
+  - nose
+  - pillow
+# algorithm
+  - scipy
+  - dendropy
+  - biopython
+  - multiprocess
+  - numpy
+# phylogenetics
+  - raxml=8.2.12
+  - iqtree=2.0.3
+  - rapidnj
+  - raxml-ng=1.0.1
+  - fasttree=2.1.10

@@ -120,7 +120,10 @@ def choose_executable_based_on_processor(list_of_executables: list):
     else:
         # Final executable on list is generic
         executable = list_of_executables[-1]
-        return None
+    
+    # Check executable is available
+    if which(executable):
+        return executable
 
     # No executable found
     return None

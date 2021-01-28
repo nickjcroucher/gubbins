@@ -111,12 +111,15 @@ def choose_executable_based_on_processor(list_of_executables: list):
     if cpu_info:
         # Iterate through list to match with CPU features
         for executable in list_of_executables:
-            if 'AVX2' in executable and 'avx2' in flags and which(executable) is not None:
-                return executable
-            elif 'AVX' in executable and 'avx' in flags and which(executable) is not None:
-                return executable
-            elif 'SSE3' in executable and 'sse3' in flags and which(executable) is not None:
-                return executable
+            if 'AVX2' in executable and 'avx2' in flags:
+                if which(executable) is not None:
+                    return executable
+            elif 'AVX' in executable and 'avx' in flags:
+                if which(executable) is not None:
+                    return executable
+            elif 'SSE3' in executable and 'sse3' in flags:
+                if which(executable) is not None:
+                    return executable
             elif which(executable) is not None:
                 return executable
     else:

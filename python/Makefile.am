@@ -14,4 +14,4 @@ clean-local:
 	$(PYTHON) setup.py clean --all
 
 check-local:
-	pytest gubbins/tests/
+	pytest --cov=gubbins gubbins/tests/

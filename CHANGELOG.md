@@ -1,5 +1,18 @@
 # Change Log
 
+## [v3.0.0](https://github.com/sanger-pathogens/gubbins/tree/v3.0.0) (2021-01-27)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v2.4.1...v3.0.0)
+
+**Closed issues:**
+
+- Question: gubbins input? [\#215](https://github.com/sanger-pathogens/gubbins/issues/215)
+
+**Merged pull requests:**
+
+- Upgrade to version 3.0 [\#291](https://github.com/sanger-pathogens/gubbins/pull/291) ([nickjcroucher](https://github.com/nickjcroucher))
+- remove email address [\#287](https://github.com/sanger-pathogens/gubbins/pull/287) ([puethe](https://github.com/puethe))
+- Remove email/phone number in contact us section [\#281](https://github.com/sanger-pathogens/gubbins/pull/281) ([garethpeat](https://github.com/garethpeat))
+
 ## [v2.4.1](https://github.com/sanger-pathogens/gubbins/tree/v2.4.1) (2020-01-20)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v2.4.0-docker2...v2.4.1)
 

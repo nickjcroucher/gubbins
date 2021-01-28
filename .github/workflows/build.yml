@@ -1,9 +1,5 @@
 on:
-    push:
-        branches:
-        - master
-
-name: Push test
+    push
 
 jobs:
 

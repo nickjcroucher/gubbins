@@ -1,7 +1,7 @@
 # Gubbins
 Genealogies Unbiased By recomBinations In Nucleotide Sequences
 
-![build](https://github.com/sanger-pathogens/gubbins/workflows/Push%20test/badge.svg)  
+![build](https://github.com/sanger-pathogens/gubbins/workflows/build/badge.svg)  
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  

@@ -17,7 +17,12 @@ setuptools.setup(
     test_suite='nose.collector',
     tests_require=[
         "nose >= 1.3",
-        "wheel >= 0.34"
+        "wheel >= 0.34",
+        "biopython >= 1.59",
+        "dendropy  >= 4.0.2",
+        "multiprocess >= 0.70",
+        "scipy >= 1.5.3",
+        "numpy >= 1.19"
     ],
     long_description="""\
       Gubbins is a tool that generates a reconstruction of
@@ -33,11 +38,11 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     install_requires=[
-        'biopython >= 1.59',
-        'dendropy  >= 4.0.2',
-        'multiprocess >= 0.70',
-        'scipy >= 1.5.3',
-        'numpy >= 1.19'
+        "biopython >= 1.59",
+        "dendropy  >= 4.0.2",
+        "multiprocess >= 0.70",
+        "scipy >= 1.5.3",
+        "numpy >= 1.19"
     ],
-    license='GPL'
+    license="GPL"
 )

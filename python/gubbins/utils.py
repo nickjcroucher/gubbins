@@ -119,15 +119,14 @@ def choose_executable_based_on_processor(list_of_executables: list):
                 return executable
             elif which(executable) is not None:
                 return executable
-            else:
-                return None
     else:
         # Final executable on list is generic
         executable = list_of_executables[-1]
         if which(executable) is not None:
             return executable
-        else:
-            return None
+
+    # No executable found
+    return None
 
 def replace_executable(command, alternative_executable):
     """Changes the executable in a command"""

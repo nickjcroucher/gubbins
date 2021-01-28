@@ -47,12 +47,6 @@ RUN curl -L https://github.com/stamatak/standard-RAxML/archive/v${raxml_version}
   && cd standard-RAxML-${raxml_version} \
   && make -f Makefile.gcc \
   && make -f Makefile.PTHREADS.gcc \
-  && make -f Makefile.AVX2.gcc \
-  && make -f Makefile.AVX2.PTHREADS.gcc \
-  && make -f Makefile.AVX.gcc \
-  && make -f Makefile.AVX.PTHREADS.gcc \
-  && make -f Makefile.SSE3.gcc \
-  && make -f Makefile.SSE3.PTHREADS.gcc \
   && cp raxml* /usr/local/bin/ \
   && cd .. \
   && rm -rf standard-RAxML-${raxml_version} standard-RAxML-${raxml_version}.tar.gz
@@ -83,6 +77,16 @@ RUN curl -LO https://github.com/johnlees/rapidnj/archive/${rapidnj_version}.zip 
   && cp bin/rapidnj /usr/local/bin \
   && cd .. \
   && rm -rf rapidnj-${rapidnj_version} ${rapidnj_version}.zip
+
+# Install Python dependencies
+RUN pip3 install \
+  pytest \
+  pytest-cov \
+  biopython==1.78 \
+  multiprocess==0.70.11 \
+  scipy==1.6.0 \
+  numpy==1.19.5 \
+  dendropy==4.5.1
 
 # Install Gubbins
 ENV BUILD_DIR /opt/gubbins

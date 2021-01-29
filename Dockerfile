@@ -96,7 +96,5 @@ RUN cd ${BUILD_DIR} \
   && autoreconf -i \
   && ./configure \
   && make \
-  && make check \
   && make install \
-  && cd python \
-  && python3 setup.py install
+  && make check

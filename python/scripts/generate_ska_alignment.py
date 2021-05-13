@@ -1,6 +1,6 @@
 # encoding: utf-8
-# Wellcome Trust Sanger Institute
-# Copyright (C) 2020 Imperial College London
+# Wellcome Trust Sanger Institute and Imperial College London
+# Copyright (C) 2020 Imperial College London and Imperial College London
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -138,7 +138,7 @@ if __name__ == "__main__":
                                         k = args.k,
                                         ref = args.reference),
                                         all_names)
-    
+
     # Generate alignment
     subprocess.check_output('cat ' + ' '.join([seq + '.map.aln' for seq in all_names]) + ' > ' + args.out,
                             shell = True)

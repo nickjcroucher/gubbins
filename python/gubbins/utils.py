@@ -117,6 +117,9 @@ def choose_executable_based_on_processor(list_of_executables: list):
                 break
             elif 'SSE3' in executable and 'sse3' in flags and which(executable):
                 break
+            # to enable selection of raxml-ng-mpi
+            elif '-mpi' in executable and which(executable):
+                break
     else:
         # Final executable on list is generic
         executable = list_of_executables[-1]

@@ -10,6 +10,8 @@ class ValidateFastaAlignment(object):
       self.input_filename = input_filename
 
     def is_input_fasta_file_valid(self):
+      self.check_special_chars_in_names()
+
       try:
           if not self.does_each_sequence_have_the_same_length():
               print("Each sequence must be the same length")
@@ -22,9 +24,10 @@ class ValidateFastaAlignment(object):
               return False
       except:
           return False
-    
+
+
       return True
-    
+
     def does_each_sequence_have_a_name_and_genomic_data(self):
       with  open(self.input_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
@@ -43,11 +46,11 @@ class ValidateFastaAlignment(object):
                   return False
         input_handle.close()
       return True
-    
+
     def does_each_sequence_have_the_same_length(self):
       try:
         with open(self.input_filename) as input_handle:
-    
+
           alignments = AlignIO.parse(input_handle, "fasta")
           sequence_length = -1
           for alignment in alignments:
@@ -63,7 +66,7 @@ class ValidateFastaAlignment(object):
         print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
         return False
       return True
-    
+
     def are_sequence_names_unique(self):
       with open(self.input_filename) as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
@@ -71,9 +74,36 @@ class ValidateFastaAlignment(object):
         for alignment in alignments:
             for record in alignment:
                 sequence_names.append(record.name)
-          
+
         if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
           return False
         input_handle.close()
       return True
+
+    def check_special_chars_in_names(self):
+        # Remove any #s and :s from the isolate names
+        with open(self.input_filename) as input_handle:
+            alignments = AlignIO.parse(input_handle, "fasta")
+            sequence_names = []
+            for alignment in alignments:
+                for record in alignment:
+                    sequence_names.append(record.name)
+            input_handle.close()
+
+        if any(["#" in name for name in sequence_names]) | any([":" in name for name in sequence_names]):
+            print("Removing #s and/or :s from sequence names")
+            with open(self.input_filename, 'r') as input_handle:
+                alignments_seq = AlignIO.read(input_handle, "fasta")
+
+                for record in alignments_seq:
+                    record.name = record.name.replace("#","_").replace(":","_")
+                    record.id = record.id.replace("#", "_").replace(":", "_")
+                    record.description = record.description.replace("#", "_").replace(":", "_")
+
+            with open(self.input_filename, "w") as output_handle:
+                AlignIO.write(alignments_seq,output_handle, "fasta")
+
+        return True
+
+
       

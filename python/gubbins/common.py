@@ -821,7 +821,7 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
 
 def remove_internal_nodes_from_alignment(input_filename):
     # Get the start line of the internal nodes in the alignment
-    start_cmd = "grep -n '^>internal_Node1$ " + input_filename + " | sed 's/\:.*$//g' "
+    start_cmd = "grep -n '^>internal_Node1$' " + input_filename + " | sed 's/\:.*$//g' "
     start_num = subprocess.check_output(start_cmd, shell=True)
     start_num = str(int(start_num.strip().decode("utf-8")) - 1)
 

@@ -322,6 +322,8 @@ def parse_and_run(input_args, program_description=""):
             printer.print("\nReinserting gaps into the alignment...")
             shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
             reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
+            if input_args.seq_recon == "raxmlng":
+                remove_internal_nodes_from_alignment(gaps_alignment_filename)
             if not os.path.exists(gaps_alignment_filename) \
                     or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
                 sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "
@@ -817,6 +819,18 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
+def remove_internal_nodes_from_alignment(input_filename):
+    # Get the start line of the internal nodes in the alignment
+    start_cmd = "grep -n '^>internal_Node1$ " + input_filename + " | sed 's/\:.*$//g' "
+    start_num = subprocess.check_output(start_cmd, shell=True)
+    start_num = str(int(start_num.strip().decode("utf-8")) - 1)
+
+    # Now just use head to take all the lines before this
+    head_cmd = "head -n " + start_num + " " + input_filename + " > tmp_aln.txt && mv tmp_aln.txt " + input_filename
+    try:
+        subprocess.check_call(head_cmd, shell=True)
+    except subprocess.SubprocessError:
+        sys.exit("Command to remove internal nodes from raxmlng ancestral alignment failed")
 
 def remove_internal_node_labels_from_tree(input_filename, output_filename):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)

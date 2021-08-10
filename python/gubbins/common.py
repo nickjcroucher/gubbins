@@ -334,6 +334,8 @@ def parse_and_run(input_args, program_description=""):
 
         # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
+        if i == 3:
+            sys.exit("Stopping at iter 3 to properly run through gubbins command")
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,

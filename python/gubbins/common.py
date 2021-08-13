@@ -327,8 +327,8 @@ def parse_and_run(input_args, program_description=""):
             print(gaps_alignment_filename)
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            if input_args.seq_recon == "raxmlng":
-                remove_internal_nodes_from_alignment(gaps_alignment_filename)
+            # if input_args.seq_recon == "raxmlng":
+            #     remove_internal_nodes_from_alignment(gaps_alignment_filename)
             if not os.path.exists(gaps_alignment_filename) \
                     or not ValidateFastaAlignment(gaps_alignment_filename).is_input_fasta_file_valid():
                 sys.exit("There is a problem with your FASTA file after running internal sequence reconstruction. "

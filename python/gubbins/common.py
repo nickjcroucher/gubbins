@@ -294,8 +294,6 @@ def parse_and_run(input_args, program_description=""):
             os.chdir(temp_working_dir)
             try:
                 print()
-                sys.exit("The seq recon executable is above")
-                print()
                 subprocess.check_call(sequence_reconstruction_command, shell=True)
             except subprocess.SubprocessError:
                 sys.exit("Failed while reconstructing the ancestral sequences.")

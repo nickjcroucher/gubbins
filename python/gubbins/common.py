@@ -346,9 +346,7 @@ def parse_and_run(input_args, program_description=""):
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
-        if i == 1:
-            print(gubbins_command)
-            sys.exit("Stopping at iter 3 to properly run through gubbins command")
+        
         try:
             subprocess.check_call(gubbins_command, shell=True)
         except subprocess.SubprocessError:

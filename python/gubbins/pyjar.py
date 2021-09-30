@@ -46,16 +46,22 @@ def read_alignment(filename, file_type, verbose=False):
 #Calculate Pij from Q matrix and branch length
 def calculate_pij(branch_length,rate_matrix):
     if branch_length==0:
-        return numpy.array([[1, 0, 0, 0,], [0, 1, 0, 0,], [0, 0, 1, 0,], [0, 0, 0, 1,]])
+        return numpy.array([[0.0, float("-inf"), float("-inf"), float("-inf"),],
+                            [float("-inf"), 0.0, float("-inf"), float("-inf"),],
+                            [float("-inf"), float("-inf"), 0.0, float("-inf"),],
+                            [float("-inf"), float("-inf"), float("-inf"), 0.0,]])
     else:
-        return numpy.log(linalg.expm(numpy.multiply(branch_length,rate_matrix)))
+        return numpy.log(linalg.expm(numpy.multiply(branch_length,rate_matrix))) # modified
 
 #Read the tree file and root
 def read_tree(treefile):
     if not os.path.isfile(treefile):
         print("Error: tree file does not exist")
         sys.exit()
-    t=dendropy.Tree.get(path=treefile, schema="newick", preserve_underscores=True, rooting="force-rooted")
+    t=dendropy.Tree.get(path=treefile,
+                        schema="newick",
+                        preserve_underscores=True,
+                        rooting="force-rooted")
     return t
 
 # Read the RAxML info file to get rates and frequencies
@@ -239,7 +245,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
     
     # Iterate over columns
     for column,base_pattern_columns_padded in zip(columns,column_positions):
-    
+
         ### TIMING
         if verbose:
             calc_time_start = time.process_time()
@@ -285,6 +291,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                         
                             #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
                             node.L={"A": pij[base_matrix["A"]][base_matrix[base[taxon]]], "C": pij[base_matrix["C"]][base_matrix[base[taxon]]], "G": pij[base_matrix["G"]][base_matrix[base[taxon]]], "T": pij[base_matrix["T"]][base_matrix[base[taxon]]]}
+
                         else:
                             
                             node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
@@ -327,7 +334,6 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                     c+=child.L[end]
                 for start in columnbases:
                     j=log(base_frequencies[base_matrix[end]])+c
-
                     if j>node.L[start]:
                         node.L[start]=j
                         node.C[start]=end
@@ -339,7 +345,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                     max_root_base_likelihood=node.L[root_base]
                     max_root_base=node.C[root_base]
             node.r=max_root_base
-            
+
             #Traverse the tree from the root in the direction of the OTUs, assigning to each node its most likely ancestral character as follows:
             for node in tree.preorder_node_iter():
             
@@ -354,8 +360,6 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             rootlens=[]
             for child in tree.seed_node.child_node_iter():
                 rootlens.append([child.edge_length,child,child.r])
-            rootlens.sort(key = lambda x: x[0])
-            tree.seed_node.r=rootlens[-1][1].r
             
             ### TIMING
             if verbose:

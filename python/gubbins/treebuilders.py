@@ -629,8 +629,7 @@ class RAxMLNG:
         self.citation = "https://doi.org/10.1093/bioinformatics/btz305"
         
         # Set parallelisation
-        if self.threads > 1:
-            command.extend(["--threads", str(self.threads)])
+        command.extend(["--threads", str(self.threads)])
 
         # Add model
         command.extend(["-model"])

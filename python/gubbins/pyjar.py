@@ -20,7 +20,7 @@ try:
     NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
 except ImportError as e:
     sys.stderr.write("This version of Gubbins requires the multiprocessing library and python v3.8 or higher for memory management\n")
-    sys.exit(0)
+    sys.exit(201)
 
 from gubbins.utils import generate_shared_mem_array
 
@@ -31,16 +31,17 @@ from gubbins.utils import generate_shared_mem_array
 def read_alignment(filename, file_type, verbose=False):
     if not os.path.isfile(filename):
         print("Error: alignment file " + filename + " does not exist")
-        sys.exit()
+        sys.exit(202)
     if verbose:
         print("Trying to open file " + filename + " as " + file_type)
     try:
-        alignmentObject = AlignIO.read(open(filename), file_type)
+        with open(filename,'r') as aln_in:
+            alignmentObject = AlignIO.read(aln_in, file_type)
         if verbose:
             print("Alignment read successfully")
     except:
         print("Cannot open alignment file " + filename + " as " + file_type)
-        sys.exit()
+        sys.exit(203)
     return alignmentObject
 
 #Calculate Pij from Q matrix and branch length
@@ -57,7 +58,7 @@ def calculate_pij(branch_length,rate_matrix):
 def read_tree(treefile):
     if not os.path.isfile(treefile):
         print("Error: tree file does not exist")
-        sys.exit()
+        sys.exit(204)
     t=dendropy.Tree.get(path=treefile,
                         schema="newick",
                         preserve_underscores=True,
@@ -69,11 +70,11 @@ def read_info(infofile, type = 'raxml'):
 
     if not os.path.isfile(infofile):
         print("Error: model information file " + infofile + " does not exist")
-        sys.exit()
+        sys.exit(205)
     
     if type not in ['raxml', 'raxmlng', 'iqtree','fasttree']:
         sys.stderr.write('Only able to parse GTR-type models from raxml, iqtree or fasttree')
-        sys.exit()
+        sys.exit(206)
     
     r=[-1.0] * 6 # initialise rates
     f=[-1.0] * 4 # initialise frequencies
@@ -152,7 +153,7 @@ def read_info(infofile, type = 'raxml'):
     # Check frequencies and rates have been extracted correctly
     if -1.0 in f or -1.0 in r:
         sys.stderr.write('Problem with extracting model parameters - frequencies are ' + str(f) + ' and rates are ' + str(r))
-        sys.exit()
+        sys.exit(207)
 
     return f, r
 
@@ -299,7 +300,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                         
                     except KeyError:
                         print("Cannot find", taxon, "in base")
-                        sys.exit()
+                        sys.exit(208)
                 
                 else:
                     node.L={}
@@ -484,7 +485,7 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
             node.taxon=tree.taxon_namespace.get_taxon(nodename)
             if nodename in alignment_sequence_names:
                 print(nodename, "already in alignment. Quitting")
-                sys.exit()
+                sys.exit(209)
             ancestral_node_names.append(nodename) # index for reconstruction
         if node.parent_node != None:
             node.pij=calculate_pij(node.edge_length, rm)
@@ -557,10 +558,17 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
                     continue
 
         # Print tree
+        from gubbins.common import tree_as_string
+        
         if verbose:
             print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
         with open(output_prefix+".joint.tre", "w") as tree_output:
-            print(tree.as_string(schema="newick", suppress_rooting=True, unquoted_underscores=True, suppress_internal_node_labels=True).replace("'",""), file=tree_output)
+        
+            recon_tree = tree_as_string(tree,
+                                        suppress_rooting=True,
+                                        suppress_internal=False)
+            print(recon_tree.replace('\'', ''),
+                  file = tree_output)
         
     if verbose:
         print("Done")

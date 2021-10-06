@@ -755,6 +755,17 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn):
     new_tree_string = tree_as_string(new_tree,
                                         suppress_internal=False,
                                         suppress_rooting=False)
+
+    # Check both trees are topologically identical
+    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(tree_for_root,
+                                                                                    new_tree,
+                                                                                    is_bipartitions_updated=False)
+    
+    if len(missing_bipartitions) > 0:
+        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.exit(1)
+
+    # Write output
     with open(new_tree_fn, 'w+') as output_file:
         output_file.write(new_tree_string.replace('\'', ''))
 
@@ -854,12 +865,25 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
                                                     taxon_namespace=taxa,
                                                     rooting='force-rooted')
     destination_tree.encode_bipartitions()
+    
+    # Check both trees are topologically identical
+    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(source_tree,
+                                                                                    destination_tree,
+                                                                                    is_bipartitions_updated=False)
+    if len(missing_bipartitions) > 0:
+        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.exit(1)
+    
     root_alternative = ''
-    for index, destination_internal_node in enumerate(destination_tree.internal_nodes()):
+    for destination_internal_node in destination_tree.internal_nodes():
         if destination_internal_node != destination_tree.seed_node or use_root:
             node_bipartition = destination_internal_node.edge.bipartition
             if sequence_reconstructor == 'pyjar':
-                new_label = source_internal_node_dict[node_bipartition]
+                try:
+                    new_label = source_internal_node_dict[node_bipartition]
+                except:
+                    sys.stderr.write('Unable to find bipartition ' + str(node_bipartition) + '\n')
+                    sys.exit(1)
             else:
                 new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_dict[node_bipartition]))
             destination_internal_node.label = None

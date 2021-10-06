@@ -706,7 +706,6 @@ def reroot_tree_with_outgroup(tree_name, outgroups):
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
-
 def reroot_tree_at_midpoint(tree_name):
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
     split_all_non_bi_nodes(tree.seed_node)

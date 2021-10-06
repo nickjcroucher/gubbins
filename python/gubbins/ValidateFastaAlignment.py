@@ -6,6 +6,7 @@ from collections import Counter
 from Bio.Align import MultipleSeqAlignment
 
 class ValidateFastaAlignment(object):
+
     def __init__(self, input_filename):
       self.input_filename = input_filename
 
@@ -22,9 +23,8 @@ class ValidateFastaAlignment(object):
               return False
       except:
           return False
-    
       return True
-    
+
     def does_each_sequence_have_a_name_and_genomic_data(self):
       with  open(self.input_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
@@ -33,21 +33,19 @@ class ValidateFastaAlignment(object):
             for record in alignment:
                 number_of_sequences +=1
                 if record.name is None or record.name == "":
-                  print("Error with the input FASTA file: One of the sequence names is blank")
+                  sys.stderr.write("Error with the input FASTA file: " + record.name + " is blank\n")
                   return False
                 if record.seq is None or record.seq == "":
-                  print("Error with the input FASTA file: One of the sequences is empty")
+                  sys.stderr.write("Error with the input FASTA file: " + record.name + " is empty\n")
                   return False
                 if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
-                  print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
+                  sys.stderr.write("Error with the input FASTA file: " + record.name + " contains disallowed characters, only ACGTNacgtn- are permitted\n")
                   return False
-        input_handle.close()
       return True
-    
+
     def does_each_sequence_have_the_same_length(self):
       try:
         with open(self.input_filename) as input_handle:
-    
           alignments = AlignIO.parse(input_handle, "fasta")
           sequence_length = -1
           for alignment in alignments:
@@ -63,17 +61,25 @@ class ValidateFastaAlignment(object):
         print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
         return False
       return True
-    
+
     def are_sequence_names_unique(self):
-      with open(self.input_filename) as input_handle:
-        alignments = AlignIO.parse(input_handle, "fasta")
-        sequence_names = []
-        for alignment in alignments:
+        any_modified_names = False
+        with open(self.input_filename) as input_handle:
+            alignment = AlignIO.read(input_handle, "fasta")
+            sequence_names = []
             for record in alignment:
+                # Remove disallowed characters
+                if '#' in record.name or '#' in record.name:
+                    record.name = record.name.replace("#","_").replace(":","_")
+                    record.id = record.id.replace("#", "_").replace(":", "_")
+                    record.description = record.description.replace("#", "_").replace(":", "_")
+                    any_modified_names = True
+                # Store modified names
                 sequence_names.append(record.name)
-          
         if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
           return False
-        input_handle.close()
-      return True
+        # Update alignment if names changed
+        with open(self.input_filename, "w") as output_handle:
+            AlignIO.write(alignment,output_handle, "fasta")
+        return True
       

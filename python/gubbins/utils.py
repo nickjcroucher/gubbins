@@ -108,18 +108,18 @@ def choose_executable_based_on_processor(list_of_executables: list):
                                   stdout=subprocess.PIPE,
                                   shell=True).communicate()[0].decode("utf-8")
     flags = output.lower().split()
-    if cpu_info:
-        # Iterate through list to match with CPU features
-        for executable in list_of_executables:
-            if 'AVX2' in executable and 'avx2' in flags and which(executable):
-                break
-            elif 'AVX' in executable and 'avx' in flags and which(executable):
-                break
-            elif 'SSE3' in executable and 'sse3' in flags and which(executable):
-                break
-    else:
-        # Final executable on list is generic
-        executable = list_of_executables[-1]
+
+    # Iterate through list to match with CPU features
+    for executable in list_of_executables:
+        if cpu_info and 'AVX2' in executable and 'avx2' in flags and which(executable):
+            break
+        elif cpu_info and 'AVX' in executable and 'avx' in flags and which(executable):
+            break
+        elif cpu_info and 'SSE3' in executable and 'sse3' in flags and which(executable):
+            break
+        # to enable selection of raxml-ng-mpi
+        elif '-mpi' in executable and which(executable):
+            break
 
     # Check executable is available
     if which(executable):

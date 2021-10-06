@@ -629,8 +629,7 @@ class RAxMLNG:
         self.citation = "https://doi.org/10.1093/bioinformatics/btz305"
         
         # Set parallelisation
-        if self.threads > 1:
-            command.extend(["--threads", str(self.threads)])
+        command.extend(["--threads", str(self.threads)])
 
         # Add model
         command.extend(["-model"])
@@ -706,6 +705,7 @@ class RAxMLNG:
 
     def convert_raw_ancestral_states_to_fasta(self, input_filename, output_filename):
         """Converts the file containing ancestral sequences into FASTA format"""
+        # Use the IUPAC codes from here: https://www.bioinformatics.org/sms/iupac.html
         with open(input_filename, 'r') as infile:
             with open(output_filename, 'w+') as outfile:
                 for sequence_line in infile:
@@ -714,7 +714,13 @@ class RAxMLNG:
                                                                              'R': 'N',
                                                                              'Y': 'N',
                                                                              'S': 'N',
-                                                                             'W': 'N'
+                                                                             'W': 'N',
+                                                                             'K': 'N',
+                                                                             'M': 'N',
+                                                                             'B': 'N',
+                                                                             'D': 'N',
+                                                                             'H': 'N',
+                                                                             'V': 'N'
                                                                             }
                                                                      )
                                                               )

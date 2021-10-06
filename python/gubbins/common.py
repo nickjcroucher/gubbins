@@ -256,8 +256,9 @@ def parse_and_run(input_args, program_description=""):
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
             recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)
-            # Arbitrary rooting of tree
-            reroot_tree_at_midpoint(recontree_filename)
+            # Set root of reconstruction tree to match that of the current tree
+            # Cannot just midpoint root both, because the branch lengths differ between them
+            harmonise_roots(recontree_filename, temp_rooted_tree)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
@@ -271,8 +272,12 @@ def parse_and_run(input_args, program_description=""):
                 verbose = input_args.verbose)
             gaps_alignment_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.tre"
-            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
-                                                  current_tree_name_with_internal_nodes, "pyjar")
+            printer.print(["\nTransferring pyjar results onto original recombination-corrected tree"])
+            transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename,
+                                                  temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes,
+                                                  "pyjar")
+            printer.print(["\nDone transfer"])
 
         else:
 
@@ -309,10 +314,12 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
             elif input_args.seq_recon == "iqtree" or input_args.seq_recon == "raxmlng":
                 # IQtree returns an unrooted tree
-                temp_unrooted_tree = temp_working_dir + "/" + current_tree_name + ".unrooted"
-                unroot_tree(temp_rooted_tree, temp_unrooted_tree)
-                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_unrooted_tree,
-                                                  current_tree_name_with_internal_nodes, sequence_reconstructor)
+                harmonise_roots(raw_internal_rooted_tree_filename, temp_rooted_tree)
+                transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename,
+                                                 temp_rooted_tree,
+                                                  current_tree_name_with_internal_nodes,
+                                                  sequence_reconstructor,
+                                                  use_root = False)
             else:
                 sys.stderr.write("Unrecognised sequence reconstruction command: " + input_args.seq_recon + '\n')
                 sys.exit()
@@ -699,7 +706,6 @@ def reroot_tree_with_outgroup(tree_name, outgroups):
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
-
 def reroot_tree_at_midpoint(tree_name):
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
     split_all_non_bi_nodes(tree.seed_node)
@@ -717,6 +723,50 @@ def unroot_tree(input_filename, output_filename):
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
+
+def harmonise_roots(new_tree_fn, tree_for_root_fn):
+    # Read in tree and get nodes adjacent to root
+    taxa = dendropy.TaxonNamespace()
+    tree_for_root = dendropy.Tree.get_from_path(tree_for_root_fn,
+                                                'newick',
+                                                preserve_underscores=True,
+                                                taxon_namespace=taxa,
+                                                rooting="force-rooted")
+    tree_for_root.encode_bipartitions()
+    root = tree_for_root.seed_node
+    root_adjacent_bipartitions = []
+    for root_adjacent_node in root.child_nodes():
+        root_adjacent_bipartitions.append(root_adjacent_node.edge.bipartition)
+    # Now search the new tree for these nodes
+    new_tree = dendropy.Tree.get_from_path(new_tree_fn,
+                                            'newick',
+                                            preserve_underscores=True,
+                                            taxon_namespace=taxa,
+                                            rooting="force-rooted")
+    new_tree.encode_bipartitions()
+    for node in new_tree.preorder_node_iter():
+        if node.edge.bipartition in root_adjacent_bipartitions:
+            half_branch_length = node.edge_length/2
+            new_tree.reroot_at_edge(node.edge,
+                                    length1 = half_branch_length,
+                                    length2 = half_branch_length)
+            break
+    new_tree_string = tree_as_string(new_tree,
+                                        suppress_internal=False,
+                                        suppress_rooting=False)
+
+    # Check both trees are topologically identical
+    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(tree_for_root,
+                                                                                    new_tree,
+                                                                                    is_bipartitions_updated=False)
+    
+    if len(missing_bipartitions) > 0:
+        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.exit(1)
+
+    # Write output
+    with open(new_tree_fn, 'w+') as output_file:
+        output_file.write(new_tree_string.replace('\'', ''))
 
 def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
@@ -791,32 +841,70 @@ def get_monophyletic_outgroup(tree_name, outgroups):
 
 
 def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename,
-                                          sequence_reconstructor):
-
+                                          sequence_reconstructor, use_root = True):
     # read source tree and extract node labels, to match with the ancestral sequence reconstruction
-    source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
-    source_internal_node_labels = []
+    taxa = dendropy.TaxonNamespace()
+    source_tree = dendropy.Tree.get_from_path(source_tree_filename,
+                                              'newick',
+                                              preserve_underscores=True,
+                                              taxon_namespace=taxa,
+                                              rooting='force-rooted')
+    source_tree.encode_bipartitions()
+    source_internal_node_dict = {}
     for source_internal_node in source_tree.internal_nodes():
+        node_bipartition = source_internal_node.edge.bipartition
         if source_internal_node.label:
-            source_internal_node_labels.append(source_internal_node.label)
+            source_internal_node_dict[node_bipartition] = source_internal_node.label
         else:
-            source_internal_node_labels.append('')
-
+            source_internal_node_dict[node_bipartition] = ''
     # read original tree and add in the labels from the ancestral sequence reconstruction
-    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
-    for index, destination_internal_node in enumerate(destination_tree.internal_nodes()):
-        if sequence_reconstructor == 'pyjar':
-            new_label = str(source_internal_node_labels[index])
-        else:
-            new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_labels[index]))
-        destination_internal_node.label = None
-        destination_internal_node.taxon = dendropy.Taxon(new_label)
+    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename,
+                                                    'newick',
+                                                    preserve_underscores=True,
+                                                    taxon_namespace=taxa,
+                                                    rooting='force-rooted')
+    destination_tree.encode_bipartitions()
+    
+    # Check both trees are topologically identical
+    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(source_tree,
+                                                                                    destination_tree,
+                                                                                    is_bipartitions_updated=False)
+    if len(missing_bipartitions) > 0:
+        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.exit(1)
+    
+    root_alternative = ''
+    for destination_internal_node in destination_tree.internal_nodes():
+        if destination_internal_node != destination_tree.seed_node or use_root:
+            node_bipartition = destination_internal_node.edge.bipartition
+            if sequence_reconstructor == 'pyjar':
+                try:
+                    new_label = source_internal_node_dict[node_bipartition]
+                except:
+                    sys.stderr.write('Unable to find bipartition ' + str(node_bipartition) + '\n')
+                    sys.exit(1)
+            else:
+                new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_dict[node_bipartition]))
+            destination_internal_node.label = None
+            destination_internal_node.taxon = dendropy.Taxon(new_label)
 
     # output final tree
-    output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
-    with open(output_tree_filename, 'w+') as output_file:
-        output_file.write(output_tree_string.replace('\'', ''))
+    if not use_root:
+        alt_root_name = ''
+        for root_child_node in destination_tree.seed_node.child_nodes():
+            alt_root_name = root_child_node.taxon.label
+            break
+        destination_tree.seed_node.label = None
+        destination_tree.seed_node.taxon = dendropy.Taxon(alt_root_name)
+    destination_tree_string = destination_tree.as_string(schema="newick",
+                                                            suppress_rooting=True,
+                                                            unquoted_underscores=True,
+                                                            suppress_internal_node_labels=True).replace("'","").replace('\'', '')
 
+    with open(output_tree_filename, 'w+') as output_file:
+        print(destination_tree_string,
+                 file=output_file,
+                 end='')
 
 def remove_internal_node_labels_from_tree(input_filename, output_filename):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)

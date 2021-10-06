@@ -43,7 +43,7 @@ class ValidateFastaAlignment(object):
                   return False
                 if re.search('[^ACGTNacgtn-]', str(record.seq))  != None:
                   print("Error with the input FASTA file: One of the sequences contains odd characters, only ACGTNacgtn- are permitted")
-                  print(record.id)
+                  print(record.id + "contains a non-IUPAC character")
                   return False
         input_handle.close()
       return True

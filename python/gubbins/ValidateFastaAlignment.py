@@ -79,7 +79,8 @@ class ValidateFastaAlignment(object):
         if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
           return False
         # Update alignment if names changed
-        with open(self.input_filename, "w") as output_handle:
-            AlignIO.write(alignment,output_handle, "fasta")
+        if any_modified_names:
+            with open(self.input_filename, "w") as output_handle:
+                AlignIO.write(alignment,output_handle, "fasta")
         return True
       

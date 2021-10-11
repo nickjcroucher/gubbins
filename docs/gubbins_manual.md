@@ -130,9 +130,9 @@ The robustness of the final tree can be assessed using [bootstraps](https://onli
 
 ### Nucleotide substitution model options
 
-The available nucleotide substitution models are:
+The selected nucleotide substitution model is used for both constructing the tree, and estimating the branch lengths and model parameters for the ancestral state reconstruction. The available nucleotide substitution models are:
 
-- **JC** - Jukes-Cantor - all model-fitting software
+- **JC** - Jukes-Cantor - all phylogenetic software
 
 - **K2P** - Kimura 2-parameter - available for RAxML, RAxML-NG, IQtree and Rapidnj
 
@@ -144,7 +144,7 @@ The available nucleotide substitution models are:
 
 - **GTRCAT** - General time reversible with a categorisation of between-site rate heterogeneity - available for RAxML
 
-The model fitting software must be consistent with the selected model - by default, the fitting software will be the same as the tree builder, but this can be changed with `--model-fitter` and `--first-model-fitter`. To reduce run time, it may be most efficient to use a simple model (e.g. `--first-model JC`) for the first tree, which is likely to be inaccurate, and a more realistic model (e.g. `--model GTR`) for later trees.
+The tree building and model fitting software must be consistent with the selected model - by default, the fitting software will be the same as the tree builder, but this can be changed with `--model-fitter` and `--first-model-fitter`. To reduce run time, it may be most efficient to use a simple model (e.g. `--first-model JC`) for the first tree, which is likely to be inaccurate, and a more realistic model (e.g. `--model GTR`) for later trees.
 
 ```
   --model-fitter {raxml,raxmlng,iqtree,fasttree,None}, -F {raxml,raxmlng,iqtree,fasttree,None}

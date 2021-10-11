@@ -52,7 +52,7 @@ Phylogenetic software:
 * [FastTree](https://doi.org/10.1371/journal.pone.0009490)
 * [Rapidnj](https://doi.org/10.1007/978-3-540-87361-7_10)
 
-Python modules
+Python modules:
 * Biopython (> 1.59),
 * DendroPy (>=4.0)
 * Scipy

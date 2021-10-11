@@ -124,7 +124,7 @@ To run Gubbins with default settings:
 
     run_gubbins.py [FASTA alignment]
 
-Information on on further options can be found in the [manual](docs/gubbins_manual.html).
+Information on on further options can be found in the [manual](docs/gubbins_manual.md).
 
 ## License
 Gubbins is free software, licensed under [GPLv2](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE).

@@ -211,7 +211,7 @@ A successful Gubbins run will generate files with the suffixes:
 
 - `.branch_base_reconstruction.embl` -	Base substitution reconstruction in EMBL format
 
-- `.summary_of_snp_distribution.vcf` -	VCF file summarising the distribution of SNPs
+- `.summary_of_snp_distribution.vcf` -	VCF file summarising the distribution of point mutations
 
 - `.per_branch_statistics.csv` -	per branch reporting of the base substitutions inside and outside recombination events
 
@@ -231,17 +231,31 @@ To generate a recombination-masked alignment (i.e., with sequences predicted to 
 mask_gubbins_aln.py --aln out.aln --gff out.recombination_predictions.gff --out out.masked.aln
 ```
 
+## Output statistics
+
+The `.per_branch_statistics.csv` file contains summary statistics for each branch in the tree in comma delimited format. For each branch, the following statistics are reported:
+
+* **Node** - Name of the node subtended by the branch. This can either be one of the taxa included in the input alignment, or an internal node, which are numbered 
+* **Total SNPs** - Total number of base substitutions reconstructed onto the branch
+* **Num of SNPs inside recombinations** - Number of base substitutions reconstructed onto the branch that fall within a predicted recombination (*r*)
+* **Num of SNPs outside recombinations** - Number of base substitutions reconstructed onto the branch that fall outside of a predicted recombination. i.e. predicted to have arisen by point mutation (*m*)
+* **Num of Recombination Blocks** - Total number of recombination blocks reconstructed onto the branch
+* **Bases in recombinations** - Total length of all recombination events reconstructed onto the branch
+* ***r/m*** - The r/m value for the branch. This value gives a measure of the relative impact of recombination and mutation on the variation accumulated on the branch
+* ***rho/theta*** - The ratio of the number of recombination events to point mutations on a branch; a measure of the relative rates of recombination and point mutation
+* **Genome Length** - The total number of aligned bases between the ancestral and descendent nodes for the branch excluding any missing data or gaps in either
+
 ## Examples
 
 Two example alignments can be downloaded from http://sanger-pathogens.github.io/gubbins/:
 
-- [*Streptococcus pneumoniae* PMEN1](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
+- ***Streptococcus pneumoniae*** **PMEN1** (available from ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
 
 ![](../example_data/PMEN1/PMEN1_Phandango_output.png)
 
 This used the command `run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln` and took ~20s on a single CPU.
 
-- [*Staphylococcus aureus* ST239](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
+- ***Staphylococcus aureus*** **ST239** (available from ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
 
 ![](../example_data/ST239/ST239_Phandango_output.png)
 

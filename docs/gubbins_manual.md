@@ -28,7 +28,7 @@ Iterations continue until the same tree is observed in multiple iterations, or t
 
 ## Installation and dependencies
 
-Gubbins is a command line program designed to be run on Linux or Max OSX systems and requires Python version 3.8 or greater. Gubbins can also be run on Windows operating systems using the Powershell within Windows >=10, a Bio-Linux virtual machine. The recommended installation approach is to use conda:
+Gubbins is a command line program designed to be run on Linux or Mac OSX systems and requires Python version 3.8 or greater. Gubbins can also be run on Windows operating systems using the Powershell within Windows >=10, a Bio-Linux virtual machine. The recommended installation approach is to use conda:
 
 ```
 conda config --add channels r

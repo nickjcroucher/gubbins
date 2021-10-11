@@ -6,7 +6,6 @@ ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz
 and was run through gubbins with all of the default parameters:
 ```
 gunzip PMEN1.aln.gz
-run_gubbins.py PMEN1.aln
+run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln
 ```
-This directory contains the output files generated.
-It required 60 Mbytes of memory and took 50 seconds to run.
+This directory contains the output files generated. The analysis took ~20 seconds to run.

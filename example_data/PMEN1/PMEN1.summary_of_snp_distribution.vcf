@@ -1,10 +1,9 @@
 ##fileformat=VCFv4.2
 ##contig=<ID=1,length=2221315>
 ##FORMAT=<ID=AB,Number=1,Type=String,Description="Alt Base">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	2682	1731	1788	3350	3355	1842	2097	2098	1789	2699	3267									
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	2682	1731	1788	3350	3355	1842	2097	2098	1789	2699	3267										
 1	26360	.	G	T	.	.	.	AB	G	G	G	G	G	G	G	G	G	T	G	
 1	64558	.	C	T	.	.	.	AB	C	C	C	C	C	C	C	T	C	C	C	
-1	76580	.	C	-,T	.	.	.	AB	C	-	T	T	T	T	T	T	T	T	T	
 1	86778	.	T	G	.	.	.	AB	T	T	T	T	T	T	T	T	T	T	G	
 1	92756	.	T	C	.	.	.	AB	T	C	C	C	C	C	C	C	C	C	C	
 1	97487	.	T	A	.	.	.	AB	T	T	T	T	T	T	T	T	T	A	A	
@@ -13,14 +12,18 @@
 1	107744	.	G	T	.	.	.	AB	G	G	G	G	G	G	G	G	T	G	G	
 1	123642	.	T	-,G	.	.	.	AB	T	T	T	T	-	T	T	T	G	T	T	
 1	123916	.	C	T,-	.	.	.	AB	C	T	C	C	C	T	C	C	-	C	C	
-1	124659	.	T	N,C	.	.	.	AB	T	T	T	T	T	T	T	N	C	T	N	
+1	124659	.	T	C,N	.	.	.	AB	T	T	T	T	T	T	T	C	C	T	N	
+1	124698	.	G	A,-,N	.	.	.	AB	G	G	G	G	G	G	G	A	-	G	N	
+1	124732	.	A	G,-,N	.	.	.	AB	A	A	A	A	A	A	A	G	-	A	N	
+1	124815	.	G	A,-	.	.	.	AB	G	G	G	G	G	G	G	A	-	G	G	
+1	124841	.	T	C,-	.	.	.	AB	T	T	T	T	T	T	T	C	-	T	T	
 1	139420	.	T	-,C	.	.	.	AB	T	T	-	C	-	-	C	C	-	C	C	
 1	190832	.	G	A	.	.	.	AB	G	G	G	G	G	A	G	G	G	G	G	
 1	229680	.	C	T	.	.	.	AB	C	C	C	T	T	T	C	C	C	C	C	
 1	261320	.	G	A	.	.	.	AB	G	G	G	G	G	G	G	G	G	G	A	
 1	282339	.	G	A,-	.	.	.	AB	G	G	A	A	-	A	A	A	A	A	A	
 1	305966	.	C	T	.	.	.	AB	C	C	C	C	C	C	C	T	C	C	C	
-1	306989	.	C	T,-,N	.	.	.	AB	C	C	C	T	T	C	C	-	-	C	C	
+1	306989	.	C	T,-	.	.	.	AB	C	C	C	T	T	C	C	-	-	C	C	
 1	308427	.	G	A	.	.	.	AB	G	G	A	G	G	G	G	G	G	G	G	
 1	356249	.	C	T	.	.	.	AB	C	C	C	C	C	C	C	C	T	C	C	
 1	381285	.	G	T	.	.	.	AB	G	G	G	G	G	G	G	T	G	G	G	
@@ -104,13 +107,7 @@
 1	1711360	.	T	G,-	.	.	.	AB	T	G	-	T	T	T	T	T	T	T	T	
 1	1712429	.	G	A	.	.	.	AB	G	G	G	G	G	G	G	A	G	G	G	
 1	1715682	.	G	A	.	.	.	AB	G	G	G	G	G	G	G	G	G	G	A	
-1	1722140	.	G	A	.	.	.	AB	G	G	A	A	A	A	A	A	A	A	A	
-1	1722142	.	C	T	.	.	.	AB	C	C	T	T	T	T	T	T	T	T	T	
-1	1722145	.	G	A	.	.	.	AB	G	G	A	A	A	A	A	A	A	A	A	
-1	1722151	.	G	-,T	.	.	.	AB	G	-	T	T	T	T	T	T	T	T	T	
-1	1722157	.	C	T	.	.	.	AB	C	C	T	T	T	T	T	T	T	T	T	
-1	1722505	.	A	T	.	.	.	AB	A	A	A	A	A	A	A	A	A	T	A	
-1	1723519	.	-	C,T	.	.	.	AB	-	C	T	T	T	T	T	T	T	T	T	
+1	1722505	.	N	A,T	.	.	.	AB	N	N	A	A	A	A	A	A	A	T	A	
 1	1723711	.	-	A,C	.	.	.	AB	-	-	A	A	A	A	C	A	A	A	A	
 1	1844749	.	G	C	.	.	.	AB	G	G	G	C	C	G	G	G	G	G	G	
 1	1875498	.	G	A	.	.	.	AB	G	G	G	G	G	G	G	A	G	G	G	
@@ -129,6 +126,7 @@
 1	2028538	.	C	T,-	.	.	.	AB	C	C	C	T	-	T	C	C	C	C	C	
 1	2033600	.	T	C	.	.	.	AB	T	T	T	T	T	T	T	C	T	T	T	
 1	2103509	.	A	G	.	.	.	AB	A	G	G	G	G	G	G	G	G	G	G	
+1	2110724	.	N	G,-,A	.	.	.	AB	N	N	G	G	-	G	G	G	A	G	G	
 1	2136876	.	C	A	.	.	.	AB	C	C	C	C	C	C	C	C	C	C	A	
 1	2138665	.	T	G	.	.	.	AB	T	T	T	T	T	T	T	T	T	T	G	
 1	2153074	.	A	G	.	.	.	AB	A	G	G	G	G	G	G	G	G	G	G	

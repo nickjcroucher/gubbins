@@ -249,13 +249,13 @@ The `.per_branch_statistics.csv` file contains summary statistics for each branc
 
 Two example alignments can be downloaded from http://sanger-pathogens.github.io/gubbins/:
 
-- ***Streptococcus pneumoniae*** **PMEN1** [(download)](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
+- ***Streptococcus pneumoniae*** **PMEN1** [ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
 
 ![](../example_data/PMEN1/PMEN1_Phandango_output.png)
 
 This used the command `run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln` and took ~20s on a single CPU.
 
-- ***Staphylococcus aureus*** **ST239** [(download)](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
+- ***Staphylococcus aureus*** **ST239** [ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
 
 ![](../example_data/ST239/ST239_Phandango_output.png)
 

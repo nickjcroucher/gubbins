@@ -1,11 +1,3 @@
----
-title: "Gubbins v3 Manual"
-author: "Nicholas Croucher"
-date: "11th October, 2021"
-output: html_document
-urlcolor: blue
----
-
 # Analysing whole genome alignments with Gubbins
 
 ## Introduction
@@ -245,13 +237,13 @@ Two example alignments can be downloaded from http://sanger-pathogens.github.io/
 
 - [*Streptococcus pneumoniae* PMEN1](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
 
-![](example_data/PMEN1/PMEN1_Phandango_output.png)
+![](PMEN1_Phandango_output.png)
 
 This used the command `run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln` and took ~20s on a single CPU.
 
 - [*Staphylococcus aureus* ST239](ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
 
-![](example_data/ST239/ST239_Phandango_output.png)
+![](ST239_Phandango_output.png)
 
 This used the command `run_gubbins.py --prefix ST239 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR ST239.aln` and took ~30s on a single CPU.
 

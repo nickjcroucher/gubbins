@@ -21,8 +21,6 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
     * [OSX/Linux/Windows \- Virtual Machine](#osxlinuxwindows---virtual-machine)
     * [Running the tests](#running-the-tests)
   * [Usage](#usage)
-    * [Generating Input files](#generating-input-files)
-    * [Output files](#output-files)
   * [License](#license)
   * [Feedback/Issues](#feedbackissues)
   * [Citation](#citation)
@@ -57,10 +55,10 @@ Phylogenetic software:
 Python modules
 * Biopython (> 1.59),
 * DendroPy (>=4.0)
-* scipy
-* numpy
-* multiprocessing
-* nose
+* Scipy
+* Numpy
+* Multiprocessing
+* Nose
 
 See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
@@ -126,7 +124,7 @@ To run Gubbins with default settings:
 
     run_gubbins.py [FASTA alignment]
 
-Information on on further options can be found in the [manual](gubbins_manual.html).
+Information on on further options can be found in the [manual](docs/gubbins_manual.html).
 
 ## License
 Gubbins is free software, licensed under [GPLv2](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE).

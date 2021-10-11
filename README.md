@@ -41,7 +41,7 @@ generates highly accurate reconstructions under realistic models of short-term b
 in only a few hours on alignments of hundreds of bacterial genome sequences.
 
 ## Installation
-Before you do anything, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/).
+Before you do anything, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/) and [manual](gubbins_manual.md).
 
 ### Required dependencies
 

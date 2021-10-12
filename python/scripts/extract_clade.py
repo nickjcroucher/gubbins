@@ -33,9 +33,8 @@ from Bio.Seq import Seq
 # command line parsing
 def get_options():
 
-    parser = argparse.ArgumentParser(description='Mask recombinant regions detected by'
-                                                    ' Gubbins from the input alignment',
-                                     prog='mask_gubbins_aln')
+    parser = argparse.ArgumentParser(description='Extract a clade from a Gubbins output',
+                                     prog='extract_clade')
 
     # input options
     parser.add_argument('--list',

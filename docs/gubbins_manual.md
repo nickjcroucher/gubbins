@@ -4,7 +4,7 @@
 
 [Gubbins](http://sanger-pathogens.github.io/gubbins/) (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term diversification of sequences through both point mutation and recombination, and can be run on alignments of many hundreds of bacterial genome sequences. It is therefore not appropriate for looking at recombination across species-wide diversity - this can be done gene-by-gene using software such as fastGEAR. Instead, it works on **samples of limited diversity, sharing a recent common ancestor** - a [strain or lineage](https://www.nature.com/articles/s41396-020-00867-w).
 
-The time taken for the algorithm to converge on a stable solution increases approximately quadratically with the number of samples; this increase can be ameliorated to some extent by using faster and/or simpler phylogenetic algorithms to generate trees within the analysis pipeline. The input should be a *whole genome sequence alignment*; there is no need to remove accessory genome loci, as the algorithm should cope with regions of missing data. Gubbins will not produce a sensible alignment on concantentations of core genes output but software such as [Roary](https://sanger-pathogens.github.io/Roary/), because it requires information on the spatial distribution of polymorphisms.
+The time taken for the algorithm to converge on a stable solution increases approximately quadratically with the number of samples; this increase can be ameliorated to some extent by using faster and/or simpler phylogenetic algorithms to generate trees within the analysis pipeline. The input should be a **whole genome sequence alignment**; there is no need to remove accessory genome loci, as the algorithm should cope with regions of missing data. Gubbins will not produce a sensible alignment on concantentations of core genes output by software such as [Roary](https://sanger-pathogens.github.io/Roary/) or [Panaroo](https://github.com/gtonkinhill/panaroo), because it requires information on the spatial distribution of polymorphisms across the genome.
 
 Gubbins cannot distinguish elevated densities of polymorphisms arising through recombination from other potential causes. These may be assembly or alignment errors, mutational hotspots or regions of the genome with relaxed selection. Such false positives are more likely to arise on longer branches within a phylogeny; it is recommended that populations be subdivided into smaller groups of less diverse samples that can each be independently analysed with Gubbins. This can be achieved with software such as [PopPUNK](https://poppunk.net/) or [fastBAPS](https://www.ncbi.nlm.nih.gov/labs/pmc/articles/PMC6582336/). Further discussion of potential confounding factors in the analysis of such population genomic datasets [can be found elsewhere](https://pubmed.ncbi.nlm.nih.gov/23382424/).
 
@@ -28,7 +28,7 @@ Iterations continue until the same tree is observed in multiple iterations, or t
 
 ## Installation and dependencies
 
-Gubbins is a command line program designed to be run on Linux or Max OSX systems and requires Python version 3.8 or greater. Gubbins can also be run on Windows operating systems using the Powershell within Windows >=10, a Bio-Linux virtual machine. The recommended installation approach is to use conda:
+Gubbins is a command line program designed to be run on Linux or Mac OSX systems and requires Python version 3.8 or greater. Gubbins can also be run on Windows operating systems using the Powershell within Windows >=10, a Bio-Linux virtual machine. The recommended installation approach is to use conda:
 
 ```
 conda config --add channels r
@@ -192,7 +192,7 @@ Recombination is detected using a [spatial scanning statistic](https://link.spri
 
 ### Algorithm stop options
 
-Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. In practice, there is little improvement to the tree after three iterations.
+Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG). In practice, there is little improvement to the tree after three iterations.
 
 ```
   --iterations ITERATIONS, -i ITERATIONS

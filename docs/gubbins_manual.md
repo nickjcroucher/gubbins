@@ -12,17 +12,12 @@ Gubbins cannot distinguish elevated densities of polymorphisms arising through r
 
 A brief overview of the algorithm is, within each iteration:
 
-- A set of polymorphic sites assumed to have arisen through point mutation is extracted from the whole genome alignment
-
-- A tree is generated from these sites
-
-- A phylogenetic model is fitted to the tree and all polymorphic sites in the alignment
-
-- The pattern of base substitutions resulting in the observed distribution of alleles across polymorphic sites is reconstructed
-
-- A spatial scanning statistic is iteratively applied to the base substitutions reconstructed as occurring on each branch, to identify all regions with an elevated density of base substitutions
-
-- These regions are assumed to have arisen through recombination, and base substitutions within these regions in the taxa descended from the branch are excluded from the set used to generate the tree in the next iteration
+* A set of polymorphic sites assumed to have arisen through point mutation is extracted from the whole genome alignment
+* A tree is generated from these sites
+* A phylogenetic model is fitted to the tree and all polymorphic sites in the alignment
+* The pattern of base substitutions resulting in the observed distribution of alleles across polymorphic sites is reconstructed
+* A spatial scanning statistic is iteratively applied to the base substitutions reconstructed as occurring on each branch, to identify all regions with an elevated density of base substitutions
+* These regions are assumed to have arisen through recombination, and base substitutions within these regions in the taxa descended from the branch are excluded from the set used to generate the tree in the next iteration
 
 Iterations continue until the same tree is observed in multiple iterations, or the maximum number of iterations is reached. In terms of runtime, the first iteration requires a tree to be generated from all polymorphic sites, as none have yet been excluded as recombinant, and therefore this step is usually the slowest part of the analysis.
 
@@ -38,17 +33,13 @@ conda config --add channels bioconda
 conda install gubbins
 ```
 
-Alternative approaches are described on the [Github page](https://github.com/sanger-pathogens/gubbins). Gubbins relies on multiple other phylogenetics software packages, including:
+Alternative approaches are described on the [Github page](https://github.com/sanger-pathogens/gubbins). Gubbins relies on multiple other phylogenetic software packages, including:
 
-- [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
-
-- [IQTree](https://doi.org/10.1093/molbev/msaa015)
-
-- [RAxML-NG](https://doi.org/10.1093/bioinformatics/btz305)
-
-- [FastTree](https://doi.org/10.1371/journal.pone.0009490)
-
-- [Rapidnj](https://doi.org/10.1007/978-3-540-87361-7_10)
+* [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
+* [IQTree](https://doi.org/10.1093/molbev/msaa015)
+* [RAxML-NG](https://doi.org/10.1093/bioinformatics/btz305)
+* [FastTree](https://doi.org/10.1371/journal.pone.0009490)
+* [Rapidnj](https://doi.org/10.1007/978-3-540-87361-7_10)
 
 These will automatically be installed within the conda environment. Please cite any of these methods you use as part of a Gubbins analysis - these are listed in a `.log` file output by Gubbins.
 
@@ -56,7 +47,7 @@ These will automatically be installed within the conda environment. Please cite 
 
 The required input file for Gubbins is a whole genome FASTA alignment. Each sequence should have a unique identifier, and special characters should be avoided. The sequences should only use the characters `ACGT` (DNA bases), `N` (unknown base) or `-` (alignment gap). If a starting tree is to be included, then this should be a Newick format.
 
-The alignment is most easily generated through mapping sequences against a reference sequence. This can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA](https://github.com/simonrharris/SKA), which can be installed through `conda install -c bioconda ska`. For instance,
+The alignment is most easily generated through mapping sequences against a reference sequence. This can be achieved with the popular mapping software Snippy, following the instructions on the relevant [Github repository](https://github.com/tseemann/snippy). Alternatively, the alignment can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA](https://github.com/simonrharris/SKA), which can be installed through `conda install -c bioconda ska`. For instance,
 
 ```
 generate_ska_alignment.py --reference seq_X.fa --fasta fasta_files.list --fastq fastq_files.list --out out.aln
@@ -109,7 +100,7 @@ Gubbins can remove duplicate or low-quality sequences from samples. It can also 
 
 Multiple phylogenetic packages can be used to run a Gubbins analysis. Typically, we would recommend a fast, simple tree builder is used for the first phylogeny (`--first-tree-builder` set to `star`,`rapidnj` or `fasttree`), and a more accurate, slower maximum-likelihood tree builder is used for subsequent iterations (`--tree-builder` set to `raxml`, `raxmlng` or `iqtree`).
 
-The robustness of the final tree can be assessed using [bootstraps](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.1985.tb00420.x), [transfer bootstraps](https://www.nature.com/articles/s41586-018-0043-0) or an [Shimodaira–Hasegawa test](https://academic.oup.com/sysbio/article/49/4/652/1678908?login=true) (`--sh-test`) of node likelihoods.
+The robustness of the final tree can be assessed using [bootstraps](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.1985.tb00420.x), [transfer bootstraps](https://www.nature.com/articles/s41586-018-0043-0) or a [Shimodaira–Hasegawa test](https://academic.oup.com/sysbio/article/49/4/652/1678908) (`--sh-test`) of node likelihoods.
 
 ```
   --tree-builder {raxml,raxmlng,iqtree,fasttree,hybrid,rapidnj}, -t {raxml,raxmlng,iqtree,fasttree,hybrid,rapidnj}
@@ -205,25 +196,16 @@ Given the scale of available dataset sizes, and the size of tree space, it is un
 
 A successful Gubbins run will generate files with the suffixes:
 
- - `.recombination_predictions.embl` -	Recombination predictions in EMBL file format.
-
-- `.recombination_predictions.gff` -	Recombination predictions in GFF format
-
-- `.branch_base_reconstruction.embl` -	Base substitution reconstruction in EMBL format
-
-- `.summary_of_snp_distribution.vcf` -	VCF file summarising the distribution of point mutations
-
-- `.per_branch_statistics.csv` -	per branch reporting of the base substitutions inside and outside recombination events
-
-- `.filtered_polymorphic_sites.fasta` -	FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
-
-- `.filtered_polymorphic_sites.phylip` -	Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
-
-- `.final_tree.tree` - this file contains the final phylogeny in Newick format
-
-- `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels
-
-- `.log` - log file specifying the software used at each step of the analysis, with accompanying citations
+* `.recombination_predictions.embl` -	Recombination predictions in EMBL file format.
+* `.recombination_predictions.gff` -	Recombination predictions in GFF format
+* `.branch_base_reconstruction.embl` -	Base substitution reconstruction in EMBL format
+* `.summary_of_snp_distribution.vcf` -	VCF file summarising the distribution of point mutations
+* `.per_branch_statistics.csv` -	per branch reporting of the base substitutions inside and outside recombination events
+* `.filtered_polymorphic_sites.fasta` -	FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
+* `.filtered_polymorphic_sites.phylip` -	Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
+* `.final_tree.tree` - this file contains the final phylogeny in Newick format
+* `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels
+* `.log` - log file specifying the software used at each step of the analysis, with accompanying citations
 
 To generate a recombination-masked alignment (i.e., with sequences predicted to have been introduced by recombination removed, leaving just the clonal frame), the post-processing script `mask_gubbins_aln.py` can be used:
 

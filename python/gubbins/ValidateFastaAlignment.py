@@ -69,7 +69,7 @@ class ValidateFastaAlignment(object):
             sequence_names = []
             for record in alignment:
                 # Remove disallowed characters
-                if '#' in record.name or '#' in record.name:
+                if '#' in record.name or ':' in record.name:
                     record.name = record.name.replace("#","_").replace(":","_")
                     record.id = record.id.replace("#", "_").replace(":", "_")
                     record.description = record.description.replace("#", "_").replace(":", "_")
@@ -79,7 +79,8 @@ class ValidateFastaAlignment(object):
         if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
           return False
         # Update alignment if names changed
-        with open(self.input_filename, "w") as output_handle:
-            AlignIO.write(alignment,output_handle, "fasta")
+        if any_modified_names:
+            with open(self.input_filename, "w") as output_handle:
+                AlignIO.write(alignment,output_handle, "fasta")
         return True
       

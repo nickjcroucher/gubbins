@@ -69,7 +69,7 @@ class ValidateFastaAlignment(object):
             sequence_names = []
             for record in alignment:
                 # Remove disallowed characters
-                if '#' in record.name or '#' in record.name:
+                if '#' in record.name or ':' in record.name:
                     record.name = record.name.replace("#","_").replace(":","_")
                     record.id = record.id.replace("#", "_").replace(":", "_")
                     record.description = record.description.replace("#", "_").replace(":", "_")

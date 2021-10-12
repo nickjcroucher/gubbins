@@ -668,7 +668,9 @@ class RAxMLNG:
         command.extend(["--search"])
         command.extend(["--msa", alignment_filename, "--prefix", basename])
         if input_tree:
-            command.extend(["--tree", input_tree])
+            command.extend(["--tree", input_tree + ",rand{9}"])
+        else:
+            command.extend(["--tree","rand{10}"])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)

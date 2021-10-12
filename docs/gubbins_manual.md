@@ -192,7 +192,7 @@ Recombination is detected using a [spatial scanning statistic](https://link.spri
 
 ### Algorithm stop options
 
-Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. In practice, there is little improvement to the tree after three iterations.
+Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG). In practice, there is little improvement to the tree after three iterations.
 
 ```
   --iterations ITERATIONS, -i ITERATIONS

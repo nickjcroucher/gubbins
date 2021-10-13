@@ -563,7 +563,10 @@ def return_algorithm_choices(args,i):
         extra_tree_arguments = args.first_tree_args
     # If RAXML-NG first tree builder use search1 option to decrease runtime
     if i == 1 and current_tree_builder == "raxmlng":
-        extra_tree_arguments.extend(["--search1"])
+        if extra_tree_arguments is None:
+            extra_tree_arguments = ["--search1"]
+        else:
+            extra_tree_arguments.extend(["--search1"])
     # Pick model fitter
     current_model_fitter = args.model_fitter
     if args.first_model_fitter is not None and i==1:

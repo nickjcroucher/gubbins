@@ -665,7 +665,8 @@ class RAxMLNG:
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxMLNG executable for tree building"""
         command = self.base_command.copy()
-        command.extend(["--search"])
+        if "--search1" not in command:
+            command.extend(["--search"])
         command.extend(["--msa", alignment_filename, "--prefix", basename])
         if input_tree:
             command.extend(["--tree", input_tree])

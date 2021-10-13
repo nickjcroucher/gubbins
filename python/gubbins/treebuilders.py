@@ -632,7 +632,7 @@ class RAxMLNG:
         command.extend(["--threads", str(self.threads)])
 
         # Add model
-        command.extend(["-model"])
+        command.extend(["--model"])
         if self.model == 'JC':
             command.extend(["JC"])
         elif self.model == 'K2P':

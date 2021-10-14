@@ -14,6 +14,11 @@ setuptools.setup(
             "run_gubbins.py = gubbins.run_gubbins:main",
         ]
     },
+    scripts=[
+        'scripts/generate_ska_alignment.py',
+        'scripts/extract_gubbins_clade.py',
+        'scripts/mask_gubbins_aln.py'
+    ],
     test_suite='nose.collector',
     tests_require=[
         "nose >= 1.3",

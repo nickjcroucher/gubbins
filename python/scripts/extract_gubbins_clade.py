@@ -34,7 +34,7 @@ from Bio.Seq import Seq
 def get_options():
 
     parser = argparse.ArgumentParser(description='Extract a clade from a Gubbins output',
-                                     prog='extract_clade')
+                                     prog='extract_gubbins_clade')
 
     # input options
     parser.add_argument('--list',

@@ -632,7 +632,7 @@ class RAxMLNG:
         command.extend(["--threads", str(self.threads)])
 
         # Add model
-        command.extend(["-model"])
+        command.extend(["--model"])
         if self.model == 'JC':
             command.extend(["JC"])
         elif self.model == 'K2P':
@@ -668,8 +668,6 @@ class RAxMLNG:
         if "--search1" not in command:
             command.extend(["--search"])
         command.extend(["--msa", alignment_filename, "--prefix", basename])
-        if input_tree:
-            command.extend(["--tree", input_tree])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)

@@ -779,6 +779,8 @@ class RAxMLNG:
         command.extend(["--prefix",tmp + "/" + basename + ".bootstrapped"])
         if transfer:
             command.extend(["--bs-metric tbe"])
+        else:
+            command.extend(["--bs-metric fbp"])
         # Output
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])

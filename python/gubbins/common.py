@@ -392,7 +392,7 @@ def parse_and_run(input_args, program_description=""):
         else:
             # Define alignment and a RAxML object for bootstrapping utilities
             bootstrap_aln = final_aln
-            if current_tree_builder == "raxmlng":
+            if current_tree_builder == "raxml":
                 bootstrap_utility = tree_builder
             else:
                 bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
@@ -412,7 +412,12 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit("Failed while running bootstrap analysis.")
             # Annotate the final tree using the bootstraps
             bootstrapped_trees_file = tree_builder.get_bootstrapped_trees_file(temp_working_dir,current_basename)
-            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir), transfer = input_args.transfer_bootstrap)
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln),
+                                                                                            os.path.abspath(current_tree_name),
+                                                                                            bootstrapped_trees_file,
+                                                                                            current_basename,
+                                                                                            os.path.abspath(temp_working_dir),
+                                                                                            transfer = input_args.transfer_bootstrap)
             try:
                 subprocess.check_call(annotation_command, shell=True)
             except subprocess.SubprocessError:

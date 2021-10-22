@@ -1,5 +1,29 @@
 # Change Log
 
+## [v3.1.3](https://github.com/sanger-pathogens/gubbins/tree/v3.1.2) (2021-10-22)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.2...v3.1.3)
+
+- Output SH tests on final tree (#314)
+
+## [v3.1.2](https://github.com/sanger-pathogens/gubbins/tree/v3.1.2) (2021-10-12)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.1...v3.1.2)
+
+- Install scripts correctly
+- Correct documentation
+
+## [v3.1.1](https://github.com/sanger-pathogens/gubbins/tree/v3.1.1) (2021-10-12)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.0...v3.1.1)
+
+- Avoid using a single starting tree for RAxML-NG
+
+## [v3.1.0](https://github.com/sanger-pathogens/gubbins/tree/v3.1.0) (2021-10-08)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.0.0...v3.1.0)
+
+- Adds scripts for generating inputs and processing outputs
+- More thorough checking of tree topology when passing information between methods
+- More detailed error handling for incorrect input alignments
+
+
 ## [v3.0.0](https://github.com/sanger-pathogens/gubbins/tree/v3.0.0) (2021-01-27)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v2.4.1...v3.0.0)
 

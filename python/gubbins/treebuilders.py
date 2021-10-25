@@ -234,7 +234,7 @@ class FastTree:
         command = self.base_command.copy()
         command.extend(["-mllen","-nome"])
         command.extend(["-intree",input_tree])
-        command.extend(["-out",input_tree + ".sh_support"])
+        command.extend(["-out",tmp + "/" + input_tree + ".sh_support"])
         command.extend([alignment_filename])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
@@ -780,6 +780,8 @@ class RAxMLNG:
         command.extend(["--prefix",tmp + "/" + basename + ".bootstrapped"])
         if transfer:
             command.extend(["--bs-metric tbe"])
+        else:
+            command.extend(["--bs-metric fbp"])
         # Output
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])

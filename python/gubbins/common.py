@@ -412,7 +412,12 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit("Failed while running bootstrap analysis.")
             # Annotate the final tree using the bootstraps
             bootstrapped_trees_file = tree_builder.get_bootstrapped_trees_file(temp_working_dir,current_basename)
-            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), bootstrapped_trees_file, current_basename, os.path.abspath(temp_working_dir), transfer = input_args.transfer_bootstrap)
+            annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln),
+                                                                                            os.path.abspath(current_tree_name),
+                                                                                            bootstrapped_trees_file,
+                                                                                            current_basename,
+                                                                                            os.path.abspath(temp_working_dir),
+                                                                                            transfer = input_args.transfer_bootstrap)
             try:
                 subprocess.check_call(annotation_command, shell=True)
             except subprocess.SubprocessError:
@@ -421,15 +426,19 @@ def parse_and_run(input_args, program_description=""):
 
     # 7. Run node branch support analysis if requested
     if input_args.sh_test:
-        sh_test_command = tree_builder.sh_test(final_aln, current_tree_name, current_basename, os.path.abspath(temp_working_dir))
+        sh_test_command = tree_builder.sh_test(final_aln,
+                                                current_tree_name,
+                                                current_basename,
+                                                os.path.abspath(temp_working_dir))
         try:
             subprocess.check_call(sh_test_command, shell=True)
         except subprocess.SubprocessError:
             sys.exit("Failed while running SH test.")
-        if current_tree_builder == "raxml":
-            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "raxml")
-        elif current_tree_builder == "iqtree":
-            reformat_sh_support(current_tree_name, os.path.abspath(temp_working_dir), algorithm = "iqtree")
+        reformat_sh_support(current_tree_name,
+                            os.path.abspath(temp_working_dir),
+                            current_tree_name,
+                            algorithm = current_tree_builder,
+                            outgroup = input_args.outgroup)
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -1105,19 +1114,30 @@ def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename,
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
-def reformat_sh_support(tree_name, tmpdir, algorithm = "raxml"):
+def reformat_sh_support(tree_name, tmpdir, final_tree_fn, algorithm = "raxml", outgroup = None):
+    # Tree file name
+    outtree_fn = tree_name + ".sh_support"
+    # Read in tree
     if algorithm == "raxml":
         intree_fn = tmpdir + "/RAxML_fastTreeSH_Support." + tree_name + ".sh_support"
     elif algorithm == "iqtree":
         intree_fn = tmpdir + "/" + tree_name + ".sh_support.treefile"
-    outtree_fn = tree_name + ".sh_support"
-    with open(intree_fn,'r') as intree, open(outtree_fn,'w') as outtree:
-        for line in intree.readlines():
-            if algorithm == "raxml":
-                new_line = re.sub(r':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
-            elif algorithm == "iqtree":
-                new_line = re.sub(r'\/', '', line)
-            outtree.write(new_line)
+    # Change SH support value formatting
+    if algorithm == "raxml" or algorithm == "iqtree":
+        with open(intree_fn,'r') as intree, open(tmpdir + "/" + outtree_fn,'w') as outtree:
+            for line in intree.readlines():
+                if algorithm == "raxml":
+                    new_line = re.sub(r':(\d*[.]?\d*)\[(\d+)\]', '\\2:\\1', line)
+                elif algorithm == "iqtree":
+                    new_line = re.sub(r'\/', '', line)
+                outtree.write(new_line)
+    # Transfer SH support to final tree
+    transfer_bootstraps_to_tree(tmpdir + "/" + outtree_fn,
+                                final_tree_fn,
+                                outtree_fn,
+                                outgroups = outgroup)
+    
+    
 
 def update_methods_log(log, method = None, step = ''):
     """Record methods used at each step"""

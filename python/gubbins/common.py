@@ -570,6 +570,14 @@ def return_algorithm_choices(args,i):
     extra_tree_arguments = args.tree_args
     if args.first_tree_args is not None and i==1:
         extra_tree_arguments = args.first_tree_args
+    # If RAXML-NG first tree builder use search1 option to decrease runtime
+    if i == 1 and current_tree_builder == "raxmlng":
+        if extra_tree_arguments is None:
+            extra_tree_arguments = "--search1"
+        else:
+            extra_tree_arguments = [extra_tree_arguments]
+            extra_tree_arguments.extend(["--search1"])
+            extra_tree_arguments = " ".join(extra_tree_arguments)
     # Pick model fitter
     current_model_fitter = args.model_fitter
     if args.first_model_fitter is not None and i==1:

@@ -1,3 +1,5 @@
+#! python
+
 # encoding: utf-8
 # Wellcome Trust Sanger Institute and Imperial College London
 # Copyright (C) 2020  Wellcome Trust Sanger Institute and Imperial College London

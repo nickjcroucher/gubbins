@@ -1,3 +1,5 @@
+#! python
+
 # encoding: utf-8
 # Wellcome Trust Sanger Institute and Imperial College London
 # Copyright (C) 2020 Imperial College London and Imperial College London
@@ -38,11 +40,11 @@ def get_options():
                         help = 'Name of reference sequence to use for alignment',
                         required = True)
     parser.add_argument('--fasta',
-                        help = 'List of FASTA files to include in alignment',
+                        help = 'Two column list of names and FASTA files to include in alignment',
                         default = None,
                         required = False)
     parser.add_argument('--fastq',
-                        help = 'List of FASTQ files to include in alignment',
+                        help = 'Two/three column list of names and of FASTQ files to include in alignment',
                         default = None,
                         required = False)
     parser.add_argument('--out',

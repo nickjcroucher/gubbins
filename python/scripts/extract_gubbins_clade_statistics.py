@@ -54,6 +54,10 @@ def get_options():
     parser.add_argument('--tree',
                         help = 'Labelled tree output by Gubbins',
                         required = True)
+    parser.add_argument('--print-trees',
+                        help = 'Print clade trees',
+                        default = False,
+                        action = 'store_true')
     parser.add_argument('--out',
                         help = 'Output file prefix; suffix is "_clades.csv"',
                         required = True)
@@ -146,6 +150,25 @@ if __name__ == "__main__":
             clade_members = [sequence for sequence in clades if clades[sequence] == clade_name]
             clade_tree = tree.clone(depth = 1)
             clade_tree.retain_taxa_with_labels(clade_members)
+            if args.print_trees:
+                clade_tree_string = clade_tree.as_string(
+                                        schema='newick',
+                                        suppress_leaf_taxon_labels=False,
+                                        suppress_leaf_node_labels=True,
+                                        suppress_internal_taxon_labels=True,
+                                        suppress_internal_node_labels=True,
+                                        suppress_rooting=True,
+                                        suppress_edge_lengths=False,
+                                        unquoted_underscores=True,
+                                        preserve_spaces=False,
+                                        store_tree_weights=False,
+                                        suppress_annotations=True,
+                                        annotations_as_nhx=False,
+                                        suppress_item_comments=True,
+                                        node_label_element_separator=' '
+                                    )
+                with open(clade_name + '.tre','w') as tree_out:
+                    tree_out.write(clade_tree_string + '\n')
             clade_info = {label:0 for label in info_labels + tree_info_labels}
             for node in clade_tree.preorder_node_iter():
                 if node != clade_tree.seed_node:

@@ -58,6 +58,10 @@ def get_options():
                         help = 'Print clade trees',
                         default = False,
                         action = 'store_true')
+    parser.add_argument('--print-rec-lengths',
+                        help = 'Print recombination lengths',
+                        default = False,
+                        action = 'store_true')
     parser.add_argument('--out',
                         help = 'Output file prefix; suffix is "_clades.csv"',
                         required = True)
@@ -141,6 +145,7 @@ if __name__ == "__main__":
                              rooting='force-rooted')
     
     # Calculate statistics per clade
+    rec_length_string = ''
     with open(args.out + '_clades.csv','w') as out_file:
         out_file.write('Clade,')
         out_file.write(','.join(info_labels + tree_info_labels))
@@ -185,6 +190,13 @@ if __name__ == "__main__":
                         clade_info['mutation_snps'] += pm_snps[node_label_string]
                     if node_label_string in node_rec_starts:
                         clade_info['recombinations'] += len(node_rec_starts[node_label_string])
+                        if args.print_rec_lengths:
+                            for s,e in zip(node_rec_starts[node_label_string],node_rec_ends[node_label_string]):
+                                rec_length_string += clade_name + ',' + str(1+e-s) + '\n'
                     
             out_file.write(','.join([str(clade_info[label]) for label in info_labels + tree_info_labels]))
             out_file.write('\n')
+    
+    if args.print_rec_lengths:
+        with open(args.out + '_rec_lengths.csv','w') as rec_out_file:
+            rec_out_file.write('Clade,Length\n' + rec_length_string)

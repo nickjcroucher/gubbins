@@ -50,7 +50,8 @@ def get_options():
                         required = True)
     parser.add_argument('--exclude-regions',
                         help = 'Two column file specifying start and end of regions to be excluded',
-                        required = False)
+                        required = False,
+                        default = None)
     parser.add_argument('--tree',
                         help = 'Labelled tree output by Gubbins',
                         required = True)
@@ -86,6 +87,20 @@ if __name__ == "__main__":
             else:
                 sys.stderr.write('Line needs two columns: ' + line + '\n')
     
+    # Exclude regions
+    excluded_region_starts = []
+    excluded_region_ends = []
+    if args.exclude_regions is not None:
+        with open(args.exclude_regions,'r') as exclude_file:
+            for line in exclude_file.readlines():
+                coords = line.strip().split()
+                if int(coords[0]) < int(coords[1]):
+                    excluded_region_starts.append(int(coords[0]))
+                    excluded_region_ends.append(int(coords[1]))
+                else:
+                    sys.stderr.write('Start of excluded region must be less than end\n')
+                    sys.exit(1)
+    
     # Store SNP information
     node_snps = {}
     snp_total = 0
@@ -95,13 +110,19 @@ if __name__ == "__main__":
             info = line.strip().split()
             if info[1] == 'variation':
                 pos = int(info[2])
-                snp_total += 1
             if info[1].startswith('/node='):
                 node = info[1].replace('"','').split('->')
-                if node[1] in node_snps:
-                    node_snps[node[1]].append(pos)
-                else:
-                    node_snps[node[1]] = [pos]
+                include_snp = True
+                for s,e in zip(excluded_region_starts,excluded_region_ends):
+                    if pos >= s and pos <= e:
+                        include_snp = False
+                        break
+                if include_snp:
+                    snp_total += 1
+                    if node[1] in node_snps:
+                        node_snps[node[1]].append(pos)
+                    else:
+                        node_snps[node[1]] = [pos]
 
     # Store recombination information
     node_rec_starts = {}
@@ -113,12 +134,17 @@ if __name__ == "__main__":
                 start = int(info[3])
                 end = int(info[4])
                 node = info[8].split(';')[0].replace('"','').split('->')[1]
-                if node not in node_rec_starts:
-                    node_rec_starts[node] = [start]
-                    node_rec_ends[node] = [end]
-                else:
-                    node_rec_starts[node].append(start)
-                    node_rec_ends[node].append(end)
+                include_rec = True
+                for s,e in zip(excluded_region_starts,excluded_region_ends):
+                    if start >= s and end <= e:
+                        include_rec = False
+                if include_rec:
+                    if node not in node_rec_starts:
+                        node_rec_starts[node] = [start]
+                        node_rec_ends[node] = [end]
+                    else:
+                        node_rec_starts[node].append(start)
+                        node_rec_ends[node].append(end)
     
     # Divide SNPs into recombinant and non-recombinant
     rec_snps = {node:0 for node in node_snps}

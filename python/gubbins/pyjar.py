@@ -224,6 +224,14 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
     ancestrally_conserved = {b:list() for b in ["A", "C", "G", "T", "-"]}
     ancestrally_variable = {b:{ancestral_node_indices[x]:list() for x in ancestral_node_indices} for b in ["A", "C", "G", "T", "-"]}
 
+    # Generate data structures for reconstructions
+    num_nodes = len(tree.nodes())
+    Lmat = numpy.full((num_nodes,4), numpy.NINF, dtype = float)
+    Cmat = numpy.full((num_nodes,4), [0,1,2,3], dtype = int)
+    node_indices = {}
+    reconstructed_base_indices = [-1]*num_nodes
+    ordered_bases = ['A','C','G','T']
+
     # Load base pattern information
     base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
     base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
@@ -244,6 +252,18 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
         prep_time_end = time.process_time()
         prep_time = prep_time_end - prep_time_start
     
+    fetch_time = 0.0
+    leaf_time  = 0.0
+    internal_time = 0.0
+    lik_calc_time = 0.0
+    tree_trav_time = 0.0
+    reinsert_time = 0.0
+    middle_bit_time = 0.0
+    p1_time = 0.0
+    p2_time = 0.0
+    p3_time = 0.0
+    p4_time = 0.0
+    
     # Iterate over columns
     for column,base_pattern_columns_padded in zip(columns,column_positions):
 
@@ -252,8 +272,8 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             calc_time_start = time.process_time()
         
         # Get column information
+        fetch_time_start = time.process_time()
         base_pattern_columns = base_pattern_columns_padded[base_pattern_columns_padded > -1].tolist()
-        
         columnbases=set([])
         base={}
         unknown_base_count = 0
@@ -263,9 +283,16 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                 columnbases.add(y)
             else:
                 unknown_base_count = unknown_base_count + 1
+        fetch_time_end = time.process_time()
+        fetch_time += (fetch_time_end - fetch_time_start)
+
+        # Reset matrices
+        Lmat.fill(numpy.NINF)
+        Cmat[:] = [0,1,2,3]
 
         # Heuristic for speed: if all taxa are monomorphic, with a gap in only one sequence, then the ancestral states
         # will all be the observed base, as no ancestral node will have two child nodes with unknown bases at this site
+        middle_bit_start = time.process_time()
         if unknown_base_count == 1 and len(columnbases) == 1:
             
             ancestrally_conserved[columnbases.pop()].extend(base_pattern_columns)
@@ -277,120 +304,262 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             #Visit a nonroot internal node, z, which has not been visited yet, but both of whose sons, nodes x and y, have already been visited, i.e., Lx(j), Cx(j), Ly(j), and Cy(j) have already been defined for each j. Let tz be the length of the branch connecting node z and its father. For each amino acid i, compute Lz(i) and Cz(i) according to the following formulae:
             
             #Denote the three sons of the root by x, y, and z. For each amino acid k, compute the expression Pk x Lx(k) x Ly(k) x Lz(k). Reconstruct r by choosing the amino acid k maximizing this expression. The maximum value found is the likelihood of the best reconstruction.
-            for node in tree.postorder_node_iter():
+            
+            # Create data structures for storing likelihoods
+            
+            
+            for node_index,node in enumerate(tree.postorder_node_iter()):
+                
+                taxon=str(node.taxon.label).strip("'")
+                node_indices[taxon] = node_index
+            
                 if node.parent_node==None:
+#                    node.label = str(node_index)
+#                    node_indices[node.label] = node_index
                     continue
                 #calculate the transistion matrix for the branch
                 pij=node.pij
                 
                 if node.is_leaf():
+                
+                    leaf_time_start = time.process_time()
                     taxon=str(node.taxon.label).strip("'")
+                    node_indices[taxon] = node_index
                     try:
-                        if base[taxon] in ["A", "C", "G", "T"]:
+                        p1_start = time.process_time()
+                        taxon_base = base[taxon]
+                        if taxon_base in bases:
+                            
                             #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
-                            node.C={"A": base[taxon], "C": base[taxon], "G": base[taxon], "T": base[taxon]}
+                            taxon_base_index = base_matrix[taxon_base]
+                            Cmat[node_index,:] = taxon_base_index
+                            Lmat[node_index,:] = [pij[0][taxon_base_index],pij[1][taxon_base_index],pij[2][taxon_base_index],pij[3][taxon_base_index]]
+                            
+#                            node.C={"A": taxon_base, "C": taxon_base, "G": taxon_base, "T": taxon_base}
                         
                             #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
-                            node.L={"A": pij[base_matrix["A"]][base_matrix[base[taxon]]], "C": pij[base_matrix["C"]][base_matrix[base[taxon]]], "G": pij[base_matrix["G"]][base_matrix[base[taxon]]], "T": pij[base_matrix["T"]][base_matrix[base[taxon]]]}
+                            
+#                            node.L={"A": pij[0][taxon_base_index],
+#                                    "C": pij[1][taxon_base_index],
+#                                    "G": pij[2][taxon_base_index],
+#                                    "T": pij[3][taxon_base_index]}
+                            p1_end = time.process_time()
+                            p1_time += (p1_end - p1_start)
 
                         else:
+                            p2_start = time.process_time()
+                            # Cmat stays as default when base is unknown
+                            Lmat[node_index,:] = [pij[0][0],pij[1][1],pij[2][2],pij[3][3]]
                             
-                            node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
-                            node.L={"A": pij[base_matrix["A"]][base_matrix["A"]], "C": pij[base_matrix["C"]][base_matrix["C"]], "G": pij[base_matrix["G"]][base_matrix["G"]], "T": pij[base_matrix["T"]][base_matrix["T"]]}
-                        
+#                            node.C={"A": "A", "C": "C", "G": "G", "T": "T"}
+#                            node.L={"A": pij[0][0],
+#                                    "C": pij[1][1],
+#                                    "G": pij[2][2],
+#                                    "T": pij[3][3]}
+                            p2_end = time.process_time()
+                            p2_time += (p2_end - p2_start)
+                            
                     except KeyError:
                         print("Cannot find", taxon, "in base")
                         sys.exit(208)
+                        
+                    leaf_time_end = time.process_time()
+                    leaf_time += (leaf_time_end - leaf_time_start)
                 
                 else:
-                    node.L={}
-                    node.C={}
+                
+                    internal_time_start = time.process_time()
+#                    node.label = str(node_index)
+                    column_base_indices = [base_matrix[b] for b in columnbases]
+#                    node_indices[node.label] = node_index
+                    node_indices[taxon] = node_index
+                    child_node_indices = []
+                    for child in node.child_node_iter():
+#                        if child.is_leaf():
+                        child_node_indices.append(node_indices[child.taxon.label.strip("'")])
+#                        else:
+#                            child_node_indices.append(node_indices[child.label])
+                    
+                    print('Child indices: ' + str(child_node_indices))
+                    
+                    #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
+                    #2b. Cz(i) = the value of j attaining the above maximum.
+                    for end_index in column_base_indices:
+                        c = 0.0
+                        for child_index in child_node_indices:
+                            c += Lmat[child_index,end_index]
+                        for start_index in column_base_indices:
+                            j = pij[start_index,end_index]+c
+                            if j > Lmat[node_index,start_index]:
+                                Lmat[node_index,start_index] = j
+                                Cmat[node_index,start_index] = end_index
+                        
+#                    node.L={}
+#                    node.C={}
                     
                     #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
                     #2b. Cz(i) = the value of j attaining the above maximum.
                     
-                    for basenum in columnbases:
-                        node.L[basenum]=float("-inf")
-                        node.C[basenum]=None
+                    p3_start = time.process_time()
+#                    for basenum in columnbases:
+#                        node.L[basenum]=float("-inf")
+#                        node.C[basenum]=None
+                    p3_end = time.process_time()
+                    p3_time += (p3_end - p3_start)
                     
-                    for end in columnbases:
-                        c=0.0
-                        for child in node.child_node_iter():
-                            c+=child.L[end]
-                        for start in columnbases:
-                            j=pij[base_matrix[start],base_matrix[end]]+c
-                            
-                            if j>node.L[start]:
-                                node.L[start]=j
-                                node.C[start]=end
+                    p4_start = time.process_time()
+#                    for end in columnbases:
+#                        c=0.0
+#                        for child in node.child_node_iter():
+#                            c+=child.L[end]
+#                        for start in columnbases:
+#                            j=pij[base_matrix[start],base_matrix[end]]+c
+#
+#                            if j>node.L[start]:
+#                                node.L[start]=j
+#                                node.C[start]=end
+                    p4_end = time.process_time()
+                    p4_time += (p4_end - p4_start)
 
-            node.L={}
-            node.C={}
-            for basenum in columnbases:
-                node.L[basenum]=float("-inf")
-                node.C[basenum]=None
-            for end in columnbases:
-                c=0
-                for child in node.child_node_iter():
-                    c+=child.L[end]
-                for start in columnbases:
-                    j=log(base_frequencies[base_matrix[end]])+c
-                    if j>node.L[start]:
-                        node.L[start]=j
-                        node.C[start]=end
-                
-            max_root_base=None
-            max_root_base_likelihood=float("-inf")
-            for root_base in columnbases:
-                if node.L[root_base] > max_root_base_likelihood:
-                    max_root_base_likelihood=node.L[root_base]
-                    max_root_base=node.C[root_base]
-            node.r=max_root_base
+                    internal_time_end = time.process_time()
+                    internal_time += (internal_time_end - internal_time_start)
+            middle_bit_end = time.process_time()
+            middle_bit_time += (middle_bit_end - middle_bit_start)
+            
+            lik_time_start = time.process_time()
+            child_node_indices = []
+            for child in node.child_node_iter():
+#                if child.is_leaf():
+                child_node_indices.append(node_indices[child.taxon.label.strip("'")])
+#                else:
+#                    child_node_indices.append(node_indices[child.label])
+            for end_index in column_base_indices:
+                c = 0.0
+                for child_index in child_node_indices:
+                    c += Lmat[child_index,end_index]
+                for start_index in column_base_indices:
+                    j = log(base_frequencies[end_index]) + c
+                    if j > Lmat[node_index,start_index]:
+                        Lmat[node_index,start_index] = j
+                        Cmat[node_index,start_index] = end_index
+
+            max_root_base_index = Cmat[node_index,numpy.argmax(Lmat[node_index,:])]
+            reconstructed_base_indices[node_index] = max_root_base_index
+            print('Max base index: ' + str(max_root_base_index))
+            print('Lmat row: ' + str(Lmat[node_index,:]))
+            print('Cmat row: ' + str(Cmat[node_index,:]))
+            print('Lmat: ' + str(Lmat))
+#            max_root_base_likelihood=float("-inf")
+#            for root_base in columnbases:
+#                if node.L[root_base] > max_root_base_likelihood:
+#                    max_root_base_likelihood=node.L[root_base]
+#                    max_root_base=node.C[root_base]
+#            node.r=max_root_base
+#
+#            node.L={}
+#            node.C={}
+#            for basenum in columnbases:
+#                node.L[basenum]=float("-inf")
+#                node.C[basenum]=None
+#            for end in columnbases:
+#                c=0
+#                for child in node.child_node_iter():
+#                    c+=child.L[end]
+#                for start in columnbases:
+#                    j=log(base_frequencies[base_matrix[end]])+c
+#                    if j>node.L[start]:
+#                        node.L[start]=j
+#                        node.C[start]=end
+#
+#            max_root_base=None
+#            max_root_base_likelihood=float("-inf")
+#            for root_base in columnbases:
+#                if node.L[root_base] > max_root_base_likelihood:
+#                    max_root_base_likelihood=node.L[root_base]
+#                    max_root_base=node.C[root_base]
+#            node.r=max_root_base
+
+            lik_time_end = time.process_time()
+            lik_calc_time = lik_time_end - lik_time_start
 
             #Traverse the tree from the root in the direction of the OTUs, assigning to each node its most likely ancestral character as follows:
+            tree_trav_start = time.process_time()
             for node in tree.preorder_node_iter():
-            
+                node_label = node.taxon.label.strip("'")
+                node_index = node_indices[node_label]
                 try:
                     #5a. Visit an unreconstructed internal node x whose father y has already been reconstructed. Denote by i the reconstructed amino acid at node y.
-                    i = node.parent_node.r
+                    parent_node_index = node_indices[node.parent_node.taxon.label.strip("'")]
+                    i = reconstructed_base_indices[parent_node_index]
                 except AttributeError:
                     continue
                 #5b. Reconstruct node x by choosing Cx(i).
-                node.r=node.C[i]
+                reconstructed_base_indices[node_index] = Cmat[node_index,i]
+#                node.r=node.C[i]
 
-            rootlens=[]
-            for child in tree.seed_node.child_node_iter():
-                rootlens.append([child.edge_length,child,child.r])
+#            rootlens=[]
+#            for child in tree.seed_node.child_node_iter():
+#                rootlens.append([child.edge_length,child,child.r])
+            
+            print('Reconstructed: ' + str(reconstructed_base_indices))
             
             ### TIMING
             if verbose:
                 calc_time_end = time.process_time()
                 calc_time += (calc_time_end - calc_time_start)
                 storage_time_start = time.process_time()
-
+            
+            tree_trav_end = time.process_time()
+            tree_trav_time = tree_trav_end - tree_trav_start
+            
             # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
             # store reconstructed alleles
             reconstructed_alleles = {}
+            reinsert_time_start = time.process_time()
             for node in tree.postorder_node_iter():
+                node_label = node.taxon.label.strip("'")
+                node_index = node_indices[node_label]
                 if node.is_leaf():
-                    node.r = base[node.taxon.label]
+                    reconstructed_alleles[node_label] = base[node_label]
                 else:
+#                    node_label = node.label.strip("'")
+#                    node_index = node_indices[node_label]
                     has_child_base = False
+                    child_taxon_labels = []
                     for child in node.child_node_iter():
-                        if child.r in bases:
-                            has_child_base=True
-                            break
-                    if not has_child_base:
-                        node.r = "-"
-                    # Store reconstructed allele to determine how it should be inserted into the new alignment
-                    reconstructed_alleles[node.taxon.label] = node.r
+#                        if child.is_leaf():
+                        child_taxon_labels.append(child.taxon.label.strip("'"))
+#                        else:
+#                            child_taxon_labels.append(child.label.strip("'"))
+                    for child_taxon_label in child_taxon_labels:
+                        if reconstructed_alleles[child_taxon_label] in bases:
+                            has_child_base = True
+                    if has_child_base:
+                        reconstructed_alleles[node_label] = ordered_bases[reconstructed_base_indices[node_index]]
+                    else:
+                        reconstructed_alleles[node_label] = '-'
+                    
+#            reconstructed_alleles = {}
+#            for node in tree.postorder_node_iter():
+#                if node.is_leaf():
+#                    node.r = base[node.taxon.label]
+#                else:
+#                    has_child_base = False
+#                    for child in node.child_node_iter():
+#                        if child.r in bases:
+#                            has_child_base=True
+#                            break
+#                    if not has_child_base:
+#                        node.r = "-"
+#                    # Store reconstructed allele to determine how it should be inserted into the new alignment
+#                    reconstructed_alleles[node.taxon.label] = node.r
         
             # If site is monomorphic - replace whole column; else replace specific entries
             reconstructed_allele_set = set(reconstructed_alleles.values())
             if len(reconstructed_allele_set) == 1:
                 ancestrally_conserved[reconstructed_allele_set.pop()].extend(base_pattern_columns)
             else:
-                for taxon in reconstructed_alleles:
+                for taxon in ancestral_node_indices:
                     ancestrally_variable[reconstructed_alleles[taxon]][ancestral_node_indices[taxon]].extend(base_pattern_columns)
             
             # iterate through tree
@@ -400,9 +569,23 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                         node_snps[node.taxon.label] += len(base_pattern_columns)
                 except AttributeError:
                     continue
+            reinsert_time_end = time.process_time()
+            reinsert_time = reinsert_time_end - reinsert_time_start
 
     ### TIMING
     if verbose:
+        print('Time for P1:\t' + str(p1_time))
+        print('Time for P2:\t' + str(p2_time))
+        print('Time for P3:\t' + str(p3_time))
+        print('Time for P4:\t' + str(p4_time))
+        print('Time for fetching:\t' + str(fetch_time))
+        print('Time for middle bit:\t' + str(middle_bit_time))
+        print('Time for leaf processing:\t' + str(leaf_time))
+        print('Time for internal processing:\t' + str(internal_time))
+        print('Time for lik calc time:\t' + str(lik_calc_time))
+        print('Time for tree trav time:\t' + str(tree_trav_time))
+        print('Time for aln insert time:\t' + str(reinsert_time))
+        
         storage_time_end = time.process_time()
         storage_time += (storage_time_end - storage_time_start)
         writing_time_start = time.process_time()

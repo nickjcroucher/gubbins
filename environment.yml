@@ -24,6 +24,7 @@ dependencies:
   - biopython
   - multiprocess
   - numpy
+  - numba
 # phylogenetics
   - raxml=8.2.12
   - iqtree=2.0.3

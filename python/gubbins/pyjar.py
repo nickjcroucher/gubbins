@@ -183,11 +183,25 @@ def convert_to_square_numpy_array(data):
     return out
 
 @njit
-def process_sequence(seq,seq_to_int):
-    return numpy.array([seq_to_int[x] for x in seq], dtype = numpy.uint8)
+def process_sequence(seq,seq_length):
+    int_seq = numpy.zeros(seq_length, dtype = numpy.uint8)
+    for i,b in zip(range(seq_length),seq):
+        if b == 'A':
+            int_seq[i] = 0
+        elif b == 'C':
+            int_seq[i] = 1
+        elif b == 'G':
+            int_seq[i] = 2
+        elif b == 'T':
+            int_seq[i] = 3
+        elif b == '-':
+            int_seq[i] = 4
+        elif b == 'N':
+            int_seq[i] = 5
+    return int_seq
 
 # Based on https://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array
-def unique_columns2(data):
+def get_unique_columns(data):
     dt = numpy.dtype((numpy.void, data.dtype.itemsize * data.shape[0]))
     dataf = numpy.asfortranarray(data).view(dt)
     u,uind = numpy.unique(dataf, return_inverse=True)
@@ -199,26 +213,15 @@ def get_base_patterns(alignment, verbose):
         print("Finding unique base patterns")
     # Identify unique base patterns
     t1=time.process_time()
-    # Set up data structures to convert characters to integers with numba
-    np_unichar = numpy.dtype('<U5')
-    UnicharType = from_dtype(np_unichar)
-    seq_to_int = Dict.empty(
-        key_type=UnicharType,
-        value_type=types.uint8,
-    )
-    seq_to_int['A'] = numpy.uint8(0)
-    seq_to_int['C'] = numpy.uint8(1)
-    seq_to_int['G'] = numpy.uint8(2)
-    seq_to_int['T'] = numpy.uint8(3)
-    seq_to_int['-'] = numpy.uint8(4)
-    seq_to_int['N'] = numpy.uint8(5)
     # Convert alignment to Numpy array
-    align_array = numpy.array([process_sequence(numpy.array(record.seq, dtype = np_unichar),
-                                                seq_to_int) for record in alignment],
-                                dtype = numpy.uint8,
-                                order='F')
+    ntaxa = len(alignment)
+    seq_length = alignment.get_alignment_length()
+    align_array = numpy.zeros((ntaxa,seq_length), dtype = numpy.uint8, order='F')
+    # Convert alignment to Numpy array
+    for i,record in enumerate(alignment):
+        align_array[i] = process_sequence(numpy.fromiter(record.seq, dtype = numpy.dtype('<U5')), seq_length)
     # Get unique base patterns and their indices in the alignment
-    base_pattern_bases_array, base_pattern_positions_array = unique_columns2(align_array)
+    base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     base_pattern_positions_array_of_arrays = [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
     # Convert the array of arrays into an ndarray that can be saved to shared memory
     square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)

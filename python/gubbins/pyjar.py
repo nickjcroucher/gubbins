@@ -13,9 +13,7 @@ import time
 from Bio import AlignIO
 from math import log, exp
 from functools import partial
-from scipy.sparse import csr_matrix
 from numba import jit, njit, types, from_dtype
-from numba.types import bool_
 from numba.typed import Dict
 import collections
 try:
@@ -398,7 +396,7 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
                     reconstructed_alleles[node_label] = column[alignment_index]
                 else:
                     has_child_base = False
-                    child_taxon_labels = [child.taxon.label for child in node.child_node_iter()for child in node.child_node_iter()]
+                    child_taxon_labels = [child.taxon.label for child in node.child_node_iter()]
                     for child_taxon_label in child_taxon_labels:
                         if reconstructed_alleles[child_taxon_label] < 4:
                             has_child_base = True
@@ -417,8 +415,11 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
             
             # iterate through tree
             for node in tree.preorder_node_iter():
+                node_label = node.taxon.label
                 try:
-                    if node.r in bases and node.parent_node.r in bases and node.r!=node.parent_node.r:
+                    parent_node_label = node.parent_node.taxon.label
+                    if reconstructed_alleles[node_label] < 4 and reconstructed_alleles[parent_node_label] < 4 \
+                      and reconstructed_alleles[node_label] != reconstructed_alleles[parent_node_label]:
                         node_snps[node.taxon.label] += len(base_pattern_columns)
                 except AttributeError:
                     continue
@@ -441,9 +442,10 @@ def reconstruct_alignment_column(column_indices, tree = None, alignment_sequence
         if len(ancestrally_conserved[b]) > 0:
             out_aln[ancestrally_conserved[b],:] = b
     for b_index in ancestrally_variable:
+        b = ordered_bases[b_index]
         for index in ancestrally_variable[b_index]:
             if len(ancestrally_variable[b_index][index]) > 0:
-                out_aln[ancestrally_variable[b_index][index],index] = ordered_bases[b_index]
+                out_aln[ancestrally_variable[b_index][index],index] = b
 
     # Close shared memory
     out_aln_shm.close()

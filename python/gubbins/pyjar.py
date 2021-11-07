@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-import pprofile
-profiler = pprofile.Profile()
-
-#from pyinstrument import Profiler
-#profiler = Profiler()
-
 # pyjar written by Simon Harris
 # code modified from https://github.com/simonrharris/pyjar
 # pyjar is free software, licensed under GPLv3.

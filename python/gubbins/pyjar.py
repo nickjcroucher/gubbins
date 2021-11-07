@@ -188,9 +188,14 @@ def convert_to_square_numpy_array(data):
     out[mask] = numpy.concatenate(data)
     return out
 
+def process_sequence(seq,codec,seq_length):
+    unicode_seq = numpy.frombuffer(bytearray(seq, codec), dtype = 'U1')
+    int_seq = seq_to_int(unicode_seq,seq_length)
+    return int_seq
+
 @njit
-def process_sequence(seq,seq_length):
-    int_seq = numpy.zeros(seq_length, dtype = numpy.uint8)
+def seq_to_int(seq,seq_length):
+    int_seq = numpy.full(seq_length, 8, dtype = numpy.uint8)
     for i,b in zip(range(seq_length),seq):
         if b == 'A':
             int_seq[i] = 0
@@ -226,7 +231,8 @@ def get_base_patterns(alignment, verbose):
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     for i,record in enumerate(alignment):
-        align_array[i] = process_sequence(numpy.frombuffer(bytearray(str(record.seq), codec), dtype = 'U1'), seq_length)
+#        align_array[i] = process_sequence(numpy.frombuffer(bytearray(str(record.seq), codec), dtype = 'U1'), seq_length)
+        align_array[i] = process_sequence(str(record.seq), codec, seq_length)
     # Get unique base patterns and their indices in the alignment
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     base_pattern_positions_array_of_arrays = [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
@@ -606,7 +612,13 @@ def jar(alignment = None, base_patterns = None, base_pattern_positions = None, t
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
 
     # Compile functions prior to multiprocessing
-    for func in [find_most_likely_base_given_descendents,process_leaf,calculate_root_likelihood,count_node_snps,reconstruct_alleles,fill_out_aln]:
+    for func in [find_most_likely_base_given_descendents,
+                process_leaf,
+                calculate_root_likelihood,
+                count_node_snps,
+                reconstruct_alleles,
+                fill_out_aln,
+                iterate_over_base_patterns]:
         try:
             func()
         except:

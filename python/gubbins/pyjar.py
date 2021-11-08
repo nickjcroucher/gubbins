@@ -260,24 +260,6 @@ def find_most_likely_base_given_descendents(Lmat, Cmat, pij, node_index, child_n
                 Lmat[node_index,start_index] = j
                 Cmat[node_index,start_index] = end_index
 
-# Fill in matrices given known or unknown base in sequence
-##########################################################
-@njit(numba.void(numba.float32[:,:],
-                numba.uint8[:,:],
-                numba.float32[:,:],
-                numba.int32,
-                numba.uint8),
-                cache=True)
-def process_leaf(Lmat, Cmat, pij, node_index, taxon_base_index):
-    if taxon_base_index < 4:
-        #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
-        Cmat[node_index,:] = taxon_base_index
-        #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
-        Lmat[node_index,:] = [pij[0][taxon_base_index],pij[1][taxon_base_index],pij[2][taxon_base_index],pij[3][taxon_base_index]]
-    else:
-        # Cmat stays as default when base is unknown
-        Lmat[node_index,:] = [pij[0][0],pij[1][1],pij[2][2],pij[3][3]]
-
 # Calculate the most likely base at the root node
 #################################################
 @njit(numba.void(numba.float32[:,:],
@@ -295,6 +277,24 @@ def calculate_root_likelihood(Lmat, Cmat, base_frequencies, node_index, child_no
             if j > Lmat[node_index,start_index]:
                 Lmat[node_index,start_index] = j
                 Cmat[node_index,start_index] = end_index
+
+# Fill in matrices given known or unknown base in sequence
+##########################################################
+@njit(numba.void(numba.float32[:,:],
+                numba.uint8[:,:],
+                numba.float32[:,:],
+                numba.int32,
+                numba.uint8),
+                cache=True)
+def process_leaf(Lmat, Cmat, pij, node_index, taxon_base_index):
+    if taxon_base_index < 4:
+        #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
+        Cmat[node_index,:] = taxon_base_index
+        #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
+        Lmat[node_index,:] = [pij[0][taxon_base_index],pij[1][taxon_base_index],pij[2][taxon_base_index],pij[3][taxon_base_index]]
+    else:
+        # Cmat stays as default when base is unknown
+        Lmat[node_index,:] = [pij[0][0],pij[1][1],pij[2][2],pij[3][3]]
 
 # Count the number of substitutions occurring on a branch
 #########################################################
@@ -434,7 +434,7 @@ def iterate_over_base_patterns(columns,
                 #calculate the transistion matrix for the branch
                 pij=numpy.reshape(node_pij[node_index,:].copy(),(4,4))
                 if node_index in leaf_nodes:
-                
+
                     alignment_index = node_index_to_aln_row[node_index]
                     taxon_base_index = column[alignment_index]
                     process_leaf(Lmat, Cmat, pij, node_index, taxon_base_index)
@@ -703,6 +703,7 @@ def jar(alignment = None,
     node_pij = numpy.full((num_nodes,16), numpy.NINF, dtype=numpy.float32)
     postordered_nodes = numpy.arange(num_nodes, dtype=numpy.int32)
     seed_node = None
+    seed_node_edge_truncation = True
     node_index_to_aln_row = numpy.full(num_nodes, -1, dtype=numpy.int32)
     ancestral_node_indices = {}
     for node_index,node in zip(postordered_nodes,tree.postorder_node_iter()):
@@ -724,6 +725,12 @@ def jar(alignment = None,
                 sys.exit(1)
         if node.parent_node == None:
             seed_node = node_index
+        elif node.parent_node == tree.seed_node and seed_node_edge_truncation:
+            # Set the length of one root-to-child branch to ~zero
+            # as reconstruction should occur with rooting at a node
+            # midpoint rooting causes problems at the root, especially w/JC69
+            seed_node_edge_truncation = False
+            node_pij[node_index,:]=calculate_pij(node.edge_length/1e6, rm)
         else:
             node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
         # Store information to avoid subsequent recalculation as

@@ -26,10 +26,6 @@
 1	75199	.	A	-,N,C	.	.	.	AB	A	-	-	N	N	N	N	C	C	C	C	C	C	C	
 1	77426	.	C	A	.	.	.	AB	C	C	C	C	A	A	A	C	C	C	C	C	C	C	
 1	79036	.	T	C	.	.	.	AB	T	T	T	T	T	T	T	C	C	C	C	C	C	C	
-1	88564	.	N	-,A,G	.	.	.	AB	N	-	-	-	-	-	A	G	G	G	G	G	G	G	
-1	88754	.	N	-,A,C	.	.	.	AB	N	-	-	-	-	-	A	C	C	C	C	C	C	C	
-1	89281	.	T	-,C	.	.	.	AB	T	-	-	-	-	-	-	C	C	C	C	C	C	C	
-1	89290	.	G	-,A	.	.	.	AB	G	-	-	-	-	-	-	A	A	A	A	A	A	A	
 1	94492	.	T	C	.	.	.	AB	T	T	C	T	T	T	T	T	T	T	T	T	T	T	
 1	96757	.	A	G	.	.	.	AB	A	A	A	A	A	A	A	G	G	A	A	A	A	A	
 1	98681	.	G	-,A	.	.	.	AB	G	G	G	G	G	G	G	G	G	-	G	A	A	A	
@@ -620,7 +616,9 @@
 1	2085943	.	T	A	.	.	.	AB	T	A	A	A	A	A	A	A	A	A	A	A	A	A	
 1	2087134	.	C	T	.	.	.	AB	C	C	C	C	C	C	C	T	T	C	C	C	C	C	
 1	2101969	.	T	C	.	.	.	AB	T	T	T	T	T	T	C	T	T	T	T	T	T	T	
-1	2152652	.	N	T,-,G	.	.	.	AB	N	N	N	N	N	N	N	T	T	-	T	T	G	G	
+1	2112089	.	G	T,N	.	.	.	AB	G	T	G	G	G	G	G	N	N	N	N	N	N	N	
+1	2113851	.	T	C,N	.	.	.	AB	T	T	T	T	T	T	C	N	N	N	N	N	N	N	
+1	2135843	.	C	T,N	.	.	.	AB	C	T	C	C	C	C	C	N	N	N	N	N	N	N	
 1	2156644	.	G	T	.	.	.	AB	G	T	T	T	T	T	T	T	T	T	T	T	T	T	
 1	2163993	.	A	-,T	.	.	.	AB	A	A	A	A	A	A	A	A	A	-	A	A	T	T	
 1	2166339	.	A	-,G	.	.	.	AB	A	A	A	A	A	A	A	A	A	-	A	G	G	G	

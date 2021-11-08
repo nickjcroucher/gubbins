@@ -30,6 +30,7 @@ from gubbins.utils import generate_shared_mem_array
 # Python-native functions #
 ###########################
 
+# Split a list into chunks for multiprocessing
 # from https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length/37414115#37414115
 def chunks(l, k):
     n = len(l)
@@ -55,6 +56,7 @@ def calculate_pij(branch_length,rate_matrix):
         pij = numpy.array(numpy.log(linalg.expm(numpy.multiply(branch_length,rate_matrix))), dtype = numpy.float32) # modified
     return pij.flatten()
 
+# Create an instanteous rate matrix
 def create_rate_matrix(f, r):
     #convert f and r to Q matrix
     rm=numpy.array([[0, f[0]*r[1], f[0]*r[2], f[0]*r[3]],[f[1]*r[0], 0, f[1]*r[3],f[1]*r[4]],[f[2]*r[1], f[2]*r[3], 0, f[2]*r[5]],[f[3]*r[2], f[3]*r[4], f[3]*r[5], 0]])
@@ -66,7 +68,8 @@ def create_rate_matrix(f, r):
 
     return rm
 
-# Read the RAxML info file to get rates and frequencies
+# Read the info file from the selected phylogenetic software
+# to get rates and frequencies
 def read_info(infofile, type = 'raxml'):
 
     if not os.path.isfile(infofile):
@@ -158,6 +161,8 @@ def read_info(infofile, type = 'raxml'):
 
     return numpy.array(f, dtype = numpy.float32), numpy.array(r, dtype = numpy.float32)
 
+# Convert arrays of variable-length arrays to a square matrix
+# for compatibility with numba
 # from https://stackoverflow.com/questions/32037893/numpy-fix-array-with-rows-of-different-lengths-by-filling-the-empty-elements-wi
 def convert_to_square_numpy_array(data):
     # Get lengths of each row of data
@@ -171,6 +176,7 @@ def convert_to_square_numpy_array(data):
     out[mask] = numpy.concatenate(data)
     return out
 
+# Read in sequence to enable conversion to integers with JIT function
 def process_sequence(index_list,alignment = None,codec = None,align_array = None):
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
@@ -197,6 +203,7 @@ def read_alignment(filename, file_type, verbose=False):
         sys.exit(203)
     return alignmentObject
 
+# Get the unique base patterns within the numpy array
 # Based on https://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array
 def get_unique_columns(data):
     dt = numpy.dtype((numpy.void, data.dtype.itemsize * data.shape[0]))

@@ -32,6 +32,7 @@ from dendropy.calculate import treecompare
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
+from Bio.Phylo import Consensus
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
@@ -400,12 +401,9 @@ def parse_and_run(input_args, program_description=""):
                 bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
-                alignment_generation_command = bootstrap_utility.generate_alignments_for_bootstrapping(os.path.abspath(bootstrap_aln), current_basename, temp_working_dir)
-                try:
-                    subprocess.check_call(alignment_generation_command, shell=True)
-                except subprocess.SubprocessError:
-                    sys.exit("Failed while generating alignments for bootstrap analysis.")
-                bootstrap_aln = temp_working_dir + "/" + current_basename
+                bootstrap_aln = generate_bootstrap_alignments(bootstrap_aln,
+                                                                input_args.bootstrap,
+                                                                temp_working_dir + "/" + current_basename)
             # Generate bootstrap trees
             bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(bootstrap_aln), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
             try:
@@ -1084,6 +1082,12 @@ def symmetric_difference(input_tree_name, output_tree_name):
     output_tree.encode_bipartitions()
     return dendropy.calculate.treecompare.symmetric_difference(input_tree, output_tree)
 
+def generate_bootstrap_alignments(bootstrap_aln, n, output_aln_prefix):
+    snp_aln = list(AlignIO.parse(bootstrap_aln, "fasta"))[0]
+    with open(output_aln_prefix + '.bootstrapping.aln', "w+") as output_handle:
+        for aln in (Phylo.Consensus.bootstrap(snp_aln, n)):
+            AlignIO.write(aln, output_handle, "phylip")
+    return output_aln_prefix
 
 def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename, outgroups = None):
     # read source tree and extract bootstraps as node labels, match with bipartition

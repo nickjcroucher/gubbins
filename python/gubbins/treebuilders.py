@@ -619,7 +619,7 @@ class RAxMLNG:
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxml-ng']
-        self.multi_threaded_executables = ['raxml-ng-mpi','raxml-ng']
+        self.multi_threaded_executables = ['raxml-ng']
         self.executable = self.select_executable_based_on_threads()
         if self.executable is None:
             sys.exit("No usable version of RAxML-NG could be found.")

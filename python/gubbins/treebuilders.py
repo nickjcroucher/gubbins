@@ -221,6 +221,7 @@ class FastTree:
         command = self.base_command.copy()
         output_tree = basename + self.tree_suffix
         command.extend(["-nosupport"])
+        command.extend(["-intree1",input_tree]) # http://www.microbesonline.org/fasttree/
         command.extend(["-out", tmp + "/" + basename + ".bootstrapped_trees"])
         command.extend(["-log", basename + ".log"])
         command.extend(["-n", str(self.bootstrap)])
@@ -618,7 +619,7 @@ class RAxMLNG:
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxml-ng']
-        self.multi_threaded_executables = ['raxml-ng-mpi','raxml-ng']
+        self.multi_threaded_executables = ['raxml-ng']
         self.executable = self.select_executable_based_on_threads()
         if self.executable is None:
             sys.exit("No usable version of RAxML-NG could be found.")
@@ -745,17 +746,6 @@ class RAxMLNG:
         command = self.base_command.copy()
         command.extend(["--evaluate"])
         command.extend(["--msa", alignment_filename, "--prefix", basename + '_reconstruction', "--tree", input_tree])
-        return " ".join(command)
-
-    def generate_alignments_for_bootstrapping(self, alignment_filename: str, basename: str, tmp: str) -> str:
-        """Generates subsampled alignments for bootstrap analysis with FastTree"""
-        # Generate alignments
-        command = self.base_command.copy()
-        command.extend(["--bsmsa"])
-        command.extend(["--msa", alignment_filename, "--prefix", tmp + "/" + basename + ".bootstrapping"])
-        command.extend(["--bs-trees",str(self.bootstrap)])
-        # Then concatenate
-        command.extend(["; cat", tmp + "/" + basename + ".bootstrapping.raxml.bootstrapMSA.*.phy >", tmp + "/" + basename + ".bootstrapping.aln"])
         return " ".join(command)
 
     def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:

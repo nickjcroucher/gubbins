@@ -369,7 +369,9 @@ def fill_out_aln(out_aln,reconstructed_alleles,ordered_bases,ancestral_node_orde
                 cache=True)
 def get_columns(base_pattern_columns_padded,column_positions,column_index):
     base_pattern_columns_indices = numpy.argmax(base_pattern_columns_padded == -1)
-    base_pattern_columns = column_positions[column_index,1:(base_pattern_columns_indices-1)]
+    if base_pattern_columns_indices == 0:
+        base_pattern_columns_indices = base_pattern_columns_padded.size
+    base_pattern_columns = column_positions[column_index,0:base_pattern_columns_indices]
     return base_pattern_columns
 
 # Reconstruct each base pattern
@@ -849,7 +851,7 @@ def jar(alignment = None,
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
-                asr_output.write(out_aln[:,i].tobytes().decode('utf-8') + '\n')
+                asr_output.write(''.join(out_aln[:,i]) + '\n')
 
         # Release pool nodes
         pool.join()

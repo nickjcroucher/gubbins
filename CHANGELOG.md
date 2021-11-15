@@ -1,5 +1,13 @@
 # Change Log
 
+## [v3.1.4](https://github.com/sanger-pathogens/gubbins/tree/v3.1.4) (2021-10-22)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.3...v3.1.4)
+
+- Reimplement JAR with numpy and numba
+- Switch to spawn over fork for Linux multiprocessing
+- Fixes bootstraps with Fasttree (#312)
+- Fixes parallelisation of RAxML-NG
+
 ## [v3.1.3](https://github.com/sanger-pathogens/gubbins/tree/v3.1.2) (2021-10-22)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.2...v3.1.3)
 

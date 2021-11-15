@@ -1,15 +1,12 @@
 ##gff-version 3
 ##sequence-region SEQUENCE 1 3043210
-SEQUENCE	GUBBINS	CDS	87951	87964	0.000	.	0	node="Node_12->S78";neg_log_likelihood="132.510694";taxa="S78";snp_count="6";
-SEQUENCE	GUBBINS	CDS	684115	688501	0.000	.	0	node="Node_10->Node_11";neg_log_likelihood="296.952907";taxa=" S26  S2 S78";snp_count="8";
-SEQUENCE	GUBBINS	CDS	87661	88284	0.000	.	0	node="Node_9->Node_10";neg_log_likelihood="441.528991";taxa=" DEN907  S26  S2 S78";snp_count="45";
-SEQUENCE	GUBBINS	CDS	60359	75239	0.000	.	0	node="Node_9->Node_10";neg_log_likelihood="322.093263";taxa=" DEN907  S26  S2 S78";snp_count="26";
-SEQUENCE	GUBBINS	CDS	87781	88870	0.000	.	0	node="Node_8->TW20";neg_log_likelihood="583.221188";taxa="TW20";snp_count="11";
-SEQUENCE	GUBBINS	CDS	60390	62294	0.000	.	0	node="Node_8->TW20";neg_log_likelihood="536.744652";taxa="TW20";snp_count="11";
-SEQUENCE	GUBBINS	CDS	75262	75291	0.000	.	0	node="Node_2->Node_6";neg_log_likelihood="317.751629";taxa=" S85  S87 S130";snp_count="6";
-SEQUENCE	GUBBINS	CDS	2109139	2138317	0.000	.	0	node="Node_1->Node_8";neg_log_likelihood="916.517919";taxa=" TW20   DEN907  S26  S2 S78  S38 S7";snp_count="83";
-SEQUENCE	GUBBINS	CDS	2145234	2153030	0.000	.	0	node="Node_1->Node_8";neg_log_likelihood="621.247113";taxa=" TW20   DEN907  S26  S2 S78  S38 S7";snp_count="31";
-SEQUENCE	GUBBINS	CDS	2132409	2151365	0.000	.	0	node="Node_1->Node_2";neg_log_likelihood="934.856976";taxa="   S102 S40  S93 S71  S85  S87 S130";snp_count="74";
-SEQUENCE	GUBBINS	CDS	2109287	2125853	0.000	.	0	node="Node_1->Node_2";neg_log_likelihood="680.442835";taxa="   S102 S40  S93 S71  S85  S87 S130";snp_count="53";
-SEQUENCE	GUBBINS	CDS	87781	88111	0.000	.	0	node="Node_1->Node_2";neg_log_likelihood="494.664511";taxa="   S102 S40  S93 S71  S85  S87 S130";snp_count="13";
-SEQUENCE	GUBBINS	CDS	60390	62195	0.000	.	0	node="Node_1->Node_2";neg_log_likelihood="453.987090";taxa="   S102 S40  S93 S71  S85  S87 S130";snp_count="9";
+SEQUENCE	GUBBINS	CDS	75262	75291	0.000	.	0	node="Node_12->Node_8";neg_log_likelihood="289.540059";taxa="  S87 S130 S85";snp_count="6";
+SEQUENCE	GUBBINS	CDS	87951	87964	0.000	.	0	node="Node_2->S78";neg_log_likelihood="132.510694";taxa="S78";snp_count="6";
+SEQUENCE	GUBBINS	CDS	684115	688501	0.000	.	0	node="Node_4->Node_3";neg_log_likelihood="296.952907";taxa="  S78 S2 S26";snp_count="8";
+SEQUENCE	GUBBINS	CDS	87661	88284	0.000	.	0	node="Node_5->Node_4";neg_log_likelihood="436.927022";taxa=" DEN907   S78 S2 S26";snp_count="45";
+SEQUENCE	GUBBINS	CDS	60359	75239	0.000	.	0	node="Node_5->Node_4";neg_log_likelihood="319.658827";taxa=" DEN907   S78 S2 S26";snp_count="25";
+SEQUENCE	GUBBINS	CDS	87781	88870	0.000	.	0	node="Node_6->TW20";neg_log_likelihood="587.641767";taxa="TW20";snp_count="11";
+SEQUENCE	GUBBINS	CDS	60390	62294	0.000	.	0	node="Node_6->TW20";neg_log_likelihood="539.000893";taxa="TW20";snp_count="12";
+SEQUENCE	GUBBINS	CDS	2109139	2153030	0.000	.	0	node="Node_13->Node_12";neg_log_likelihood="1557.527321";taxa="   S87 S130 S85   S71 S93  S102 S40";snp_count="244";
+SEQUENCE	GUBBINS	CDS	87781	89290	0.000	.	0	node="Node_13->Node_12";neg_log_likelihood="910.194901";taxa="   S87 S130 S85   S71 S93  S102 S40";snp_count="18";
+SEQUENCE	GUBBINS	CDS	60390	61574	0.000	.	0	node="Node_13->Node_12";neg_log_likelihood="854.720266";taxa="   S87 S130 S85   S71 S93  S102 S40";snp_count="8";

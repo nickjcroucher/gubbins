@@ -86,7 +86,8 @@ RUN pip3 install \
   multiprocess==0.70.11 \
   scipy==1.6.0 \
   numpy==1.19.5 \
-  dendropy==4.5.1
+  dendropy==4.5.1 \
+  numba==0.53.1
 
 # Install Gubbins
 ENV BUILD_DIR /opt/gubbins

@@ -207,6 +207,9 @@ def parse_and_run(input_args, program_description=""):
             printer.print("\nCopying the starting tree...")
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
+            print_file = open("./printer_output","a")
+            print_file.write("Starting tree reconstruction on iter: " + i + " With tree builder: " + tree_builder.executable + "\n" )
+            print_file.close()
             printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
                            tree_building_command])
             if current_tree_builder == "star":
@@ -222,14 +225,21 @@ def parse_and_run(input_args, program_description=""):
                 os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+        print_file = open("./printer_output", "a")
+        print_file.write("Finished tree reconstruction on iter: " + i + " With tree builder: " + tree_builder.executable + "\n")
+        print_file.close()
 
         # 2. Re-root the tree
         reroot_tree(str(current_tree_name), input_args.outgroup)
         temp_rooted_tree = temp_working_dir + "/" + current_tree_name + ".rooted"
+        print_file = open("./printer_output", "a")
+        print_file.write("Rooting the tree on iter: " + i + " With tree builder: " + tree_builder.executable + "\n")
+        print_file.close()
         if input_args.tree_builder == "iqtree":
             shutil.copyfile(current_tree_name, temp_rooted_tree)
         else:
             root_tree(current_tree_name, temp_rooted_tree)
+
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
@@ -299,19 +309,27 @@ def parse_and_run(input_args, program_description=""):
             # 3.3b. Reconstruct the ancestral sequence
             printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
                            sequence_reconstruction_command])
+            print_file = open("./printer_output", "a")
+            print_file.write("Ancestral reconstruction on iter: " + i + " With reconstructer: " + sequence_reconstructor.executable + "\n")
+            print_file.close()
             os.chdir(temp_working_dir)
             try:
                 subprocess.check_call(sequence_reconstruction_command, shell=True)
             except subprocess.SubprocessError:
                 sys.exit("Failed while reconstructing the ancestral sequences.")
             os.chdir(current_directory)
-
+            print_file = open("./printer_output", "a")
+            print_file.write("Finished Ancestral reconstruction on iter: " + i + " With reconstructer: " + sequence_reconstructor.executable + "\n")
+            print_file.close()
             # 3.4b. Join ancestral sequences with given sequences
             current_tree_name_with_internal_nodes = current_tree_name + ".internal"
             sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
+            print_file = open("./printer_output", "a")
+            print_file.write("Rejoining the bases on reconstruction on iter: " + i + " With reconstructer: " + sequence_reconstructor.executable + "\n")
+            print_file.close()
             if input_args.seq_recon == "raxml":
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
@@ -327,9 +345,14 @@ def parse_and_run(input_args, program_description=""):
                 sys.stderr.write("Unrecognised sequence reconstruction command: " + input_args.seq_recon + '\n')
                 sys.exit()
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
+            print_file = open("./printer_output", "a")
+            print_file.write("Finished base rejoining on iter: " + i + " With reconstructer: " + sequence_reconstructor.executable + "\n")
+            print_file.close()
             # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
             printer.print("\nReinserting gaps into the alignment...")
+            print_file = open("./printer_output", "a")
+            print_file.write("Inserting gaps on iter: " + i + "\n")
+            print_file.close()
             shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
             reinsert_gaps_into_fasta_file(joint_sequences_filename, gaps_vcf_filename, gaps_alignment_filename)
             if not os.path.exists(gaps_alignment_filename) \
@@ -339,7 +362,9 @@ def parse_and_run(input_args, program_description=""):
 
         # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
+        print_file = open("./printer_output", "a")
+        print_file.write("Finished inserting gaps on iter: " + i + "\n")
+        print_file.close()
         # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
@@ -347,13 +372,18 @@ def parse_and_run(input_args, program_description=""):
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
+        print_file = open("./printer_output", "a")
+        print_file.write("Running gubbins on iter: " + i + "\n")
+        print_file.close()
         try:
             subprocess.check_call(gubbins_command, shell=True)
         except subprocess.SubprocessError:
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
-
+        print_file = open("./printer_output", "a")
+        print_file.write("Finished running gubbins gaps on iter: " + i + "\n")
+        print_file.close()
         # 5. Check for convergence
         printer.print("\nChecking for convergence...")
         remove_internal_node_labels_from_tree(current_tree_name_with_internal_nodes, current_tree_name)

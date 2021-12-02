@@ -19,31 +19,35 @@
 
 # Generic imports
 import os
-import sys
-import shutil
-import pkg_resources
-import time
-import subprocess
 import re
+import shutil
+import subprocess
+import sys
 import tempfile
+import time
+
 # Phylogenetic imports
 import dendropy
-from dendropy.calculate import treecompare
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
-from Bio.Phylo import Consensus
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
+from Bio.Phylo import Consensus
 from Bio.Seq import Seq
+from dendropy.calculate import treecompare
+from memory_profiler import profile
+
+from gubbins import utils
 # Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
-from gubbins.pyjar import jar, read_alignment, get_base_patterns
-from gubbins import utils
 from gubbins.__init__ import version
+from gubbins.pyjar import jar, read_alignment, get_base_patterns
+from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
+fp = open("memory_log", "w+")
+@profile(stream=fp)
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
     start_time = time.time()

@@ -891,6 +891,8 @@ def main_func(alignment):
 
 if __name__ == '__main__':
     aln = sys.argv[1]
-    aln_read = read_alignment(aln)
+    print("reading in the alignment")
+    aln_read = read_alignment(aln, "fasta", True)
+    print("running the gap inserter")
     main_func(aln_read)
 

@@ -886,13 +886,14 @@ def jar(alignment = None,
     if verbose:
         print("Done")
 
-def main_func(alignment):
-    get_base_patterns(alignment, verbose=True)
+def main_func(alignment, threads):
+    get_base_patterns(alignment, verbose=True, threads=threads)
 
 if __name__ == '__main__':
     aln = sys.argv[1]
+    threads = sys.argv[2]
     print("reading in the alignment")
     aln_read = read_alignment(aln, "fasta", True)
     print("running the gap inserter")
-    main_func(aln_read)
+    main_func(aln_read, threads)
 

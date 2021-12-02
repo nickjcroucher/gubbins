@@ -16,6 +16,10 @@ from functools import partial
 import numba
 from numba import jit, njit, types, from_dtype
 import collections
+from memory_profiler import profile
+
+fp = open("memory_log", "w+")
+
 try:
     from multiprocessing import Pool, shared_memory
     from multiprocessing.managers import SharedMemoryManager
@@ -519,7 +523,7 @@ def iterate_over_base_patterns(columns,
 ####################################################
 # Function for converting alignment to numpy array #
 ####################################################
-
+@profile(stream = fp)
 def get_base_patterns(alignment, verbose, threads = 1):
     if verbose:
         print("Finding unique base patterns")

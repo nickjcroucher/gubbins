@@ -268,12 +268,18 @@ def parse_and_run(input_args, program_description=""):
         
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
+            print_file = open("./printer_output", "a")
+            print_file.write("Starting pyjar recon" + str(time.time()) + "\n")
+            print_file.close()
             if i == 1:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
+                print_file = open("./printer_output", "a")
+                print_file.write("Getting the base patterns" + str(time.time()) + "\n")
+                print_file.close()
                 base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(polymorphism_alignment,
                                                                                             input_args.verbose,
                                                                                             threads = input_args.threads)
@@ -293,6 +299,9 @@ def parse_and_run(input_args, program_description=""):
             harmonise_roots(recontree_filename, temp_rooted_tree)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
+            print_file = open("./printer_output", "a")
+            print_file.write("Starting the jar recon" + str(time.time()) + "\n")
+            print_file.close()
             jar(alignment = polymorphism_alignment, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
                 base_pattern_positions = base_pattern_positions_array, # nparray of positions of unique base patterns in alignment

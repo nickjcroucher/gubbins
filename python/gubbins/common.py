@@ -280,6 +280,9 @@ def parse_and_run(input_args, program_description=""):
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
+                print_file = open("./printer_output", "a")
+                print_file.write("Alignment name: " + alignment_filename + "\n")
+                print_file.close()
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
                 print_file = open("./printer_output", "a")
                 print_file.write("Getting the base patterns" + str(time.time()) + "\n")

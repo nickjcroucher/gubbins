@@ -885,3 +885,12 @@ def jar(alignment = None,
 
     if verbose:
         print("Done")
+
+def main_func(alignment):
+    get_base_patterns(alignment, verbose=True)
+
+if __name__ == '__main__':
+    aln = sys.argv[1]
+    aln_read = read_alignment(aln)
+    main_func(aln_read)
+

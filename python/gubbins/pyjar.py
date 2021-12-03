@@ -17,7 +17,8 @@ import numba
 from numba import jit, njit, types, from_dtype
 import collections
 from memory_profiler import profile
-import psutil;
+import psutil
+import datetime
 
 fp = open("memory_log", "w+")
 
@@ -553,12 +554,12 @@ def get_base_patterns(alignment, verbose, threads = 1):
     ntaxa_range_indices = list(chunks(ntaxa_range_list,threads))
     with SharedMemoryManager() as smm:
         print_file = open("./printer_output", "a")
-        print_file.write("Starting shared memory array " + str(time.time()) + "\n")
+        print_file.write("Starting shared memory array " + str(datetime.datetime.now()) + "\n")
         print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         align_array_shared = generate_shared_mem_array(align_array, smm)
         print_file = open("./printer_output", "a")
-        print_file.write("Create shared memory array " + str(time.time()) + "\n")
+        print_file.write("Create shared memory array " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.close()
         with Pool(processes = threads) as pool:
@@ -576,12 +577,12 @@ def get_base_patterns(alignment, verbose, threads = 1):
 
     # Get unique base patterns and their indices in the alignment
     print_file = open("./printer_output", "a")
-    print_file.write("Staring unique column names " + str(time.time()) + "\n")
+    print_file.write("Staring unique column names " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.close()
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     print_file = open("./printer_output", "a")
-    print_file.write("End unique column names " + str(time.time()) + "\n")
+    print_file.write("End unique column names " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.close()
     base_pattern_positions_array_of_arrays = \
@@ -589,12 +590,12 @@ def get_base_patterns(alignment, verbose, threads = 1):
 
     # Convert the array of arrays into an ndarray that can be saved to shared memory
     print_file = open("./printer_output", "a")
-    print_file.write("Staring conversion to square numpy array " + str(time.time()) + "\n")
+    print_file.write("Staring conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.close()
     square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
     print_file = open("./printer_output", "a")
-    print_file.write("End conversion to square numpy array " + str(time.time()) + "\n")
+    print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.close()
     # Finish

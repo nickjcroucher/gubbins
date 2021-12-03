@@ -536,13 +536,13 @@ def get_base_patterns(alignment, verbose, threads = 1):
     ntaxa = len(alignment)
     seq_length = alignment.get_alignment_length()
     print_file = open("./printer_output", "a")
-    print_file.write("Creating initial align array " + str(time.time()) + "\n")
+    print_file.write("Creating initial align array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     align_array = numpy.full((ntaxa,seq_length), 8, dtype = numpy.uint8, order='F')
     print_file = open("./printer_output", "a")
-    print_file.write("Finished initial align array " + str(time.time()) + "\n")
+    print_file.write("Finished initial align array " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
@@ -563,12 +563,16 @@ def get_base_patterns(alignment, verbose, threads = 1):
         print_file.close()
         align_array_shared = generate_shared_mem_array(align_array, smm)
         print_file = open("./printer_output", "a")
-        print_file.write("Create shared memory array " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Created shared memory array " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
         with multiprocessing.get_context('spawn').Pool() as pool:
-        #with Pool(processes = threads) as pool:
+            print_file = open("./printer_output", "a")
+            print_file.write("Starting process sequence job " + str(datetime.datetime.now()) + "\n")
+            print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+            print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+            print_file.close()
             pool.map(partial(
                 process_sequence,
                     alignment = alignment,
@@ -577,6 +581,11 @@ def get_base_patterns(alignment, verbose, threads = 1):
                 ),
                 ntaxa_range_indices
             )
+        print_file = open("./printer_output", "a")
+        print_file.write("Finished process sequence job " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+        print_file.close()
         # Write out alignment while shared memory manager still active
         align_array_shm = shared_memory.SharedMemory(name = align_array_shared.name)
         align_array = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = align_array_shm.buf)

@@ -25,6 +25,7 @@ fp = open("memory_log", "w+")
 try:
     from multiprocessing import Pool, shared_memory
     from multiprocessing.managers import SharedMemoryManager
+    import multiprocessing
     NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
 except ImportError as e:
     sys.stderr.write("This version of Gubbins requires the multiprocessing library and python v3.8 or higher for memory management\n")
@@ -566,7 +567,8 @@ def get_base_patterns(alignment, verbose, threads = 1):
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
-        with Pool(processes = threads) as pool:
+        with multiprocessing.get_context('spawn').Pool() as pool:
+        #with Pool(processes = threads) as pool:
             pool.map(partial(
                 process_sequence,
                     alignment = alignment,

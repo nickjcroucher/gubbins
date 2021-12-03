@@ -23,7 +23,7 @@ import datetime
 fp = open("memory_log", "w+")
 
 try:
-    from multiprocessing import Pool, shared_memory
+    from multiprocessing import shared_memory
     from multiprocessing.managers import SharedMemoryManager
     import multiprocessing
     NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
@@ -873,7 +873,7 @@ def jar(alignment = None,
         base_pattern_indices = list(chunks(bp_list,threads))
 
         # Parallelise reconstructions across alignment columns using multiprocessing
-        with Pool(processes = threads) as pool:
+        with multiprocessing.get_context(method="spawn").Pool(processes=threads) as pool:
             reconstruction_results = pool.map(partial(
                                         reconstruct_alignment_column,
                                             tree = tree,

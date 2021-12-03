@@ -567,7 +567,7 @@ def get_base_patterns(alignment, verbose, threads = 1):
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
-        with multiprocessing.get_context('spawn').Pool() as pool:
+        with multiprocessing.get_context('fork').Pool() as pool:
             print_file = open("./printer_output", "a")
             print_file.write("Starting process sequence job " + str(datetime.datetime.now()) + "\n")
             print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -873,7 +873,7 @@ def jar(alignment = None,
         base_pattern_indices = list(chunks(bp_list,threads))
 
         # Parallelise reconstructions across alignment columns using multiprocessing
-        with multiprocessing.get_context(method="spawn").Pool(processes=threads) as pool:
+        with multiprocessing.get_context(method="fork").Pool(processes=threads) as pool:
             reconstruction_results = pool.map(partial(
                                         reconstruct_alignment_column,
                                             tree = tree,

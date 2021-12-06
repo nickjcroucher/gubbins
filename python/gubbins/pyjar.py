@@ -527,7 +527,7 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 @profile(stream = fp)
-def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", threads = 1):
+def get_base_patterns(alignment, verbose, printero, fit_method = "spawn", threads = 1):
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
@@ -535,13 +535,13 @@ def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", thre
     # Convert alignment to Numpy array
     ntaxa = len(alignment)
     seq_length = alignment.get_alignment_length()
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("Creating initial align array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     align_array = numpy.full((ntaxa,seq_length), 8, dtype = numpy.uint8, order='F')
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("Finished initial align array " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -556,19 +556,19 @@ def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", thre
     ntaxa_range_list = list(range(ntaxa))
     ntaxa_range_indices = list(chunks(ntaxa_range_list,threads))
     with SharedMemoryManager() as smm:
-        print_file = open(print_file, "a")
+        print_file = open(printero, "a")
         print_file.write("Starting shared memory array " + str(datetime.datetime.now()) + "\n")
         print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
         align_array_shared = generate_shared_mem_array(align_array, smm)
-        print_file = open(print_file, "a")
+        print_file = open(printero, "a")
         print_file.write("Created shared memory array " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
         with multiprocessing.get_context(fit_method).Pool() as pool:
-            print_file = open(print_file, "a")
+            print_file = open(printero, "a")
             print_file.write("Starting process sequence job " + str(datetime.datetime.now()) + "\n")
             print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -581,7 +581,7 @@ def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", thre
                 ),
                 ntaxa_range_indices
             )
-            print_file = open(print_file, "a")
+            print_file = open(printero, "a")
             print_file.write("Finished process sequence job " + str(datetime.datetime.now()) + "\n")
             print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -591,13 +591,13 @@ def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", thre
         align_array = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = align_array_shm.buf)
 
     # Get unique base patterns and their indices in the alignment
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("Staring unique column names " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("End unique column names " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -606,13 +606,13 @@ def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", thre
         [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
 
     # Convert the array of arrays into an ndarray that can be saved to shared memory
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("Staring conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
-    print_file = open(print_file, "a")
+    print_file = open(printero, "a")
     print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (MB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -950,5 +950,5 @@ if __name__ == '__main__':
     print("reading in the alignment")
     aln_read = read_alignment(aln, "fasta", True)
     print("running the gap inserter")
-    main_func(aln_read, threads, printer_name, mp_method )
+    main_func(aln_read, threads, printer_name, mp_method)
 

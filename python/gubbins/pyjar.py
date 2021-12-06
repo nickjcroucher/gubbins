@@ -949,5 +949,5 @@ if __name__ == '__main__':
     print("reading in the alignment")
     aln_read = read_alignment(aln, "fasta", True)
     print("running the gap inserter")
-    main_func(aln_read, threads)
+    main_func(aln_read, threads, printer_name)
 

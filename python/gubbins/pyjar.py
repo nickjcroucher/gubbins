@@ -945,8 +945,8 @@ def main_func(alignment, threads, printer_name, mp_meth):
 if __name__ == '__main__':
     aln = sys.argv[1]
     threads = int(sys.argv[2])
-    printer_name = sys.argv[3]
-    mp_method = sys.argv[4]
+    printer_name = "./" + str(sys.argv[3])
+    mp_method = str(sys.argv[4])
     print("reading in the alignment")
     aln_read = read_alignment(aln, "fasta", True)
     print("running the gap inserter")

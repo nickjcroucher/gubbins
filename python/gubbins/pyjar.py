@@ -940,7 +940,7 @@ def jar(alignment = None,
         print("Done")
 
 def main_func(alignment, threads, printer_name, mp_meth):
-    get_base_patterns(alignment, verbose=True, print_file=printer_name, threads=threads, fit_method=mp_meth)
+    get_base_patterns(alignment, verbose=True, printero=printer_name, threads=threads, fit_method=mp_meth)
 
 if __name__ == '__main__':
     aln = sys.argv[1]

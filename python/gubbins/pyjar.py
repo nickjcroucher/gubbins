@@ -527,7 +527,7 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 @profile(stream = fp)
-def get_base_patterns(alignment, verbose, threads = 1, print_file):
+def get_base_patterns(alignment, verbose, print_file, fit_method = "spawn", threads = 1):
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
@@ -567,7 +567,7 @@ def get_base_patterns(alignment, verbose, threads = 1, print_file):
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
-        with multiprocessing.get_context('fork').Pool() as pool:
+        with multiprocessing.get_context(fit_method).Pool() as pool:
             print_file = open(print_file, "a")
             print_file.write("Starting process sequence job " + str(datetime.datetime.now()) + "\n")
             print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -939,15 +939,16 @@ def jar(alignment = None,
     if verbose:
         print("Done")
 
-def main_func(alignment, threads):
-    get_base_patterns(alignment, verbose=True, threads=threads)
+def main_func(alignment, threads, printer_name, mp_meth):
+    get_base_patterns(alignment, verbose=True, print_file=printer_name, threads=threads, fit_method=mp_meth)
 
 if __name__ == '__main__':
     aln = sys.argv[1]
     threads = int(sys.argv[2])
     printer_name = sys.argv[3]
+    mp_method = sys.argv[4]
     print("reading in the alignment")
     aln_read = read_alignment(aln, "fasta", True)
     print("running the gap inserter")
-    main_func(aln_read, threads, printer_name)
+    main_func(aln_read, threads, printer_name, mp_method )
 

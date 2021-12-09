@@ -19,6 +19,7 @@ import collections
 from memory_profiler import profile
 import psutil
 import datetime
+import argparse
 
 fp = open("memory_log", "w+")
 
@@ -527,7 +528,7 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 @profile(stream = fp)
-def get_base_patterns(alignment, verbose, printero, fit_method = "spawn", threads = 1):
+def get_base_patterns(alignment, verbose, printero = "printer_output", fit_method = "spawn", threads = 1):
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
@@ -942,13 +943,24 @@ def jar(alignment = None,
 def main_func(alignment, threads, printer_name, mp_meth):
     get_base_patterns(alignment, verbose=True, printero=printer_name, threads=threads, fit_method=mp_meth)
 
+def get_args():
+    parser = argparse.ArgumentParser(
+        description='Debug the memory usage of the pyjar reconstruction get_base_patterns function ',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    ioGroup = parser.add_argument_group('Input and output options')
+    ioGroup.add_argument('--aln','-a',help='Multifasta alignment file', required=True)
+    ioGroup.add_argument('--threads', '-t', help='Number of threads to use (must be > 1)', type=int)
+    ioGroup.add_argument('--print-file', '-p', help='File to print debug statements to', type=str)
+    ioGroup.add_argument('--mp-method', '-m', help='method to run the pool jobs with, either spawn, fork or forkserver',
+                         choices=['spawn','fork','forkserver'], required=True, type=str)
+
+    return parser
+
+
 if __name__ == '__main__':
-    aln = sys.argv[1]
-    threads = int(sys.argv[2])
-    printer_name = "./" + str(sys.argv[3])
-    mp_method = str(sys.argv[4])
+    input_args = get_args()
     print("reading in the alignment")
-    aln_read = read_alignment(aln, "fasta", True)
+    aln_read = read_alignment(input_args.aln, "fasta", True)
     print("running the gap inserter")
-    main_func(aln_read, threads, printer_name, mp_method)
+    main_func(aln_read, input_args.threads, input_args.print_file, input_args.mp_method)
 

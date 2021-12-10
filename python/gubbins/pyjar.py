@@ -609,7 +609,6 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
             print(ntaxa_range_indices)
             pool.map(partial(
                 process_sequence,
-                    #alignment = alignment,
                     codec = codec,
                     align_array = align_array_shared
                 ),

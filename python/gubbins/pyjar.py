@@ -11,7 +11,7 @@ import sys
 import os
 import time
 from Bio import AlignIO
-from math import log, exp
+from math import log, exp, ceil
 from functools import partial
 import numba
 from numba import jit, njit, types, from_dtype
@@ -20,6 +20,7 @@ from memory_profiler import profile
 import psutil
 import datetime
 import argparse
+
 
 fp = open("memory_log", "w+")
 
@@ -185,13 +186,13 @@ def convert_to_square_numpy_array(data):
     return out
 
 # Read in sequence to enable conversion to integers with JIT function
-def process_sequence(index_list,alignment = None,codec = None,align_array = None):
+def process_sequence(index_list,alignment ,codec = None,align_array = None):
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
     out_aln = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = out_aln_shm.buf)
-    for i in index_list:
+    for seq,i in enumerate(index_list):
         # Add sequence
-        unicode_seq = numpy.frombuffer(bytearray(str(alignment[i].seq), codec), dtype = 'U1')
+        unicode_seq = numpy.frombuffer(bytearray(str(alignment[seq]), codec), dtype = 'U1')
         seq_to_int(unicode_seq,out_aln[i])
 
 # Function to read an alignment in various formats
@@ -209,7 +210,12 @@ def read_alignment(filename, file_type, verbose=False):
     except:
         print("Cannot open alignment file " + filename + " as " + file_type)
         sys.exit(203)
-    return alignmentObject
+    ## Convert to list of lists of seq types
+    aln_list = []
+    for aln in alignmentObject:
+        aln_list.append(str(aln.seq))
+
+    return aln_list
 
 # Get the unique base patterns within the numpy array
 # Based on https://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array
@@ -536,10 +542,34 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     # Convert alignment to Numpy array
     ntaxa = len(alignment)
     seq_length = alignment.get_alignment_length()
+    ## Now to create the list of alignments
+    ## Manipulate aln list into list of lists
+    print_file = open(printero, "a")
+    print_file.write("Creating list of lists for aln " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
+    ntaxa_jumps = ceil(ntaxa  / threads)
+    aln_list = [alignment[i: i+ntaxa_jumps] for i in range(0, len(alignment), 4)]
+    print_file = open(printero, "a")
+    print_file.write("Finished creating list of lists " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
+
+    print_file = open(printero, "a")
+    print_file.write("Deleting input aln " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
+    del(alignment)
+    print_file = open(printero, "a")
+    print_file.write("Deleting input aln " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
+
     print_file = open(printero, "a")
     print_file.write("Creating initial align array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     align_array = numpy.full((ntaxa,seq_length), 8, dtype = numpy.uint8, order='F')
     print_file = open(printero, "a")
@@ -555,7 +585,8 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     ntaxa_range_list = list(range(ntaxa))
-    ntaxa_range_indices = list(chunks(ntaxa_range_list,threads))
+    ntaxa_range_indices = [ntaxa_range_list[i: i+ntaxa_jumps] for i in range(0, len(ntaxa_range_list), ntaxa_jumps)]
+    #list(chunks(ntaxa_range_list,threads))
     with SharedMemoryManager() as smm:
         print_file = open(printero, "a")
         print_file.write("Starting shared memory array " + str(datetime.datetime.now()) + "\n")
@@ -578,11 +609,11 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
             print(ntaxa_range_indices)
             pool.map(partial(
                 process_sequence,
-                    alignment = alignment,
+                    #alignment = alignment,
                     codec = codec,
                     align_array = align_array_shared
                 ),
-                ntaxa_range_indices
+                ntaxa_range_indices, aln_list
             )
             print_file = open(printero, "a")
             print_file.write("Finished process sequence job " + str(datetime.datetime.now()) + "\n")

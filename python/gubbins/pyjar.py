@@ -947,20 +947,20 @@ def main_func(alignment, threads, printer_name, mp_meth):
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='Debug the memory usage of the pyjar reconstruction get_base_patterns function ',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    ioGroup = parser.add_argument_group('Input and output options')
-    ioGroup.add_argument('--aln','-a',dest="aln",
-    help='Multifasta alignment file', required=True)
-    ioGroup.add_argument('--threads', '-t', dest="threads",
-    help='Number of threads to use (must be > 1)', type=int)
-    ioGroup.add_argument('--print-file', '-p', dest="print_file",
-    help='File to print debug statements to', type=str)
-    ioGroup.add_argument('--mp-method', '-m', dest="mp_method",
-    help='method to run the pool jobs with, either spawn, fork or forkserver',
+        description='Debug the memory usage of the pyjar reconstruction get_base_patterns function ')
+        
+
+    parser.add_argument('--aln','-a',dest="aln",
+                        help='Multifasta alignment file', required=True)
+    parser.add_argument('--threads', '-t', dest="threads",
+                        help='Number of threads to use (must be > 1)', type=int, required=True)
+    parser.add_argument('--print-file', '-p', dest="print_file",
+                        help='File to print debug statements to', type=str, required=True)
+    parser.add_argument('--mp-method', '-m', dest="mp_method",
+                        help='method to run the pool jobs with. Either spawn, fork or forkserver',
                          choices=['spawn','fork','forkserver'], required=True, type=str)
 
-    return parser
+    return parser.parse_args()
 
 
 if __name__ == '__main__':

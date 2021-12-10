@@ -541,7 +541,7 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     t1=time.process_time()
     # Convert alignment to Numpy array
     ntaxa = len(alignment)
-    seq_length = alignment.get_alignment_length()
+    seq_length = len(alignment[0])
     ## Now to create the list of alignments
     ## Manipulate aln list into list of lists
     print_file = open(printero, "a")

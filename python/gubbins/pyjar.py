@@ -607,12 +607,12 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
             print_file.close()
             print("Heres the range indices:")
             print(ntaxa_range_indices)
-            pool.map(partial(
+            pool.starmap(partial(
                 process_sequence,
                     codec = codec,
                     align_array = align_array_shared
                 ),
-                ntaxa_range_indices, aln_list
+                zip(ntaxa_range_indices, aln_list)
             )
             print_file = open(printero, "a")
             print_file.write("Finished process sequence job " + str(datetime.datetime.now()) + "\n")

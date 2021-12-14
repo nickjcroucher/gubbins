@@ -74,23 +74,6 @@ Gubbins has been packaged by the Debian Med team and is trivial to install using
 
     sudo apt-get install gubbins
 
-### OSX/Linux/Cloud/Windows - Docker
-We have a docker container which gets automatically built from the latest version of Gubbins in Debian Med. To install it:
-
-    docker pull sangerpathogens/gubbins
-
-To use it you would use a command such as this:
-
-    docker run --rm -it -v <local_dir>:<remote_dir> sangerpathogens/gubbins run_gubbins.py -p <remote_dir>/<prefix> [<options>] <remote_dir>/<alignment_file>
-
-The flag `-v` synchronizes a directory on the host machine (here denoted as `<local_dir>`) with a directory in the Docker container (here denoted as `<remote_dir>`).
-`<remote_dir>` does not need to exist in the container before the run, a common choice is `/data`.
-Note that both `<local_dir>` and `<remote_dir>` must be absolute paths.
-
-The input alignment file must be present in `<local_dir>` (or in one of its subdirectories).
-In order to retrieve the files produced by Gubbins, run the program with option `-p`; the argument of this option must consist of `<remote_dir>`,
-followed by an arbitrary identifier (here denoted as `<prefix>`).
-
 ### OSX/Linux - from source
 Install the dependencies and include them in your `PATH`. Clone or download the source code from GitHub and run the following commands to install Gubbins:
 ```

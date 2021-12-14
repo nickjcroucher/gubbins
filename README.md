@@ -5,9 +5,6 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  
-[![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/gubbins)  
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
-[![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/gubbins.svg)](https://hub.docker.com/r/sangerpathogens/gubbins)  
 [![codecov](https://codecov.io/gh/sanger-pathogens/gubbins/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/gubbins)
 
 ## Contents
@@ -16,7 +13,6 @@ Genealogies Unbiased By recomBinations In Nucleotide Sequences
     * [Required dependencies](#required-dependencies)
     * [OSX/Linux \- conda](#osxlinux---conda)
     * [Linux \- Ubuntu Xenial (16\.04) &amp; Debian (unstable)](#linux---ubuntu-xenial-1604--debian-unstable)
-    * [OSX/Linux/Cloud/Windows \- Docker](#osxlinuxcloudwindows---docker)
     * [OSX/Linux \- from source](#osxlinux---from-source)
     * [OSX/Linux/Windows \- Virtual Machine](#osxlinuxwindows---virtual-machine)
     * [Running the tests](#running-the-tests)

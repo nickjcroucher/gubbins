@@ -14,4 +14,4 @@ clean-local:
 	$(PYTHON) setup.py clean --all
 
 check-local:
-	pytest --cov=gubbins gubbins/tests/
+	pytest --cov-report xml --cov=gubbins gubbins/tests/

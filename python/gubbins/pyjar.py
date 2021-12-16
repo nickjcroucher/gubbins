@@ -975,9 +975,9 @@ def jar(alignment = None,
     if verbose:
         print("Done")
 
-def main_func(alignment, threads, printer_name, mp_meth, jar_run, input_args):
-    base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=printer_name, threads=threads, fit_method=mp_meth)
-    if jar_run:
+def main_func(alignment, input_args):
+    base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
+    if input_args.jar:
         poly_aln = read_alignment(input_args.aln, "fasta", True)
         jar(alignment=poly_aln,  # complete polymorphism alignment
             base_patterns=base_pattern_bases_array,  # array of unique base patterns in alignment
@@ -987,7 +987,7 @@ def main_func(alignment, threads, printer_name, mp_meth, jar_run, input_args):
             info_filename=input_args.info,  # file containing evolutionary model parameters
             info_filetype=input_args.model_fitter,
             # model fitter - format of file containing evolutionary model parameters
-            output_prefix="temp_working_dir" + "/" + ancestral_sequence_basename,  # output prefix
+            output_prefix="temp_working_dir" + "/" + "ancestral_sequence_basename",  # output prefix
             threads=input_args.threads,  # number of cores to use
             verbose=True)
 
@@ -1009,6 +1009,13 @@ def get_args():
     parser.add_argument('--jar','-j', dest="jar",
                         default=False, action='store_true',
                         help="Whether or not to run the full jar function as well")
+    parser.add_argument('--tree','-tr',dest="tree",
+                        help="tree file for jar", type=str)
+    parser.add_argument('--info','-i', dest="info",
+                        help="log file for jar recon", type=str)
+    parser.add_argument('--model-fitter','-mf',dest="model_fitter",
+                        help="Name of tree model for jar",type=str)
+
 
     return parser.parse_args()
 
@@ -1018,5 +1025,5 @@ if __name__ == '__main__':
     print("reading in the alignment")
     aln_read = read_alignment(input_args.aln, "fasta", True, True)
     print("running the gap inserter")
-    main_func(aln_read, input_args.threads, input_args.print_file, input_args.mp_method)
+    main_func(aln_read, input_args)
 

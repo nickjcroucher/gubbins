@@ -334,7 +334,7 @@ def parse_and_run(input_args, program_description=""):
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             print_file = open("./printer_output", "a")
-            print_file.write("Starting the jar recon" + str(time.time()) + "\n")
+            print_file.write("Starting the jar recon" + " " + str(time.time()) + "\n")
             print_file.write("These are the file inputs: " + "\n" +
                              recontree_filename + "\n" +
                              info_filename + "\n" +

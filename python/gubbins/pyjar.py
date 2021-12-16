@@ -984,6 +984,11 @@ def main_func(alignment, input_args):
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print(base_pattern_bases_array)
         print(type(base_pattern_bases_array))
+        with open("base_positions.npy","wb") as f:
+            numpy.save(f,base_pattern_positions_array)
+        with open("base_patterns.npy","wb") as f:
+            numpy.save(f, base_pattern_bases_array)
+            
 
         jar(alignment=poly_aln,  # complete polymorphism alignment
             base_patterns=base_pattern_bases_array,  # array of unique base patterns in alignment

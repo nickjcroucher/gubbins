@@ -632,6 +632,9 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+    with open("align_array.npy","wb") as f:
+        numpy.save(f, align_array)
+    
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     print_file = open(printero, "a")
     print_file.write("End unique column names " + str(datetime.datetime.now()) + "\n")
@@ -988,7 +991,7 @@ def main_func(alignment, input_args):
             numpy.save(f,base_pattern_positions_array)
         with open("base_patterns.npy","wb") as f:
             numpy.save(f, base_pattern_bases_array)
-            
+
 
         jar(alignment=poly_aln,  # complete polymorphism alignment
             base_patterns=base_pattern_bases_array,  # array of unique base patterns in alignment

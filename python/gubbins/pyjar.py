@@ -979,6 +979,10 @@ def main_func(alignment, input_args):
     base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
     if input_args.jar:
         poly_aln = read_alignment(input_args.aln, "fasta", True)
+        print(base_pattern_positions_array)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(base_pattern_bases_array)
+
         jar(alignment=poly_aln,  # complete polymorphism alignment
             base_patterns=base_pattern_bases_array,  # array of unique base patterns in alignment
             base_pattern_positions=base_pattern_positions_array,

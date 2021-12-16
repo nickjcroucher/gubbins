@@ -54,6 +54,7 @@ Python modules:
 * Scipy
 * Numpy
 * Multiprocessing
+* Numba
 * Nose
 
 See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
@@ -129,4 +130,4 @@ From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint 
 This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.
 
 ### Ancestral sequence reconstruction
-From version 3.0.0 onwards, Gubbins will use joint ancestral reconstructions with pyjar. Version 2 used marginal ancestral reconstruction with RAxML. Version 1 used joint ancestral reconstruction with fastML.
+From version 3.0.0 onwards, Gubbins will use joint ancestral reconstructions with a modified version of [pyjar](https://github.com/simonrharris/pyjar) by default. Version 2 used marginal ancestral reconstruction with RAxML; this is still available in version 3, using the `--mar` flag (IQtree can also be used for reconstruction in version >3.0.0). This may useful in cases where memory use is limiting. Version 1 used joint ancestral reconstruction with [fastML](http://fastml.tau.ac.il/).

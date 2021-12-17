@@ -1003,9 +1003,9 @@ def main_func(alignment, input_args):
     if input_args.base_patterns:
         base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
         with open("base_positions.npy", "wb") as f:
-            numpy.save(f, base_pattern_positions_array)
-        with open("base_patterns.npy", "wb") as f:
             numpy.save(f, base_pattern_bases_array)
+        with open("base_patterns.npy", "wb") as f:
+            numpy.save(f, base_pattern_positions_array, allow_pickle=True)
     if input_args.jar:
         poly_aln = read_alignment(input_args.aln, "fasta", True)
         with open("base_positions.npy", "rb") as f:

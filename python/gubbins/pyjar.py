@@ -907,7 +907,7 @@ def jar(alignment = None,
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
 
         # Convert base pattern positions to shared memory numpy array
-        base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
+        #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
 
         # split list of sites into chunks per core
         bp_list = list(range(len(base_patterns)))

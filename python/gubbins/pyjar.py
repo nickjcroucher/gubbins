@@ -726,7 +726,7 @@ def reconstruct_alignment_column(column_indices,
         print_file = open(printero, "a")
         print_file.write("Getting the type for the column positions " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process())  + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + ":::" + str(multiprocessing.current_process()) + "\n")
-        print_file.write(type(column_positions) + "\n")
+        print_file.write(str(type(column_positions)) + "\n")
         print_file.close()
         # square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
         print_file = open(printero, "a")

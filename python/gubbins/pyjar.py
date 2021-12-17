@@ -1002,18 +1002,18 @@ def jar(alignment = None,
         print("Done")
 
 def main_func(alignment, input_args):
-    base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
+    if input_args.base_patterns:
+        base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
+        with open("base_positions.npy", "wb") as f:
+            numpy.save(f, base_pattern_positions_array)
+        with open("base_patterns.npy", "wb") as f:
+            numpy.save(f, base_pattern_bases_array)
     if input_args.jar:
         poly_aln = read_alignment(input_args.aln, "fasta", True)
-        print(base_pattern_positions_array)
-        print(type(base_pattern_positions_array))
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(base_pattern_bases_array)
-        print(type(base_pattern_bases_array))
-        with open("base_positions.npy","wb") as f:
-            numpy.save(f,base_pattern_positions_array)
-        with open("base_patterns.npy","wb") as f:
-            numpy.save(f, base_pattern_bases_array)
+        with open("base_positions.npy", "wb") as f:
+            base_pattern_bases_array = numpy.load(f)
+        with open("base_patterns.npy", "wb") as f:
+            base_pattern_positions_array = numpy.load(f, allow_pickle=True)
 
 
         jar(alignment=poly_aln,  # complete polymorphism alignment
@@ -1053,6 +1053,9 @@ def get_args():
                         help="log file for jar recon", type=str)
     parser.add_argument('--model-fitter','-mf',dest="model_fitter",
                         help="Name of tree model for jar",type=str)
+    parser.add_argument('--base-patterns','-b',dest="base_patterns",
+                        help="Run the base pattern reconstructions or not",
+                        default=False, action="store_true")
 
 
     return parser.parse_args()

@@ -650,7 +650,7 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
+    #square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
     print_file = open(printero, "a")
     print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -660,7 +660,7 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     t2=time.process_time()
     if verbose:
         print("Time taken to find unique base patterns:", t2-t1, "seconds")
-        print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
+        print("Unique base patterns:", str(base_pattern_bases_array.shape[1]))
     return base_pattern_bases_array.transpose(), base_pattern_positions_array_of_arrays#square_base_pattern_positions_array
 
 ########################################################
@@ -684,7 +684,8 @@ def reconstruct_alignment_column(column_indices,
                                 base_frequencies = None,
                                 new_aln = None,
                                 threads = 1,
-                                verbose = False):
+                                verbose = False,
+                                 printero = "./printer_output"):
     
     ### TIMING
     if verbose:
@@ -722,6 +723,18 @@ def reconstruct_alignment_column(column_indices,
     else:
         columns = base_patterns[column_indices]
         column_positions = base_pattern_positions#[column_indices,:]
+        print_file = open(printero, "a")
+        print_file.write("Getting the type for the column positions " + str(datetime.datetime.now()) + str(multiprocessing.current_process())  + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + str(multiprocessing.current_process()) + "\n")
+        # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+        print_file.close()
+        # square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
+        print_file = open(printero, "a")
+        print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + str(multiprocessing.current_process()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + str(multiprocessing.current_process()) + "\n")
+        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + str(multiprocessing.current_process()) +  "\n")
+        print_file.close()
+        
 
     ### TIMING
     if verbose:
@@ -779,7 +792,8 @@ def jar(alignment = None,
         info_filetype = None,
         output_prefix = None,
         threads = 1,
-        verbose = False):
+        verbose = False,
+        printero = "./printer_output"):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T": 3}
@@ -938,7 +952,8 @@ def jar(alignment = None,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
                                             threads = threads,
-                                            verbose = verbose),
+                                            verbose = verbose,
+                                            printero = printero),
                                         zip(base_pattern_indices, base_positions)
                                     )
 
@@ -1011,7 +1026,8 @@ def main_func(alignment, input_args):
             # model fitter - format of file containing evolutionary model parameters
             output_prefix="temp_working_dir" + "/" + "ancestral_sequence_basename",  # output prefix
             threads=input_args.threads,  # number of cores to use
-            verbose=True)
+            verbose=True,
+            printero=input_args.print_file)
 
 
 def get_args():

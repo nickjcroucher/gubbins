@@ -722,13 +722,11 @@ def reconstruct_alignment_column(column_indices,
         column_positions = base_pattern_positions
     else:
         columns = base_patterns[column_indices]
-        column_positions = base_pattern_positions#[column_indices,:]
         print_file = open(printero, "a")
-        print_file.write("Getting the type for the column positions " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process())  + "\n")
+        print_file.write("Converting back into square array " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process())  + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + ":::" + str(multiprocessing.current_process()) + "\n")
-        print_file.write(str(type(column_positions)) + "\n")
         print_file.close()
-        # square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
+        column_positions = convert_to_square_numpy_array(base_pattern_positions)
         print_file = open(printero, "a")
         print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + ":::" + str(multiprocessing.current_process()) + "\n")

@@ -1008,9 +1008,9 @@ def main_func(alignment, input_args):
             numpy.save(f, base_pattern_bases_array)
     if input_args.jar:
         poly_aln = read_alignment(input_args.aln, "fasta", True)
-        with open("base_positions.npy", "wb") as f:
+        with open("base_positions.npy", "rb") as f:
             base_pattern_bases_array = numpy.load(f)
-        with open("base_patterns.npy", "wb") as f:
+        with open("base_patterns.npy", "rb") as f:
             base_pattern_positions_array = numpy.load(f, allow_pickle=True)
 
 

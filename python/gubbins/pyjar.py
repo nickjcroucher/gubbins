@@ -440,9 +440,9 @@ def iterate_over_base_patterns(columns,
         column = columns[column_index]
         
         # Get column positions
-        base_pattern_columns_padded = column_positions[column_index]
-        base_pattern_columns = get_columns(base_pattern_columns_padded,column_positions,column_index)
-        
+        # base_pattern_columns_padded = column_positions[column_index]
+        # base_pattern_columns = get_columns(base_pattern_columns_padded,column_positions,column_index)
+        base_pattern_columns = column_positions[column_index]
         # Reset matrices
         Lmat.fill(numpy.NINF)
         Cmat[:] = Cmat_null
@@ -552,7 +552,7 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.close()
     ntaxa_jumps = ceil(ntaxa  / threads)
-    aln_list = [alignment[i: i+ntaxa_jumps] for i in range(0, len(alignment), 4)]
+    aln_list = [alignment[i: i+ntaxa_jumps] for i in range(0, len(alignment), ntaxa_jumps)]
     print_file = open(printero, "a")
     print_file.write("Finished creating list of lists " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -634,7 +634,7 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     print_file.close()
     with open("align_array.npy","wb") as f:
         numpy.save(f, align_array)
-    
+
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     print_file = open(printero, "a")
     print_file.write("End unique column names " + str(datetime.datetime.now()) + "\n")
@@ -661,13 +661,14 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     if verbose:
         print("Time taken to find unique base patterns:", t2-t1, "seconds")
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
-    return base_pattern_bases_array.transpose(), square_base_pattern_positions_array
+    return base_pattern_bases_array.transpose(), base_pattern_positions_array_of_arrays#square_base_pattern_positions_array
 
 ########################################################
 # Function for reconstructing individual base patterns #
 ########################################################
 
 def reconstruct_alignment_column(column_indices,
+                                 base_pattern_positions,
                                 tree = None,
                                 preordered_nodes = None,
                                 postordered_nodes = None,
@@ -679,7 +680,7 @@ def reconstruct_alignment_column(column_indices,
                                 node_index_to_aln_row = None,
                                 ancestral_node_order = None,
                                 base_patterns = None,
-                                base_pattern_positions = None,
+                                #base_pattern_positions = None,
                                 base_frequencies = None,
                                 new_aln = None,
                                 threads = 1,
@@ -710,8 +711,9 @@ def reconstruct_alignment_column(column_indices,
     base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
     base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
     # Load base pattern position information
-    base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
-    base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
+    # No Need to with the chunked up positions
+    #base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
+    #base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
 
     # Extract information for iterations
     if threads == 1:
@@ -719,7 +721,7 @@ def reconstruct_alignment_column(column_indices,
         column_positions = base_pattern_positions
     else:
         columns = base_patterns[column_indices]
-        column_positions = base_pattern_positions[column_indices,:]
+        column_positions = base_pattern_positions#[column_indices,:]
 
     ### TIMING
     if verbose:
@@ -909,11 +911,17 @@ def jar(alignment = None,
 
         # split list of sites into chunks per core
         bp_list = list(range(len(base_patterns)))
-        base_pattern_indices = list(chunks(bp_list,threads))
+        #base_pattern_indices = list(chunks(bp_list,threads))
+        npatterns = len(base_patterns)
+        ntaxa_jumps = ceil(npatterns / threads)
+        ntaxa_range_list = list(range(npatterns))
+        base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
+
+        base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
 
         # Parallelise reconstructions across alignment columns using multiprocessing
         with multiprocessing.get_context(method="fork").Pool(processes=threads) as pool:
-            reconstruction_results = pool.map(partial(
+            reconstruction_results = pool.starmap(partial(
                                         reconstruct_alignment_column,
                                             tree = tree,
                                             preordered_nodes = preordered_nodes,
@@ -926,12 +934,12 @@ def jar(alignment = None,
                                             node_index_to_aln_row = node_index_to_aln_row,
                                             ancestral_node_order = ancestral_node_order,
                                             base_patterns = base_patterns_shared_array,
-                                            base_pattern_positions = base_pattern_positions_shared_array,
+                                            #base_pattern_positions = base_pattern_positions_shared_array,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
                                             threads = threads,
                                             verbose = verbose),
-                                        base_pattern_indices
+                                        zip(base_pattern_indices, base_positions)
                                     )
 
         # Write out alignment while shared memory manager still active

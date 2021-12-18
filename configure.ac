@@ -10,10 +10,15 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 
 case $host_os in
-	*linux*)
-		HOST_OS=linux
-		;;
-	*) ;;
+    *darwin*)
+        HOST_OS=osx
+        ;;
+    *linux*)
+        HOST_OS=linux
+        ;;
+	*)
+        HOST_OS=unknown
+        ;;
 esac
 AM_CONDITIONAL([HOST_LINUX],[test x$HOST_OS = xlinux])
 

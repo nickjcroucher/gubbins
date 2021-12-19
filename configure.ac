@@ -1,4 +1,4 @@
-AC_INIT([gubbins], m4_esyscmd([tr -d '\n' < VERSION]), [gubbins@sanger.ac.uk], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins])
+AC_INIT([gubbins], m4_esyscmd([tr -d '\n' < VERSION]), [n.croucher@imperial.ac.uk], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/nickjcroucher/gubbins])
 
 AM_INIT_AUTOMAKE([foreign tar-pax subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])

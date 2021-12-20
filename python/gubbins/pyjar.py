@@ -722,16 +722,16 @@ def reconstruct_alignment_column(column_indices,
     else:
         columns = base_patterns[column_indices]
         print_file = open(printero, "a")
-        print_file.write("Converting back into square array " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process())  + "\n")
+        print_file.write("Converting back into square array " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
         print_file.close()
         column_positions = convert_to_square_numpy_array(base_pattern_positions)
         print_file = open(printero, "a")
-        print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + ":::" + str(multiprocessing.current_process()) + "\n")
+        print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) +  "\n")
         print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
-        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + ":::" + str(multiprocessing.current_process()) +  "\n")
+        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +  "\n")
         print_file.close()
 
 
@@ -924,7 +924,10 @@ def jar(alignment = None,
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
-
+        print_file = open(printero, "a")
+        print_file.write("Start Alignment shared jar " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
         new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
         print_file = open(printero, "a")
         print_file.write("End Alignment shared jar " + str(datetime.datetime.now()) + "\n")

@@ -29,6 +29,9 @@ AC_PROG_CXX
 # Checks for pthread
 AX_PTHREAD
 
+# Checks for code coverage
+AX_CODE_COVERAGE
+
 # Ensure zlib is available
 PKG_CHECK_MODULES([zlib], [zlib])
 AC_CHECK_HEADERS([zlib.h math.h])

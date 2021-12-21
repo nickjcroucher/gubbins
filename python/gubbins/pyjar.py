@@ -20,7 +20,7 @@ from memory_profiler import profile
 import psutil
 import datetime
 import argparse
-
+import pickle
 
 fp = open("memory_log", "w+")
 
@@ -537,7 +537,9 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 @profile(stream = fp)
-def get_base_patterns(alignment, verbose, printero = "printer_output", fit_method = "spawn", threads = 1):
+def get_base_patterns(alignment, verbose,
+                      printero = "printer_output", fit_method = "spawn",
+                      threads = 1, pickle_aln = False):
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
@@ -590,6 +592,12 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
     ntaxa_range_list = list(range(ntaxa))
     ntaxa_range_indices = [ntaxa_range_list[i: i+ntaxa_jumps] for i in range(0, len(ntaxa_range_list), ntaxa_jumps)]
     #list(chunks(ntaxa_range_list,threads))
+    if pickle_aln:
+        with open("pickled_aln.txt","wb") as fh:
+            pickle.dump(aln_list, fh)
+
+
+
     with SharedMemoryManager() as smm:
         print_file = open(printero, "a")
         print_file.write("Starting shared memory array " + str(datetime.datetime.now()) + "\n")
@@ -1037,7 +1045,11 @@ def jar(alignment = None,
 
 def main_func(alignment, input_args):
     if input_args.base_patterns:
-        base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True, printero=input_args.print_file, threads=input_args.threads, fit_method=input_args.mp_method)
+        base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(alignment, verbose=True,
+                                                                                   printero=input_args.print_file,
+                                                                                   threads=input_args.threads,
+                                                                                   fit_method=input_args.mp_method,
+                                                                                   pickle_aln=input_args.pickle_aln)
         with open("base_patterns.npy", "wb") as f:
             numpy.save(f, base_pattern_bases_array)
         with open("base_positions.npy", "wb") as f:
@@ -1090,6 +1102,9 @@ def get_args():
                         help="Name of tree model for jar",type=str)
     parser.add_argument('--base-patterns','-b',dest="base_patterns",
                         help="Run the base pattern reconstructions or not",
+                        default=False, action="store_true")
+    parser.add_argument('--pickle_aln','-pa', dest="pickle_aln",
+                        help="Whether to write out the aln list of lists for further inspection",
                         default=False, action="store_true")
 
 

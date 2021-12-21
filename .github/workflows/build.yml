@@ -45,4 +45,4 @@ jobs:
       - name: Upload python code coverage analysis
         uses: codecov/codecov-action@v2
         with:
-            files: ./python/coverage.xml, gubbins_coverage.info
+            files: ./python/coverage.xml,gubbins_coverage.info

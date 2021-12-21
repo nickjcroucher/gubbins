@@ -1,8 +1,8 @@
 # Gubbins
-Genealogies Unbiased By recomBinations In Nucleotide Sequences
+**G**enealogies **U**nbiased **B**y recom**B**inations **I**n **N**ucleotide **S**equences
 
-![build](https://github.com/sanger-pathogens/gubbins/workflows/build/badge.svg)  
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE)   
+![build](https://github.com/nickjcroucher/gubbins/workflows/build/badge.svg)  
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/nickjcroucher/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/gubbins/README.html)  
 [![codecov](https://codecov.io/gh/nickjcroucher/gubbins/branch/master/graph/badge.svg)](https://codecov.io/gh/nickjcroucher/gubbins)
@@ -37,7 +37,7 @@ generates highly accurate reconstructions under realistic models of short-term b
 in only a few hours on alignments of hundreds of bacterial genome sequences.
 
 ## Installation
-Before starting your analysis, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
+Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
 
 ### Required dependencies
 
@@ -55,7 +55,6 @@ Python modules:
 * Numpy
 * Multiprocessing
 * Numba
-* Nose
 
 See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
@@ -107,10 +106,10 @@ To run Gubbins with default settings:
 Information on on further options can be found in the [manual](docs/gubbins_manual.md).
 
 ## License
-Gubbins is free software, licensed under [GPLv2](https://github.com/sanger-pathogens/gubbins/blob/master/LICENSE).
+Gubbins is free software, licensed under [GPLv2](https://github.com/nickjcroucher/gubbins/blob/master/LICENSE).
 
 ## Feedback/Issues
-We currently do not have the resources to provide support for Gubbins. However, the community might be able to help you out if you report any issues about usage of the software to the [issues page](https://github.com/sanger-pathogens/gubbins/issues).
+There is no specific support for development or maintenance of Gubbins. However, we will try to help you out if you report any issues about usage of the software to the [issues page](https://github.com/nickjcroucher/gubbins/issues).
 
 ## Citation
 If you use this software please cite:
@@ -119,7 +118,7 @@ If you use this software please cite:
 (http://nar.oxfordjournals.org/content/43/3/e15)
 
 ## Further Information
-For more information on this software see the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/).
+For more information on this software see the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/).
 
 ### Data from the paper
 * ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz

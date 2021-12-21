@@ -792,7 +792,8 @@ def jar(alignment = None,
         output_prefix = None,
         threads = 1,
         verbose = False,
-        printero = "./printer_output"):
+        printero = "./printer_output",
+        mp_metho = "spawn"):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T": 3}
@@ -964,7 +965,7 @@ def jar(alignment = None,
         print_file.write("Starting Alignment reconstruction " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
-        with multiprocessing.get_context(method="fork").Pool(processes=threads) as pool:
+        with multiprocessing.get_context(method=mp_metho).Pool(processes=threads) as pool:
             reconstruction_results = pool.starmap(partial(
                                         reconstruct_alignment_column,
                                             tree = tree,
@@ -1062,7 +1063,8 @@ def main_func(alignment, input_args):
             output_prefix="temp_working_dir" + "/" + "ancestral_sequence_basename",  # output prefix
             threads=input_args.threads,  # number of cores to use
             verbose=True,
-            printero=input_args.print_file)
+            printero=input_args.print_file,
+            mp_metho=input_args.mp_method)
 
 
 def get_args():

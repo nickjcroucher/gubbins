@@ -19,9 +19,8 @@ setuptools.setup(
         'scripts/extract_gubbins_clade.py',
         'scripts/mask_gubbins_aln.py'
     ],
-    test_suite='nose.collector',
     tests_require=[
-        "nose >= 1.3",
+        "pytest >= 4.6",
         "wheel >= 0.34",
         "biopython >= 1.59",
         "dendropy  >= 4.0.2",

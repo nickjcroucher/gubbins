@@ -532,21 +532,6 @@ class RAxML:
         command.extend(["-w",os.path.dirname(basename)])
         return " ".join(command)
     
-    def generate_alignments_for_bootstrapping(self, alignment_filename: str, basename: str, tmp: str) -> str:
-        """Generates subsampled alignments for bootstrap analysis with FastTree"""
-        # Generate alignments
-        command = self.base_command.copy()
-        command.extend(["-s", os.path.basename(alignment_filename)])
-        command.extend(["-f j"])
-        p_seed = str(randint(0, 10000))
-        command.extend(["-b",p_seed])
-        command.extend(["-#",str(self.bootstrap)])
-        command.extend(["-n",basename + ".bootstrapping"])
-        command.extend(["-w",tmp])
-        # Then concatenate
-        command.extend(["; cat", tmp + "/" + os.path.basename(alignment_filename) + ".BS* >", tmp + "/" + basename + ".bootstrapping.aln"])
-        return " ".join(command)
-    
     def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         # Run bootstraps
@@ -561,24 +546,6 @@ class RAxML:
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         command.extend([";"])
-        return " ".join(command)
-        
-    def annotate_tree_using_bootstraps_command(self, alignment_filename: str, input_tree: str, bootstrapped_trees: str, basename: str, tmp: str, transfer = False) -> str:
-        # Annotate tree with bootstraps
-        command = self.base_command.copy()
-        p_seed = str(randint(0, 10000))
-        command.extend(["-p",p_seed])
-        command.extend(["-f","b"])
-        command.extend(["-t",input_tree])
-        command.extend(["-z",bootstrapped_trees]) # "RAxML_bootstrap." + basename + ".bootstrapped_trees"
-        command.extend(["-n",basename + ".bootstrapped"])
-        command.extend(["-w",tmp])
-        # Output
-        if not self.verbose:
-            command.extend([">", "/dev/null", "2>&1"])
-        command.extend([";"])
-        # Rename final file
-        command.extend(["cp",tmp + "/RAxML_bipartitions." + basename + ".bootstrapped", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
     def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:

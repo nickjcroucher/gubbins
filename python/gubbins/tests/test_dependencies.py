@@ -19,6 +19,22 @@ working_dir = os.path.join(modules_dir, 'tests')
 
 class TestExternalDependencies(unittest.TestCase):
 
+    # Test pairwise comparisons
+    def test_pairwise(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--pairwise",
+                                                    os.path.join(data_dir, 'pairwise.aln'),
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     # Test individual tree builders
     def test_fasttree(self):
         exit_code = 0
@@ -65,6 +81,21 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    def test_raxml_quiet(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_raxmlng(self):
         exit_code = 0
         parser = run_gubbins.parse_input_args()
@@ -90,6 +121,23 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--verbose", "--iterations", "3",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_defined_starting_tree(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--starting-tree",
+                                                os.path.join(data_dir, 'destination_tree.tre'),
+                                                "--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
+                                                "--threads", "1",
+                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
             self.check_for_output_files('multiple_recombinations')
         except:
             sys.stderr.write("Test failed")
@@ -296,6 +344,25 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    # Test different model structures across iterations
+    def test_different_model_selections(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model-fitter", "iqtree",
+                                                    "--first-model", "JC",
+                                                    "--model", "GTRGAMMA",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     # Test bootstrapping
     def test_raxml_bootstrapping(self):
         exit_code = 0
@@ -367,6 +434,23 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         try:
             common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--bootstrap","10",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'bootstrapping_test.aln')]))
+            self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    def test_fasttree_bootstrapping_with_raxml(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--model-fitter", "raxml",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","10",
                                                     "--threads", "1",
@@ -456,6 +540,39 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--sh-test",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
             self.check_for_output_files('bootstrapping_test')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+
+    # Test convergence
+    def test_converge_on_rec(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--converge-method", "recombination",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
+        except:
+            sys.stderr.write("Test failed")
+            exit_code = 1
+        self.cleanup('bootstrapping_test')
+        assert exit_code == 0
+    
+    def test_converge_on_unweighted_rf(self):
+        exit_code = 0
+        parser = run_gubbins.parse_input_args()
+        try:
+            common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--converge-method", "robinson_foulds",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+            self.check_for_output_files('multiple_recombinations')
         except:
             sys.stderr.write("Test failed")
             exit_code = 1

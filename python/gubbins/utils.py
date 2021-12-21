@@ -100,13 +100,18 @@ def choose_executable_based_on_processor(list_of_executables: list):
     cpu_info = False
     if os.path.exists('/proc/cpuinfo'):
         cpu_info = True
-        output = subprocess.Popen('grep flags /proc/cpuinfo', stdout=subprocess.PIPE,
-                                  shell=True).communicate()[0].decode("utf-8")
+        with subprocess.Popen('grep flags /proc/cpuinfo',
+                                stdout=subprocess.PIPE,
+                                shell=True) as p:
+            output = p.communicate()[0].decode("utf-8")
+            p.kill()
     elif which("sysctl") is not None:
         cpu_info = True
-        output = subprocess.Popen('sysctl -a | grep machdep.cpu.features',
+        with subprocess.Popen('sysctl -a | grep machdep.cpu.features',
                                   stdout=subprocess.PIPE,
-                                  shell=True).communicate()[0].decode("utf-8")
+                                  shell=True) as p:
+            output = p.communicate()[0].decode("utf-8")
+            p.kill()
     flags = output.lower().split()
 
     # Iterate through list to match with CPU features

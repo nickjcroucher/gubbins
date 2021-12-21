@@ -99,7 +99,7 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nChecking input files...")
     if not os.path.exists(input_args.alignment_filename) \
             or not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
-        sys.exit("There input alignment file does not exist or has an invalid format")
+        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist or has an invalid format")
     if input_args.starting_tree is not None and input_args.starting_tree != "" \
             and (not os.path.exists(input_args.starting_tree) or not is_starting_tree_valid(input_args.starting_tree)):
         sys.exit("The starting tree does not exist or has an invalid format")

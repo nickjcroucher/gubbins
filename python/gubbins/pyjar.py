@@ -1103,7 +1103,7 @@ def get_args():
     parser.add_argument('--base-patterns','-b',dest="base_patterns",
                         help="Run the base pattern reconstructions or not",
                         default=False, action="store_true")
-    parser.add_argument('--pickle_aln','-pa', dest="pickle_aln",
+    parser.add_argument('--pickle-aln','-pa', dest="pickle_aln",
                         help="Whether to write out the aln list of lists for further inspection",
                         default=False, action="store_true")
 

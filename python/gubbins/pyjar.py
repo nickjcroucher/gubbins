@@ -608,8 +608,6 @@ def get_base_patterns(alignment, verbose, printero = "printer_output", fit_metho
             print_file.write("Starting mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
             print_file.close()
-            print("Heres the range indices:")
-            print(ntaxa_range_indices)
             pool.starmap(partial(
                 process_sequence,
                     codec = codec,

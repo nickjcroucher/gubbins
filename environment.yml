@@ -17,7 +17,6 @@ dependencies:
   - cppunit
   - pkg-config
   - wheel
-  - nose
   - pillow
 # algorithm
   - scipy

@@ -803,7 +803,20 @@ def jar(alignment = None,
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T": 3}
-
+    print_file = open(printero, "a")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.write("<><><><><><><><><><><><><><><><><><><>" + "\n")
+    print_file.write("JAR function start " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
+    print_file.write("<><><><><><><><><><><><><><><><><><><>" + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
+    #square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
+    print_file = open(printero, "a")
+    print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, x in enumerate(alignment):
@@ -891,7 +904,7 @@ def jar(alignment = None,
     leaf_nodes = numpy.array(leaf_node_list, dtype = numpy.int32)
     child_nodes = convert_to_square_numpy_array(child_nodes_array)
     print_file = open(printero, "a")
-    print_file.write("End node labelling jar " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End tree labelling jar " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
@@ -906,8 +919,21 @@ def jar(alignment = None,
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
     # Create new empty array
+    print_file = open(printero, "a")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
+    print_file.write("Alignment array creation " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
+    
+    print_file.close()
+    
     new_aln_array = numpy.full((len(alignment[0]),len(ancestral_node_indices)), '?', dtype = 'U1')
-
+    print_file = open(printero, "a")
+    print_file.write("End Alignment array creation " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
 
@@ -969,6 +995,9 @@ def jar(alignment = None,
         # Parallelise reconstructions across alignment columns using multiprocessing
         print_file = open(printero, "a")
         print_file.write("Starting Alignment reconstruction " + str(datetime.datetime.now()) + "\n")
+        print_file.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "\n")
+        print_file.write("This is the dimension of the base_pattern_positions " + str(base_pattern_positions.shape) + "\n")
+        print_file.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         with multiprocessing.get_context(method=mp_metho).Pool(processes=threads) as pool:

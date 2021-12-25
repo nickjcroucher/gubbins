@@ -996,8 +996,11 @@ def jar(alignment = None,
         print_file = open(printero, "a")
         print_file.write("Starting Alignment reconstruction " + str(datetime.datetime.now()) + "\n")
         print_file.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "\n")
-        print_file.write("This is the dimension of the base_pattern_positions " + str(base_pattern_positions.shape) + "\n")
+        print_file.write("This is the dimension of the base_pattern_positions " + str(base_patterns.shape) + "\n")
         print_file.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "\n")
+        print_file.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + "\n")
+        print_file.write("This is the dimension of the shared base_pattern_positions " + str(base_patterns_shared_array.shape) + "\n")
+        print_file.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         with multiprocessing.get_context(method=mp_metho).Pool(processes=threads) as pool:

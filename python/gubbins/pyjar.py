@@ -931,6 +931,7 @@ def jar(alignment = None,
     print_file = open(printero, "a")
     print_file.write("End Alignment array creation " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("Size of new_aln_array " + str(new_aln_array.shape) + "\n")
     print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()

@@ -7,6 +7,9 @@ AC_CONFIG_HEADERS([config.h])
 # Add our own macro dir, so we can check for PTHREAD
 AC_CONFIG_MACRO_DIR([m4])
 
+# Add to macro search path dir for code cov
+AX_ADD_AM_MACRO_STATIC([])
+
 AC_CANONICAL_HOST
 
 case $host_os in

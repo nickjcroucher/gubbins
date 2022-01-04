@@ -40,7 +40,6 @@ in only a few hours on alignments of hundreds of bacterial genome sequences.
 Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
 
 ### Required dependencies
-
 Phylogenetic software:
 * [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
 * [IQTree](https://doi.org/10.1093/molbev/msaa015)
@@ -49,7 +48,7 @@ Phylogenetic software:
 * [Rapidnj](https://doi.org/10.1007/978-3-540-87361-7_10)
 
 Python modules:
-* Biopython (> 1.59),
+* Biopython (>1.59),
 * DendroPy (>=4.0)
 * Scipy
 * Numpy
@@ -58,8 +57,8 @@ Python modules:
 
 See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
-### OSX/Linux - conda
-Install conda and enable the bioconda channels.
+### Recommended installation method - conda
+Install conda and enable the bioconda channels. This can be done using the normal command line (Linux), with Terminal (OSX) or the Powershell (Windows versions >=10).
 
 ```
 conda config --add channels r
@@ -85,6 +84,33 @@ cd python
 [sudo] python3 setup.py install
 ```
 Use `sudo` to install Gubbins system-wide. If you don't have the permissions, run `configure` with a prefix to install Gubbins in your home directory.
+
+### OSX/Linux - installing from the repository
+The easiest way to install the latest version of the code from this repository is to set up a conda environment with the packages needed for installation, then remove gubbins:
+```
+conda create -n gubbins_git
+conda activate gubbins_git
+conda config --add channels r
+conda config --add channels defaults
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda install gubbins autoconf libtool autoconf-archive automake pkg-config
+conda remove --force gubbins
+```
+
+Then download and install the repository in the same environment:
+
+```
+git clone https://github.com/nickjcroucher/gubbins
+cd gubbins
+autoreconf -i
+chmod +x configure 
+./configure --prefix=$CONDA_PREFIX
+make
+sudo make install
+cd python
+python3 setup.py install
+```
 
 ### OSX/Linux/Windows - Virtual Machine
 Gubbins can be run through the Powershell in Windows versions >=10. We have also created a virtual machine which has all of the software setup, along with the test datasets from the paper.

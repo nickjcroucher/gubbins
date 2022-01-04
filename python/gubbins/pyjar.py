@@ -753,29 +753,36 @@ def reconstruct_alignment_column(column_indices,
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
     print_file.close()
+    mem_start = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3
+    tim_start = datetime.datetime.now()
     iterate_over_base_patterns(columns,
-                                column_positions,
-                                Lmat,
-                                Cmat,
-                                out_aln,
-                                ordered_bases,
-                                postordered_nodes,
-                                preordered_nodes,
-                                parent_nodes,
-                                child_nodes,
-                                seed_node,
-                                leaf_nodes,
-                                ancestral_node_order,
-                                node_pij,
-                                base_frequencies,
-                                node_index_to_aln_row,
-                                reconstructed_base_indices,
-                                node_snps)
+                               column_positions,
+                               Lmat,
+                               Cmat,
+                               out_aln,
+                               ordered_bases,
+                               postordered_nodes,
+                               preordered_nodes,
+                               parent_nodes,
+                               child_nodes,
+                               seed_node,
+                               leaf_nodes,
+                               ancestral_node_order,
+                               node_pij,
+                               base_frequencies,
+                               node_index_to_aln_row,
+                               reconstructed_base_indices,
+                               node_snps)
+    mem_use = (psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) - mem_start
+    tim_end = datetime.datetime.now() - tim_start
 
     print_file = open(printero, "a")
     print_file.write("End iteration over base patterns " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.write("End iteration time, mem " + str(multiprocessing.current_process()) + "\n")
+    print_file.write("End iteration time (s):::mem (GB) " + str(tim_end) + ":::" + str(mem_use) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     ### TIMING

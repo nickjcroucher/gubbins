@@ -72,7 +72,7 @@ def parse_and_run(input_args, program_description=""):
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
     print_file = open("./printer_output", "a")
-    print_file.write("Beginning gubbins runs " + str(time.time()) + "\n")
+    print_file.write("Beginning gubbins runs " + str(datetime.datetime.now()) + "\n")
     print_file.close()
     # Log algorithms used
     methods_log = {property:[] for property in ['citation','process','version','algorithm']}
@@ -89,7 +89,7 @@ def parse_and_run(input_args, program_description=""):
     
     # Select the algorithms used for the first iteration
     print_file = open("./printer_output", "a")
-    print_file.write("Selecting algorithms "+ str(time.time()) + "\n")
+    print_file.write("Selecting algorithms "+ str(datetime.datetime.now()) + "\n")
     print_file.close()
     current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
     # Initialise tree builder
@@ -108,7 +108,7 @@ def parse_and_run(input_args, program_description=""):
     # Check if the input files exist and have the right format
     printer.print("\nChecking input files...")
     print_file = open("./printer_output", "a")
-    print_file.write("Checking input files " + str(time.time()) + "\n")
+    print_file.write("Checking input files " + str(datetime.datetime.now()) + "\n")
     print_file.close()
     if not os.path.exists(input_args.alignment_filename) \
             or not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
@@ -122,7 +122,7 @@ def parse_and_run(input_args, program_description=""):
 
     # Check on number of sequences in alignment
     print_file = open("./printer_output", "a")
-    print_file.write("Checking aln file " + str(time.time()) + "\n")
+    print_file.write("Checking aln file " + str(datetime.datetime.now()) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     if input_args.pairwise:
@@ -158,7 +158,7 @@ def parse_and_run(input_args, program_description=""):
     # Filter the input alignment and save as temporary alignment file
     printer.print("\nFiltering input alignment...")
     print_file = open("./printer_output", "a")
-    print_file.write("Filtering alignment " + str(time.time()) + "\n")
+    print_file.write("Filtering alignment " + str(datetime.datetime.now()) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
@@ -287,7 +287,7 @@ def parse_and_run(input_args, program_description=""):
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
             print_file = open("./printer_output", "a")
-            print_file.write("Starting pyjar recon" + str(time.time()) + "\n")
+            print_file.write("Starting pyjar recon" + str(datetime.datetime.now()) + "\n")
             print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.close()
             if i == 1:
@@ -308,14 +308,14 @@ def parse_and_run(input_args, program_description=""):
                 print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 print_file.close()
                 print_file = open("./printer_output", "a")
-                print_file.write("Getting the base patterns" + str(time.time()) + "\n")
+                print_file.write("Getting the base patterns" + str(datetime.datetime.now()) + "\n")
                 print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
                 print_file.close()
                 base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(polymorphism_alignment,
                                                                                             input_args.verbose,
                                                                                             threads = input_args.threads)
                 print_file = open("./printer_output", "a")
-                print_file.write("Done the base patterns" + str(time.time()) + "\n")
+                print_file.write("Done the base patterns" + str(datetime.datetime.now()) + "\n")
                 print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
                 print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 print_file.close()
@@ -337,7 +337,7 @@ def parse_and_run(input_args, program_description=""):
                                                     list_out=False)
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             print_file = open("./printer_output", "a")
-            print_file.write("Starting the jar recon" + " " + str(time.time()) + "\n")
+            print_file.write("Starting the jar recon" + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("These are the file inputs: " + "\n" +
                              recontree_filename + "\n" +
                              info_filename + "\n" +

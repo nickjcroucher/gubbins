@@ -748,6 +748,11 @@ def reconstruct_alignment_column(column_indices,
         calc_time_start = time.process_time()
 
     # Iterate over columns
+    print_file = open(printero, "a")
+    print_file.write("Starting iteration over base patterns " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+    print_file.close()
     iterate_over_base_patterns(columns,
                                 column_positions,
                                 Lmat,
@@ -767,7 +772,12 @@ def reconstruct_alignment_column(column_indices,
                                 reconstructed_base_indices,
                                 node_snps)
 
-
+    print_file = open(printero, "a")
+    print_file.write("End iteration over base patterns " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     ### TIMING
     if verbose:
         calc_time_end = time.process_time()

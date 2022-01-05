@@ -88,13 +88,9 @@ Use `sudo` to install Gubbins system-wide. If you don't have the permissions, ru
 ### OSX/Linux - installing from the repository
 The easiest way to install the latest version of the code from this repository is to set up a conda environment with the packages needed for installation, then remove gubbins:
 ```
-conda create -n gubbins_git
+conda create -c bioconda -n gubbins_git gubbins python=3.9
 conda activate gubbins_git
-conda config --add channels r
-conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-conda install gubbins autoconf libtool autoconf-archive automake pkg-config
+conda install -c conda-forge libtool autoconf-archive automake pkg-config
 conda remove --force gubbins
 ```
 
@@ -109,7 +105,7 @@ chmod +x configure
 make
 sudo make install
 cd python
-python3 setup.py install
+python setup.py install
 ```
 
 ### OSX/Linux/Windows - Virtual Machine

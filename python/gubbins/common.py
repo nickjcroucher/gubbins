@@ -195,6 +195,7 @@ def parse_and_run(input_args, program_description=""):
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
     print_file.write("Moved the gaps alignment file name across " + str(datetime.datetime.now()) + "\n")
     print_file.write(gaps_alignment_filename +  "\n")
+    print_file.write(gubbins_command + "\n")
     print_file.write("Finished initial gubbins run " + str(datetime.datetime.now()) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()

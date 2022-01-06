@@ -333,7 +333,7 @@ def parse_and_run(input_args, program_description=""):
             # Cannot just midpoint root both, because the branch lengths differ between them
             harmonise_roots(recontree_filename, temp_rooted_tree)
             if i != 1:
-                alignment_type = alignment_suffix
+                alignment_type = re.sub("\.","",alignment_suffix)
             polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose=input_args.verbose,
                                                     list_out=False)
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])

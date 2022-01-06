@@ -302,6 +302,7 @@ def parse_and_run(input_args, program_description=""):
 
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose,
                                                         list_out = True)
+                original_aln_loc = alignment_filename
                 print_file = open("./printer_output", "a")
                 print_file.write("Alignment name: " + alignment_filename + "\n")
                 print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -332,9 +333,7 @@ def parse_and_run(input_args, program_description=""):
             # Set root of reconstruction tree to match that of the current tree
             # Cannot just midpoint root both, because the branch lengths differ between them
             harmonise_roots(recontree_filename, temp_rooted_tree)
-            if i != 1:
-                alignment_type = re.sub("\.","",alignment_suffix)
-            polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose=input_args.verbose,
+            polymorphism_alignment = read_alignment(original_aln_loc, alignment_type, verbose=input_args.verbose,
                                                     list_out=False)
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             print_file = open("./printer_output", "a")

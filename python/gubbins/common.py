@@ -182,7 +182,7 @@ def parse_and_run(input_args, program_description=""):
     gubbins_command = " ".join([gubbins_exec, input_args.alignment_filename])
     printer.print(["\nRunning Gubbins to detect SNPs...", gubbins_command])
     print_file = open("./printer_output", "a")
-    print_file.write("Initial gubbins run " + str(datetime.time()) + "\n")
+    print_file.write("Initial gubbins run " + str(datetime.datetime.now()) + "\n")
     print_file.close()
     try:
         subprocess.check_call(gubbins_command, shell=True)
@@ -192,7 +192,7 @@ def parse_and_run(input_args, program_description=""):
     reconvert_fasta_file(snp_alignment_filename, snp_alignment_filename)
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
     print_file = open("./printer_output", "a")
-    print_file.write("Finished initial gubbins run " + str(datetime.time()) + "\n")
+    print_file.write("Finished initial gubbins run " + str(datetime.datetime.now()) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     # Start the main loop
@@ -235,7 +235,7 @@ def parse_and_run(input_args, program_description=""):
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
             print_file = open("./printer_output","a")
-            print_file.write("Starting tree reconstruction on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.time()) +"\n" )
+            print_file.write("Starting tree reconstruction on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.datetime.now()) +"\n" )
             print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.close()
 
@@ -256,7 +256,7 @@ def parse_and_run(input_args, program_description=""):
             shutil.copyfile(built_tree, current_tree_name)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         print_file = open("./printer_output", "a")
-        print_file.write("Finished tree reconstruction on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.time()) + "\n")
+        print_file.write("Finished tree reconstruction on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
@@ -265,7 +265,7 @@ def parse_and_run(input_args, program_description=""):
         reroot_tree(str(current_tree_name), input_args.outgroup)
         temp_rooted_tree = temp_working_dir + "/" + current_tree_name + ".rooted"
         print_file = open("./printer_output", "a")
-        print_file.write("Rooting the tree on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.time()) + "\n")
+        print_file.write("Rooting the tree on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         if input_args.tree_builder == "iqtree":
@@ -274,7 +274,7 @@ def parse_and_run(input_args, program_description=""):
             root_tree(current_tree_name, temp_rooted_tree)
 
         print_file = open("./printer_output", "a")
-        print_file.write("Finished tree rooting on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.time()) + "\n")
+        print_file.write("Finished tree rooting on iter: " + str(i) + " With tree builder: " + tree_builder.executable + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
@@ -296,7 +296,7 @@ def parse_and_run(input_args, program_description=""):
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 print_file = open("./printer_output", "a")
-                print_file.write("Alignment name: " + alignment_filename + " " + str(datetime.time())+ "\n")
+                print_file.write("Alignment name: " + alignment_filename + " " + str(datetime.datetime.now())+ "\n")
                 print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
                 print_file.close()
 
@@ -381,7 +381,7 @@ def parse_and_run(input_args, program_description=""):
             printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
                            sequence_reconstruction_command])
             print_file = open("./printer_output", "a")
-            print_file.write("Ancestral reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.time()) + "\n")
+            print_file.write("Ancestral reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.close()
             os.chdir(temp_working_dir)
@@ -391,7 +391,7 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit("Failed while reconstructing the ancestral sequences.")
             os.chdir(current_directory)
             print_file = open("./printer_output", "a")
-            print_file.write("Finished Ancestral reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.time()) + "\n")
+            print_file.write("Finished Ancestral reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
             print_file.close()
@@ -402,7 +402,7 @@ def parse_and_run(input_args, program_description=""):
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
             print_file = open("./printer_output", "a")
-            print_file.write("Rejoining the bases on reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.time()) + "\n")
+            print_file.write("Rejoining the bases on reconstruction on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.close()
             if input_args.seq_recon == "raxml":
@@ -421,14 +421,14 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit()
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
             print_file = open("./printer_output", "a")
-            print_file.write("Finished base rejoining on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.time()) + "\n")
+            print_file.write("Finished base rejoining on iter: " + str(i) + " With reconstructer: " + sequence_reconstructor.executable + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
             print_file.close()
             # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
             printer.print("\nReinserting gaps into the alignment...")
             print_file = open("./printer_output", "a")
-            print_file.write("Inserting gaps on iter: " + str(i) + " " + str(datetime.time()) + "\n")
+            print_file.write("Inserting gaps on iter: " + str(i) + " " + str(datetime.datetime.now()) + "\n")
             print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.close()
             shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
@@ -441,7 +441,7 @@ def parse_and_run(input_args, program_description=""):
         # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         print_file = open("./printer_output", "a")
-        print_file.write("Finished inserting gaps on iter: " + str(i) + " " + str(datetime.time()) + "\n")
+        print_file.write("Finished inserting gaps on iter: " + str(i) + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()
@@ -453,7 +453,7 @@ def parse_and_run(input_args, program_description=""):
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         print_file = open("./printer_output", "a")
-        print_file.write("Running gubbins on iter: " + str(i) +  " " + str(datetime.time()) + "\n")
+        print_file.write("Running gubbins on iter: " + str(i) +  " " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         try:
@@ -463,7 +463,7 @@ def parse_and_run(input_args, program_description=""):
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
         print_file = open("./printer_output", "a")
-        print_file.write("Finished running gubbins gaps on iter: " + str(i) + " " + str(datetime.time()) + "\n")
+        print_file.write("Finished running gubbins gaps on iter: " + str(i) + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
         print_file.close()

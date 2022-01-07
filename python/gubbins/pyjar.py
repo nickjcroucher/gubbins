@@ -782,7 +782,7 @@ def reconstruct_alignment_column(column_indices,
     print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.write("End iteration time, mem " + str(multiprocessing.current_process()) + "\n")
-    print_file.write("End iteration time (s):::mem (GB) " + str(tim_end) + ":::" + str(mem_use) + "\n")
+    print_file.write("End iteration time === mem " + str(tim_end) + "(time) === " + str(mem_use) + " (GB)" + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     ### TIMING

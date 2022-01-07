@@ -70,7 +70,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	// Find out the names of the sequences
 	char* sequence_names[number_of_samples];
-	sequence_names[number_of_samples-1] = '\0';
+	sequence_names[number_of_samples-1] = "\0";
 	for(i = 0; i < number_of_samples; i++)
 	{
 		sequence_names[i] = calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));

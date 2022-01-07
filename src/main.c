@@ -71,7 +71,6 @@ int main (argc, argv) int argc; char **argv;
   char multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
   char vcf_filename[MAX_FILENAME_SIZE] = {""};
   char tree_filename[MAX_FILENAME_SIZE] = {""};
-  char phylip_filename[MAX_FILENAME_SIZE] = {""};
   char original_multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
 
   int recombination_flag = 0 ;

@@ -23,7 +23,7 @@
 
 int size_of_string(char *input_string)
 {
-  return strlen(input_string);
+  return (int)strlen(input_string);
 }
 
 void concat_strings_created_with_malloc(char *input_string, char *string_to_concat)

@@ -149,7 +149,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
     // TODO: The stats for the number of snps in recombinations will need to be updated.
 	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates, (num_blocks + root->number_of_blocks),snp_locations, number_of_snps, snps_in_recombinations);
-    int num_snps_updated_from_downstream_recombintations=0;
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{
  		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
@@ -283,7 +282,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
     // Save some statistics about the sequence
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
-		int number_of_gaps = length_of_original_genome-branch_genome_size;
 		
 		return leaf_sequence;
 	}
@@ -381,8 +379,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 {
 	int i = 0;
 	int window_size = 0;
-	int window_start_coordinate = 0;
-	int window_end_coordinate = 0;
 	int number_of_snps_in_block = 0;
 	int block_genome_size_without_gaps = 0;
 	double branch_snp_density = 0.0;
@@ -671,15 +667,12 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 {
 	int i;
 	
-	int previous_start;
-	int previous_end;
+	int previous_start = -1;
+	int previous_end = -1;
 	
 	for(i = 0 ; i < number_of_blocks; i++)
 	{
-		int current_start = block_coordinates[0][i];
-		int current_end = block_coordinates[1][i];
-		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
-        int end_index   = find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
+
 		if( i == 0)
 		{
 			previous_start = block_coordinates[0][i];

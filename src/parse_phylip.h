@@ -47,6 +47,7 @@ int number_of_snps_in_phylip(void);
 void load_sequences_from_multifasta_file(char filename[]);
 void set_internal_node(int internal_node_value,int sequence_index);
 void initialise_internal_node(void);
+void initialise_statistics(void);
 int get_internal_node(int sequence_index);
 void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(int parent_sequence_index, int * child_sequence_indices, int num_children);
 void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index, int * child_sequence_indices, int num_children);

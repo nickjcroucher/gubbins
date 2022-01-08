@@ -1022,41 +1022,33 @@ double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, i
 
 int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks)
 {
-    int8_t* bases_to_be_excluded;
-	bases_to_be_excluded = (int8_t*) calloc((length_of_sequence + 1),sizeof(int8_t));
-	
+
     int genome_length = length_of_sequence;
-	int i = 0;
-	for(i = 0; i<length_of_sequence; i++)
-	{
-		if(sequence[i] == 'N' || sequence[i] == '-' )
-		{
-			bases_to_be_excluded[i] = 1;
+    
+    int i = 0;
+    for(i = 0; i<length_of_sequence; i++)
+    {
+        if(sequence[i] == 'N' || sequence[i] == '-')
+        {
             genome_length--;
-		}
-	}
-	
-	int j = 0;
-	for(j = 0; j<num_blocks; j++)
-	{
-		if(block_coordinates[0][j] == -1)
-		{
-			continue;
-		}
-		
-		// Coordinates of blocks start at 1 and the index of the array starts at 0
-		int block_index = 0;
-		for(block_index = block_coordinates[0][j]; block_index <= block_coordinates[1][j]; block_index++ )
-		{
-          if(bases_to_be_excluded[block_index-1] == 0)
-          {
-            bases_to_be_excluded[block_index-1] = 1;
-            genome_length--;
-          }
-		}
-	}
-	
-	return genome_length;
+        }
+        else
+        {
+            int j = 0;
+            for(j = 0; j<num_blocks; j++)
+            {
+                if(block_coordinates[0][j] != -1)
+                {
+                    if (i >= block_coordinates[0][j] && i <= block_coordinates[1][j])
+                    {
+                        genome_length--;
+                    }
+                }
+            }
+        }
+    }
+
+    return genome_length;
 }
 
 

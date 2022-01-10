@@ -153,6 +153,8 @@ def parse_and_run(input_args, program_description=""):
             sys.exit("The starting tree " + input_args.starting_tree + " does not exist")
         (tree_base_directory, tree_base_filename) = os.path.split(input_args.starting_tree)
         temp_starting_tree = temp_working_dir + '/' + tree_base_filename
+        shutil.copyfile(input_args.starting_tree, temp_starting_tree)
+        input_args.starting_tree = temp_starting_tree
         if not is_starting_tree_valid(temp_starting_tree):
             sys.exit("The starting tree " + input_args.starting_tree + " is invalid")
         if not do_the_names_match_the_fasta_file(temp_starting_tree, temp_alignment_filename):
@@ -806,12 +808,12 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn):
         output_file.write(new_tree_string.replace('\'', ''))
 
 def filter_out_removed_taxa_from_tree(filename, taxa_removed):
-    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
+    tree = dendropy.Tree.get_from_path(filename, 'newick', preserve_underscores=True)
     tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)
     tree.prune_leaves_without_taxa(update_bipartitions=True)
     tree.deroot()
     output_tree_string = tree_as_string(tree)
-    with open(output_filename, 'w+') as output_file:
+    with open(filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 

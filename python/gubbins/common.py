@@ -95,26 +95,6 @@ def parse_and_run(input_args, program_description=""):
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
-    # Check if the input files exist and have the right format
-    printer.print("\nChecking input files...")
-    if not os.path.exists(input_args.alignment_filename) \
-            or not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
-        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist or has an invalid format")
-    if input_args.starting_tree is not None and input_args.starting_tree != "" \
-            and (not os.path.exists(input_args.starting_tree) or not is_starting_tree_valid(input_args.starting_tree)):
-        sys.exit("The starting tree does not exist or has an invalid format")
-    if input_args.starting_tree is not None and input_args.starting_tree != "" \
-            and not do_the_names_match_the_fasta_file(input_args.starting_tree, input_args.alignment_filename):
-        sys.exit("The names in the starting tree do not match the names in the alignment file")
-
-    # Check on number of sequences in alignment
-    if input_args.pairwise:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
-            sys.exit("Pairwise mode should only be used for two sequences.")
-    else:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
-            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
-
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
 
@@ -138,23 +118,47 @@ def parse_and_run(input_args, program_description=""):
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
+    # Create temporary directory for storing working copies of input files
+    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
+
+    # Check if the input files exist and have the right format
+    printer.print("\nChecking input alignment file...")
+    if not os.path.exists(input_args.alignment_filename):
+        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist")
+    temp_alignment_filename = temp_working_dir + "/" + base_filename
+    shutil.copyfile(input_args.alignment_filename, temp_alignment_filename)
+    input_args.alignment_filename = temp_alignment_filename
+    if not ValidateFastaAlignment(temp_alignment_filename).is_input_fasta_file_valid():
+        sys.exit("The input alignment file " + input_args.alignment_filename + " is invalid")
     # Filter the input alignment and save as temporary alignment file
     printer.print("\nFiltering input alignment...")
-    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-    temp_alignment_filename = temp_working_dir + "/" + base_filename
-
-    pre_process_fasta = PreProcessFasta(input_args.alignment_filename, input_args.verbose,
+    pre_process_fasta = PreProcessFasta(temp_alignment_filename,
+                                        input_args.verbose,
                                         input_args.filter_percentage)
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
-    input_args.alignment_filename = temp_alignment_filename
 
-    # If a starting tree has been provided make sure that taxa filtered out in the previous step are removed from it
-    if input_args.starting_tree:
+    # Check on number of sequences remaining in alignment after validation and processing
+    if input_args.pairwise:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+            sys.exit("Pairwise mode should only be used for two sequences.")
+    else:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
+
+    # If a starting tree has been provided check its validity
+    # Also make sure that taxa filtered out in the previous step are removed from it
+    if input_args.starting_tree is not None and input_args.starting_tree != "":
+        if not os.path.exists(input_args.starting_tree):
+            sys.exit("The starting tree " + input_args.starting_tree + " does not exist")
         (tree_base_directory, tree_base_filename) = os.path.split(input_args.starting_tree)
         temp_starting_tree = temp_working_dir + '/' + tree_base_filename
-        filter_out_removed_taxa_from_tree(input_args.starting_tree, temp_starting_tree, taxa_removed)
-        input_args.starting_tree = temp_starting_tree
+        if not is_starting_tree_valid(temp_starting_tree):
+            sys.exit("The starting tree " + input_args.starting_tree + " is invalid")
+        if not do_the_names_match_the_fasta_file(temp_starting_tree, temp_alignment_filename):
+            sys.exit("The names in the starting tree do not match the names in the alignment file")
+        filter_out_removed_taxa_from_tree(temp_starting_tree, taxa_removed)
+
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Find all SNP sites with Gubbins
@@ -652,7 +656,13 @@ def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
     tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
     leaf_names = set()
     for lf in tree.leaf_nodes():
-        leaf_names.add(utils.process_sequence_names(lf.taxon.label))
+        lf.taxon.label = utils.process_sequence_names(lf.taxon.label)
+        leaf_names.add(lf.taxon.label)
+
+    # Write out modified tree
+    output_tree_string = tree_as_string(tree, suppress_internal=False)
+    with open(starting_tree, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
 
     # Check if alignment names are a subset of the tree names
     # Superfluous taxa can be pruned from the tree
@@ -795,7 +805,7 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn):
     with open(new_tree_fn, 'w+') as output_file:
         output_file.write(new_tree_string.replace('\'', ''))
 
-def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
+def filter_out_removed_taxa_from_tree(filename, taxa_removed):
     tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
     tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)
     tree.prune_leaves_without_taxa(update_bipartitions=True)

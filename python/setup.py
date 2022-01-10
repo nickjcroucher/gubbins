@@ -19,7 +19,6 @@ setuptools.setup(
         'scripts/extract_gubbins_clade.py',
         'scripts/mask_gubbins_aln.py'
     ],
-
     tests_require=[
         "pytest >= 4.6",
         "wheel >= 0.34",

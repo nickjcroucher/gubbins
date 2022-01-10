@@ -37,11 +37,9 @@ generates highly accurate reconstructions under realistic models of short-term b
 in only a few hours on alignments of hundreds of bacterial genome sequences.
 
 ## Installation
-
 Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
 
 ### Required dependencies
-
 Phylogenetic software:
 * [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
 * [IQTree](https://doi.org/10.1093/molbev/msaa015)

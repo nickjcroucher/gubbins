@@ -37,16 +37,11 @@ generates highly accurate reconstructions under realistic models of short-term b
 in only a few hours on alignments of hundreds of bacterial genome sequences.
 
 ## Installation
-<<<<<<< HEAD
-Before starting your analysis, please have a look at the [Gubbins webpage](http://sanger-pathogens.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
 
-### Required dependencies
-
-=======
 Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [publication](https://academic.oup.com/nar/article/43/3/e15/2410982) and [manual](docs/gubbins_manual.md).
 
 ### Required dependencies
->>>>>>> master
+
 Phylogenetic software:
 * [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
 * [IQTree](https://doi.org/10.1093/molbev/msaa015)
@@ -55,30 +50,17 @@ Phylogenetic software:
 * [Rapidnj](https://doi.org/10.1007/978-3-540-87361-7_10)
 
 Python modules:
-<<<<<<< HEAD
-* Biopython (> 1.59),
-=======
 * Biopython (>1.59),
->>>>>>> master
 * DendroPy (>=4.0)
 * Scipy
 * Numpy
 * Multiprocessing
-<<<<<<< HEAD
-* Nose
-
-See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
-
-### OSX/Linux - conda
-Install conda and enable the bioconda channels.
-=======
 * Numba
 
 See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
 ### Recommended installation method - conda
 Install conda and enable the bioconda channels. This can be done using the normal command line (Linux), with Terminal (OSX) or the Powershell (Windows versions >=10).
->>>>>>> master
 
 ```
 conda config --add channels r
@@ -171,8 +153,5 @@ From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint 
 This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.
 
 ### Ancestral sequence reconstruction
-<<<<<<< HEAD
-From version 3.0.0 onwards, Gubbins will use joint ancestral reconstructions with pyjar. Version 2 used marginal ancestral reconstruction with RAxML. Version 1 used joint ancestral reconstruction with fastML.
-=======
 From version 3.0.0 onwards, Gubbins will use joint ancestral reconstructions with a modified version of [pyjar](https://github.com/simonrharris/pyjar) by default. Version 2 used marginal ancestral reconstruction with RAxML; this is still available in version 3, using the `--mar` flag (IQtree can also be used for reconstruction in version >3.0.0). This may useful in cases where memory use is limiting. Version 1 used joint ancestral reconstruction with [fastML](http://fastml.tau.ac.il/).
->>>>>>> master
+

@@ -67,7 +67,7 @@ class ValidateFastaAlignment(object):
         any_modified_names = False
         with open(self.input_filename) as input_handle:
             alignment = AlignIO.read(input_handle, "fasta")
-            sequence_names = {}
+            sequence_names = []
             for record in alignment:
                 # Remove disallowed characters
                 if '#' in record.name or ':' in record.name:
@@ -76,7 +76,7 @@ class ValidateFastaAlignment(object):
                     record.description = process_sequence_names(record.description)
                     any_modified_names = True
                 # Store modified names
-                sequence_names[record.name] = 1
+                sequence_names.append(record.name)
         duplicate_sequence_list = [k for k,v in list(Counter(sequence_names).items()) if v>1]
         if duplicate_sequence_list != []:
             print("Duplicate sequences found after name processing:")

@@ -53,12 +53,12 @@ class ValidateFastaAlignment(object):
                  if sequence_length == -1:
                    sequence_length = len(record.seq)
                  elif sequence_length != len(record.seq):
-                   print("Error with the input FASTA file: The sequences dont have the same lengths this isnt an alignment: "+record.name)
+                   print("Error with the input FASTA file: The sequences are not of the same length, this is not an alignment: "+record.name)
                    return False
           input_handle.close()
       except:
         print("Unexpected error:", sys.exc_info()[0])
-        print("Error with the input FASTA file: It is in the wrong format so check its an alignment")
+        print("Error with the input FASTA file: It is in the wrong format, check it is an alignment")
         return False
       return True
 

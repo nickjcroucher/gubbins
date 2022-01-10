@@ -10,13 +10,13 @@ dependencies:
 # installation
   - autoconf
   - automake
+  - autoconf-archive
   - pytest
   - check
   - libtool
   - cppunit
   - pkg-config
   - wheel
-  - nose
   - pillow
 # algorithm
   - scipy

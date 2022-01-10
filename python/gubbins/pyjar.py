@@ -186,6 +186,7 @@ def convert_to_square_numpy_array(data):
     return out
 
 # Read in sequence to enable conversion to integers with JIT function
+
 def process_sequence(index_list,alignment ,codec = None,align_array = None):
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
@@ -197,6 +198,7 @@ def process_sequence(index_list,alignment ,codec = None,align_array = None):
 
 # Function to read an alignment in various formats
 def read_alignment(filename, file_type, verbose=False, list_out=False):
+
     if not os.path.isfile(filename):
         print("Error: alignment file " + filename + " does not exist")
         sys.exit(202)
@@ -210,6 +212,7 @@ def read_alignment(filename, file_type, verbose=False, list_out=False):
     except:
         print("Cannot open alignment file " + filename + " as " + file_type)
         sys.exit(203)
+
     ## Convert to list of lists of seq types
     if list_out:
         aln_list = []
@@ -540,12 +543,14 @@ def iterate_over_base_patterns(columns,
 def get_base_patterns(alignment, verbose,
                       printero = "printer_output", fit_method = "spawn",
                       threads = 1, pickle_aln = False):
+
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
     t1=time.process_time()
     # Convert alignment to Numpy array
     ntaxa = len(alignment)
+
     seq_length = len(alignment[0])
     ## Now to create the list of alignments
     ## Manipulate aln list into list of lists
@@ -582,6 +587,7 @@ def get_base_patterns(alignment, verbose,
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+
     # Check njit function is compiled before multiprocessing
     try:
         seq_to_int()
@@ -590,6 +596,7 @@ def get_base_patterns(alignment, verbose,
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     ntaxa_range_list = list(range(ntaxa))
+
     ntaxa_range_indices = [ntaxa_range_list[i: i+ntaxa_jumps] for i in range(0, len(ntaxa_range_list), ntaxa_jumps)]
     #list(chunks(ntaxa_range_list,threads))
     if pickle_aln:
@@ -628,11 +635,13 @@ def get_base_patterns(alignment, verbose,
             print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
             print_file.close()
+
         # Write out alignment while shared memory manager still active
         align_array_shm = shared_memory.SharedMemory(name = align_array_shared.name)
         align_array = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = align_array_shm.buf)
 
     # Get unique base patterns and their indices in the alignment
+
     print_file = open(printero, "a")
     print_file.write("Staring unique column names " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -648,10 +657,12 @@ def get_base_patterns(alignment, verbose,
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+
     base_pattern_positions_array_of_arrays = \
         [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
 
     # Convert the array of arrays into an ndarray that can be saved to shared memory
+
     print_file = open(printero, "a")
     print_file.write("Staring conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
@@ -666,8 +677,10 @@ def get_base_patterns(alignment, verbose,
     t2=time.process_time()
     if verbose:
         print("Time taken to find unique base patterns:", t2-t1, "seconds")
+
         print("Unique base patterns:", str(base_pattern_bases_array.shape[1]))
     return base_pattern_bases_array.transpose(), base_pattern_positions_array_of_arrays#square_base_pattern_positions_array
+
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -691,7 +704,8 @@ def reconstruct_alignment_column(column_indices,
                                 new_aln = None,
                                 threads = 1,
                                 verbose = False,
-                                 printero = "./printer_output"):
+                                printero = "./printer_output"):
+
     
     ### TIMING
     if verbose:
@@ -749,6 +763,7 @@ def reconstruct_alignment_column(column_indices,
         calc_time_start = time.process_time()
 
     # Iterate over columns
+
     print_file = open(printero, "a")
     print_file.write("Starting iteration over base patterns " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -835,6 +850,7 @@ def jar(alignment = None,
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, x in enumerate(alignment):
@@ -937,6 +953,7 @@ def jar(alignment = None,
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
     # Create new empty array
+
     print_file = open(printero, "a")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
@@ -1054,6 +1071,7 @@ def jar(alignment = None,
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print_file.close()
+
         
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")

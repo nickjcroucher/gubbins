@@ -32,6 +32,7 @@ import dendropy
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
+from Bio.Phylo import Consensus
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Phylo import Consensus
@@ -112,7 +113,7 @@ def parse_and_run(input_args, program_description=""):
     print_file.close()
     if not os.path.exists(input_args.alignment_filename) \
             or not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
-        sys.exit("There input alignment file does not exist or has an invalid format")
+        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist or has an invalid format")
     if input_args.starting_tree is not None and input_args.starting_tree != "" \
             and (not os.path.exists(input_args.starting_tree) or not is_starting_tree_valid(input_args.starting_tree)):
         sys.exit("The starting tree does not exist or has an invalid format")
@@ -299,6 +300,7 @@ def parse_and_run(input_args, program_description=""):
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
+
                 print_file = open("./printer_output", "a")
                 print_file.write("Alignment name: " + alignment_filename + " " + str(datetime.datetime.now())+ "\n")
                 print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -324,6 +326,7 @@ def parse_and_run(input_args, program_description=""):
                 print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
                 print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 print_file.close()
+
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
                                                                 os.path.abspath(temp_rooted_tree),

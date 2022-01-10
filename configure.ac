@@ -1,4 +1,4 @@
-AC_INIT([gubbins], m4_esyscmd([tr -d '\n' < VERSION]), [gubbins@sanger.ac.uk], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/sanger-pathogens/gubbins])
+AC_INIT([gubbins], m4_esyscmd([tr -d '\n' < VERSION]), [n.croucher@imperial.ac.uk], [$(PACKAGE_NAME)$(AC_PACKAGE_VERSION)], [https://github.com/nickjcroucher/gubbins])
 
 AM_INIT_AUTOMAKE([foreign tar-pax subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
@@ -7,13 +7,21 @@ AC_CONFIG_HEADERS([config.h])
 # Add our own macro dir, so we can check for PTHREAD
 AC_CONFIG_MACRO_DIR([m4])
 
+# Add to macro search path dir for code cov
+AX_ADD_AM_MACRO_STATIC([])
+
 AC_CANONICAL_HOST
 
 case $host_os in
-	*linux*)
-		HOST_OS=linux
-		;;
-	*) ;;
+    *darwin*)
+        HOST_OS=osx
+        ;;
+    *linux*)
+        HOST_OS=linux
+        ;;
+	*)
+        HOST_OS=unknown
+        ;;
 esac
 AM_CONDITIONAL([HOST_LINUX],[test x$HOST_OS = xlinux])
 
@@ -23,6 +31,9 @@ AC_PROG_CXX
 
 # Checks for pthread
 AX_PTHREAD
+
+# Checks for code coverage
+AX_CODE_COVERAGE
 
 # Ensure zlib is available
 PKG_CHECK_MODULES([zlib], [zlib])

@@ -561,12 +561,12 @@ int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int g
 int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence, int * snp_locations, int number_of_snps)
 {
 	// Set up the window counter with 1 value per base in the branch
-    int * window_count;
-	window_count = (int *) calloc((genome_size+1),sizeof(int));
+    int8_t * window_count;
+	window_count = (int8_t *) calloc((genome_size+1),sizeof(int8_t));
 	
 	// Integer array with location of gaps
-    int * gaps_in_original_genome_space;
-	gaps_in_original_genome_space = (int *) calloc((genome_size+1),sizeof(int));
+    int8_t * gaps_in_original_genome_space;
+	gaps_in_original_genome_space = (int8_t *) calloc((genome_size+1),sizeof(int8_t));
 	int x =0;
 	for(x=0; x< number_of_snps; x++)
 	{

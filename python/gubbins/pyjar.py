@@ -638,8 +638,9 @@ def get_base_patterns(alignment, verbose,
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    with open("align_array.npy","wb") as f:
-        numpy.save(f, align_array)
+    if pickle_aln:
+        with open("align_array.npy","wb") as f:
+            numpy.save(f, align_array)
 
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     print_file = open(printero, "a")

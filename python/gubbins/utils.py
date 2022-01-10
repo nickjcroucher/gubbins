@@ -180,3 +180,8 @@ def generate_shared_mem_array(in_array, smm):
     array_shared[:] = in_array[:]
     array_shared = NumpyShared(name = array_raw.name, shape = in_array.shape, dtype = in_array.dtype)
     return(array_shared)
+
+def process_sequence_names(name):
+    """Replaces disalowed characters in names with underscores"""
+    new_name = name.replace("#","_").replace(":","_")
+    return new_name

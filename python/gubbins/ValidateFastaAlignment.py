@@ -4,6 +4,8 @@ import sys
 from Bio import AlignIO
 from collections import Counter
 from Bio.Align import MultipleSeqAlignment
+# Gubbins imports
+from gubbins.utils import process_sequence_names
 
 class ValidateFastaAlignment(object):
 
@@ -70,9 +72,9 @@ class ValidateFastaAlignment(object):
             for record in alignment:
                 # Remove disallowed characters
                 if '#' in record.name or ':' in record.name:
-                    record.name = record.name.replace("#","_").replace(":","_")
-                    record.id = record.id.replace("#", "_").replace(":", "_")
-                    record.description = record.description.replace("#", "_").replace(":", "_")
+                    record.name = process_sequence_names(record.name)
+                    record.id = process_sequence_names(record.id)
+                    record.description = process_sequence_names(record.namdescriptione)
                     any_modified_names = True
                 # Store modified names
                 sequence_names.append(record.name)

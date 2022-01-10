@@ -75,7 +75,7 @@ def parse_and_run(input_args, program_description=""):
     methods_log['version'].append(program_version)
 
     # Initialize tree builder and check if all required dependencies are available
-    printer.print("\nChecking dependencies...")
+    printer.print("\nChecking dependencies and input files...")
     current_tree_name = input_args.starting_tree
     tree_file_names = []
     internal_node_label_prefix = "internal_"
@@ -93,7 +93,6 @@ def parse_and_run(input_args, program_description=""):
     if input_args.mar:
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
-    printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -116,7 +115,6 @@ def parse_and_run(input_args, program_description=""):
     if utils.do_files_exist(".", intermediate_files, "", input_args.verbose):
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
-    printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Create temporary directory for storing working copies of input files
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())

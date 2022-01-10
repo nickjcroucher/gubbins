@@ -525,7 +525,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
   }
 }
 
-int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int * gaps_in_original_genome_space)
+int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int8_t * gaps_in_original_genome_space)
 {
 		int max_snp_sliding_window_counter = initial_max_coord;
 		int upper_offset = 0;
@@ -542,7 +542,7 @@ int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int g
 		return max_snp_sliding_window_counter;
 }
 
-int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int * gaps_in_original_genome_space)
+int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int8_t * gaps_in_original_genome_space)
 {
 		int lower_offset = 0;
 		int snp_sliding_window_counter = initial_min_coord;

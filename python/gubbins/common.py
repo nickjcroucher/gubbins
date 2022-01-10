@@ -652,8 +652,8 @@ def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
     tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
     leaf_names = set()
     for lf in tree.leaf_nodes():
-        leaf_names.add(lf.taxon.label)
-    
+        leaf_names.add(utils.process_sequence_names(lf.taxon.label))
+
     # Check if alignment names are a subset of the tree names
     # Superfluous taxa can be pruned from the tree
     if not sequence_names.issubset(leaf_names):

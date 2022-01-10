@@ -86,4 +86,4 @@ release/.vagrant/machines/default/virtualbox/action_set_name
 release/.vagrant/machines/default/virtualbox/id
 release/.vagrant/machines/default/virtualbox/index_uuid
 release/.vagrant/machines/default/virtualbox/synced_folders
-release/private.keypython/gubbins/__pycache__/
+release/private.key

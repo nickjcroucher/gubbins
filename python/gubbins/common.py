@@ -639,21 +639,31 @@ def is_starting_tree_valid(starting_tree):
 
 
 def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
+
+    # Extract sequence names from alignment
+    sequence_names = set()
     with open(alignment_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
-        sequence_names = {}
         for alignment in alignments:
             for record in alignment:
-                sequence_names[record.name] = 1
-        input_handle.close()
+                sequence_names.add(record.name)
 
-        tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    # Extract sequence names from tree
+    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    leaf_names = set()
+    for lf in tree.leaf_nodes():
+        leaf_names.add(lf.taxon.label)
+    
+    # Check if alignment names are a subset of the tree names
+    # Superfluous taxa can be pruned from the tree
+    if not sequence_names.issubset(leaf_names):
+        missing_seqs = list(sequence_names - leaf_names)
+        print("Error: The following sequences are present in your alignment, but not the "\
+        "starting tree: ")
+        for name in missing_seqs:
+            print(name)
+        return False
 
-        leaf_nodes = tree.leaf_nodes()
-        for i, lf in enumerate(leaf_nodes):
-            if not leaf_nodes[i].taxon.label in sequence_names:
-                print("Error: A taxon referenced in the starting tree is not found in the input fasta file")
-                return False
     return True
 
 

@@ -78,8 +78,12 @@ class ValidateFastaAlignment(object):
                     any_modified_names = True
                 # Store modified names
                 sequence_names.append(record.name)
-        if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
-          return False
+        duplicate_sequence_list = [k for k,v in list(Counter(sequence_names).items()) if v>1]
+        if duplicate_sequence_list != []:
+            print("Duplicate sequences found after name processing:")
+            for dup in duplicate_sequence_list:
+                print(dup)
+            return False
         # Update alignment if names changed
         if any_modified_names:
             with open(self.input_filename, "w") as output_handle:

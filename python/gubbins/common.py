@@ -159,7 +159,9 @@ def parse_and_run(input_args, program_description=""):
             sys.exit("The starting tree " + input_args.starting_tree + " is invalid")
         if not do_the_names_match_the_fasta_file(temp_starting_tree, temp_alignment_filename):
             sys.exit("The names in the starting tree do not match the names in the alignment file")
-        filter_out_removed_taxa_from_tree(temp_starting_tree, taxa_removed)
+        filter_out_removed_taxa_from_tree(temp_starting_tree,
+                                            temp_starting_tree,
+                                            taxa_removed)
 
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
@@ -807,13 +809,13 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn):
     with open(new_tree_fn, 'w+') as output_file:
         output_file.write(new_tree_string.replace('\'', ''))
 
-def filter_out_removed_taxa_from_tree(filename, taxa_removed):
-    tree = dendropy.Tree.get_from_path(filename, 'newick', preserve_underscores=True)
+def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
+    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
     tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)
     tree.prune_leaves_without_taxa(update_bipartitions=True)
     tree.deroot()
     output_tree_string = tree_as_string(tree)
-    with open(filename, 'w+') as output_file:
+    with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 

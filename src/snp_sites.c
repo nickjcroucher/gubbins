@@ -29,7 +29,7 @@
 #include "parse_phylip.h"
 #include "string_cat.h"
 #include "fasta_of_snp_sites.h"
-
+#include "csv_of_snp_sites.h"
 
 void build_snp_locations(int snp_locations[], char reference_sequence[])
 {
@@ -103,6 +103,8 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
 	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
 
+    create_csv_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
+    
 	free(snp_locations);
 	return 1;
 }

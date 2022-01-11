@@ -1,6 +1,8 @@
 EXTRA_DIST=debian/* tests/*.h tests/data/*
 SUBDIRS=src release python
 ACLOCAL_AMFLAGS=-I m4
+# include "check-code-coverage" rule
+include $(top_srcdir)/aminclude_static.am
 
 source: dist
 	cd release && make source

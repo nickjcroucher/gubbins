@@ -186,6 +186,10 @@ def convert_to_square_numpy_array(data):
     return out
 
 # Read in sequence to enable conversion to integers with JIT function
+<<<<<<< HEAD
+=======
+
+>>>>>>> 96c8d3375aeee83ac3abf731f52b855961ee12bd
 def process_sequence(index_list,alignment ,codec = None,align_array = None):
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
@@ -638,8 +642,9 @@ def get_base_patterns(alignment, verbose,
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     #print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    with open("align_array.npy","wb") as f:
-        numpy.save(f, align_array)
+    if pickle_aln:
+        with open("align_array.npy","wb") as f:
+            numpy.save(f, align_array)
 
     base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
     print_file = open(printero, "a")
@@ -647,10 +652,12 @@ def get_base_patterns(alignment, verbose,
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+
     base_pattern_positions_array_of_arrays = \
         [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
 
     # Convert the array of arrays into an ndarray that can be saved to shared memory
+
     print_file = open(printero, "a")
     print_file.write("Staring conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3)+ "\n")
@@ -665,8 +672,10 @@ def get_base_patterns(alignment, verbose,
     t2=time.process_time()
     if verbose:
         print("Time taken to find unique base patterns:", t2-t1, "seconds")
+
         print("Unique base patterns:", str(base_pattern_bases_array.shape[1]))
     return base_pattern_bases_array.transpose(), base_pattern_positions_array_of_arrays#square_base_pattern_positions_array
+
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -690,7 +699,8 @@ def reconstruct_alignment_column(column_indices,
                                 new_aln = None,
                                 threads = 1,
                                 verbose = False,
-                                 printero = "./printer_output"):
+                                printero = "./printer_output"):
+
     
     ### TIMING
     if verbose:
@@ -748,6 +758,7 @@ def reconstruct_alignment_column(column_indices,
         calc_time_start = time.process_time()
 
     # Iterate over columns
+
     print_file = open(printero, "a")
     print_file.write("Starting iteration over base patterns " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -834,6 +845,7 @@ def jar(alignment = None,
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, x in enumerate(alignment):
@@ -936,6 +948,7 @@ def jar(alignment = None,
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
     # Create new empty array
+
     print_file = open(printero, "a")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
@@ -949,7 +962,7 @@ def jar(alignment = None,
     print_file.write("End Alignment array creation " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("Size of new_aln_array " + str(new_aln_array.shape) + "\n")
-    print_file.write("Memory size of new aln_array: " + str(new_aln_array.nbytes) + " (bytes)" + "\n")
+    print_file.write("Memory size of new aln_array (bytes): " + str(new_aln_array.nbytes) + " (bytes)" + "\n")
     print_file.write("|/-\|/-\||/-\|/-\||/-\|/-\||/-\|/-\|" + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
@@ -1053,6 +1066,7 @@ def jar(alignment = None,
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print_file.close()
+
         
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")

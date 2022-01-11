@@ -68,13 +68,9 @@ def main(input_args):
                                      c_num, C_num, g_num, G_num,
                                      N_num, num_dash])
 
-    print()
-    print(len(row_data))
-    print(len(iso_data))
+
     iso_dat = pandas.DataFrame(row_data, columns=['a','A','t','T','c','C',
                                                   'g','G','N','dash'])
-    print(len(iso_dat.index))
-    print(iso_data)
     iso_dat.insert(0,"Isolate",iso_data)
 
     iso_dat.to_csv(path_or_buf=(input_args.out + ".csv"), index=False)

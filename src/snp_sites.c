@@ -94,8 +94,8 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	
-  char filename_without_directory[MAX_FILENAME_SIZE];
-  strip_directory_from_filename(filename, filename_without_directory);
+    char filename_without_directory[MAX_FILENAME_SIZE];
+    strip_directory_from_filename(filename, filename_without_directory);
 	
 	concat_strings_created_with_malloc(filename_without_directory,suffix);
 	

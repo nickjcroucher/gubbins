@@ -186,10 +186,7 @@ def convert_to_square_numpy_array(data):
     return out
 
 # Read in sequence to enable conversion to integers with JIT function
-<<<<<<< HEAD
-=======
 
->>>>>>> 96c8d3375aeee83ac3abf731f52b855961ee12bd
 def process_sequence(index_list,alignment ,codec = None,align_array = None):
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = align_array.name)

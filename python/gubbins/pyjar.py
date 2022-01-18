@@ -176,23 +176,6 @@ def convert_to_square_numpy_array(data):
     out[mask] = numpy.concatenate(data)
     return out
 
-# Function to read an alignment in various formats
-def read_alignment(filename, file_type, verbose=False):
-    if not os.path.isfile(filename):
-        print("Error: alignment file " + filename + " does not exist")
-        sys.exit(202)
-    if verbose:
-        print("Trying to open file " + filename + " as " + file_type)
-    try:
-        with open(filename,'r') as aln_in:
-            alignmentObject = AlignIO.read(aln_in, file_type)
-        if verbose:
-            print("Alignment read successfully")
-    except:
-        print("Cannot open alignment file " + filename + " as " + file_type)
-        sys.exit(203)
-    return alignmentObject
-
 # Get the unique base patterns within the numpy array
 # Based on https://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array
 def get_unique_columns(data):
@@ -524,7 +507,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         pass
 
     # Read in ordered sequence names
-    sequence_names_fn = prefix + '.gaps.base_patterns.csv'
+    sequence_names_fn = prefix + '.gaps.sequence_names.csv'
     sequence_names = []
     with open(sequence_names_fn,'r') as names_file:
         for line in names_file:
@@ -666,9 +649,10 @@ def reconstruct_alignment_column(column_indices,
 # Function for reconstructing complete alignment #
 ##################################################
 
-def jar(alignment = None,
+def jar(sequence_names = None,
         base_patterns = None,
         base_pattern_positions = None,
+        alignment_filename = None,
         tree_filename = None,
         info_filename = None,
         info_filetype = None,
@@ -681,8 +665,8 @@ def jar(alignment = None,
 
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
-    for i, x in enumerate(alignment):
-        alignment_sequence_names[x.id] = i
+    for i, name in enumerate(sequence_names):
+        alignment_sequence_names[name] = i
     
     # Read the tree
     if verbose:
@@ -770,8 +754,11 @@ def jar(alignment = None,
             preordered_nodes[node_count-1] = node_index # Do not add root node to preordered nodes
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
+    # Find the maximum base position for creating the numpy array
+    max_pos = numpy.amax(base_pattern_positions) + 1
+
     # Create new empty array
-    new_aln_array = numpy.full((len(alignment[0]),len(ancestral_node_indices)), '?', dtype = 'U1')
+    new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), '?', dtype = 'U1')
 
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
@@ -837,10 +824,9 @@ def jar(alignment = None,
         
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-        with open(output_prefix+".joint.aln", "w") as asr_output:
-            for taxon in alignment:
-                print(">" + taxon.id, file = asr_output)
-                print(taxon.seq, file = asr_output)
+        with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
+            for line in leaf_seqs:
+                print(line.rstrip() + '\n', file = asr_output)
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')

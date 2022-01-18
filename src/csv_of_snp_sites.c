@@ -36,14 +36,17 @@ int qrcmp(const void *x, const void *y) {
     return (strcmp(pattern_x.pattern,pattern_y.pattern));
 }
 
-FILE* create_file(char prefix[], char suffix[]) {
-    FILE* fp;
+char * generate_file_name(char prefix[], char suffix[]) {
     char* fn;
     fn = (char*) calloc(1024,sizeof(char));
     memcpy(fn, prefix, 1024*sizeof(char));
     concat_strings_created_with_malloc(fn,suffix);
+    return fn;
+}
+
+FILE* create_file(char* fn) {
+    FILE* fp;
     fp = fopen(fn, "w");
-    free(fn);
     return fp;
 }
 
@@ -51,18 +54,24 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     
     // Patterns CSV file
     FILE* patterns_file_pointer;
+    char * patterns_file_name;
     char patterns_extension[19] = {".base_patterns.csv"};
-    patterns_file_pointer = create_file(filename,patterns_extension);
+    patterns_file_name = generate_file_name(filename,patterns_extension);
+    patterns_file_pointer = create_file(patterns_file_name);
     
     // Positions CSV file
     FILE* positions_file_pointer;
+    char * positions_file_name;
     char positions_extension[20] = {".base_positions.csv"};
-    positions_file_pointer = create_file(filename,positions_extension);
+    positions_file_name = generate_file_name(filename,positions_extension);
+    positions_file_pointer = create_file(positions_file_name);
     
     // Sequence names CSV file
     FILE* names_file_pointer;
+    char * names_file_name;
     char names_extension[20] = {".sequence_names.csv"};
-    names_file_pointer = create_file(filename,names_extension);
+    names_file_name = generate_file_name(filename,names_extension);
+    names_file_pointer = create_file(names_file_name);
 
     // Write out sequence names
     int i = 0;
@@ -120,5 +129,8 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     fclose(positions_file_pointer);
     fclose(names_file_pointer);
     free(base_pattern_indices);
-    
+    free(positions_file_name);
+    free(patterns_file_name);
+    free(names_file_name);
+
 }

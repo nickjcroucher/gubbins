@@ -509,6 +509,8 @@ def get_base_patterns(prefix, verbose, threads = 1):
     # Read in ordered sequence names
     sequence_names_fn = prefix + '.gaps.sequence_names.csv'
     sequence_names = []
+    if not os.path.isfile(sequence_names_fn):
+        sys.exit("Unable to open sequence names file " + sequence_names_fn + "\n")
     with open(sequence_names_fn,'r') as names_file:
         for line in names_file:
             sequence_names.append(line.rstrip())
@@ -517,6 +519,8 @@ def get_base_patterns(prefix, verbose, threads = 1):
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     # Read in the unique base patterns
     base_patterns_fn = prefix + '.gaps.base_patterns.csv'
+    if not os.path.isfile(base_patterns_fn):
+        sys.exit("Unable to open base patterns file " + base_patterns_fn + "\n")
     array_of_pattern_arrays = []
     with open(base_patterns_fn,'r') as pattern_file:
         for line in pattern_file:
@@ -529,6 +533,8 @@ def get_base_patterns(prefix, verbose, threads = 1):
     # Read in base positions
     array_of_position_arrays = []
     base_positions_fn = prefix + '.gaps.base_positions.csv'
+    if not os.path.isfile(base_positions_fn):
+        sys.exit("Unable to open base positions file " + base_positions_fn + "\n")
     with open(base_positions_fn, 'r') as positions_file:
         for line in positions_file:
             array_of_position_arrays.append(line.rstrip().split(','))
@@ -826,7 +832,7 @@ def jar(sequence_names = None,
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
             for line in leaf_seqs:
-                print(line.rstrip() + '\n', file = asr_output)
+                print(line.rstrip(), file = asr_output)
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')

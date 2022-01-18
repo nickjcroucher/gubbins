@@ -21,7 +21,6 @@
 #ifndef _CSV_OF_SNP_SITES_
 #define _CSV_OF_SNP_SITES_
 
-//int qcmp(void* bases, const void *x, const void *y);
 int qcmp(const void *x, const void *y);
 
 void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int * snp_location);

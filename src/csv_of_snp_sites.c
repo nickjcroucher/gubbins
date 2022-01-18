@@ -25,10 +25,16 @@
 #include "parse_phylip.h"
 #include "string_cat.h"
 
-struct cmpargs {
-    int *arr;
-    char **words;
-} args;
+typedef struct {
+    int index;
+    char* pattern;
+} indexed_pattern;
+
+int qrcmp(const void *x, const void *y) {
+    const indexed_pattern pattern_x = *(indexed_pattern *)x;
+    const indexed_pattern pattern_y = *(indexed_pattern *)y;
+    return (strcmp(pattern_x.pattern,pattern_y.pattern));
+}
 
 // String comparison code
 int qcmp(const void *x, const void *y) {
@@ -84,52 +90,59 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     char positions_extension[20] = {".base_positions.csv"};
     concat_strings_created_with_malloc(positions_base_filename,positions_extension);
     positions_file_pointer = fopen(positions_base_filename, "w");
-
-    // Copy pointers for sorting
-    char** sorted_base_patterns = malloc(number_of_snps * sizeof(char*));
+    
+    // Indices
+    indexed_pattern* base_pattern_indices = malloc(number_of_snps * sizeof(indexed_pattern));
     int i = 0;
     for (i = 0; i < number_of_snps; i++)
     {
-        sorted_base_patterns[i] = bases_for_snps[i];
+        base_pattern_indices[i].pattern = bases_for_snps[i];
+        base_pattern_indices[i].index = i;
     }
-    
-    // Create structure for sorting
-    args.arr = sorted_base_patterns;
-    args.words = bases_for_snps;
 
-    // Sort the pointers to strings
-    int stringLen = sizeof(bases_for_snps) / sizeof(char*);
-    
-    qsort(sorted_base_patterns, number_of_snps, sizeof(char*), qcmp);
-//    qsort_r(sorted_base_patterns, number_of_snps, sizeof(int*), bases_for_snps, qcmp);
-//    qsort_r(sorted_base_patterns, number_of_snps, sizeof(int), &args, qcmp);
+    // Sort the base patterns
+    qsort(base_pattern_indices, number_of_snps, sizeof(indexed_pattern), qrcmp);
     
     // Avoid any large data structures to reduce peak memory
     int j = 0;
+    int8_t first = 1;
     for (j = 0; j < number_of_snps; j++)
     {
         // Identify if value is unique using sorted array
-        if (j == 0 || strcmp(sorted_base_patterns[j-1],sorted_base_patterns[j]) != 0)
+        if (j == 0 || strcmp(base_pattern_indices[j-1].pattern,base_pattern_indices[j].pattern) != 0)
         {
-            // Print base pattern to file
-            fprintf(patterns_file_pointer, "%s\n", sorted_base_patterns[j]);
-            // Print each position at which the pattern is observed
-            int k = 0;
-            for (k = 0; k < number_of_snps; k++)
+            // Set as first index
+            first = 1;
+            // End previous line if required
+            if (j > 0)
             {
-                if (strcmp(bases_for_snps[j],bases_for_snps[k]) == 0)
-                {
-                    fprintf(positions_file_pointer, "%i\t", snp_location[k]);
-                }
+                fprintf(positions_file_pointer, "\n");
             }
+            // Print base pattern to file
+            fprintf(patterns_file_pointer, "%s\n", base_pattern_indices[j].pattern);
+        }
+        else
+        {
+            // End line for positions
             fprintf(positions_file_pointer, "\n");
         }
+        if (first == 1)
+        {
+            fprintf(positions_file_pointer, "%i", base_pattern_indices[j].index);
+        }
+        else
+        {
+            fprintf(positions_file_pointer, ",%i", base_pattern_indices[j].index);
+        }
+        first = 0;
     }
-
+    // Final end of line
+    fprintf(positions_file_pointer, "\n");
+    
     // Tidy up memory
     fclose(patterns_file_pointer);
     fclose(positions_file_pointer);
-    free(sorted_base_patterns);
+    free(base_pattern_indices);
     free(patterns_base_filename);
     free(positions_base_filename);
     

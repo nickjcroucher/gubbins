@@ -511,15 +511,24 @@ def iterate_over_base_patterns(columns,
 ####################################################
 
 def get_base_patterns(prefix, verbose, threads = 1):
+    
+    # Identify unique base patterns
     if verbose:
         print("Finding unique base patterns")
-    # Identify unique base patterns
     t1=time.process_time()
+    
     # Check njit function is compiled before multiprocessing
     try:
         seq_to_int()
     except:
         pass
+
+    # Read in ordered sequence names
+    sequence_names_fn = prefix + '.gaps.base_patterns.csv'
+    sequence_names = []
+    with open(sequence_names_fn,'r') as names_file:
+        for line in names_file:
+            sequence_names.append(line.rstrip())
 
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
@@ -549,7 +558,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
     
     # Return output
-    return vstacked_patterns,square_base_pattern_positions_array
+    return sequence_names,vstacked_patterns,square_base_pattern_positions_array
 
 ########################################################
 # Function for reconstructing individual base patterns #

@@ -251,9 +251,10 @@ def parse_and_run(input_args, program_description=""):
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
-                base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(base_filename,
-                                                                                            input_args.verbose,
-                                                                                            threads = input_args.threads)
+                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array = \
+                                                            get_base_patterns(base_filename,
+                                                                                input_args.verbose,
+                                                                                threads = input_args.threads)
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,

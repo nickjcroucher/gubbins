@@ -36,7 +36,7 @@ int qrcmp(const void *x, const void *y) {
     return (strcmp(pattern_x.pattern,pattern_y.pattern));
 }
 
-void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int* snp_location) {
+void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps) {
     
     // Patterns CSV file
     FILE* patterns_file_pointer;
@@ -56,13 +56,14 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     concat_strings_created_with_malloc(positions_base_filename,positions_extension);
     positions_file_pointer = fopen(positions_base_filename, "w");
     
-    // Indices
+    // Indices run consecutively, rather than using SNP locations in whole genome alignment
+    // This is because pyjar reconstructs only the polymorphic sites, not the whole sequences
     indexed_pattern* base_pattern_indices = malloc(number_of_snps * sizeof(indexed_pattern));
     int i = 0;
     for (i = 0; i < number_of_snps; i++)
     {
         base_pattern_indices[i].pattern = bases_for_snps[i];
-        base_pattern_indices[i].index = snp_location[i];
+        base_pattern_indices[i].index = i;
     }
 
     // Sort the base patterns

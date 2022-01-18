@@ -106,7 +106,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
     // Generate CSV for ancestral state reconstruction - only need version with gaps
     if (exclude_gaps == 0)
     {
-        create_csv_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, snp_locations);
+        create_csv_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps);
     }
     
 	free(snp_locations);

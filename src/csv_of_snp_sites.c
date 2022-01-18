@@ -36,41 +36,6 @@ int qrcmp(const void *x, const void *y) {
     return (strcmp(pattern_x.pattern,pattern_y.pattern));
 }
 
-// String comparison code
-int qcmp(const void *x, const void *y) {
-    
-    const char *pp1 = *(const char**)x;
-    const char *pp2 = *(const char**)y;
-    printf("PP1 is %s\n",pp1);
-    int compval = strcmp(pp1,pp2);
-//    return strncmp(pp1, pp2, 14);
-    return compval;
-    
-//    const char *(x_str) = *(const char **)x;
-//    const char *(y_str) = *(const char **)y;
-//    return strcmp(x_str, y_str);
-    
-//    const int ix = *(const int *)x;
-//    const int iy = *(const int *)y;
-//    return ix - iy;
-//    const char *(x_str) = *(const char **)bases[*ix];
-//    const char *(y_str) = *(const char **)bases[*iy];
-//    return strcmp(x_str, y_str);
-//    const char *(x_str) = *(const char **)bases[*(const int*)x];
-//    const char *(y_str) = *(const char **)bases[*(const int*)y];
-//    return strcmp(x_str, y_str);
-}
-
-//int cmpfunc(const void * a, const void * b, void *_args) {
-//    struct cmpargs args = _args;
-//
-//    int *a1 = a;
-//    int *a2 = b;
-//
-//    int idx1 = a - args->arr;
-//    int idx2 = b - args->arr;
-//}
-
 void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int* snp_location, char ** sequence_names, int number_of_samples,int internal_nodes[]) {
     
     // Patterns CSV file

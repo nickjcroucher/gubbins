@@ -23,6 +23,6 @@
 
 int qcmp(const void *x, const void *y);
 
-void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps);
+void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples);
 
 #endif

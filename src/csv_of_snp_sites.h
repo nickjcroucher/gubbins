@@ -24,6 +24,6 @@
 //int qcmp(void* bases, const void *x, const void *y);
 int qcmp(const void *x, const void *y);
 
-void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int * snp_location, char ** sequence_names, int number_of_samples,int internal_nodes[]);
+void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int * snp_location);
 
 #endif

@@ -36,7 +36,7 @@ int qrcmp(const void *x, const void *y) {
     return (strcmp(pattern_x.pattern,pattern_y.pattern));
 }
 
-void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int* snp_location, char ** sequence_names, int number_of_samples,int internal_nodes[]) {
+void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, int* snp_location) {
     
     // Patterns CSV file
     FILE* patterns_file_pointer;
@@ -62,7 +62,7 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     for (i = 0; i < number_of_snps; i++)
     {
         base_pattern_indices[i].pattern = bases_for_snps[i];
-        base_pattern_indices[i].index = i;
+        base_pattern_indices[i].index = snp_location[i];
     }
 
     // Sort the base patterns

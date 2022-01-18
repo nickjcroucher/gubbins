@@ -176,16 +176,6 @@ def convert_to_square_numpy_array(data):
     out[mask] = numpy.concatenate(data)
     return out
 
-# Read in sequence to enable conversion to integers with JIT function
-def process_sequence(index_list,alignment = None,codec = None,align_array = None):
-    # Load shared memory output alignment
-    out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
-    out_aln = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = out_aln_shm.buf)
-    for i in index_list:
-        # Add sequence
-        unicode_seq = numpy.frombuffer(bytearray(str(alignment[i].seq), codec), dtype = 'U1')
-        seq_to_int(unicode_seq,out_aln[i])
-
 # Function to read an alignment in various formats
 def read_alignment(filename, file_type, verbose=False):
     if not os.path.isfile(filename):
@@ -520,52 +510,46 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 
-def get_base_patterns(alignment, verbose, threads = 1):
+def get_base_patterns(prefix, verbose, threads = 1):
     if verbose:
         print("Finding unique base patterns")
     # Identify unique base patterns
     t1=time.process_time()
-    # Convert alignment to Numpy array
-    ntaxa = len(alignment)
-    seq_length = alignment.get_alignment_length()
-    align_array = numpy.full((ntaxa,seq_length), 8, dtype = numpy.uint8, order='F')
     # Check njit function is compiled before multiprocessing
     try:
         seq_to_int()
     except:
         pass
+
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
-    ntaxa_range_list = list(range(ntaxa))
-    ntaxa_range_indices = list(chunks(ntaxa_range_list,threads))
-    with SharedMemoryManager() as smm:
-        align_array_shared = generate_shared_mem_array(align_array, smm)
-        with Pool(processes = threads) as pool:
-            pool.map(partial(
-                process_sequence,
-                    alignment = alignment,
-                    codec = codec,
-                    align_array = align_array_shared
-                ),
-                ntaxa_range_indices
-            )
-        # Write out alignment while shared memory manager still active
-        align_array_shm = shared_memory.SharedMemory(name = align_array_shared.name)
-        align_array = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = align_array_shm.buf)
+    # Read in the unique base patterns
+    base_patterns_fn = prefix + '.gaps.base_patterns.csv'
+    array_of_pattern_arrays = []
+    with open(base_patterns_fn,'r') as pattern_file:
+        for line in pattern_file:
+            unicode_seq = numpy.frombuffer(bytearray(line.rstrip(), codec), dtype = 'U1')
+            out_array = numpy.ndarray(unicode_seq.size, dtype = numpy.uint8)
+            seq_to_int(unicode_seq,out_array)
+            array_of_pattern_arrays.append(out_array)
+    vstacked_patterns = numpy.vstack(array_of_pattern_arrays)
 
-    # Get unique base patterns and their indices in the alignment
-    base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
-    base_pattern_positions_array_of_arrays = \
-        [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
-
-    # Convert the array of arrays into an ndarray that can be saved to shared memory
-    square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
-    # Finish
+    # Read in base positions
+    array_of_position_arrays = []
+    base_positions_fn = prefix + '.gaps.base_positions.csv'
+    with open(base_positions_fn, 'r') as positions_file:
+        for line in positions_file:
+            array_of_position_arrays.append(line.rstrip().split(','))
+    square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
+    
+    # Record timing
     t2=time.process_time()
     if verbose:
-        print("Time taken to find unique base patterns:", t2-t1, "seconds")
+        print("Time taken to load unique base patterns:", t2-t1, "seconds")
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
-    return base_pattern_bases_array.transpose(), square_base_pattern_positions_array
+    
+    # Return output
+    return vstacked_patterns,square_base_pattern_positions_array
 
 ########################################################
 # Function for reconstructing individual base patterns #

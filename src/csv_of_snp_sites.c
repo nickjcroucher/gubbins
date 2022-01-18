@@ -121,11 +121,6 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
             // Print base pattern to file
             fprintf(patterns_file_pointer, "%s\n", base_pattern_indices[j].pattern);
         }
-        else
-        {
-            // End line for positions
-            fprintf(positions_file_pointer, "\n");
-        }
         if (first == 1)
         {
             fprintf(positions_file_pointer, "%i", base_pattern_indices[j].index);

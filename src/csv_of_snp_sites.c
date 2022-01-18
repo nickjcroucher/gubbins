@@ -37,17 +37,11 @@ int qrcmp(const void *x, const void *y) {
 }
 
 char * generate_file_name(char prefix[], char suffix[]) {
-    char* fn;
+    char * fn;
     fn = (char*) calloc(1024,sizeof(char));
     memcpy(fn, prefix, 1024*sizeof(char));
     concat_strings_created_with_malloc(fn,suffix);
     return fn;
-}
-
-FILE* create_file(char* fn) {
-    FILE* fp;
-    fp = fopen(fn, "w");
-    return fp;
 }
 
 void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_for_snps, char ** sequence_names, int number_of_samples) {
@@ -57,21 +51,21 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     char * patterns_file_name;
     char patterns_extension[19] = {".base_patterns.csv"};
     patterns_file_name = generate_file_name(filename,patterns_extension);
-    patterns_file_pointer = create_file(patterns_file_name);
+    patterns_file_pointer = fopen(patterns_file_name,"w");
     
     // Positions CSV file
     FILE* positions_file_pointer;
     char * positions_file_name;
     char positions_extension[20] = {".base_positions.csv"};
     positions_file_name = generate_file_name(filename,positions_extension);
-    positions_file_pointer = create_file(positions_file_name);
+    positions_file_pointer = fopen(positions_file_name,"w");
     
     // Sequence names CSV file
     FILE* names_file_pointer;
     char * names_file_name;
     char names_extension[20] = {".sequence_names.csv"};
     names_file_name = generate_file_name(filename,names_extension);
-    names_file_pointer = create_file(names_file_name);
+    names_file_pointer = fopen(names_file_name,"w");
 
     // Write out sequence names
     int i = 0;

@@ -16,14 +16,14 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/sanger-pathogens/gubbins">View source code on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/nickjcroucher/gubbins">View source code on GitHub</a>
 
           <h1 id="project_title">Gubbins</h1>
           <h2 id="project_tagline">Genealogies Unbiased By recomBinations In Nucleotide Sequences</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/sanger-pathogens/gubbins/zipball/master">Download source code as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/sanger-pathogens/gubbins/tarball/master">Download source code as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/nickjcroucher/gubbins/zipball/master">Download source code as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/nickjcroucher/gubbins/tarball/master">Download source code as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -31,150 +31,56 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h1>
-<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h1>
+        <h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
 
 <p>Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous increase in the size of datasets being used for estimating bacterial population phylodynamics. Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used for mitigating the effect of mechanisms of horizontal sequence transfer on phylogenetic reconstructions cannot cope with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.</p>
 
-<h2>The paper</h2>
+<h3>The paper</h3>
 The paper is available from Nucleic Acids Research (open access):
 <a href="http://nar.oxfordjournals.org/content/43/3/e15">Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins</a>.
-
-<h3>Citing Gubbins</h3>
 
 <p><em>Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R.</em> "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". doi:10.1093/nar/gku1196, Nucleic Acids Research, 2014.
 </p>
 
-<h3>Data used in the paper</h3>
-<ul>
-  <li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz">PMEN1 dataset (12 Mbyte multi-FASTA alignment file)</a></li>
-  <li><a href="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz">ST239 dataset (7 Mbyte multi-FASTA alignment file)</a></li>
-</ul>
-
-<h2>Feedback/Issues</h2>
-<p>We currently do not have the resources to provide support for Gubbins. However, the community might be able to help you out if you report any issues about usage of the software to the <a href="https://github.com/sanger-pathogens/gubbins/issues">issues page</a>.</p>
-
-<h2>User manual</h2>
-<ul>
-  <li>
-    <a href="https://github.com/sanger-pathogens/gubbins/raw/master/GubbinsManual_latest.docx">User manual</a>
-  </li>
-</ul>
-
-<h2>
-<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Installing</h2>
-<p>Detailed installation instructions are available in the <a href="https://github.com/sanger-pathogens/gubbins/blob/master/README.md">README file</a>. 
-	If you already have homebrew installed then run <em>brew install gubbins</em>.
+<h3>
+<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Installation</h3>
+<p>Detailed installation instructions are available in the <a href="https://github.com/nickjcroucher/gubbins/blob/master/README.md">README file</a>.
+    If you already have anaconda installed, then run:<br>
+        <code class=shell>
+        conda create -n gubbins<br>
+        conda activate gubbins<br>
+        conda config --add channels r<br>
+        conda config --add channels defaults<br>
+        conda config --add channels conda-forge<br>
+        conda config --add channels bioconda<br>
+        conda install gubbins
+        </code>
 </p>
 
+<h3>User manual</h3>
+Instructions on how to use the software are detailed in the
+    <a href="https://github.com/nickjcroucher/gubbins/blob/master/docs/gubbins_manual.md"> manual</a><br>
 
-<h1><a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running Gubbins</h1>
-<p>To run Gubbins with default settings:</p>
-
-    <ul><li>run_gubbins.py [FASTA alignment]</li></ul>
-    
-<p>Input options:</p>
-
-    <ul><li>--outgroup, -o</li></ul>
-
-<p>The name of a sequence in the alignment on which to root the tree</p>
-
-    <ul><li>--starting_tree, -s</li></ul>
-
-<p>A Newick-format starting tree on which to perform the first iteration analysis. The default is to compute a starting tree using RAxML</p>
-
-    <ul><li>--filter_percentage -f</li></ul>
-
-<p>Filter out taxa with more than this percentage of missing data. Default is 25%</p>
-    
-<p>Processing options:</p>
-
-    <ul><li>--tree_builder, -t</li></ul>
-    
-<p>The algorithm to use in the construction of phylogenies in the analysis; can be ‘raxml’, to use RAxML, ‘fasttree’, to use Fasttree, or ‘hybrid’, to use Fasttree for the first iteration and RAxML in all subsequent iterations. Default is raxml</p>
-
-    <ul><li>--iterations, -i</li></ul>
-    
-<p>The maximum number of iterations to perform; the algorithm will stop earlier than this if it converges on the same tree in two successive iterations. Default is 5.</p>
-
-    <ul><li>--min_snps, -m</li></ul>
-<p>The minimum number of base substitutions required to identify a recombination. Default is 3.</p>
- 
-    <ul><li>--converge_method, -z</li></ul>
-<p>Convergence criteria. Criteria to use to know when to halt iterations (weighted_robinson_foulds, robinson_foulds, recombination). Default is 'weighted_robinson_foulds'.</p> 
-    
-<p>Output options:</p>
-
-    <ul><li>--use_time_stamp, -u</li></ul>
-    
-<p>Include a time stamp in the name of output files to avoid overwriting previous runs on the same input file. Default is to not include a time stamp.</p>
-
-    <ul><li>--prefix, -p</li></ul>
-    
-<p>Specifiy a prefix for output files. If none is provided it defaults to the name of the input FASTA alignment</p>
-
-    <ul><li>--verbose, -v</li></ul>
-    
-<p>Print debugging messages. Default is off.</p>
-
-    <ul><li>--no_cleanup, -n</li></ul>
-    
-<p>Do not remove files from intermediate iterations. This option will also keep other files created by RAxML and fasttree, which would otherwise be deleted. Default is to only keep files from the final iteration.</p>
-
-
-<h2><a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Output files</h2>
-<h3><a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Prefix</h3>
-<p>If a prefix is not defined with the –prefix option, the default prefix of the output files is:
-X.Y</p>
-
-<p>where:</p>
+<h3>Quickstart tutorial with example datasets</h3>
 <ul>
-  <li>X = Prefix taken from the input fasta file</li>
-<li>Y = Time stamp. NOTE: This will only be included in the output file prefix if the –u flag has been selected</li></ul>
+  <li>A small set of <em>S. pneumoniae</em> PMEN3 assemblies can be downloaded <a href="https://figshare.com/ndownloader/files/33486593">here</a> (6.5 Mb archive of assemblies and a reference annotation). A brief tutorial on how to analyse such data is here <a href="https://github.com/nickjcroucher/gubbins/blob/master/docs/gubbins_tutorial.md">here</a></li>
+  <li>A small <em>S. pneumoniae</em> PMEN1 dataset can be downloaded <a href="https://figshare.com/ndownloader/files/33471200">here</a> (6.4 Mb multi-FASTA whole genome alignment file). The expected output is <a href="https://github.com/nickjcroucher/gubbins/tree/master/example_data/PMEN1">here</a></li>
+  <li>A small <em>S. aureus</em> ST239 dataset can be downloaded <a href="https://figshare.com/ndownloader/files/33472622">here</a> (11.3 Mb multi-FASTA whole genome alignment file). The expected output is <a href="https://github.com/nickjcroucher/gubbins/tree/master/example_data/ST239">here</a></li></li>
+</ul>
 
-<h3><a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Output file suffices</h3>
+<h3>Feedback/Issues</h3>
+<p>Please report problems to the <a href="https://github.com/nickjcroucher/gubbins/issues">issues page</a>.</p>
 
-<p>Recombination predictions in EMBL tab file format.</p>
-<ul><li>.recombination_predictions.embl</li></ul>
-
-<p>Recombination predictions in GFF3 format</p>
-<ul><li>.recombination_predictions.gff	</li></ul>
-
-<p>Base substitution reconstruction in EMBL tab format.</p>
-<ul><li>.branch_base_reconstruction.embl	</li></ul>
-
-<p>VCF file summarising the distribution of SNPs</p>
-<ul><li>.summary_of_snp_distribution.vcf	</li></ul>
-
-<p>Per branch reporting of the base substitutions inside and outside recombinations events.</p>
-<ul><li>.per_branch_statistics.csv	</li></ul>
-
-<p>FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration.</p>
-<ul><li>.filtered_polymorphic_sites.fasta	</li></ul>
-
-<p>Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration.</p>
-<ul><li>.filtered_polymorphic_sites.phylip	</li></ul>
-
-<p>Final phylogenetic tree in newick format.</p>
-<ul><li>.final_tree.tre	</li></ul>
-
-<p>Final phylogenetic tree in newick format but with internal node labels.</p>
-<ul><li>.node_labelled.final_tree.tre	</li></ul>
-
-<h1><a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h1>
-        <h3><a name="segfault" class="anchor" href="#segfault"><span class="octicon octicon-link"></span></a>What do I do if I get a Segmentation fault?</h3>
-        <p>If you get a segfault, it means your input data is probably too divergenet or insufficiently curated for quality. Keep removing samples until gubbins can complete.</p>
-        
-<h3><a name="roary" class="anchor" href="#roary"><span class="octicon octicon-link"></span></a>Can the output of Roary be used as the input to Gubbins?</h3>
+<h3>Frequently asked questions</h3>
+<h4>What type of dataset can be analysed with Gubbins?</h4>
+<p>Gubbins detects recombinations through the locally-elevated densities of polymorphisms that arise when segments of sequence are acquired from a donor that is genetically divergent from the set of sequences being analysed. We recommend that you divide your population into strains using <a href="https://poppunk.net/">PopPUNK</a>, and use Gubbins on a whole genome alignment of each strain separately.</p>
+<h4>Can the output of Roary be used as the input to Gubbins?</h4>
 <p>The output of <a href="http://sanger-pathogens.github.io/Roary/">Roary (the pan genome pipeline)</a> cannot be used as the input to Gubbins.
-They are fundamentally different methods. Detecting recombination in pan genomes is an open problem.</p>
-
-<h3>
-<a name="virtual-machine" class="anchor" href="#compiling"><span class="octicon octicon-link"></span></a>Running Gubbins within Sanger?</h3>
-<p>The command to run the script within Sanger with 8GB of RAM and 16 cores looks like:</p>
-<ul><li>
-bsub.py --threads 16 8 log run_gubbins.py --threads 16 my_alignment.aln
-</li></ul>
+Gubbins requires a whole genome alignment as input, in order to analyse the spatial distribution of base substitutions.</p>
+<h4>Can an alignment of polymorphic sites be used as the input to Gubbins?</h4>
+<p>An alignment of polymorphic sites cannot be used as the input to Gubbins.
+Gubbins requires a whole genome alignment as input, in order to analyse the spatial distribution of base substitutions.</p>
 
       </section>
     </div>
@@ -182,7 +88,7 @@ bsub.py --threads 16 8 log run_gubbins.py --threads 16 my_alignment.aln
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Gubbins maintained by <a href="https://github.com/sanger-pathogens">sanger-pathogens</a></p>
+        <p class="copyright">Gubbins maintained by <a href="https://github.com/nickjcroucher">Nick Croucher</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>

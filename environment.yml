@@ -12,6 +12,7 @@ dependencies:
   - automake
   - autoconf-archive
   - pytest
+  - pytest-cov
   - check
   - libtool
   - cppunit

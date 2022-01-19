@@ -294,19 +294,25 @@ def parse_and_run(input_args, program_description=""):
         
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
-            print_file = open("./printer_output", "a")
-            print_file.write("Starting pyjar recon" + str(datetime.datetime.now()) + "\n")
-            print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-            print_file.close()
+            
             if i == 1:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
+                
+                print_file = open("./printer_output", "a")
+                print_file.write("Starting get base patterns" + str(datetime.datetime.now()) + "\n")
+                print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+                print_file.close()
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array = \
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
+                print_file = open("./printer_output", "a")
+                print_file.write("End get base patterns" + str(datetime.datetime.now()) + "\n")
+                print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+                print_file.close()
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
@@ -324,6 +330,10 @@ def parse_and_run(input_args, program_description=""):
             polymorphism_alignment = read_alignment(original_aln_loc, alignment_type, verbose=input_args.verbose,
                                                     list_out=False)
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
+            print_file = open("./printer_output", "a")
+            print_file.write("Starting pyjar recon" + str(datetime.datetime.now()) + "\n")
+            print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+            print_file.close()
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
                 base_pattern_positions = base_pattern_positions_array, # nparray of positions of unique base patterns in alignment
@@ -334,6 +344,10 @@ def parse_and_run(input_args, program_description=""):
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
                 threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose)
+            print_file = open("./printer_output", "a")
+            print_file.write("End pyjar recon" + str(datetime.datetime.now()) + "\n")
+            print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+            print_file.close()
             gaps_alignment_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.tre"
             printer.print(["\nTransferring pyjar results onto original recombination-corrected tree"])

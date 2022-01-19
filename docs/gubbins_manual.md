@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[Gubbins](http://sanger-pathogens.github.io/gubbins/) (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. [Simulations demonstrate](https://academic.oup.com/nar/article/43/3/e15/2410982) the algorithm generates highly accurate reconstructions under realistic models of short-term diversification of sequences through both point mutation and recombination, and can be run on alignments of many hundreds of bacterial genome sequences. It is therefore not appropriate for looking at recombination across species-wide diversity - this can be done gene-by-gene using software such as [fastGEAR](https://pubmed.ncbi.nlm.nih.gov/28199698/). Instead, it works on **samples of limited diversity, sharing a recent common ancestor** - a [strain or lineage](https://www.nature.com/articles/s41396-020-00867-w).
+[Gubbins](http://nickjcroucher.github.io/gubbins/) (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing a phylogeny based on the putative point mutations outside of these regions. [Simulations demonstrate](https://academic.oup.com/nar/article/43/3/e15/2410982) the algorithm generates highly accurate reconstructions under realistic models of short-term diversification of sequences through both point mutation and recombination, and can be run on alignments of many hundreds of bacterial genome sequences. It is therefore not appropriate for looking at recombination across species-wide diversity - this can be done gene-by-gene using software such as [fastGEAR](https://pubmed.ncbi.nlm.nih.gov/28199698/). Instead, it works on **samples of limited diversity, sharing a recent common ancestor** - a [strain or lineage](https://www.nature.com/articles/s41396-020-00867-w).
 
 The time taken for the algorithm to converge on a stable solution increases approximately quadratically with the number of samples; this increase can be ameliorated to some extent by using faster and/or simpler phylogenetic algorithms to generate trees within the analysis pipeline. The input should be a **whole genome sequence alignment**; there is no need to remove accessory genome loci, as the algorithm should cope with regions of missing data. Gubbins will not produce a sensible alignment on concantentations of core genes output by software such as [Roary](https://sanger-pathogens.github.io/Roary/) or [Panaroo](https://github.com/gtonkinhill/panaroo), because it requires information on the spatial distribution of polymorphisms across the genome.
 
@@ -33,7 +33,7 @@ conda config --add channels bioconda
 conda install gubbins
 ```
 
-Alternative approaches are described on the [Github page](https://github.com/sanger-pathogens/gubbins). Gubbins relies on multiple other phylogenetic software packages, including:
+Alternative approaches are described on the [Github page](https://github.com/nickjcroucher/gubbins). Gubbins relies on multiple other phylogenetic software packages, including:
 
 * [RAxML](https://doi.org/10.1093/bioinformatics/btu033)
 * [IQTree](https://doi.org/10.1093/molbev/msaa015)
@@ -229,23 +229,23 @@ The `.per_branch_statistics.csv` file contains summary statistics for each branc
 
 ## Examples
 
-Two example alignments can be downloaded from http://sanger-pathogens.github.io/gubbins/:
+Two example alignments can be downloaded from http://nickjcroucher.github.io/gubbins/:
 
-- ***Streptococcus pneumoniae*** **PMEN1** (available from ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz), for which the expected output is:
+- ***Streptococcus pneumoniae*** **PMEN1** (available from https://figshare.com/ndownloader/files/33468725), for which the expected output is:
 
-![](../example_data/PMEN1/PMEN1_Phandango_output.png)
+![](../example_data/PMEN1/PMEN1_output.png)
 
 This used the command `run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln` and took ~20s on a single CPU.
 
-- ***Staphylococcus aureus*** **ST239** (available from ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz), for which the expected output is:
+- ***Staphylococcus aureus*** **ST239** (available from https://figshare.com/ndownloader/files/33468719), for which the expected output is:
 
-![](../example_data/ST239/ST239_Phandango_output.png)
+![](../example_data/ST239/ST239_output.png)
 
 This used the command `run_gubbins.py --prefix ST239 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR ST239.aln` and took ~30s on a single CPU.
 
 ## Troubleshooting
 
-Please log any issues you encounter on the GitHub site: https://github.com/sanger-pathogens/gubbins. Please be patient, as there is currently no specific funding support for Gubbins. 
+Please log any issues you encounter on the GitHub site: https://github.com/nickjcroucher/gubbins. Please be patient, as there is currently no specific funding support for Gubbins. 
 
 ## Citation
 

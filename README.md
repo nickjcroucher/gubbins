@@ -143,8 +143,8 @@ If you use this software please cite:
 For more information on this software see the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/).
 
 ### Data from the paper
-* ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/PMEN1.aln.gz
-* ftp://ftp.sanger.ac.uk/pub/project/pathogens/gubbins/ST239.aln.gz
+* [PMEN1 alignment](https://figshare.com/ndownloader/files/33468725)
+* [ST239 alignment](https://figshare.com/ndownloader/files/33468719)
 
 ### Midpoint rerooting
 From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default.

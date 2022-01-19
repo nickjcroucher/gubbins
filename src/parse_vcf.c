@@ -153,7 +153,7 @@ int get_number_of_columns(char * column_header)
 	do
 	{
 		split_string_and_return_specific_index( result, column_header, number_of_columns,100000);
-		if(result == NULL ||  result[0] == '\n')
+		if (result[0] == '\n')
 		{
 			break;	
 		}

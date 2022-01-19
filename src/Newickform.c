@@ -71,36 +71,36 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	root = parseTree(pcTreeStr);
 	
 	// output tab file
-  FILE * block_file_pointer;
-  char block_file_name[MAX_FILENAME_SIZE] = {""};
-  char block_file_extension[5]= {".tab"};
+    FILE * block_file_pointer;
+    char block_file_name[MAX_FILENAME_SIZE] = {""};
+    char block_file_extension[5]= {".tab"};
 	memcpy(block_file_name, filename, size_of_string(filename) +1);
 	concat_strings_created_with_malloc(block_file_name,block_file_extension);
 	block_file_pointer = fopen(block_file_name, "w");
 	
 	// output tab file
-  FILE * branch_snps_file_pointer;
-  char branch_snps_file_name[MAX_FILENAME_SIZE]= {""};
-  char branchtab_extension[18]= {".branch_snps.tab"};
+    FILE * branch_snps_file_pointer;
+    char branch_snps_file_name[MAX_FILENAME_SIZE]= {""};
+    char branchtab_extension[18]= {".branch_snps.tab"};
 	memcpy(branch_snps_file_name, filename, size_of_string(filename) +1);
 	concat_strings_created_with_malloc(branch_snps_file_name,branchtab_extension);
 	branch_snps_file_pointer = fopen(branch_snps_file_name, "w");
 	
 	// output gff file
 	FILE * gff_file_pointer;
-  char gff_file_name[MAX_FILENAME_SIZE]= {""};
-  memcpy(gff_file_name, filename, size_of_string(filename) +1);
-  char gff_extension[5]= {".gff"};
+    char gff_file_name[MAX_FILENAME_SIZE]= {""};
+    memcpy(gff_file_name, filename, size_of_string(filename) +1);
+    char gff_extension[5]= {".gff"};
 	concat_strings_created_with_malloc(gff_file_name,gff_extension);
 	gff_file_pointer = fopen(gff_file_name, "w");
 	print_gff_header(gff_file_pointer,length_of_original_genome);
 	
-	char * root_sequence;
+    char * root_sequence = NULL;
 
 	carry_unambiguous_gaps_up_tree(root);
 	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer,window_min, window_max);
 	free(root_sequence);
-	int * parent_recombinations;
+    int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);
 
 	fclose(block_file_pointer);
@@ -156,14 +156,14 @@ newick_node* parseTree(char *str)
 		if (pcColon == NULL)
 		{
 			// Taxon only
-			node->taxon = (char*)seqMalloc(strlen(pcStart) + 1);
+			node->taxon = (char*)seqMalloc((int)strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
 		}
 		else
 		{
 			// Taxon
 			*pcColon = '\0';
-			node->taxon = (char*)seqMalloc(strlen(pcStart) + 1);
+			node->taxon = (char*)seqMalloc((int)strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
 			*pcColon = ':';
 			// Distance
@@ -299,7 +299,7 @@ newick_node* parseTree(char *str)
 			}
 			cTemp = *pcCurrent;
 			*pcCurrent = '\0';
-			node->taxon = seqMalloc(strlen(pcStart) + 1);
+			node->taxon = seqMalloc((int)strlen(pcStart) + 1);
 			memcpy(node->taxon, pcStart, strlen(pcStart));
 			node->taxon = strip_quotes(node->taxon);
 			

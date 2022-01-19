@@ -113,11 +113,24 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--starting-tree",
-                                                os.path.join(data_dir, 'destination_tree.tre'),
+                                                os.path.join(data_dir, 'starting_tree.tre'),
                                                 "--tree-builder", "iqtree",
                                                 "--verbose", "--iterations", "3",
                                                 "--threads", "1",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_defined_mislabelled_starting_tree(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--starting-tree",
+                                                os.path.join(data_dir, 'mislabelled.starting_tree.tre'),
+                                                "--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
+                                                "--threads", "1",
+                                                os.path.join(data_dir, 'mislabelled.multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
         self.cleanup('multiple_recombinations')
         assert exit_code == 0

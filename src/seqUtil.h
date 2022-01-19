@@ -29,16 +29,16 @@
 #define APPEND_LEN	256
 
 #ifdef __SEQUTIL_C__
-	void seqMemInit();
+    void seqMemInit(void);
 	void* seqMalloc(int size);
-	void seqFree();
-	void seqFreeAll();
+    void seqFree(void*);
+    void seqFreeAll(void);
 	void inputString(char *input, char **ppcStr, int *iLen, int *iMaxLen);
 #else
-	extern void seqMemInit();
+    extern void seqMemInit(void);
 	extern void* seqMalloc(int size);
-	extern void seqFreeAll();
-	extern void seqFree();
+    extern void seqFreeAll(void);
+    extern void seqFree(void*);
 	extern void inputString(char *input, char **ppcStr, int *iLen, int *iMaxLen);
 #endif
 

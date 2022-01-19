@@ -4,6 +4,8 @@ import sys
 from Bio import AlignIO
 from collections import Counter
 from Bio.Align import MultipleSeqAlignment
+# Gubbins imports
+from gubbins.utils import process_sequence_names
 
 class ValidateFastaAlignment(object):
 
@@ -26,7 +28,7 @@ class ValidateFastaAlignment(object):
       return True
 
     def does_each_sequence_have_a_name_and_genomic_data(self):
-      with  open(self.input_filename, "r") as input_handle:
+      with open(self.input_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
         number_of_sequences = 0
         for alignment in alignments:
@@ -55,7 +57,6 @@ class ValidateFastaAlignment(object):
                  elif sequence_length != len(record.seq):
                    print("Error with the input FASTA file: The sequences are not of the same length, this is not an alignment: "+record.name)
                    return False
-          input_handle.close()
       except:
         print("Unexpected error:", sys.exc_info()[0])
         print("Error with the input FASTA file: It is in the wrong format, check it is an alignment")
@@ -70,14 +71,18 @@ class ValidateFastaAlignment(object):
             for record in alignment:
                 # Remove disallowed characters
                 if '#' in record.name or ':' in record.name:
-                    record.name = record.name.replace("#","_").replace(":","_")
-                    record.id = record.id.replace("#", "_").replace(":", "_")
-                    record.description = record.description.replace("#", "_").replace(":", "_")
+                    record.name = process_sequence_names(record.name)
+                    record.id = process_sequence_names(record.id)
+                    record.description = process_sequence_names(record.description)
                     any_modified_names = True
                 # Store modified names
                 sequence_names.append(record.name)
-        if [k for k,v in list(Counter(sequence_names).items()) if v>1] != []:
-          return False
+        duplicate_sequence_list = [k for k,v in list(Counter(sequence_names).items()) if v>1]
+        if duplicate_sequence_list != []:
+            print("Duplicate sequences found after name processing:")
+            for dup in duplicate_sequence_list:
+                print(dup)
+            return False
         # Update alignment if names changed
         if any_modified_names:
             with open(self.input_filename, "w") as output_handle:

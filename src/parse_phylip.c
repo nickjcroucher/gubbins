@@ -108,9 +108,8 @@ void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(in
 			break;
 		}
 		
-		int real_base_found = 0;
 		int child_counter = 0;
-		char comparison_base ;
+        char comparison_base = '\0';
 		for(child_counter = 0 ; child_counter < num_children ; child_counter++)
 		{
 			int child_index = child_sequence_indices[child_counter];

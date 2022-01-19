@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <math.h>
 #include "seqUtil.h"
 #include "Newickform.h"
@@ -149,7 +150,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
     // TODO: The stats for the number of snps in recombinations will need to be updated.
 	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates, (num_blocks + root->number_of_blocks),snp_locations, number_of_snps, snps_in_recombinations);
-    int num_snps_updated_from_downstream_recombintations=0;
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{
  		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
@@ -283,7 +283,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
     // Save some statistics about the sequence
 		branch_genome_size = calculate_size_of_genome_without_gaps(leaf_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(root->taxon,branch_genome_size);
-		int number_of_gaps = length_of_original_genome-branch_genome_size;
 		
 		return leaf_sequence;
 	}
@@ -381,8 +380,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 {
 	int i = 0;
 	int window_size = 0;
-	int window_start_coordinate = 0;
-	int window_end_coordinate = 0;
 	int number_of_snps_in_block = 0;
 	int block_genome_size_without_gaps = 0;
 	double branch_snp_density = 0.0;
@@ -528,7 +525,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
   }
 }
 
-int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int * gaps_in_original_genome_space)
+int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int8_t * gaps_in_original_genome_space)
 {
 		int max_snp_sliding_window_counter = initial_max_coord;
 		int upper_offset = 0;
@@ -545,7 +542,7 @@ int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int g
 		return max_snp_sliding_window_counter;
 }
 
-int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int * gaps_in_original_genome_space)
+int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int8_t * gaps_in_original_genome_space)
 {
 		int lower_offset = 0;
 		int snp_sliding_window_counter = initial_min_coord;
@@ -565,12 +562,12 @@ int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int g
 int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence, int * snp_locations, int number_of_snps)
 {
 	// Set up the window counter with 1 value per base in the branch
- 	int * window_count;
-	window_count = (int *) calloc((genome_size+1),sizeof(int));
+    int8_t * window_count;
+	window_count = (int8_t *) calloc((genome_size+1),sizeof(int8_t));
 	
 	// Integer array with location of gaps
-	int * gaps_in_original_genome_space;
-	gaps_in_original_genome_space = (int *) calloc((genome_size+1),sizeof(int));
+    int8_t * gaps_in_original_genome_space;
+	gaps_in_original_genome_space = (int8_t *) calloc((genome_size+1),sizeof(int8_t));
 	int x =0;
 	for(x=0; x< number_of_snps; x++)
 	{
@@ -671,15 +668,12 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 {
 	int i;
 	
-	int previous_start;
-	int previous_end;
+	int previous_start = -1;
+	int previous_end = -1;
 	
 	for(i = 0 ; i < number_of_blocks; i++)
 	{
-		int current_start = block_coordinates[0][i];
-		int current_end = block_coordinates[1][i];
-		int start_index = find_starting_index( current_start, snp_site_coords,0, number_of_branch_snps);
-    int end_index   = find_starting_index( current_end, snp_site_coords, start_index, number_of_branch_snps);
+
 		if( i == 0)
 		{
 			previous_start = block_coordinates[0][i];
@@ -1029,41 +1023,33 @@ double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, i
 
 int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks)
 {
-	int * bases_to_be_excluded;  
-	bases_to_be_excluded = (int*) calloc((length_of_sequence + 1),sizeof(int));
-	
-  int genome_length = length_of_sequence;
-	int i = 0;
-	for(i = 0; i<length_of_sequence; i++)
-	{
-		if(sequence[i] == 'N' || sequence[i] == '-' )
-		{
-			bases_to_be_excluded[i] = 1;
-      genome_length--;
-		}
-	}
-	
-	int j = 0;
-	for(j = 0; j<num_blocks; j++)
-	{
-		if(block_coordinates[0][j] == -1)
-		{
-			continue;
-		}
-		
-		// Coordinates of blocks start at 1 and the index of the array starts at 0
-		int block_index = 0;
-		for(block_index = block_coordinates[0][j]; block_index <= block_coordinates[1][j]; block_index++ )
-		{
-      if(bases_to_be_excluded[block_index-1] == 0)
-      {
-        bases_to_be_excluded[block_index-1] = 1;
-        genome_length--;
-      }
-		}
-	}
-	
-	return genome_length;
+
+    int genome_length = length_of_sequence;
+    
+    int i = 0;
+    for(i = 0; i<length_of_sequence; i++)
+    {
+        if(sequence[i] == 'N' || sequence[i] == '-')
+        {
+            genome_length--;
+        }
+        else
+        {
+            int j = 0;
+            for(j = 0; j<num_blocks; j++)
+            {
+                if(block_coordinates[0][j] != -1)
+                {
+                    if (i >= block_coordinates[0][j] && i <= block_coordinates[1][j])
+                    {
+                        genome_length--;
+                    }
+                }
+            }
+        }
+    }
+
+    return genome_length;
 }
 
 

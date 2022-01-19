@@ -85,22 +85,18 @@ class PreProcessFasta(object):
             taxa_to_remove = self.taxa_of_duplicate_sequences() + self.taxa_missing_too_much_data()
 
         with open(self.input_filename) as input_handle:
-            with open(output_filename, "w+") as output_handle:
-                alignments = AlignIO.parse(input_handle, "fasta")
-                output_alignments = []
+            alignments = AlignIO.parse(input_handle, "fasta")
+            output_alignments = []
+            number_of_included_alignments = 0
+            for alignment in alignments:
+                for record in alignment:
+                    if record.id not in taxa_to_remove:
+                        output_alignments.append(record)
+                        number_of_included_alignments += 1
+            if number_of_included_alignments <= 1:
+                sys.exit("Not enough sequences are left after removing duplicates.Please check you input data.")
 
-                number_of_included_alignments = 0
-                for alignment in alignments:
-                    for record in alignment:
+        with open(output_filename, "w+") as output_handle:
+            AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
 
-                        if record.id not in taxa_to_remove:
-                            output_alignments.append(record)
-                            number_of_included_alignments += 1
-
-                if number_of_included_alignments <= 1:
-                    sys.exit("Not enough sequences are left after removing duplicates.Please check you input data.")
-
-                AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
-                output_handle.close()
-            input_handle.close()
         return taxa_to_remove

@@ -56,12 +56,15 @@ void print_usage(FILE* stream, int exit_code)
 
 int check_file_exists_or_exit(char * filename)
 {
-  if( access( filename, F_OK ) != -1 ) {
-		return 1;
-  } else {
-		printf("Error: File '%s' does not exist\n",filename);
-		print_usage(stderr, EXIT_FAILURE);
-		return 0;
+  if (access( filename, F_OK ) != -1 )
+  {
+    return 1;
+  }
+  else
+  {
+    printf("Error: File '%s' does not exist\n",filename);
+    print_usage(stderr, EXIT_FAILURE);
+    return 0;
   }
 }
 
@@ -71,7 +74,6 @@ int main (argc, argv) int argc; char **argv;
   char multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
   char vcf_filename[MAX_FILENAME_SIZE] = {""};
   char tree_filename[MAX_FILENAME_SIZE] = {""};
-  char phylip_filename[MAX_FILENAME_SIZE] = {""};
   char original_multi_fasta_filename[MAX_FILENAME_SIZE] = {""};
 
   int recombination_flag = 0 ;
@@ -84,14 +86,14 @@ int main (argc, argv) int argc; char **argv;
     {
       static struct option long_options[] =
         {
-					{"help",                no_argument,       0, 'h'},
-          {"recombination",       no_argument,       0, 'r'},
-          {"vcf",                 required_argument, 0, 'v'},
-          {"tree",                required_argument, 0, 't'},
-          {"original_multifasta", required_argument, 0, 'f'},
-          {"min_snps",            required_argument, 0, 'm'},
-		  {"window_min",                 required_argument, 0, 'a'},
-		  {"window_max",                 required_argument, 0, 'b'},
+            {"help",                no_argument,       0, 'h'},
+            {"recombination",       no_argument,       0, 'r'},
+            {"vcf",                 required_argument, 0, 'v'},
+            {"tree",                required_argument, 0, 't'},
+            {"original_multifasta", required_argument, 0, 'f'},
+            {"min_snps",            required_argument, 0, 'm'},
+            {"window_min",          required_argument, 0, 'a'},
+            {"window_max",          required_argument, 0, 'b'},
 		  
           {0, 0, 0, 0}
         };
@@ -115,27 +117,27 @@ int main (argc, argv) int argc; char **argv;
           printf ("\n");
           break;
 		    case 'h':
-					print_usage(stdout, EXIT_SUCCESS);
+            print_usage(stdout, EXIT_SUCCESS);
 	      case 'r':
-				  recombination_flag = 1;
+            recombination_flag = 1;
 	        break;
 	      case 'f':
-					memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
+            memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
 	        break;
           case 'v':
-		  			memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
+            memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
             break;
 	      case 'm':
-	          min_snps = atoi(optarg);
-	          break;
+            min_snps = atoi(optarg);
+            break;
   	      case 'a':
-  	          window_min = atoi(optarg);
-  	          break;
+            window_min = atoi(optarg);
+            break;
 	  	  case 'b':
-	  	      window_max = atoi(optarg);
-	  	      break;
+            window_max = atoi(optarg);
+            break;
           case 't':
-	          memcpy(tree_filename, optarg, size_of_string(optarg) +1);
+            memcpy(tree_filename, optarg, size_of_string(optarg) +1);
             break;
           case '?':
             /* getopt_long already printed an error message. */
@@ -152,19 +154,19 @@ int main (argc, argv) int argc; char **argv;
 			optind++;
     }
 
-	
-		check_file_exists_or_exit(multi_fasta_filename);
+    check_file_exists_or_exit(multi_fasta_filename);
+
     if(recombination_flag == 1)
     {
-			check_file_exists_or_exit(vcf_filename);
-			check_file_exists_or_exit(tree_filename);
-			check_file_exists_or_exit(original_multi_fasta_filename);
-      run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max);
+        check_file_exists_or_exit(vcf_filename);
+        check_file_exists_or_exit(tree_filename);
+        check_file_exists_or_exit(original_multi_fasta_filename);
+        run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max);
     }
     else
     {
-      generate_snp_sites(multi_fasta_filename, 0, ".gaps");
-			generate_snp_sites(multi_fasta_filename, 1, "");
+        generate_snp_sites(multi_fasta_filename, 0, ".gaps");
+        generate_snp_sites(multi_fasta_filename, 1, "");
     }
 
     exit(EXIT_SUCCESS);

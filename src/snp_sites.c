@@ -29,7 +29,7 @@
 #include "parse_phylip.h"
 #include "string_cat.h"
 #include "fasta_of_snp_sites.h"
-
+#include "csv_of_snp_sites.h"
 
 void build_snp_locations(int snp_locations[], char reference_sequence[])
 {
@@ -70,7 +70,7 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	// Find out the names of the sequences
 	char* sequence_names[number_of_samples];
-	sequence_names[number_of_samples-1] = '\0';
+	sequence_names[number_of_samples-1] = "\0";
 	for(i = 0; i < number_of_samples; i++)
 	{
 		sequence_names[i] = calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
@@ -94,8 +94,8 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	
 	get_bases_for_each_snp(filename, snp_locations, bases_for_snps, length_of_genome, number_of_snps);
 	
-  char filename_without_directory[MAX_FILENAME_SIZE];
-  strip_directory_from_filename(filename, filename_without_directory);
+    char filename_without_directory[MAX_FILENAME_SIZE];
+    strip_directory_from_filename(filename, filename_without_directory);
 	
 	concat_strings_created_with_malloc(filename_without_directory,suffix);
 	
@@ -103,6 +103,12 @@ int generate_snp_sites(char filename[],  int exclude_gaps, char suffix[])
 	create_phylip_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
 	create_fasta_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples,internal_nodes);
 
+    // Generate CSV for ancestral state reconstruction - only need version with gaps
+    if (exclude_gaps == 0)
+    {
+        create_csv_of_snp_sites(filename_without_directory, number_of_snps, bases_for_snps, sequence_names, number_of_samples);
+    }
+    
 	free(snp_locations);
 	return 1;
 }

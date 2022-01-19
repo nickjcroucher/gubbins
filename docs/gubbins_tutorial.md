@@ -22,7 +22,7 @@ An index file is then generated to name the isolates to be aligned:
 for f in 6678*fa; do echo "${f%.fa}\t${f}"; done > PMEN3_isolates.list
 ```
 
-This should look like:
+The `PMEN3_isolates.list` should contain this text:
 
 ```
 6678_3_10    6678_3_10.fa
@@ -51,11 +51,11 @@ run_gubbins.py --prefix PMEN3 PMEN3.aln
 
 This should complete in under a minute. The results can be visualised using the website https://jameshadfield.github.io/phandango. Three files can be dragged and dropped onto the loading screen:
 
-* PMEN3.final_tree.tre
+* `PMEN3.final_tree.tre`
 
-* PMEN3.recombination_predictions.gff
+* `PMEN3.recombination_predictions.gff`
 
-* RMV4.gff
+* `RMV4.gff`
 
 The output should resemble this image:
 ![PMEN3 output](pmen3_output.png)

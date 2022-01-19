@@ -13,6 +13,7 @@ dependencies:
   - autoconf-archive
   - pytest
   - pytest-cov
+  - lcov
   - check
   - libtool
   - cppunit

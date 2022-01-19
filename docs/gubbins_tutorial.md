@@ -59,3 +59,5 @@ This should complete in under a minute. The results can be visualised using the 
 
 The output should resemble this image:
 ![PMEN3 output](pmen3_output.png)
+
+The tree is on the left, and the refence annotation is across the top. The red bars indicate recombinations reconstructed as occurring on internal branches, which are therefore shared by isolates through common ancestry. The blue bars indicate recombinations reconstructed as occurring on terminal branhces, which are unique to individual isolates. The graph at the bottom summarises the distribution of recombination across the genome, with peaks corresponding to loci encoding antigens (e.g. the *cps* locus and *pspA*) and resistance loci (e.g. *murM*).

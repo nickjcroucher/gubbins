@@ -1,6 +1,6 @@
 Process,Algorithm,Version,Citation
-Overall,Gubbins,3.1.3,https://doi.org/10.1093/nar/gku1196
+Overall,Gubbins,3.1.4,https://doi.org/10.1093/nar/gku1196
 Tree constructor (1st iteration),rapidnj,unspecified,https://doi.org/10.1007/978-3-540-87361-7_10
-Model fitter (1st iteration),raxml-ng,1.0.3,https://doi.org/10.1093/bioinformatics/btz305
-Tree constructor (later iterations),raxml-ng,1.0.3,https://doi.org/10.1093/bioinformatics/btz305
-Model fitter (later iterations),raxml-ng,1.0.3,https://doi.org/10.1093/bioinformatics/btz305
+Model fitter (1st iteration),raxml-ng,1.0.1,https://doi.org/10.1093/bioinformatics/btz305
+Tree constructor (later iterations),raxml-ng,1.0.1,https://doi.org/10.1093/bioinformatics/btz305
+Model fitter (later iterations),raxml-ng,1.0.1,https://doi.org/10.1093/bioinformatics/btz305

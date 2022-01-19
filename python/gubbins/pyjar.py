@@ -525,7 +525,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     with open(base_patterns_fn,'r') as pattern_file:
         for line in pattern_file:
             unicode_seq = numpy.frombuffer(bytearray(line.rstrip(), codec), dtype = 'U1')
-            out_array = numpy.ndarray(unicode_seq.size, dtype = numpy.uint8)
+            out_array = numpy.ndarray(unicode_seq.shape, dtype = numpy.uint8)
             seq_to_int(unicode_seq,out_array)
             array_of_pattern_arrays.append(out_array)
     vstacked_patterns = numpy.vstack(array_of_pattern_arrays)

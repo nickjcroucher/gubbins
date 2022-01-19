@@ -40,7 +40,7 @@ from Bio.Seq import Seq
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
-from gubbins.pyjar import jar, read_alignment, get_base_patterns
+from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
 
@@ -75,7 +75,7 @@ def parse_and_run(input_args, program_description=""):
     methods_log['version'].append(program_version)
 
     # Initialize tree builder and check if all required dependencies are available
-    printer.print("\nChecking dependencies...")
+    printer.print("\nChecking dependencies and input files...")
     current_tree_name = input_args.starting_tree
     tree_file_names = []
     internal_node_label_prefix = "internal_"
@@ -93,27 +93,6 @@ def parse_and_run(input_args, program_description=""):
     if input_args.mar:
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
-    printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
-    # Check if the input files exist and have the right format
-    printer.print("\nChecking input files...")
-    if not os.path.exists(input_args.alignment_filename) \
-            or not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
-        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist or has an invalid format")
-    if input_args.starting_tree is not None and input_args.starting_tree != "" \
-            and (not os.path.exists(input_args.starting_tree) or not is_starting_tree_valid(input_args.starting_tree)):
-        sys.exit("The starting tree does not exist or has an invalid format")
-    if input_args.starting_tree is not None and input_args.starting_tree != "" \
-            and not do_the_names_match_the_fasta_file(input_args.starting_tree, input_args.alignment_filename):
-        sys.exit("The names in the starting tree do not match the names in the alignment file")
-
-    # Check on number of sequences in alignment
-    if input_args.pairwise:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
-            sys.exit("Pairwise mode should only be used for two sequences.")
-    else:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
-            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -136,25 +115,52 @@ def parse_and_run(input_args, program_description=""):
     if utils.do_files_exist(".", intermediate_files, "", input_args.verbose):
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
-    printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
+    # Create temporary directory for storing working copies of input files
+    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
+
+    # Check if the input files exist and have the right format
+    printer.print("\nChecking input alignment file...")
+    if not os.path.exists(input_args.alignment_filename):
+        sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist")
+    temp_alignment_filename = temp_working_dir + "/" + base_filename
+    shutil.copyfile(input_args.alignment_filename, temp_alignment_filename)
+    input_args.alignment_filename = temp_alignment_filename
+    if not ValidateFastaAlignment(temp_alignment_filename).is_input_fasta_file_valid():
+        sys.exit("The input alignment file " + input_args.alignment_filename + " is invalid")
     # Filter the input alignment and save as temporary alignment file
     printer.print("\nFiltering input alignment...")
-    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-    temp_alignment_filename = temp_working_dir + "/" + base_filename
-
-    pre_process_fasta = PreProcessFasta(input_args.alignment_filename, input_args.verbose,
+    pre_process_fasta = PreProcessFasta(temp_alignment_filename,
+                                        input_args.verbose,
                                         input_args.filter_percentage)
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
-    input_args.alignment_filename = temp_alignment_filename
 
-    # If a starting tree has been provided make sure that taxa filtered out in the previous step are removed from it
-    if input_args.starting_tree:
+    # Check on number of sequences remaining in alignment after validation and processing
+    if input_args.pairwise:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+            sys.exit("Pairwise mode should only be used for two sequences.")
+    else:
+        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+            sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
+
+    # If a starting tree has been provided check its validity
+    # Also make sure that taxa filtered out in the previous step are removed from it
+    if input_args.starting_tree is not None and input_args.starting_tree != "":
+        if not os.path.exists(input_args.starting_tree):
+            sys.exit("The starting tree " + input_args.starting_tree + " does not exist")
         (tree_base_directory, tree_base_filename) = os.path.split(input_args.starting_tree)
         temp_starting_tree = temp_working_dir + '/' + tree_base_filename
-        filter_out_removed_taxa_from_tree(input_args.starting_tree, temp_starting_tree, taxa_removed)
+        shutil.copyfile(input_args.starting_tree, temp_starting_tree)
         input_args.starting_tree = temp_starting_tree
+        if not is_starting_tree_valid(temp_starting_tree):
+            sys.exit("The starting tree " + input_args.starting_tree + " is invalid")
+        if not do_the_names_match_the_fasta_file(temp_starting_tree, temp_alignment_filename):
+            sys.exit("The names in the starting tree do not match the names in the alignment file")
+        filter_out_removed_taxa_from_tree(temp_starting_tree,
+                                            temp_starting_tree,
+                                            taxa_removed)
+
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Find all SNP sites with Gubbins
@@ -244,10 +250,10 @@ def parse_and_run(input_args, program_description=""):
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
-                polymorphism_alignment = read_alignment(alignment_filename, alignment_type, verbose = input_args.verbose)
-                base_pattern_bases_array, base_pattern_positions_array = get_base_patterns(polymorphism_alignment,
-                                                                                            input_args.verbose,
-                                                                                            threads = input_args.threads)
+                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array = \
+                                                            get_base_patterns(base_filename,
+                                                                                input_args.verbose,
+                                                                                threads = input_args.threads)
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
@@ -264,9 +270,10 @@ def parse_and_run(input_args, program_description=""):
             harmonise_roots(recontree_filename, temp_rooted_tree)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
-            jar(alignment = polymorphism_alignment, # complete polymorphism alignment
+            jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
                 base_pattern_positions = base_pattern_positions_array, # nparray of positions of unique base patterns in alignment
+                alignment_filename = base_filename + ".start", # gap and SNP alignment file name
                 tree_filename = recontree_filename, # tree generated by model fit
                 info_filename = info_filename, # file containing evolutionary model parameters
                 info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
@@ -639,21 +646,37 @@ def is_starting_tree_valid(starting_tree):
 
 
 def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
+
+    # Extract sequence names from alignment
+    sequence_names = set()
     with open(alignment_filename, "r") as input_handle:
         alignments = AlignIO.parse(input_handle, "fasta")
-        sequence_names = {}
         for alignment in alignments:
             for record in alignment:
-                sequence_names[record.name] = 1
-        input_handle.close()
+                sequence_names.add(record.name)
 
-        tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    # Extract sequence names from tree
+    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    leaf_names = set()
+    for lf in tree.leaf_nodes():
+        lf.taxon.label = utils.process_sequence_names(lf.taxon.label)
+        leaf_names.add(lf.taxon.label)
 
-        leaf_nodes = tree.leaf_nodes()
-        for i, lf in enumerate(leaf_nodes):
-            if not leaf_nodes[i].taxon.label in sequence_names:
-                print("Error: A taxon referenced in the starting tree is not found in the input fasta file")
-                return False
+    # Write out modified tree
+    output_tree_string = tree_as_string(tree, suppress_internal=False)
+    with open(starting_tree, 'w+') as output_file:
+        output_file.write(output_tree_string.replace('\'', ''))
+
+    # Check if alignment names are a subset of the tree names
+    # Superfluous taxa can be pruned from the tree
+    if not sequence_names.issubset(leaf_names):
+        missing_seqs = list(sequence_names - leaf_names)
+        print("Error: The following sequences are present in your alignment, but not the "\
+        "starting tree: ")
+        for name in missing_seqs:
+            print(name)
+        return False
+
     return True
 
 

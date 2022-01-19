@@ -90,7 +90,7 @@ The easiest way to install the latest version of the code from this repository i
 ```
 conda create -c bioconda -n gubbins_git gubbins python=3.9
 conda activate gubbins_git
-conda install -c conda-forge libtool autoconf-archive automake pkg-config
+conda install -c conda-forge libtool autoconf-archive automake pkg-config check pytest
 conda remove --force gubbins
 ```
 

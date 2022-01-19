@@ -41,7 +41,7 @@ int line_length(FILE * alignment_file_pointer)
 	int total_length_of_line = 0;
 	
 	while((pcRes = fgets(szBuffer, sizeof(szBuffer), alignment_file_pointer))  != NULL){
-		length_of_line = strlen(szBuffer) - 1;
+		length_of_line = (int)strlen(szBuffer) - 1;
 		total_length_of_line = total_length_of_line + length_of_line;
 		if((szBuffer)[length_of_line] == '\n'){
 			break;
@@ -98,21 +98,20 @@ void get_bases_for_each_snp(char filename[], int snp_locations[], char ** bases_
 
 int genome_length(char filename[])
 {
-	int length_of_genome;
 	
 	if( access( filename, F_OK ) == -1 ) {
 		printf("Cannot calculate genome_length because file '%s' does not exist\n",filename);
 		exit(0);
-  }
+    }
 
 	gzFile fp;
 	kseq_t *seq;
 	
 	fp = gzopen(filename, "r");
 	seq = kseq_init(fp);
-  kseq_read(seq);
+    kseq_read(seq);
 
-  length_of_genome = seq->seq.l;
+    int length_of_genome = (int)seq->seq.l;
 
 	kseq_destroy(seq);
 	gzclose(fp);
@@ -143,8 +142,6 @@ int number_of_sequences_in_file(char filename[])
 int build_reference_sequence(char reference_sequence[], char filename[])
 {
 	int i;
-	
-	int length_of_genome;
 
 	gzFile fp;
 	kseq_t *seq;
@@ -298,8 +295,6 @@ char filter_invalid_characters(char input_char)
 		return '\0';
 	}
 	return '\0';
-
-	regfree(&regex);
 }
 
 

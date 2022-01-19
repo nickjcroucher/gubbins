@@ -176,33 +176,6 @@ def convert_to_square_numpy_array(data):
     out[mask] = numpy.concatenate(data)
     return out
 
-# Read in sequence to enable conversion to integers with JIT function
-def process_sequence(index_list,alignment = None,codec = None,align_array = None):
-    # Load shared memory output alignment
-    out_aln_shm = shared_memory.SharedMemory(name = align_array.name)
-    out_aln = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = out_aln_shm.buf)
-    for i in index_list:
-        # Add sequence
-        unicode_seq = numpy.frombuffer(bytearray(str(alignment[i].seq), codec), dtype = 'U1')
-        seq_to_int(unicode_seq,out_aln[i])
-
-# Function to read an alignment in various formats
-def read_alignment(filename, file_type, verbose=False):
-    if not os.path.isfile(filename):
-        print("Error: alignment file " + filename + " does not exist")
-        sys.exit(202)
-    if verbose:
-        print("Trying to open file " + filename + " as " + file_type)
-    try:
-        with open(filename,'r') as aln_in:
-            alignmentObject = AlignIO.read(aln_in, file_type)
-        if verbose:
-            print("Alignment read successfully")
-    except:
-        print("Cannot open alignment file " + filename + " as " + file_type)
-        sys.exit(203)
-    return alignmentObject
-
 # Get the unique base patterns within the numpy array
 # Based on https://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array
 def get_unique_columns(data):
@@ -520,52 +493,61 @@ def iterate_over_base_patterns(columns,
 # Function for converting alignment to numpy array #
 ####################################################
 
-def get_base_patterns(alignment, verbose, threads = 1):
+def get_base_patterns(prefix, verbose, threads = 1):
+    
+    # Identify unique base patterns
     if verbose:
         print("Finding unique base patterns")
-    # Identify unique base patterns
     t1=time.process_time()
-    # Convert alignment to Numpy array
-    ntaxa = len(alignment)
-    seq_length = alignment.get_alignment_length()
-    align_array = numpy.full((ntaxa,seq_length), 8, dtype = numpy.uint8, order='F')
+    
     # Check njit function is compiled before multiprocessing
     try:
         seq_to_int()
     except:
         pass
+
+    # Read in ordered sequence names
+    sequence_names_fn = prefix + '.gaps.sequence_names.csv'
+    sequence_names = []
+    if not os.path.isfile(sequence_names_fn):
+        sys.exit("Unable to open sequence names file " + sequence_names_fn + "\n")
+    with open(sequence_names_fn,'r') as names_file:
+        for line in names_file:
+            sequence_names.append(line.rstrip())
+
     # Convert alignment to Numpy array
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
-    ntaxa_range_list = list(range(ntaxa))
-    ntaxa_range_indices = list(chunks(ntaxa_range_list,threads))
-    with SharedMemoryManager() as smm:
-        align_array_shared = generate_shared_mem_array(align_array, smm)
-        with Pool(processes = threads) as pool:
-            pool.map(partial(
-                process_sequence,
-                    alignment = alignment,
-                    codec = codec,
-                    align_array = align_array_shared
-                ),
-                ntaxa_range_indices
-            )
-        # Write out alignment while shared memory manager still active
-        align_array_shm = shared_memory.SharedMemory(name = align_array_shared.name)
-        align_array = numpy.ndarray(align_array.shape, dtype = numpy.uint8, buffer = align_array_shm.buf)
+    # Read in the unique base patterns
+    base_patterns_fn = prefix + '.gaps.base_patterns.csv'
+    if not os.path.isfile(base_patterns_fn):
+        sys.exit("Unable to open base patterns file " + base_patterns_fn + "\n")
+    array_of_pattern_arrays = []
+    with open(base_patterns_fn,'r') as pattern_file:
+        for line in pattern_file:
+            unicode_seq = numpy.frombuffer(bytearray(line.rstrip(), codec), dtype = 'U1')
+            out_array = numpy.ndarray(unicode_seq.shape, dtype = numpy.uint8)
+            seq_to_int(unicode_seq,out_array)
+            array_of_pattern_arrays.append(out_array)
+    vstacked_patterns = numpy.vstack(array_of_pattern_arrays)
 
-    # Get unique base patterns and their indices in the alignment
-    base_pattern_bases_array, base_pattern_positions_array = get_unique_columns(align_array)
-    base_pattern_positions_array_of_arrays = \
-        [numpy.where(base_pattern_positions_array==x)[0] for x in range(base_pattern_bases_array.shape[1])]
-
-    # Convert the array of arrays into an ndarray that can be saved to shared memory
-    square_base_pattern_positions_array = convert_to_square_numpy_array(base_pattern_positions_array_of_arrays)
-    # Finish
+    # Read in base positions
+    array_of_position_arrays = []
+    base_positions_fn = prefix + '.gaps.base_positions.csv'
+    if not os.path.isfile(base_positions_fn):
+        sys.exit("Unable to open base positions file " + base_positions_fn + "\n")
+    with open(base_positions_fn, 'r') as positions_file:
+        for line in positions_file:
+            array_of_position_arrays.append(line.rstrip().split(','))
+    square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
+    
+    # Record timing
     t2=time.process_time()
     if verbose:
-        print("Time taken to find unique base patterns:", t2-t1, "seconds")
+        print("Time taken to load unique base patterns:", t2-t1, "seconds")
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
-    return base_pattern_bases_array.transpose(), square_base_pattern_positions_array
+    
+    # Return output
+    return sequence_names,vstacked_patterns,square_base_pattern_positions_array
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -673,9 +655,10 @@ def reconstruct_alignment_column(column_indices,
 # Function for reconstructing complete alignment #
 ##################################################
 
-def jar(alignment = None,
+def jar(sequence_names = None,
         base_patterns = None,
         base_pattern_positions = None,
+        alignment_filename = None,
         tree_filename = None,
         info_filename = None,
         info_filetype = None,
@@ -688,8 +671,8 @@ def jar(alignment = None,
 
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
-    for i, x in enumerate(alignment):
-        alignment_sequence_names[x.id] = i
+    for i, name in enumerate(sequence_names):
+        alignment_sequence_names[name] = i
     
     # Read the tree
     if verbose:
@@ -777,8 +760,11 @@ def jar(alignment = None,
             preordered_nodes[node_count-1] = node_index # Do not add root node to preordered nodes
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
+    # Find the maximum base position for creating the numpy array
+    max_pos = numpy.amax(base_pattern_positions) + 1
+
     # Create new empty array
-    new_aln_array = numpy.full((len(alignment[0]),len(ancestral_node_indices)), '?', dtype = 'U1')
+    new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), '?', dtype = 'U1')
 
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
@@ -844,10 +830,9 @@ def jar(alignment = None,
         
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-        with open(output_prefix+".joint.aln", "w") as asr_output:
-            for taxon in alignment:
-                print(">" + taxon.id, file = asr_output)
-                print(taxon.seq, file = asr_output)
+        with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
+            for line in leaf_seqs:
+                print(line.rstrip(), file = asr_output)
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')

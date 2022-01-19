@@ -233,13 +233,13 @@ Two example alignments can be downloaded from http://nickjcroucher.github.io/gub
 
 - ***Streptococcus pneumoniae*** **PMEN1** (available from https://figshare.com/ndownloader/files/33468725), for which the expected output is:
 
-![](../example_data/PMEN1/PMEN1_Phandango_output.png)
+![](../example_data/PMEN1/PMEN1_output.png)
 
 This used the command `run_gubbins.py --prefix PMEN1 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR PMEN1.aln` and took ~20s on a single CPU.
 
 - ***Staphylococcus aureus*** **ST239** (available from https://figshare.com/ndownloader/files/33468719), for which the expected output is:
 
-![](../example_data/ST239/ST239_Phandango_output.png)
+![](../example_data/ST239/ST239_output.png)
 
 This used the command `run_gubbins.py --prefix ST239 --first-tree-builder rapidnj --first-model JC --tree-builder raxmlng --model GTR ST239.aln` and took ~30s on a single CPU.
 

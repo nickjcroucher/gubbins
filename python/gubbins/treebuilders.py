@@ -151,7 +151,7 @@ class FastTree:
         command = [self.executable]
         command.extend(["-nt"])
         if self.model == 'JC':
-            pass # default model
+            command.extend(["-nocat"])
         elif self.model == 'GTR':
             command.extend(["-gtr","-nocat"])
         elif self.model == 'GTRGAMMA':

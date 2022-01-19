@@ -45,7 +45,6 @@ void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_file
 	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename,window_min, window_max);
 	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
 	freeup_memory();
-
 }
 
 
@@ -116,10 +115,10 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	fclose(output_tree_pointer);
 	
 	
-	// Theres a seg fault in here
+	// Segfaults recorded by AP, none seen recently
 	for(i = 0; i < number_of_columns; i++)
 	{
-		free(column_names[i] );
+		free(column_names[i]);
 	}
 	
 	for(i=0; i<number_of_samples; i++ )

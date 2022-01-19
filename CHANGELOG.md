@@ -1,5 +1,13 @@
 # Change Log
 
+## [v3.1.5](https://github.com/sanger-pathogens/gubbins/tree/v3.1.5) (2021-10-22)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.3...v3.1.5)
+
+- Reduce memory consumption of some C code
+- Extract unique base patterns in C code
+- Adapt python code to take new inputs
+- Update documentation and website
+
 ## [v3.1.4](https://github.com/sanger-pathogens/gubbins/tree/v3.1.4) (2021-10-22)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.3...v3.1.4)
 

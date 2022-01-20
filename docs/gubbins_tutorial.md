@@ -43,7 +43,7 @@ generate_ska_alignment.py --reference RMV4.fa --fasta PMEN3_isolates.list --out 
 
 ## Analysis with Gubbins
 
-The resulting whole genome alignment can then be generated using Gubbins:
+The resulting whole genome alignment can then be analysed using Gubbins:
 
 ```
 run_gubbins.py --prefix PMEN3 PMEN3.aln

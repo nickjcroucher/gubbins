@@ -1,7 +1,13 @@
 # Change Log
 
-## [v3.1.5](https://github.com/sanger-pathogens/gubbins/tree/v3.1.5) (2021-10-22)
-[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.3...v3.1.5)
+## [v3.1.6](https://github.com/sanger-pathogens/gubbins/tree/v3.1.6) (2021-1-20)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.5...v3.1.6)
+
+- Fix problem with sequence reconstruction
+- Add test for consistency of reconstructions
+
+## [v3.1.5](https://github.com/sanger-pathogens/gubbins/tree/v3.1.5) (2022-1-19)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.4...v3.1.5)
 
 - Reduce memory consumption of some C code
 - Extract unique base patterns in C code

@@ -75,7 +75,7 @@ def parse_and_run(input_args, program_description=""):
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
     print_file = open("./printer_output", "a")
-    print_file.write("Beginning gubbins runs " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Beginning gubbins runs VERSION 3.1.6" + str(datetime.datetime.now()) + "\n")
     print_file.close()
     # Log algorithms used
     methods_log = {property:[] for property in ['citation','process','version','algorithm']}

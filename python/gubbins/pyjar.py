@@ -516,6 +516,10 @@ def get_base_patterns(prefix, verbose, threads = 1):
             sequence_names.append(line.rstrip())
 
     # Convert alignment to Numpy array
+    print_file = open("./printer_output", "a")
+    print_file.write("Converting alignment to numpy array " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     # Read in the unique base patterns
     base_patterns_fn = prefix + '.gaps.base_patterns.csv'
@@ -529,8 +533,16 @@ def get_base_patterns(prefix, verbose, threads = 1):
             seq_to_int(unicode_seq,out_array)
             array_of_pattern_arrays.append(out_array)
     vstacked_patterns = numpy.vstack(array_of_pattern_arrays)
-
+    print_file = open("./printer_output", "a")
+    print_file.write("Alignment is numpy array " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Read in base positions
+    print_file = open("./printer_output", "a")
+    print_file.write("Reading in position arrays " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
     array_of_position_arrays = []
     base_positions_fn = prefix + '.gaps.base_positions.csv'
     if not os.path.isfile(base_positions_fn):
@@ -538,8 +550,21 @@ def get_base_patterns(prefix, verbose, threads = 1):
     with open(base_positions_fn, 'r') as positions_file:
         for line in positions_file:
             array_of_position_arrays.append(line.rstrip().split(','))
+    print_file = open("./printer_output", "a")
+    print_file.write("Read in base positions " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
+    print_file = open("./printer_output", "a")
+    print_file.write("Converting to square array " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
     square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
-    
+    print_file = open("./printer_output", "a")
+    print_file.write("Converted to square array " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Record timing
     t2=time.process_time()
     if verbose:
@@ -764,8 +789,17 @@ def jar(sequence_names = None,
     max_pos = numpy.amax(base_pattern_positions) + 1
 
     # Create new empty array
+    print_file = open("./printer_output", "a")
+    print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")
+    print_file.write("Getting the new aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.close()
     new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), '?', dtype = 'U1')
-
+    print_file = open("./printer_output", "a")
+    print_file.write("Got the new aln array JAR " + " " + str(datetime.datetime.now()) + "\n")
+    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")
+    print_file.close()
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
 

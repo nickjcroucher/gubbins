@@ -11,6 +11,7 @@ import sys
 import glob
 import argparse
 import pkg_resources
+import shutil
 from gubbins import common, run_gubbins
 
 modules_dir = os.path.dirname(os.path.abspath(common.__file__))
@@ -106,8 +107,16 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
+        # Copy file for subsequent tests
+        shutil.copyfile(os.path.join(data_dir,'rapidnj_jc_output.recombination_predictions.embl'),
+                        os.path.join(data_dir,'new_rapidnj_jc_output.recombination_predictions.embl'))
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
+
+    def check_rapidnj_consistency(self):
+        reference_file = os.path.join(data_dir,'new_rapidnj_jc_output.recombination_predictions.embl')
+        new_file = os.path.join(data_dir,'ref_rapidnj_jc_output.recombination_predictions.embl')
+        assert common.have_recombinations_been_seen_before(reference_file,[new_file])
 
     def test_defined_starting_tree(self):
         exit_code = 1

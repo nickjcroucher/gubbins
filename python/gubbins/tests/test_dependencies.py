@@ -108,7 +108,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
         # Copy file for subsequent tests
-        shutil.copyfile(os.path.join('rapidnj_jc_output.recombination_predictions.embl'),
+        shutil.copyfile(os.path.join('multiple_recombinations.recombination_predictions.embl'),
                         os.path.join('new_rapidnj_jc_output.recombination_predictions.embl'))
         self.cleanup('multiple_recombinations')
         assert exit_code == 0

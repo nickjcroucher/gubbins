@@ -47,7 +47,7 @@ from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
-from gubbins.pyjar import jar, read_alignment, get_base_patterns
+from gubbins.pyjar import jar, get_base_patterns
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
 fp = open("memory_log", "w+")

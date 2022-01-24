@@ -75,7 +75,7 @@ def parse_and_run(input_args, program_description=""):
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
     print_file = open("./printer_output", "a")
-    print_file.write("Beginning gubbins runs VERSION 3.1.6" + str(datetime.datetime.now()) + "\n")
+    print_file.write("Beginning gubbins runs VERSION 3.1.6 " + str(datetime.datetime.now()) + "\n")
     print_file.close()
     # Log algorithms used
     methods_log = {property:[] for property in ['citation','process','version','algorithm']}
@@ -327,8 +327,7 @@ def parse_and_run(input_args, program_description=""):
             # Set root of reconstruction tree to match that of the current tree
             # Cannot just midpoint root both, because the branch lengths differ between them
             harmonise_roots(recontree_filename, temp_rooted_tree)
-            polymorphism_alignment = read_alignment(original_aln_loc, alignment_type, verbose=input_args.verbose,
-                                                    list_out=False)
+            
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             print_file = open("./printer_output", "a")
             print_file.write("Starting pyjar recon" + str(datetime.datetime.now()) + "\n")

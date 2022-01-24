@@ -4,6 +4,7 @@
 # code modified from https://github.com/simonrharris/pyjar
 # pyjar is free software, licensed under GPLv3.
 
+from ctypes import alignment
 from scipy import linalg
 import numpy
 import dendropy
@@ -576,7 +577,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
     
     # Return output
-    return sequence_names,vstacked_patterns,array_of_position_arrays#square_base_pattern_positions_array
+    return sequence_names,vstacked_patterns,square_base_pattern_positions_array#array_of_position_arrays#
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -807,7 +808,8 @@ def jar(sequence_names = None,
 
     # Find the maximum base position for creating the numpy array
     max_pos = numpy.amax(base_pattern_positions) + 1
-
+    print(max_pos)
+    print(len(alignment[0]))
     # Create new empty array
     print_file = open("./printer_output", "a")
     print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")

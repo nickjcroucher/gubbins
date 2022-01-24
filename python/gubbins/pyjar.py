@@ -15,9 +15,11 @@ from math import log, exp
 from functools import partial
 import numba
 from numba import jit, njit, types, from_dtype
+from math import ceil
 import collections
 import psutil
 import datetime
+import multiprocessing
 try:
     from multiprocessing import Pool, shared_memory
     from multiprocessing.managers import SharedMemoryManager
@@ -574,13 +576,14 @@ def get_base_patterns(prefix, verbose, threads = 1):
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
     
     # Return output
-    return sequence_names,vstacked_patterns,square_base_pattern_positions_array
+    return sequence_names,vstacked_patterns,array_of_position_arrays#square_base_pattern_positions_array
 
 ########################################################
 # Function for reconstructing individual base patterns #
 ########################################################
 
 def reconstruct_alignment_column(column_indices,
+                                base_pattern_positions,
                                 tree = None,
                                 preordered_nodes = None,
                                 postordered_nodes = None,
@@ -591,12 +594,13 @@ def reconstruct_alignment_column(column_indices,
                                 node_pij = None,
                                 node_index_to_aln_row = None,
                                 ancestral_node_order = None,
-                                base_pattern_positions = None,
+                                #base_pattern_positions = None,
                                 base_patterns = None,
                                 base_frequencies = None,
                                 new_aln = None,
                                 threads = 1,
-                                verbose = False):
+                                verbose = False,
+                                printero = "./printer_output"):
     
     ### TIMING
     if verbose:
@@ -623,8 +627,8 @@ def reconstruct_alignment_column(column_indices,
     base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
     base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
     # Load base pattern position information
-    base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
-    base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
+    #base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
+    #base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
 
     # Extract information for iterations
     if threads == 1:
@@ -632,7 +636,20 @@ def reconstruct_alignment_column(column_indices,
         column_positions = base_pattern_positions
     else:
         columns = base_patterns[column_indices]
-        column_positions = base_pattern_positions[column_indices,:]
+        print_file = open(printero, "a")
+        print_file.write("Converting back into square array " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+        print_file.close()
+        column_positions = convert_to_square_numpy_array(base_pattern_positions)
+        print_file = open(printero, "a")
+        print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) +  "\n")
+        print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +  "\n")
+        print_file.close()
+        columns = base_patterns[column_indices]
+        
 
     ### TIMING
     if verbose:
@@ -669,7 +686,7 @@ def reconstruct_alignment_column(column_indices,
     # Close shared memory
     out_aln_shm.close()
     base_patterns_shm.close()
-    base_pattern_positions_shm.close()
+    #base_pattern_positions_shm.close()
 
     ### TIMING
     if verbose:
@@ -691,7 +708,8 @@ def jar(sequence_names = None,
         info_filetype = None,
         output_prefix = None,
         threads = 1,
-        verbose = False):
+        verbose = False,
+        mp_metho = "spawn"):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T": 3}
@@ -831,15 +849,25 @@ def jar(sequence_names = None,
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
 
         # Convert base pattern positions to shared memory numpy array
-        base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
+        #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
 
         # split list of sites into chunks per core
+        # bp_list = list(range(len(base_patterns)))
+        # base_pattern_indices = list(chunks(bp_list,threads))
+        # split list of sites into chunks per core
         bp_list = list(range(len(base_patterns)))
-        base_pattern_indices = list(chunks(bp_list,threads))
+        #base_pattern_indices = list(chunks(bp_list,threads))
+        npatterns = len(base_patterns)
+        ntaxa_jumps = ceil(npatterns / threads)
+        ntaxa_range_list = list(range(npatterns))
+        base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
+        base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
+
+
 
         # Parallelise reconstructions across alignment columns using multiprocessing
-        with Pool(processes = threads) as pool:
-            reconstruction_results = pool.map(partial(
+        with multiprocessing.get_context(method=mp_metho).Pool(processes = threads) as pool:
+            reconstruction_results = pool.starmap(partial(
                                         reconstruct_alignment_column,
                                             tree = tree,
                                             preordered_nodes = preordered_nodes,
@@ -852,12 +880,12 @@ def jar(sequence_names = None,
                                             node_index_to_aln_row = node_index_to_aln_row,
                                             ancestral_node_order = ancestral_node_order,
                                             base_patterns = base_patterns_shared_array,
-                                            base_pattern_positions = base_pattern_positions_shared_array,
+                                            #base_pattern_positions = base_pattern_positions_shared_array,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
                                             threads = threads,
                                             verbose = verbose),
-                                        base_pattern_indices
+                                        zip(base_pattern_indices, base_positions)
                                     )
 
         # Write out alignment while shared memory manager still active

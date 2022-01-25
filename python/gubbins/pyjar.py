@@ -564,18 +564,18 @@ def get_base_patterns(prefix, verbose, threads = 1):
     print_file.write("Converting to square array " + " " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.close()
-    square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
+    #square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
     print_file = open("./printer_output", "a")
     print_file.write("Converted to square array " + " " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    array_max = max([sublist[-1] for sublist in array_of_position_arrays])
-    max_pos = numpy.amax(square_base_pattern_positions_array) + 1
+    array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
+    #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
     print_file = open("./printer_output", "a")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.write("max value from the array max finder" + str(array_max) + "\n")
-    print_file.write("max value from the square max finder" + str(max_pos) + "\n")
+    #print_file.write("max value from the square max finder" + str(max_pos) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
     # Record timing
@@ -585,7 +585,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
     
     # Return output
-    return sequence_names,vstacked_patterns,square_base_pattern_positions_array#array_of_position_arrays#
+    return sequence_names,vstacked_patterns,array_of_position_arrays#square_base_pattern_positions_array#
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -815,9 +815,8 @@ def jar(sequence_names = None,
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
     # Find the maximum base position for creating the numpy array
-    max_pos = numpy.amax(base_pattern_positions) + 1
-    print(max_pos)
-    print(len(alignment[0]))
+    max_pos = max([sublist[-1] for sublist in base_pattern_positions]) + 1
+    #max_pos = numpy.amax(base_pattern_positions) + 1
     # Create new empty array
     print_file = open("./printer_output", "a")
     print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")

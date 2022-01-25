@@ -582,7 +582,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     t2=time.process_time()
     if verbose:
         print("Time taken to load unique base patterns:", t2-t1, "seconds")
-        print("Unique base patterns:", str(square_base_pattern_positions_array.shape[0]))
+        #print("Unique base patterns:", )
     
     # Return output
     return sequence_names,vstacked_patterns,array_of_position_arrays#square_base_pattern_positions_array#

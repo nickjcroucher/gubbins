@@ -570,6 +570,14 @@ def get_base_patterns(prefix, verbose, threads = 1):
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
+    array_max = max([sublist[-1] for sublist in array_of_position_arrays])
+    max_pos = numpy.amax(square_base_pattern_positions_array) + 1
+    print_file = open("./printer_output", "a")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.write("max value from the array max finder" + str(array_max) + "\n")
+    print_file.write("max value from the square max finder" + str(max_pos) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Record timing
     t2=time.process_time()
     if verbose:

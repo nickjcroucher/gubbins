@@ -571,18 +571,16 @@ def get_base_patterns(prefix, verbose, threads = 1):
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    #array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
+    array_max = int(max([sublist[-1] for sublist in array_of_position_arrays])) + 1
     #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
-    # print_file = open("./printer_output", "a")
-    # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    # print_file.write("max value from the array max finder" + str(array_max) + "\n")
-    # #print_file.write("max value from the square max finder" + str(max_pos) + "\n")
-    # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    # print_file.close()
+    print_file = open("./printer_output", "a")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.write("max value from the array max finder" + str(array_max) + "\n")
+    #print_file.write("max value from the square max finder" + str(max_pos) + "\n")
+    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
+    print_file.close()
     # Record timing
-    with open("./base_positions_array.pkl", "wb") as f:
-        pickle.dump(array_of_position_arrays, f)
-
+    
 
     t2=time.process_time()
     if verbose:
@@ -590,7 +588,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         #print("Unique base patterns:", )
     
     # Return output
-    return sequence_names,vstacked_patterns,array_of_position_arrays#square_base_pattern_positions_array#
+    return sequence_names,vstacked_patterns,array_of_position_arrays, array_max#square_base_pattern_positions_array#
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -723,7 +721,8 @@ def jar(sequence_names = None,
         output_prefix = None,
         threads = 1,
         verbose = False,
-        mp_metho = "spawn"):
+        mp_metho = "spawn", 
+        max_pos = None):
 
     # Lookup for each base
     mb={"A": 0, "C": 1, "G": 2, "T": 3}
@@ -820,7 +819,7 @@ def jar(sequence_names = None,
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
     # Find the maximum base position for creating the numpy array
-    max_pos = max([sublist[-1] for sublist in base_pattern_positions]) + 1
+    #max_pos = max([sublist[-1] for sublist in base_pattern_positions]) + 1
     #max_pos = numpy.amax(base_pattern_positions) + 1
     # Create new empty array
     print_file = open("./printer_output", "a")

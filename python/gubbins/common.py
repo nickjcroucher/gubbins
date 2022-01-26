@@ -305,7 +305,7 @@ def parse_and_run(input_args, program_description=""):
                 print_file.close()
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
-                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array = \
+                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array, max_pos = \
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
@@ -342,7 +342,8 @@ def parse_and_run(input_args, program_description=""):
                 info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
                 threads = input_args.threads, # number of cores to use
-                verbose = input_args.verbose)
+                verbose = input_args.verbose,
+                max_pos= max_pos)
             print_file = open("./printer_output", "a")
             print_file.write("End pyjar recon" + str(datetime.datetime.now()) + "\n")
             print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")

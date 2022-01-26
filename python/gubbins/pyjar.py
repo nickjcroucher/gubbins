@@ -555,7 +555,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
         sys.exit("Unable to open base positions file " + base_positions_fn + "\n")
     with open(base_positions_fn, 'r') as positions_file:
         for line in positions_file:
-            array_of_position_arrays.append(line.rstrip().split(','))
+            array_of_position_arrays.append(list(map(int,line.rstrip().split(','))))
     print_file = open("./printer_output", "a")
     print_file.write("Read in base positions " + " " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -571,7 +571,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
-    array_max = int(max([sublist[-1] for sublist in array_of_position_arrays])) + 1
+    array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
     #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
     print_file = open("./printer_output", "a")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
@@ -585,7 +585,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     t2=time.process_time()
     if verbose:
         print("Time taken to load unique base patterns:", t2-t1, "seconds")
-        #print("Unique base patterns:", )
+        print("Unique base patterns: ", max_pos)
     
     # Return output
     return sequence_names,vstacked_patterns,array_of_position_arrays, array_max#square_base_pattern_positions_array#

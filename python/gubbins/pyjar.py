@@ -21,6 +21,7 @@ import collections
 import psutil
 import datetime
 import multiprocessing
+import pickle
 try:
     from multiprocessing import Pool, shared_memory
     from multiprocessing.managers import SharedMemoryManager
@@ -579,6 +580,10 @@ def get_base_patterns(prefix, verbose, threads = 1):
     # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     # print_file.close()
     # Record timing
+    with open("./base_positions_array.pkl", "wb") as f:
+        pickle.dump(array_of_position_arrays, f)
+
+
     t2=time.process_time()
     if verbose:
         print("Time taken to load unique base patterns:", t2-t1, "seconds")

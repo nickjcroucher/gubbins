@@ -575,7 +575,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
     print_file = open("./printer_output", "a")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.write("max value from the array max finder" + str(array_max) + "\n")
+    print_file.write("max value from the array max finder " + str(array_max) + "\n")
     #print_file.write("max value from the square max finder" + str(max_pos) + "\n")
     print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
     print_file.close()
@@ -585,7 +585,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     t2=time.process_time()
     if verbose:
         print("Time taken to load unique base patterns:", t2-t1, "seconds")
-        print("Unique base patterns: ", max_pos)
+        print("Unique base patterns: ", array_max)
     
     # Return output
     return sequence_names,vstacked_patterns,array_of_position_arrays, array_max#square_base_pattern_positions_array#

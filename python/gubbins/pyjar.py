@@ -326,9 +326,9 @@ def reconstruct_alleles(reconstructed_alleles,
 
 # Transfer reconstructed alleles into alignment
 ###############################################
-@njit(numba.void(numba.typeof(numpy.dtype('U1'))[:,:],
+@njit(numba.void(numba.typeof(numpy.dtype('i1'))[:,:],
                 numba.uint8[:],
-                numba.typeof(numpy.dtype('U1'))[:],
+                numba.typeof(numpy.dtype('i1'))[:],
                 numba.int32[:],
                 numba.int32[:]),
                 cache=True)
@@ -360,7 +360,7 @@ def get_columns(base_pattern_columns_padded,column_positions,column_index):
                 numba.float32[:,:],
                 numba.uint8[:,:],
                 numba.typeof(numpy.dtype('i1'))[:,:],
-                numba.typeof(numpy.dtype('U1'))[:],
+                numba.typeof(numpy.dtype('i1'))[:],
                 numba.int32[:],
                 numba.int32[:],
                 numba.int32[:],
@@ -632,7 +632,8 @@ def reconstruct_alignment_column(column_indices,
 
     # Record SNPs reconstructed as occurring on each branch
     bases = frozenset(['A','C','G','T'])
-    ordered_bases = numpy.array(['A','C','G','T','-'], dtype = 'U1')
+    #ordered_bases = numpy.array(['A','C','G','T','-'], dtype = 'U1')
+    ordered_bases = numpy.array([0,1,2,3,4], dtype=numpy.int8)
     node_snps = numpy.zeros(num_nodes, dtype = numpy.int32)
 
     # Load base pattern information
@@ -937,7 +938,7 @@ def jar(sequence_names = None,
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
-        out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'U1', buffer = out_aln_shm.buf)
+        out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
         print_file = open("./printer_output", "a")
         print_file.write("End out alignment writing" + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -951,6 +952,10 @@ def jar(sequence_names = None,
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
+                print("\n\n")
+                print(''.join(out_aln[:,i]))
+                print("\n")
+                sys.exit
                 asr_output.write(''.join(out_aln[:,i]) + '\n')
 
         # Release pool nodes

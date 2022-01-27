@@ -856,11 +856,29 @@ def jar(sequence_names = None,
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
+        print_file = open("./printer_output", "a")
+        print_file.write("!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?." + "\n")
+        print_file.write("Creating shared mem aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
         new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
-
+        print_file = open("./printer_output", "a")
+        print_file.write("Created shared mem aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?." + "\n")
+        print_file.close()
         # Convert base patterns to shared memory numpy array
+        print_file = open("./printer_output", "a")
+        print_file.write("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + "\n")
+        print_file.write("Creating shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
-
+        print_file = open("./printer_output", "a")
+        print_file.write("Created shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + "\n")
+        print_file.close()
         # Convert base pattern positions to shared memory numpy array
         #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
 

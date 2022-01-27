@@ -648,18 +648,18 @@ def reconstruct_alignment_column(column_indices,
         column_positions = base_pattern_positions
     else:
         columns = base_patterns[column_indices]
-        print_file = open(printero, "a")
-        print_file.write("Converting back into square array " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
-        print_file.close()
+        # print_file = open(printero, "a")
+        # print_file.write("Converting back into square array " + str(datetime.datetime.now()) + "\n")
+        # print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        # print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+        # print_file.close()
         column_positions = convert_to_square_numpy_array(base_pattern_positions)
-        print_file = open(printero, "a")
-        print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) +  "\n")
-        print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
-        print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +  "\n")
-        print_file.close()
+        # print_file = open(printero, "a")
+        # print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
+        # print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) +  "\n")
+        # print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
+        # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +  "\n")
+        # print_file.close()
         columns = base_patterns[column_indices]
         
 
@@ -869,7 +869,7 @@ def jar(sequence_names = None,
         print_file.close()
         # Convert base patterns to shared memory numpy array
         print_file = open("./printer_output", "a")
-        print_file.write("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + "\n")
+        print_file.write("==============================================" + "\n")
         print_file.write("Creating shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
@@ -877,7 +877,7 @@ def jar(sequence_names = None,
         print_file = open("./printer_output", "a")
         print_file.write("Created shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + "\n")
+        print_file.write("==============================================" + "\n")
         print_file.close()
         # Convert base pattern positions to shared memory numpy array
         #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
@@ -894,7 +894,11 @@ def jar(sequence_names = None,
         base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
 
-
+        print_file = open("./printer_output", "a")
+        print_file.write("==============================================" + "\n")
+        print_file.write("Starting reconstruct alignment col run" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
 
         # Parallelise reconstructions across alignment columns using multiprocessing
         with multiprocessing.get_context(method=mp_metho).Pool(processes = threads) as pool:
@@ -919,10 +923,24 @@ def jar(sequence_names = None,
                                         zip(base_pattern_indices, base_positions)
                                     )
 
+        print_file = open("./printer_output", "a")
+        print_file.write("End reconstruct alignment col run" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("==============================================" + "\n")
+        print_file.close()
         # Write out alignment while shared memory manager still active
+        print_file = open("./printer_output", "a")
+        print_file.write("************************************************" + "\n")
+        print_file.write("Starting out alignment writing" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
         out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
         out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'U1', buffer = out_aln_shm.buf)
-        
+        print_file = open("./printer_output", "a")
+        print_file.write("End out alignment writing" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("************************************************" + "\n")
+        print_file.close()
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:

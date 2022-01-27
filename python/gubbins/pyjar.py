@@ -359,7 +359,7 @@ def get_columns(base_pattern_columns_padded,column_positions,column_index):
                 numba.int32[:,:],
                 numba.float32[:,:],
                 numba.uint8[:,:],
-                numba.typeof(numpy.dtype(numpy.int8))[:,:],
+                numba.typeof(numpy.dtype(numba.int8))[:,:],
                 numba.typeof(numpy.dtype('U1'))[:],
                 numba.int32[:],
                 numba.int32[:],

@@ -359,7 +359,7 @@ def get_columns(base_pattern_columns_padded,column_positions,column_index):
                 numba.int32[:,:],
                 numba.float32[:,:],
                 numba.uint8[:,:],
-                numba.typeof(numpy.dtype('U1'))[:,:],
+                numba.typeof(numpy.dtype(numpy.int))[:,:],
                 numba.typeof(numpy.dtype('U1'))[:],
                 numba.int32[:],
                 numba.int32[:],
@@ -622,7 +622,7 @@ def reconstruct_alignment_column(column_indices,
 
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
-    out_aln = numpy.ndarray(new_aln.shape, dtype = 'U1', buffer = out_aln_shm.buf)
+    out_aln = numpy.ndarray(new_aln.shape, dtype = numpy.int8, buffer = out_aln_shm.buf)
     
     # Generate data structures for reconstructions
     num_nodes = len(tree.nodes())

@@ -953,7 +953,7 @@ def jar(sequence_names = None,
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
                 print("\n\n")
-                print(''.join(out_aln[:,i]))
+                print(''.join(str(out_aln[:,i])))
                 print("\n")
                 sys.exit
                 asr_output.write(''.join(out_aln[:,i]) + '\n')

@@ -827,7 +827,9 @@ def jar(sequence_names = None,
     print_file.write("Getting the new aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
     print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     print_file.close()
-    new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), '?', dtype = 'U1')
+    ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
+    ## form the seq_to_int transformation o the sequence 
+    new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), 5, dtype = numpy.int8)
     print_file = open("./printer_output", "a")
     print_file.write("Got the new aln array JAR " + " " + str(datetime.datetime.now()) + "\n")
     print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")

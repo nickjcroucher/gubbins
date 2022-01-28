@@ -4,6 +4,9 @@
 # code modified from https://github.com/simonrharris/pyjar
 # pyjar is free software, licensed under GPLv3.
 
+from asyncio import subprocess
+from operator import delitem
+import subprocess
 from ctypes import alignment
 from scipy import linalg
 import numpy
@@ -491,6 +494,48 @@ def iterate_over_base_patterns(columns,
                             base_pattern_columns,
                             )
 
+# Convert integers to bases
+
+###########################
+
+@njit(numba.void(numba.int8[:],
+
+                 numba.typeof(numpy.dtype('U1'))[:]),
+
+                cache = True)
+
+def int_to_seq(seq,out_seq):
+
+    for i,b in enumerate(seq):
+
+        if b == 0:
+
+            out_seq[i] = 'A'
+
+        elif b == 1:
+
+            out_seq[i] = 'C'
+
+        elif b == 2:
+
+            out_seq[i] = 'G'
+
+        elif b == 3:
+
+            out_seq[i] = 'T'
+
+        elif b == 4:
+
+            out_seq[i] = '-'
+
+        elif b == 5:
+
+            out_seq[i] = 'N'
+
+        else:
+
+            print('Unable to process integer')
+
 ##################
 # Main functions #
 ##################
@@ -846,7 +891,8 @@ def jar(sequence_names = None,
                 count_node_snps,
                 reconstruct_alleles,
                 fill_out_aln,
-                iterate_over_base_patterns]:
+                iterate_over_base_patterns,
+                int_to_seq]:
         try:
             func()
         except:
@@ -956,6 +1002,7 @@ def jar(sequence_names = None,
         print_file.write("Starting out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
+        aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
@@ -964,14 +1011,37 @@ def jar(sequence_names = None,
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
-                #print("\n\n")
-                #''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])])
                 #print(''.join(str(out_aln[:,i])))
-                #print("\n")
-                #sys.exit
-                asr_output.write(''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])]) + "\n")
+                ## Lets try out the numba way to transform back into strings 
+                if i == 0:
+                    start_time_int = datetime.datetime.now()
+                int_to_seq(out_aln[:,i], aln_line)
+                if i == 0:
+                    end_time_int = datetime.datetime.now()
+                    start_time_tofile = datetime.datetime.now()
+                #aln_line.tofile(asr_output,sep=",", format="%s")
+                asr_output.write(''.join(aln_line) + "\n")
+                #numpy.savetxt(asr_output,aln_line,fmt="%s",delimiter="",newline="")
+                if i == 0:
+                    end_time_tofile = datetime.datetime.now()
+                    
+                
+                #asr_output.write(''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])]) + "\n")
                 #asr_output.write(''.join(out_aln[:,i]) + '\n')
+        ## Very hack remove commas using sed via subproccess
+        print_file = open("./printer_output", "a")
+        print_file.write(" " + "\n")
+        print_file.write("Example line times, int_to_seq: " +  str(end_time_int - start_time_int) + "\n")
+        print_file.write("Example line times, write: " +  str(end_time_tofile - start_time_tofile) + "\n")
+        print_file.write(" " + "\n")
+        print_file.close()
 
+        # sed_cmd = "sed -i 's/,//g' " + output_prefix+".joint.aln"
+        # try:
+        #     subprocess.check_call(sed_cmd, shell=True)
+        # except subprocess.SubprocessError:
+        #     sys.exit("Failed while removing commas in ancestral_sequences.")
+        
         print_file = open("./printer_output", "a")
         print_file.write("End out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")

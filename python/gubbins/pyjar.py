@@ -944,6 +944,11 @@ def jar(sequence_names = None,
         print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.write("************************************************" + "\n")
         print_file.close()
+        trans_dict = {ord('0'):"A",
+                      ord('1'):"C",
+                      ord('2'):"G",
+                      ord('3'):"T",
+                      ord('4'):"-"}
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
@@ -952,11 +957,13 @@ def jar(sequence_names = None,
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
-                print("\n\n")
-                print(''.join(str(out_aln[:,i])))
-                print("\n")
-                sys.exit
-                asr_output.write(''.join(out_aln[:,i]) + '\n')
+                #print("\n\n")
+                #''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])])
+                #print(''.join(str(out_aln[:,i])))
+                #print("\n")
+                #sys.exit
+                asr_output.write(''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])]) + "\n")
+                #asr_output.write(''.join(out_aln[:,i]) + '\n')
 
         # Release pool nodes
         pool.join()

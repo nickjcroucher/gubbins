@@ -948,7 +948,14 @@ def jar(sequence_names = None,
                       ord('1'):"C",
                       ord('2'):"G",
                       ord('3'):"T",
-                      ord('4'):"-"}
+                      ord('4'):"-",
+                      ord('5'):"N"}
+
+        print_file = open("./printer_output", "a")
+        print_file.write("************************************************" + "\n")
+        print_file.write("Starting out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.close()
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
@@ -965,6 +972,11 @@ def jar(sequence_names = None,
                 asr_output.write(''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])]) + "\n")
                 #asr_output.write(''.join(out_aln[:,i]) + '\n')
 
+        print_file = open("./printer_output", "a")
+        print_file.write("End out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
+        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+        print_file.write("************************************************" + "\n")
+        print_file.close()
         # Release pool nodes
         pool.join()
 

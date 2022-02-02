@@ -6,6 +6,7 @@
 
 from asyncio import subprocess
 from operator import delitem
+import shutil
 import subprocess
 from ctypes import alignment
 from scipy import linalg
@@ -1003,11 +1004,20 @@ def jar(sequence_names = None,
         print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         print_file.close()
         aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
+        aln_line_mem = aln_line.nbytes / (1024 ** 3)
+        print_file.open("./printer_output","a")
+        print_file.write("Memory size for the aln_line object: " + str(aln_line_mem) + "\n")
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-        with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
-            for line in leaf_seqs:
-                print(line.rstrip(), file = asr_output)
+        source = alignment_filename
+        destination = output_prefix+".joint.aln"
+        start_time_shutil = datetime.datetime.time()
+        dest = shutil.copy(source, destination)
+        end_time_shutil = datetime.datetime.time()
+        #with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
+        with open(dest, "a") as asr_output:
+            # for line in leaf_seqs:
+            #     print(line.rstrip(), file = asr_output)
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
@@ -1033,6 +1043,7 @@ def jar(sequence_names = None,
         print_file.write(" " + "\n")
         print_file.write("Example line times, int_to_seq: " +  str(end_time_int - start_time_int) + "\n")
         print_file.write("Example line times, write: " +  str(end_time_tofile - start_time_tofile) + "\n")
+        print_file.write("Shutil copy time: " +  str(end_time_shutil - start_time_shutil) + "\n")
         print_file.write(" " + "\n")
         print_file.close()
 

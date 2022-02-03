@@ -1005,7 +1005,7 @@ def jar(sequence_names = None,
         print_file.close()
         aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
         aln_line_mem = aln_line.nbytes / (1024 ** 3)
-        print_file.open("./printer_output","a")
+        print_file = open("./printer_output","a")
         print_file.write("Memory size for the aln_line object: " + str(aln_line_mem) + "\n")
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")

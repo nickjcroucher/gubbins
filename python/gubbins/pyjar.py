@@ -1011,9 +1011,9 @@ def jar(sequence_names = None,
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         source = alignment_filename
         destination = output_prefix+".joint.aln"
-        start_time_shutil = datetime.datetime.time()
+        start_time_shutil = datetime.datetime.now()
         dest = shutil.copy(source, destination)
-        end_time_shutil = datetime.datetime.time()
+        end_time_shutil = datetime.datetime.now()
         #with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
         with open(dest, "a") as asr_output:
             # for line in leaf_seqs:

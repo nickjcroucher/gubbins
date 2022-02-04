@@ -50,8 +50,7 @@ from gubbins.__init__ import version
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
-fp = open("memory_log", "w+")
-@profile(stream=fp)
+
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
     start_time = time.time()

@@ -227,6 +227,8 @@ The `.per_branch_statistics.csv` file contains summary statistics for each branc
 * ***rho/theta*** - The ratio of the number of recombination events to point mutations on a branch; a measure of the relative rates of recombination and point mutation
 * **Genome Length** - The total number of aligned bases between the ancestral and descendent nodes for the branch excluding any missing data or gaps in either
 
+Note that all positions in the output files are relative to the input alignment. If you wish to compare the positions of recombinations relative to a reference annotation, their coordinates will need to be adjusted to account for any gaps in the reference sequence introduced when generating the alignment.
+
 ## Examples
 
 Two example alignments can be downloaded from http://nickjcroucher.github.io/gubbins/:

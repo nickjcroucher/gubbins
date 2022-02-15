@@ -25,7 +25,6 @@ import subprocess
 import sys
 import tempfile
 import time
-import datetime
 # Phylogenetic imports
 import dendropy
 # Biopython imports
@@ -36,7 +35,7 @@ from Bio.Align import MultipleSeqAlignment
 from Bio.Phylo import Consensus
 from Bio.Seq import Seq
 from dendropy.calculate import treecompare
-from memory_profiler import profile
+
 
 from gubbins import utils
 # Gubbins imports

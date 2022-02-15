@@ -79,10 +79,8 @@ def main(input_args):
     with open((input_args.out + ".csv"), "w") as output:
         output.write(",".join(['isolate','a','A','t','T','c','C','g','G','N','gap']) + "\n")
         for i, aln_row in enumerate(row_data):
-            print(aln_row)
             aln_row_str = list(map(str, aln_row))
             aln_row_str.insert(0, iso_data[i])
-            print(aln_row_str)
             output.write(",".join(aln_row_str) + "\n")
 
     print("Finished")

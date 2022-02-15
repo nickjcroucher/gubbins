@@ -1,7 +1,7 @@
 import argparse
 import re
-import pandas
-from tqdm import tqdm
+#import pandas
+#from tqdm import tqdm
 
 def parse_input_args():
 
@@ -23,7 +23,7 @@ def main(input_args):
     tot_lines = 0
     with open(input_args.aln, "r") as aln_file:
         for line in aln_file:
-            if "^>" in line:
+            if re.search("^>", line):
                 row_num += 1
             tot_lines += 1
 
@@ -32,9 +32,14 @@ def main(input_args):
 
     row_data = []
     iso_data = []
-
+    tot_length_str = str(tot_lines)
+    print("Running through alignment file: %s" % input_args.aln)
+    print()
     with open(input_args.aln, "r") as aln_file:
-        for index,line in tqdm(enumerate(aln_file), total=tot_lines):
+        for index,line in enumerate(aln_file):
+            num_zeros = len(tot_length_str) - len(str(index + 1))
+            fmt_index = (("0" * num_zeros) + str(index + 1))
+            
             if re.search("^>", line):
                 iso = re.sub("\n","",(re.sub("^>","",line)))
                 iso_data.append(iso)
@@ -67,13 +72,18 @@ def main(input_args):
                     row_data.append([a_num, A_num, t_num, T_num,
                                      c_num, C_num, g_num, G_num,
                                      N_num, num_dash])
+            print("Finished %s of %s rows" % (fmt_index, tot_length_str), end="\r", flush=True)
 
-
-    iso_dat = pandas.DataFrame(row_data, columns=['a','A','t','T','c','C',
-                                                  'g','G','N','dash'])
-    iso_dat.insert(0,"Isolate",iso_data)
-
-    iso_dat.to_csv(path_or_buf=(input_args.out + ".csv"), index=False)
+    
+    print("Writing out results...")
+    with open((input_args.out + ".csv"), "w") as output:
+        output.write(",".join(['isolate','a','A','t','T','c','C','g','G','N','gap']) + "\n")
+        for i, aln_row in enumerate(row_data):
+            print(aln_row)
+            aln_row_str = list(map(str, aln_row))
+            aln_row_str.insert(0, iso_data[i])
+            print(aln_row_str)
+            output.write(",".join(aln_row_str) + "\n")
 
     print("Finished")
 

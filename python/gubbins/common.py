@@ -34,10 +34,6 @@ from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Phylo import Consensus
 from Bio.Seq import Seq
-from dendropy.calculate import treecompare
-
-
-from gubbins import utils
 # Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
@@ -170,6 +166,7 @@ def parse_and_run(input_args, program_description=""):
 
     # Find all SNP sites with Gubbins
     gubbins_command = " ".join([gubbins_exec, input_args.alignment_filename])
+    printer.print(["\nRunning Gubbins to detect SNPs...", gubbins_command])
     try:
         subprocess.check_call(gubbins_command, shell=True)
     except subprocess.SubprocessError:
@@ -286,7 +283,7 @@ def parse_and_run(input_args, program_description=""):
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
                 threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose,
-                max_pos= max_pos)
+                max_pos = max_pos)
             gaps_alignment_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.tre"
             printer.print(["\nTransferring pyjar results onto original recombination-corrected tree"])

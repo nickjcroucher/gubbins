@@ -5,10 +5,7 @@
 # pyjar is free software, licensed under GPLv3.
 
 from asyncio import subprocess
-from operator import delitem
 import shutil
-import subprocess
-from ctypes import alignment
 from scipy import linalg
 import numpy
 import dendropy
@@ -588,17 +585,16 @@ def get_base_patterns(prefix, verbose, threads = 1):
         for line in positions_file:
             array_of_position_arrays.append(list(map(int,line.rstrip().split(','))))
     array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
-    #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
-    # Record timing
     
-
+    # Record timing
+   
     t2=time.process_time()
     if verbose:
         print("Time taken to load unique base patterns:", t2-t1, "seconds")
         print("Unique base patterns: ", array_max)
     
     # Return output
-    return sequence_names,vstacked_patterns,array_of_position_arrays, array_max#square_base_pattern_positions_array#
+    return sequence_names,vstacked_patterns,array_of_position_arrays, array_max
 
 ########################################################
 # Function for reconstructing individual base patterns #
@@ -616,13 +612,11 @@ def reconstruct_alignment_column(column_indices,
                                 node_pij = None,
                                 node_index_to_aln_row = None,
                                 ancestral_node_order = None,
-                                #base_pattern_positions = None,
                                 base_patterns = None,
                                 base_frequencies = None,
                                 new_aln = None,
                                 threads = 1,
-                                verbose = False,
-                                printero = "./printer_output"):
+                                verbose = False):
     
     ### TIMING
     if verbose:
@@ -641,8 +635,7 @@ def reconstruct_alignment_column(column_indices,
     reconstructed_base_indices = numpy.full(num_nodes, 8, dtype = numpy.uint8)
 
     # Record SNPs reconstructed as occurring on each branch
-    bases = frozenset(['A','C','G','T'])
-    #ordered_bases = numpy.array(['A','C','G','T','-'], dtype = 'U1')
+    
     ordered_bases = numpy.array([0,1,2,3,4], dtype=numpy.int8)
     node_snps = numpy.zeros(num_nodes, dtype = numpy.int32)
 
@@ -650,8 +643,7 @@ def reconstruct_alignment_column(column_indices,
     base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
     base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
     # Load base pattern position information
-    #base_pattern_positions_shm = shared_memory.SharedMemory(name = base_pattern_positions.name)
-    #base_pattern_positions = numpy.ndarray(base_pattern_positions.shape, dtype = base_pattern_positions.dtype, buffer = base_pattern_positions_shm.buf)
+    
 
     # Extract information for iterations
     if threads == 1:
@@ -697,7 +689,7 @@ def reconstruct_alignment_column(column_indices,
     # Close shared memory
     out_aln_shm.close()
     base_patterns_shm.close()
-    #base_pattern_positions_shm.close()
+    
 
     ### TIMING
     if verbose:
@@ -723,8 +715,7 @@ def jar(sequence_names = None,
         mp_metho = "spawn", 
         max_pos = None):
 
-    # Lookup for each base
-    mb={"A": 0, "C": 1, "G": 2, "T": 3}
+       
 
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
@@ -817,11 +808,7 @@ def jar(sequence_names = None,
             preordered_nodes[node_count-1] = node_index # Do not add root node to preordered nodes
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
-    # Find the maximum base position for creating the numpy array
-    #max_pos = max([sublist[-1] for sublist in base_pattern_positions]) + 1
-    #max_pos = numpy.amax(base_pattern_positions) + 1
-    # Create new empty array
-    
+        
     ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
     ## form the seq_to_int transformation o the sequence 
     new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), 5, dtype = numpy.int8)
@@ -858,17 +845,10 @@ def jar(sequence_names = None,
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
         
         # Convert base pattern positions to shared memory numpy array
-        #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
-
-        # split list of sites into chunks per core
-        # bp_list = list(range(len(base_patterns)))
-        # base_pattern_indices = list(chunks(bp_list,threads))
-        # split list of sites into chunks per core
+        
         bp_list = list(range(len(base_patterns)))
-        #base_pattern_indices = list(chunks(bp_list,threads))
         npatterns = len(base_patterns)
         ntaxa_jumps = ceil(npatterns / threads)
-        ntaxa_range_list = list(range(npatterns))
         base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
 
@@ -887,7 +867,6 @@ def jar(sequence_names = None,
                                             node_index_to_aln_row = node_index_to_aln_row,
                                             ancestral_node_order = ancestral_node_order,
                                             base_patterns = base_patterns_shared_array,
-                                            #base_pattern_positions = base_pattern_positions_shared_array,
                                             base_frequencies = f,
                                             new_aln = new_aln_shared_array,
                                             threads = threads,
@@ -907,13 +886,8 @@ def jar(sequence_names = None,
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         source = alignment_filename
         destination = output_prefix+".joint.aln"
-        start_time_shutil = datetime.datetime.now()
         dest = shutil.copy(source, destination)
-        end_time_shutil = datetime.datetime.now()
-        #with open(output_prefix+".joint.aln", "w") as asr_output, open(alignment_filename,'r') as leaf_seqs:
         with open(dest, "a") as asr_output:
-            # for line in leaf_seqs:
-            #     print(line.rstrip(), file = asr_output)
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')

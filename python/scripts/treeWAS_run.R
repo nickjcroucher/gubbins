@@ -18,7 +18,7 @@ require(dplyr, quietly = TRUE,warn.conflicts = FALSE)
 get_input <- function(){
   parser <- ArgumentParser(description='Perform treeWAS on gubbins results')
   parser$add_argument('--aln', type="character", required = TRUE,
-                       help='alignment of isolates ')
+                       help='alignment of isolates (initial input to GUBBINS) ')
   parser$add_argument('--tree', dest='tree', required = TRUE,
                       help='gubbins node labelled tree')
   parser$add_argument('--phen',dest = "phen", type = "character", required = TRUE,
@@ -70,7 +70,7 @@ main <- function(input_args){
   
   ## Get the tree loaded
   cat("Loading Tree", "\n")
-  gpsc52_tree <- read.tree("~/Dropbox/phd/treeWAS/gps_data/gpsc52_data/gpsc52_treewas/gpsc52_gubbins_caps.node_labelled.final_tree.tre")
+  gpsc52_tree <- read.tree(input_args$tree)
   cat("Done", "\n")
   ## Ok lets try out a treeWAS run!
   cat("Beginning treeWAS run", "\n")

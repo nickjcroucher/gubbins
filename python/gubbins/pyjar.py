@@ -22,10 +22,8 @@ import numba
 from numba import jit, njit, types, from_dtype
 from math import ceil
 import collections
-import psutil
 import datetime
 import multiprocessing
-import pickle
 try:
     from multiprocessing import Pool, shared_memory
     from multiprocessing.managers import SharedMemoryManager
@@ -568,10 +566,6 @@ def get_base_patterns(prefix, verbose, threads = 1):
             sequence_names.append(line.rstrip())
 
     # Convert alignment to Numpy array
-    print_file = open("./printer_output", "a")
-    print_file.write("Converting alignment to numpy array " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.close()
     codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
     # Read in the unique base patterns
     base_patterns_fn = prefix + '.gaps.base_patterns.csv'
@@ -585,16 +579,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
             seq_to_int(unicode_seq,out_array)
             array_of_pattern_arrays.append(out_array)
     vstacked_patterns = numpy.vstack(array_of_pattern_arrays)
-    print_file = open("./printer_output", "a")
-    print_file.write("Alignment is numpy array " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.close()
     # Read in base positions
-    print_file = open("./printer_output", "a")
-    print_file.write("Reading in position arrays " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.close()
     array_of_position_arrays = []
     base_positions_fn = prefix + '.gaps.base_positions.csv'
     if not os.path.isfile(base_positions_fn):
@@ -602,29 +587,8 @@ def get_base_patterns(prefix, verbose, threads = 1):
     with open(base_positions_fn, 'r') as positions_file:
         for line in positions_file:
             array_of_position_arrays.append(list(map(int,line.rstrip().split(','))))
-    print_file = open("./printer_output", "a")
-    print_file.write("Read in base positions " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.close()
-    print_file = open("./printer_output", "a")
-    print_file.write("Converting to square array " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.close()
-    #square_base_pattern_positions_array = convert_to_square_numpy_array(array_of_position_arrays)
-    print_file = open("./printer_output", "a")
-    print_file.write("Converted to square array " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.close()
     array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
     #max_pos = numpy.amax(square_base_pattern_positions_array) + 1
-    print_file = open("./printer_output", "a")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.write("max value from the array max finder " + str(array_max) + "\n")
-    #print_file.write("max value from the square max finder" + str(max_pos) + "\n")
-    print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" + "\n")
-    print_file.close()
     # Record timing
     
 
@@ -694,19 +658,7 @@ def reconstruct_alignment_column(column_indices,
         columns = base_patterns
         column_positions = base_pattern_positions
     else:
-        columns = base_patterns[column_indices]
-        # print_file = open(printero, "a")
-        # print_file.write("Converting back into square array " + str(datetime.datetime.now()) + "\n")
-        # print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        # print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
-        # print_file.close()
         column_positions = convert_to_square_numpy_array(base_pattern_positions)
-        # print_file = open(printero, "a")
-        # print_file.write("End conversion to square numpy array " + str(datetime.datetime.now()) + "\n")
-        # print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) +  "\n")
-        # print_file.write("Process id: " + str(multiprocessing.current_process()) + "\n")
-        # print_file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +  "\n")
-        # print_file.close()
         columns = base_patterns[column_indices]
         
 
@@ -869,19 +821,11 @@ def jar(sequence_names = None,
     #max_pos = max([sublist[-1] for sublist in base_pattern_positions]) + 1
     #max_pos = numpy.amax(base_pattern_positions) + 1
     # Create new empty array
-    print_file = open("./printer_output", "a")
-    print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")
-    print_file.write("Getting the new aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.close()
+    
     ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
     ## form the seq_to_int transformation o the sequence 
     new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), 5, dtype = numpy.int8)
-    print_file = open("./printer_output", "a")
-    print_file.write("Got the new aln array JAR " + " " + str(datetime.datetime.now()) + "\n")
-    print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    print_file.write("JARJARJARJARJARJARJARJARJARJARJARJARJAR" + "\n")
-    print_file.close()
+    
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
 
@@ -906,29 +850,13 @@ def jar(sequence_names = None,
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
-        print_file = open("./printer_output", "a")
-        print_file.write("!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?." + "\n")
-        print_file.write("Creating shared mem aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.close()
+        
         new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
-        print_file = open("./printer_output", "a")
-        print_file.write("Created shared mem aln array in JAR " + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?.!?." + "\n")
-        print_file.close()
+        
         # Convert base patterns to shared memory numpy array
-        print_file = open("./printer_output", "a")
-        print_file.write("==============================================" + "\n")
-        print_file.write("Creating shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.close()
+        
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
-        print_file = open("./printer_output", "a")
-        print_file.write("Created shared mem base patterns array in JAR " + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("==============================================" + "\n")
-        print_file.close()
+        
         # Convert base pattern positions to shared memory numpy array
         #base_pattern_positions_shared_array = generate_shared_mem_array(base_pattern_positions, smm)
 
@@ -943,12 +871,6 @@ def jar(sequence_names = None,
         ntaxa_range_list = list(range(npatterns))
         base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
-
-        print_file = open("./printer_output", "a")
-        print_file.write("==============================================" + "\n")
-        print_file.write("Starting reconstruct alignment col run" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.close()
 
         # Parallelise reconstructions across alignment columns using multiprocessing
         with multiprocessing.get_context(method=mp_metho).Pool(processes = threads) as pool:
@@ -973,40 +895,14 @@ def jar(sequence_names = None,
                                         zip(base_pattern_indices, base_positions)
                                     )
 
-        print_file = open("./printer_output", "a")
-        print_file.write("End reconstruct alignment col run" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("==============================================" + "\n")
-        print_file.close()
+        
         # Write out alignment while shared memory manager still active
-        print_file = open("./printer_output", "a")
-        print_file.write("************************************************" + "\n")
-        print_file.write("Starting out alignment writing" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.close()
+        
         out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
         out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
-        print_file = open("./printer_output", "a")
-        print_file.write("End out alignment writing" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("************************************************" + "\n")
-        print_file.close()
-        trans_dict = {ord('0'):"A",
-                      ord('1'):"C",
-                      ord('2'):"G",
-                      ord('3'):"T",
-                      ord('4'):"-",
-                      ord('5'):"N"}
-
-        print_file = open("./printer_output", "a")
-        print_file.write("************************************************" + "\n")
-        print_file.write("Starting out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("Start mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.close()
+        
+        
         aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
-        aln_line_mem = aln_line.nbytes / (1024 ** 3)
-        print_file = open("./printer_output","a")
-        print_file.write("Memory size for the aln_line object: " + str(aln_line_mem) + "\n")
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
         source = alignment_filename
@@ -1021,43 +917,9 @@ def jar(sequence_names = None,
             for i,node_index in enumerate(ancestral_node_order):
                 taxon = ancestral_node_indices[node_index]
                 asr_output.write('>' + taxon + '\n')
-                #print(''.join(str(out_aln[:,i])))
-                ## Lets try out the numba way to transform back into strings 
-                if i == 0:
-                    start_time_int = datetime.datetime.now()
                 int_to_seq(out_aln[:,i], aln_line)
-                if i == 0:
-                    end_time_int = datetime.datetime.now()
-                    start_time_tofile = datetime.datetime.now()
-                #aln_line.tofile(asr_output,sep=",", format="%s")
                 asr_output.write(''.join(aln_line) + "\n")
-                #numpy.savetxt(asr_output,aln_line,fmt="%s",delimiter="",newline="")
-                if i == 0:
-                    end_time_tofile = datetime.datetime.now()
-                    
-                
-                #asr_output.write(''.join([str(number).translate(trans_dict) for number in list(out_aln[:,i])]) + "\n")
-                #asr_output.write(''.join(out_aln[:,i]) + '\n')
-        ## Very hack remove commas using sed via subproccess
-        print_file = open("./printer_output", "a")
-        print_file.write(" " + "\n")
-        print_file.write("Example line times, int_to_seq: " +  str(end_time_int - start_time_int) + "\n")
-        print_file.write("Example line times, write: " +  str(end_time_tofile - start_time_tofile) + "\n")
-        print_file.write("Shutil copy time: " +  str(end_time_shutil - start_time_shutil) + "\n")
-        print_file.write(" " + "\n")
-        print_file.close()
-
-        # sed_cmd = "sed -i 's/,//g' " + output_prefix+".joint.aln"
-        # try:
-        #     subprocess.check_call(sed_cmd, shell=True)
-        # except subprocess.SubprocessError:
-        #     sys.exit("Failed while removing commas in ancestral_sequences.")
-        
-        print_file = open("./printer_output", "a")
-        print_file.write("End out alignment translating" + " " + str(datetime.datetime.now()) + "\n")
-        print_file.write("End mem usage (GB): " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-        print_file.write("************************************************" + "\n")
-        print_file.close()
+             
         # Release pool nodes
         pool.join()
 

@@ -1,0 +1,6 @@
+Process,Algorithm,Version,Citation
+Overall,Gubbins,3.1.5,https://doi.org/10.1093/nar/gku1196
+Tree constructor (1st iteration),FastTree,2.1.10,https://doi.org/10.1371/journal.pone.0009490
+Model fitter (1st iteration),iqtree,2.0.3,https://doi.org/10.1093/molbev/msaa015
+Tree constructor (later iterations),iqtree,2.0.3,https://doi.org/10.1093/molbev/msaa015
+Model fitter (later iterations),iqtree,2.0.3,https://doi.org/10.1093/molbev/msaa015

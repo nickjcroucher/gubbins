@@ -203,8 +203,8 @@ A successful Gubbins run will generate files with the suffixes:
 * `.per_branch_statistics.csv` -	per branch reporting of the base substitutions inside and outside recombination events
 * `.filtered_polymorphic_sites.fasta` -	FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
 * `.filtered_polymorphic_sites.phylip` -	Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
-* `.final_tree.tree` - this file contains the final phylogeny in Newick format
-* `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels
+* `.final_tree.tree` - this file contains the final phylogeny in Newick format; branch lengths are in point mutations
+* `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels; branch lengths are in point mutations
 * `.log` - log file specifying the software used at each step of the analysis, with accompanying citations
 
 To generate a recombination-masked alignment (i.e., with sequences predicted to have been introduced by recombination removed, leaving just the clonal frame), the post-processing script `mask_gubbins_aln.py` can be used:
@@ -212,6 +212,8 @@ To generate a recombination-masked alignment (i.e., with sequences predicted to 
 ```
 mask_gubbins_aln.py --aln out.aln --gff out.recombination_predictions.gff --out out.masked.aln
 ```
+
+Note that the final tree branch lengths are in point mutations (i.e. the number of recombination-filtered substitutions across the genome), not the more common mean number of substitutions per site. The branch lengths can be converted to substitutions per site by dividing them by the number of sites in the input alignment. 
 
 ## Output statistics
 

@@ -29,6 +29,8 @@ class TestPythonScripts(unittest.TestCase):
         assert self.md5_check(output_csv, test_csv)
         os.remove(output_csv)
 
+    ## Test the clade extraction script
+
     def test_clade_extraction(self):
         multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
         clade_list = os.path.join(data_dir, "clade_to_extract.txt")
@@ -52,7 +54,7 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(out_gff)
         os.remove(out_tree)
 
-
+    ## Test the masking aln script 
     def test_masking_aln(self):
         multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
         multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
@@ -66,26 +68,7 @@ class TestPythonScripts(unittest.TestCase):
         assert self.md5_check(out_aln, test_aln)
         os.remove(out_aln)
         
-    # def test_clade_stats(self):
-    #     multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
-    #     clade_list = os.path.join(data_dir, "clade_to_extract.txt")
-    #     multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
-    #     multiple_tree = os.path.join(data_dir, "multiple_recombinations_gubbins.node_labelled.final_tree.tre")
-    #     out_aln = os.path.join(data_dir, "multiple_recombinations_extract.aln")
-    #     out_gff = os.path.join(data_dir, "multiple_recombinations_extract.gff")
-    #     out_tree = os.path.join(data_dir, "multiple_recombinations_extract.tree")
-    #     base_path = os.path.join(data_dir, "multiple_recombinations_extract")
-    #     extract_clade_cmd = "extract_gubbins_clade.py --list " + clade_list + " --aln " + multiple_aln +\
-    #         " --gff " + multiple_gff + " --tree " + multiple_tree + " --out " + base_path +  " --out-fmt fasta"
-    #     subprocess.check_call(extract_clade_cmd, shell=True)
-    #     assert self.md5_check(out_aln, "f9a1645bc6f668eecd4fe828df5d5d0f")
-    #     assert self.md5_check(out_gff, "adc2afaebd2adc7fe6690e8a63b73c8b")
-    #     assert self.md5_check(out_tree, "cafd551664494ba6caab287c7360aa67")
-    #     os.remove(out_aln)
-    #     os.remove(out_gff)
-    #     os.remove(out_tree)
-
-
+    
     @staticmethod
     def md5_check(file_path, correct_output):
         file_sum = hashlib.md5(open(file_path, "rb").read()).hexdigest()

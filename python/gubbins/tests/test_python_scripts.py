@@ -9,10 +9,12 @@ import unittest
 import os
 import subprocess
 import hashlib
-from gubbins import common
+import glob
+from gubbins import common, run_gubbins
 
 modules_dir = os.path.dirname(os.path.abspath(common.__file__))
 data_dir = os.path.join(modules_dir, 'tests', 'data')
+preprocess_dir = os.path.join(data_dir, 'preprocessfasta')
 working_dir = os.path.join(modules_dir, 'tests')
 
 class TestPythonScripts(unittest.TestCase):
@@ -67,7 +69,61 @@ class TestPythonScripts(unittest.TestCase):
         subprocess.check_call(extract_clade_cmd, shell=True)
         assert self.md5_check(out_aln, test_aln)
         os.remove(out_aln)
-        
+
+    ## Test the ska alignment generator 
+    def test_generate_ska_alignment(self):
+        exit_code = 1
+        ## Get files to run initial ska alignment on via the bash script 
+        bash_script = os.path.join(preprocess_dir, 'fasta_list_creator.sh')
+        fasta_creator = "bash " + bash_script + " " + preprocess_dir
+        subprocess.check_call(fasta_creator, shell=True)
+        ## Run the generate_ska_alignment script
+        fasta_loc = 'ska_fasta_list.txt'
+        ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
+        aln_out = os.path.join(preprocess_dir, 'ska_test_aln.aln')
+        ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
+            " --reference " + ref_seq + " --out " + aln_out +\
+                " --k 6"
+        subprocess.check_call(ska_cmd, shell=True)
+        ## Now run gubbins on the aln and check all the output is produced 
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--prefix", "ska_test",
+                                                    "--verbose", "--mar",
+                                                    aln_out]))
+        exit_code = self.check_for_output_files('ska_test')
+        self.cleanup('ska_test')
+        os.remove(aln_out)
+        os.remove(fasta_loc)
+        assert exit_code == 0
+
+
+
+    @staticmethod
+    def check_for_output_files(prefix):
+        assert os.path.exists(prefix + '.summary_of_snp_distribution.vcf')
+        assert os.path.exists(prefix + '.recombination_predictions.embl')
+        assert os.path.exists(prefix + '.per_branch_statistics.csv')
+        assert os.path.exists(prefix + '.filtered_polymorphic_sites.fasta')
+        assert os.path.exists(prefix + '.filtered_polymorphic_sites.phylip')
+        assert os.path.exists(prefix + '.recombination_predictions.gff')
+        assert os.path.exists(prefix + '.branch_base_reconstruction.embl')
+        assert os.path.exists(prefix + '.final_tree.tre')
+        assert os.path.exists(prefix + '.node_labelled.final_tree.tre')
+        return 0
+
+    @staticmethod
+    def cleanup(prefix):
+        #os.chdir(working_dir)
+        regex_to_remove = prefix + ".*"
+        for file in glob.glob(regex_to_remove):
+            os.remove(file)
+        tmp_to_remove = "./tmp*/*"
+        for file in glob.glob(tmp_to_remove):
+            os.remove(file)
+        for dir in glob.glob("./tmp*"):
+            if os.path.isdir(dir):
+                os.rmdir(dir)
+
     
     @staticmethod
     def md5_check(file_path, correct_output):

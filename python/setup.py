@@ -18,7 +18,8 @@ setuptools.setup(
     scripts=[
         'scripts/generate_ska_alignment.py',
         'scripts/extract_gubbins_clade.py',
-        'scripts/mask_gubbins_aln.py'
+        'scripts/mask_gubbins_aln.py',
+        'scripts/alignment_checker.py'
     ],
     tests_require=[
         "pytest >= 4.6",
@@ -27,7 +28,8 @@ setuptools.setup(
         "dendropy  >= 4.0.2",
         "multiprocess >= 0.70",
         "scipy >= 1.5.3",
-        "numpy >= 1.19"
+        "numpy >= 1.19",
+        "ska >= 1.0"
     ],
     long_description="""\
       Gubbins is a tool that generates a reconstruction of

@@ -19,22 +19,20 @@
 
 # Generic imports
 import os
-import sys
-import shutil
-import pkg_resources
-import time
-import subprocess
 import re
+import shutil
+import subprocess
+import sys
 import tempfile
+import time
 # Phylogenetic imports
 import dendropy
-from dendropy.calculate import treecompare
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
-from Bio.Phylo import Consensus
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
+from Bio.Phylo import Consensus
 from Bio.Seq import Seq
 # Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
@@ -43,6 +41,9 @@ from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
+from gubbins.pyjar import jar, get_base_patterns
+from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -66,7 +67,6 @@ def parse_and_run(input_args, program_description=""):
             gubbins_exec = utils.replace_executable(gubbins_exec, gubbins_bundled_exec)
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
-
     # Log algorithms used
     methods_log = {property:[] for property in ['citation','process','version','algorithm']}
     methods_log['algorithm'].append("Gubbins")
@@ -116,6 +116,7 @@ def parse_and_run(input_args, program_description=""):
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
+    # Filter the input alignment and save as temporary alignment file
     # Create temporary directory for storing working copies of input files
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
 
@@ -173,7 +174,6 @@ def parse_and_run(input_args, program_description=""):
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
     reconvert_fasta_file(snp_alignment_filename, snp_alignment_filename)
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
-
     # Start the main loop
     printer.print("\nEntering the main loop.")
     for i in range(1, input_args.iterations+1):
@@ -213,6 +213,7 @@ def parse_and_run(input_args, program_description=""):
             printer.print("\nCopying the starting tree...")
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
+
             printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
                            tree_building_command])
             if current_tree_builder == "star":
@@ -245,12 +246,14 @@ def parse_and_run(input_args, program_description=""):
         
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
+            
             if i == 1:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
+                
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
-                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array = \
+                ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array, max_pos = \
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
@@ -279,7 +282,8 @@ def parse_and_run(input_args, program_description=""):
                 info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
                 threads = input_args.threads, # number of cores to use
-                verbose = input_args.verbose)
+                verbose = input_args.verbose,
+                max_pos = max_pos)
             gaps_alignment_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.aln"
             raw_internal_rooted_tree_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".joint.tre"
             printer.print(["\nTransferring pyjar results onto original recombination-corrected tree"])
@@ -312,13 +316,13 @@ def parse_and_run(input_args, program_description=""):
             except subprocess.SubprocessError:
                 sys.exit("Failed while reconstructing the ancestral sequences.")
             os.chdir(current_directory)
-
             # 3.4b. Join ancestral sequences with given sequences
             current_tree_name_with_internal_nodes = current_tree_name + ".internal"
             sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
                                     joint_sequences_filename)
+
             if input_args.seq_recon == "raxml":
                 transfer_internal_node_labels_to_tree(raw_internal_rooted_tree_filename, temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes, sequence_reconstructor)
@@ -334,7 +338,6 @@ def parse_and_run(input_args, program_description=""):
                 sys.stderr.write("Unrecognised sequence reconstruction command: " + input_args.seq_recon + '\n')
                 sys.exit()
             printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
             # 3.5b. Reinsert gaps (cp15 note: something is wonky here, the process is at the very least terribly inefficient)
             printer.print("\nReinserting gaps into the alignment...")
             shutil.copyfile(base_filename + ".start", gaps_alignment_filename)
@@ -346,7 +349,6 @@ def parse_and_run(input_args, program_description=""):
 
         # Ancestral reconstruction complete
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
-
         # 4. Detect recombination sites with Gubbins (cp15 note: copy file with internal nodes back and forth to
         # ensure all created files have the desired name structure and to avoid fiddling with the Gubbins C program)
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
@@ -360,7 +362,6 @@ def parse_and_run(input_args, program_description=""):
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
-
         # 5. Check for convergence
         printer.print("\nChecking for convergence...")
         remove_internal_node_labels_from_tree(current_tree_name_with_internal_nodes, current_tree_name)

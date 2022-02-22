@@ -151,4 +151,3 @@ if __name__ == "__main__":
                                 shell = True)
         subprocess.check_output('rm ' + ' '.join([seq + '.skf' for seq in all_names]),
                                 shell = True)
-

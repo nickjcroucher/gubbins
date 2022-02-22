@@ -646,12 +646,8 @@ def reconstruct_alignment_column(column_indices,
     
 
     # Extract information for iterations
-    if threads == 1:
-        columns = base_patterns
-        column_positions = base_pattern_positions
-    else:
-        column_positions = convert_to_square_numpy_array(base_pattern_positions)
-        columns = base_patterns[column_indices]
+    column_positions = convert_to_square_numpy_array(base_pattern_positions)
+    columns = base_patterns[column_indices]
         
 
     ### TIMING

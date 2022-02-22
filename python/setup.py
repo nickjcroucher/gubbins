@@ -7,6 +7,7 @@ setuptools.setup(
     version = open('VERSION').read().strip(),
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris',
+    author_email='n.croucher@imperial.ac.uk',
     url='https://github.com/sanger-pathogens/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={

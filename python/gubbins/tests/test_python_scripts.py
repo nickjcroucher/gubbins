@@ -73,12 +73,10 @@ class TestPythonScripts(unittest.TestCase):
     ## Test the ska alignment generator 
     def test_generate_ska_alignment(self):
         exit_code = 1
-        ## Get files to run initial ska alignment on via the bash script 
-        bash_script = os.path.join(preprocess_dir, 'fasta_list_creator.sh')
-        fasta_creator = "bash " + bash_script + " " + preprocess_dir
-        subprocess.check_call(fasta_creator, shell=True)
+        ## Change to the preprocess dir to run the tests
+        os.chdir(preprocess_dir) 
         ## Run the generate_ska_alignment script
-        fasta_loc = 'ska_fasta_list.txt'
+        fasta_loc = './ska_fasta_list.txt'
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_test_aln.aln')
         ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
@@ -93,7 +91,6 @@ class TestPythonScripts(unittest.TestCase):
         exit_code = self.check_for_output_files('ska_test')
         self.cleanup('ska_test')
         os.remove(aln_out)
-        os.remove(fasta_loc)
         assert exit_code == 0
 
 

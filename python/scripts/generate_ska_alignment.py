@@ -108,17 +108,11 @@ if __name__ == "__main__":
                 else:
                     sys.stderr.write('Unable to find file ' + info[1] + '\n')
         # Sketch into split kmers
-        if args.threads == 1:
-            for name in fasta_names:
-                map_fasta_sequence(name,
+        with Pool(processes = args.threads) as pool:
+            pool.map(partial(map_fasta_sequence,
                                 k = args.k,
-                                names = seq_names)
-        else:
-            with Pool(processes = args.threads) as pool:
-                pool.map(partial(map_fasta_sequence,
-                                    k = args.k,
-                                    names = seq_names),
-                                    fasta_names)
+                                names = seq_names),
+                                fasta_names)
     
     # Make split kmers from FASTQs
     fastq_names = []
@@ -134,29 +128,18 @@ if __name__ == "__main__":
                 else:
                     sys.stderr.write('Unable to find files ' + fns[1] + ' and ' + fns[2] + '\n')
         # Sketch into split kmers
-        if args.threads == 1:
-            for name in fastq_names:
-                return_codes = map_fastq_sequence(read_pair= name,
-                                                    k = args.k, 
-                                                    names = seq_names)
-        else:
-            with Pool(processes = args.threads) as pool:
-                return_codes = pool.map(partial(map_fastq_sequence,
-                                                k = args.k,
-                                                names = seq_names),
-                                                fastq_names)
-    
-    # Map sequences
-    if args.threads == 1:
-        for current_seq in all_names:
-            return_codes = ska_map_sequences(seq = current_seq, k = args.k,
-                                             ref = args.reference)
-    else:
         with Pool(processes = args.threads) as pool:
-            return_codes = pool.map(partial(ska_map_sequences,
+            return_codes = pool.map(partial(map_fastq_sequence,
                                             k = args.k,
-                                            ref = args.reference),
-                                            all_names)
+                                            names = seq_names),
+                                            fastq_names)
+
+    # Map sequences
+    with Pool(processes = args.threads) as pool:
+        return_codes = pool.map(partial(ska_map_sequences,
+                                        k = args.k,
+                                        ref = args.reference),
+                                        all_names)
 
     # Generate alignment
     subprocess.check_output('cat ' + ' '.join([seq + '.map.aln' for seq in all_names]) + ' > ' + args.out,

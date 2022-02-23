@@ -1,4 +1,0 @@
-sequence_t1	./sequence_t1.fasta
-sequence_t2	./sequence_t2.fasta
-sequence_t3	./sequence_t3.fasta
-sequence_t4	./sequence_t4.fasta

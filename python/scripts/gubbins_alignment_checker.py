@@ -20,7 +20,9 @@
 #
 
 import argparse
+from asyncore import write
 import re
+from collections import Counter
 
 def parse_input_args():
 
@@ -46,11 +48,12 @@ def main(input_args):
                 row_num += 1
             tot_lines += 1
 
-    # Going to need 11 columns: id, A, C, G, T, a, c, g, t, N, -
-    # Lets append to a list and go from there
+    # Going to use counter in a first pass to store sequence counts and the range of sequences
+    
 
-    row_data = []
+    total_base_counts = []
     iso_data = []
+    total_headers = []
     tot_length_str = str(tot_lines)
     print("Running through alignment file: %s" % input_args.aln)
     print()
@@ -62,42 +65,32 @@ def main(input_args):
             if re.search("^>", line):
                 iso = re.sub("\n","",(re.sub("^>","",line)))
                 iso_data.append(iso)
-                if index > 0:
-                    row_data.append([a_num,A_num, t_num, T_num,
-                                     c_num, C_num, g_num, G_num,
-                                     N_num, num_dash])
-                a_num = 0
-                A_num = 0
-                c_num = 0
-                C_num = 0
-                t_num = 0
-                T_num = 0
-                g_num = 0
-                G_num = 0
-                N_num = 0
-                num_dash = 0
+                
             else:
-                a_num += line.count("a")
-                A_num += line.count("A")
-                t_num += line.count("t")
-                T_num += line.count("T")
-                c_num += line.count("c")
-                C_num += line.count("C")
-                g_num += line.count("g")
-                G_num += line.count("G")
-                N_num += line.count("N")
-                num_dash += line.count("-")
-                if index == (tot_lines - 1):
-                    row_data.append([a_num, A_num, t_num, T_num,
-                                     c_num, C_num, g_num, G_num,
-                                     N_num, num_dash])
-            print("Finished %s of %s rows" % (fmt_index, tot_length_str), end="\r", flush=True)
+                current_count = Counter(line.strip())
+                iso_headers = sorted(list(current_count))
+                add_list = list(set(iso_headers) - set(total_headers))
+                if len(add_list) > 0:
+                    total_headers.extend(add_list)
+                total_base_counts.append(current_count)
+            print("Counted %s of %s rows" % (fmt_index, tot_length_str), end="\r", flush=True)
 
-    
+    ## Second pass to line up all the counts across the isolates 
+    print("")
+    print("Assessing counts...")
+    isolate_bases = []
+    for count in total_base_counts:
+        iso_row = []
+        for header in total_headers:
+            iso_row.append(count[header])
+        isolate_bases.append(iso_row)
+
+    total_headers.insert(0, "isolate")
+    write_out_headers = [re.sub("-","gap",i) for i in total_headers]
     print("Writing out results...")
     with open((input_args.out + ".csv"), "w") as output:
-        output.write(",".join(['isolate','a','A','t','T','c','C','g','G','N','gap']) + "\n")
-        for i, aln_row in enumerate(row_data):
+        output.write(",".join(write_out_headers) + "\n")
+        for i, aln_row in enumerate(isolate_bases):
             aln_row_str = list(map(str, aln_row))
             aln_row_str.insert(0, iso_data[i])
             output.write(",".join(aln_row_str) + "\n")

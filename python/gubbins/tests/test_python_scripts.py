@@ -65,7 +65,7 @@ class TestPythonScripts(unittest.TestCase):
         ## Get the test file 
         test_aln = os.path.join(data_dir, "masking_multiple.aln")
         # Script name
-        extract_clade_cmd = "extract_gubbins_clade.py --aln " + multiple_aln +\
+        extract_clade_cmd = "mask_gubbins_aln.py --aln " + multiple_aln +\
             " --gff " + multiple_gff + " --out " + out_aln +  " --out-fmt fasta"
         subprocess.check_call(extract_clade_cmd, shell=True)
         assert self.md5_check(out_aln, test_aln)

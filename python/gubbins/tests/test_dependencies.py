@@ -38,7 +38,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'pairwise.aln')]))
         exit_code = self.check_for_output_files('pairwise')
-        self.cleanup('pairwise')
+        self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     # Test individual tree builders
@@ -140,8 +140,8 @@ class TestExternalDependencies(unittest.TestCase):
                                                 "--verbose", "--iterations", "3",
                                                 "--threads", "1",
                                                 os.path.join(data_dir, 'mislabelled.multiple_recombinations.aln')]))
-        exit_code = self.check_for_output_files('mislabelled.multiple_recombinations')
-        self.cleanup('mislabelled.multiple_recombinations')
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     # Test initial star tree
@@ -459,7 +459,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--converge-method", "recombination",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
-        self.cleanup('multiple_recombinations')
+        self.cleanup('bootstrapping_test')
         assert exit_code == 0
 
     def test_converge_on_unweighted_rf(self):
@@ -471,7 +471,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--converge-method", "robinson_foulds",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
-        self.cleanup('multiple_recombinations')
+        self.cleanup('bootstrapping_test')
         assert exit_code == 0
 
     # Test renaming of final output

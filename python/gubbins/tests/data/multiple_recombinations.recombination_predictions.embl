@@ -1,0 +1,30 @@
+FT   misc_feature    29..49
+FT                   /node="Node_4->Node_3"
+FT                   /neg_log_likelihood="4.955311"
+FT                   /colour="2"
+FT                   /taxa="  sequence_7 sequence_9 sequence_8"
+FT                   /SNP_count="21"
+FT   misc_feature    51..84
+FT                   /node="Node_5->Node_4"
+FT                   /neg_log_likelihood="10.195830"
+FT                   /colour="2"
+FT                   /taxa=" sequence_6   sequence_7 sequence_9 sequence_8"
+FT                   /SNP_count="30"
+FT   misc_feature    51..84
+FT                   /node="Node_6->sequence_1"
+FT                   /neg_log_likelihood="8.046578"
+FT                   /colour="4"
+FT                   /taxa="sequence_1"
+FT                   /SNP_count="30"
+FT   misc_feature    124..201
+FT                   /node="Node_9->sequence_10"
+FT                   /neg_log_likelihood="40.155361"
+FT                   /colour="4"
+FT                   /taxa="sequence_10"
+FT                   /SNP_count="78"
+FT   misc_feature    51..84
+FT                   /node="Node_9->Node_8"
+FT                   /neg_log_likelihood="10.195830"
+FT                   /colour="2"
+FT                   /taxa="  sequence_3 sequence_4  sequence_2   sequence_5  sequence_6   sequence_7 sequence_9 sequence_8 sequence_1"
+FT                   /SNP_count="30"

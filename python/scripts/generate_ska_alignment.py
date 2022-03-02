@@ -82,6 +82,8 @@ def ska_map_sequences(seq, k = None, ref = None):
 # main code
 if __name__ == "__main__":
 
+    __spec__ = None
+
     # Get command line options
     args = get_options()
 

@@ -109,13 +109,13 @@ class TestExternalDependencies(unittest.TestCase):
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
         # Copy file for subsequent tests
-        shutil.copyfile(os.path.join('multiple_recombinations.recombination_predictions.embl'),
-                        os.path.join('new_rapidnj_jc_output.recombination_predictions.embl'))
+        shutil.copyfile(os.path.join(data_dir, 'multiple_recombinations.recombination_predictions.embl'),
+                        os.path.join(data_dir, 'new_rapidnj_jc_output.recombination_predictions.embl'))
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     def check_rapidnj_consistency(self):
-        new_file = 'new_rapidnj_jc_output.recombination_predictions.embl'
+        new_file = os.path.join(data_dir,'new_rapidnj_jc_output.recombination_predictions.embl')
         reference_file = os.path.join(data_dir,'ref_rapidnj_jc_output.recombination_predictions.embl')
         assert common.have_recombinations_been_seen_before(reference_file,[new_file])
 

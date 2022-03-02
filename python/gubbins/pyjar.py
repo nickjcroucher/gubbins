@@ -584,8 +584,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
     with open(base_positions_fn, 'r') as positions_file:
         for line in positions_file:
             array_of_position_arrays.append(list(map(int,line.rstrip().split(','))))
-    array_max = max([sublist[-1] for sublist in array_of_position_arrays]) + 1
-    
+    array_max = max([max(sublist) for sublist in array_of_position_arrays]) + 1
     # Record timing
    
     t2=time.process_time()

@@ -14,6 +14,7 @@ import pkg_resources
 import shutil
 from gubbins import common, run_gubbins
 
+unittest.TestLoader.sortTestMethodsUsing = None
 modules_dir = os.path.dirname(os.path.abspath(common.__file__))
 data_dir = os.path.join(modules_dir, 'tests', 'data')
 working_dir = os.path.join(modules_dir, 'tests')
@@ -38,7 +39,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'pairwise.aln')]))
         exit_code = self.check_for_output_files('pairwise')
-        self.cleanup('multiple_recombinations')
+        self.cleanup('pairwise')
         assert exit_code == 0
 
     # Test individual tree builders
@@ -108,13 +109,13 @@ class TestExternalDependencies(unittest.TestCase):
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
         # Copy file for subsequent tests
-        shutil.copyfile(os.path.join('multiple_recombinations.recombination_predictions.embl'),
-                        os.path.join('new_rapidnj_jc_output.recombination_predictions.embl'))
+        shutil.copyfile(os.path.join(data_dir, 'multiple_recombinations.recombination_predictions.embl'),
+                        os.path.join(data_dir, 'new_rapidnj_jc_output.recombination_predictions.embl'))
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     def check_rapidnj_consistency(self):
-        new_file = 'new_rapidnj_jc_output.recombination_predictions.embl'
+        new_file = os.path.join(data_dir,'new_rapidnj_jc_output.recombination_predictions.embl')
         reference_file = os.path.join(data_dir,'ref_rapidnj_jc_output.recombination_predictions.embl')
         assert common.have_recombinations_been_seen_before(reference_file,[new_file])
 
@@ -140,8 +141,8 @@ class TestExternalDependencies(unittest.TestCase):
                                                 "--verbose", "--iterations", "3",
                                                 "--threads", "1",
                                                 os.path.join(data_dir, 'mislabelled.multiple_recombinations.aln')]))
-        exit_code = self.check_for_output_files('multiple_recombinations')
-        self.cleanup('multiple_recombinations')
+        exit_code = self.check_for_output_files('mislabelled.multiple_recombinations')
+        self.cleanup('mislabelled.multiple_recombinations')
         assert exit_code == 0
 
     # Test initial star tree
@@ -459,7 +460,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--converge-method", "recombination",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
-        self.cleanup('bootstrapping_test')
+        self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     def test_converge_on_unweighted_rf(self):
@@ -471,7 +472,7 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--converge-method", "robinson_foulds",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
-        self.cleanup('bootstrapping_test')
+        self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
     # Test renaming of final output
@@ -507,7 +508,7 @@ class TestExternalDependencies(unittest.TestCase):
 
     @staticmethod
     def cleanup(prefix):
-        os.chdir(working_dir)
+        #os.chdir(working_dir)
         regex_to_remove = prefix + ".*"
         for file in glob.glob(regex_to_remove):
             os.remove(file)

@@ -26,7 +26,7 @@ class TestPythonScripts(unittest.TestCase):
         output_file = os.path.join(working_dir, "valid_alignment_test")
         output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
         test_csv = os.path.join(data_dir, "test_valid_output.csv")
-        aln_cmd = "alignment_checker.py --aln " + small_aln + " --out " + output_file 
+        aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_file
         subprocess.check_call(aln_cmd, shell=True)
         assert self.md5_check(output_csv, test_csv)
         os.remove(output_csv)
@@ -46,6 +46,7 @@ class TestPythonScripts(unittest.TestCase):
         test_aln = os.path.join(data_dir, "multiple_recombinations_clade_extract.aln")
         test_gff = os.path.join(data_dir, "multiple_recombinations_clade_extract.gff")
         test_tree = os.path.join(data_dir, "multiple_recombinations_clade_extract.tree")
+        # Script name
         extract_clade_cmd = "extract_gubbins_clade.py --list " + clade_list + " --aln " + multiple_aln +\
             " --gff " + multiple_gff + " --tree " + multiple_tree + " --out " + base_path +  " --out-fmt fasta"
         subprocess.check_call(extract_clade_cmd, shell=True)
@@ -63,7 +64,7 @@ class TestPythonScripts(unittest.TestCase):
         out_aln = os.path.join(data_dir, "multiple_recombinations_mask.aln")
         ## Get the test file 
         test_aln = os.path.join(data_dir, "masking_multiple.aln")
-        
+        # Script name
         extract_clade_cmd = "mask_gubbins_aln.py --aln " + multiple_aln +\
             " --gff " + multiple_gff + " --out " + out_aln +  " --out-fmt fasta"
         subprocess.check_call(extract_clade_cmd, shell=True)
@@ -73,14 +74,15 @@ class TestPythonScripts(unittest.TestCase):
     ## Test the ska alignment generator 
     def test_generate_ska_alignment(self):
         exit_code = 1
-        ## Get files to run initial ska alignment on via the bash script 
-        bash_script = os.path.join(preprocess_dir, 'fasta_list_creator.sh')
-        fasta_creator = "bash " + bash_script + " " + preprocess_dir
-        subprocess.check_call(fasta_creator, shell=True)
         ## Run the generate_ska_alignment script
-        fasta_loc = 'ska_fasta_list.txt'
+        fasta_loc = os.path.join(preprocess_dir, './ska_fasta_list.txt')
+        with open(fasta_loc,'w') as list_file:
+            for i in range(1,5):
+                list_file.write('sequence_t' + str(i) + '\t' + \
+                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '.fasta\n'))
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_test_aln.aln')
+        # Script name
         ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
                 " --k 6"
@@ -95,8 +97,6 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(aln_out)
         os.remove(fasta_loc)
         assert exit_code == 0
-
-
 
     @staticmethod
     def check_for_output_files(prefix):

@@ -82,6 +82,8 @@ def ska_map_sequences(seq, k = None, ref = None):
 # main code
 if __name__ == "__main__":
 
+    __spec__ = None
+
     # Get command line options
     args = get_options()
 
@@ -133,7 +135,7 @@ if __name__ == "__main__":
                                             k = args.k,
                                             names = seq_names),
                                             fastq_names)
-    
+
     # Map sequences
     with Pool(processes = args.threads) as pool:
         return_codes = pool.map(partial(ska_map_sequences,

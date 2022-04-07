@@ -38,7 +38,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--pairwise",
                                                     "--threads", "1",
                                                     "--p-value", "0.01",
-                                                    "--trimmming-ratio 2.0",
+                                                    "--trimmming-ratio", "2.0",
                                                     os.path.join(data_dir, 'pairwise.aln')]))
         exit_code = self.check_for_output_files('pairwise')
         self.cleanup('pairwise')

@@ -354,7 +354,8 @@ def parse_and_run(input_args, program_description=""):
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
-            input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
+            input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size,
+            input_args.p_value, input_args.trimming_ratio)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         try:
             subprocess.check_call(gubbins_command, shell=True)
@@ -617,10 +618,11 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     return initialised_algorithm
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
-                           original_alignment_filename, min_snps, min_window_size, max_window_size):
+                           original_alignment_filename, min_snps, min_window_size, max_window_size,
+                           p_value, trimming_ratio):
     command = [gubbins_exec, "-r", "-v", vcf_filename, "-a", str(min_window_size),
                "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
-               "-m", str(min_snps), alignment_filename]
+               "-m", str(min_snps), "-p", p_value, "-i", trimming_ratio, alignment_filename]
     return " ".join(command)
 
 

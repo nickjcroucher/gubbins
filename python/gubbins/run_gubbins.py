@@ -120,6 +120,14 @@ def parse_input_args():
                                                       help='Minimum window size', type=int, default=100)
     gubbinsGroup.add_argument('--max-window-size','-b',
                                                       help='Maximum window size', type=int, default=10000)
+    gubbinsGroup.add_argument('--p-value',
+                                                      help='Uncorrected p value used to identify recombinations',
+                                                      type=float,
+                                                      default=0.05)
+    gubbinsGroup.add_argument('--trimming-ratio',
+                                                      help='Ratio of log probabilities used to trim recombinations',
+                                                      type=float,
+                                                      default=1.0)
 
     stopGroup = parser.add_argument_group('Algorithm stop options')
     stopGroup.add_argument('--iterations',      '-i', help='Maximum No. of iterations', type=int, default=5)

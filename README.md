@@ -105,7 +105,7 @@ chmod +x configure
 make
 sudo make install
 cd python
-python setup.py install
+python3 -m pip install .
 ```
 
 ### OSX/Linux/Windows - Virtual Machine

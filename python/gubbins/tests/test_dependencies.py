@@ -32,11 +32,13 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('pairwise')
         assert exit_code == 0
 
-    def test_pairwise(self):
+    def test_pairwise_altered_rec_options(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--pairwise",
                                                     "--threads", "1",
+                                                    "--p-value", "0.01",
+                                                    "--trimmming-ratio 2.0",
                                                     os.path.join(data_dir, 'pairwise.aln')]))
         exit_code = self.check_for_output_files('pairwise')
         self.cleanup('pairwise')

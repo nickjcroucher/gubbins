@@ -722,6 +722,8 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 
 
 		// Move left inwards while the likelihood gets better
+        // to avoid the current asymmetry in which the two edges are treated, we
+        // should trim SNPs from each edge in an alternating order
 		while(current_start < current_end && block_snp_count >= min_snps)
 		{
             next_start_position++;
@@ -743,7 +745,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 			  
             double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 				
-            if(next_block_likelihood <= current_block_likelihood*trimming_ratio)
+            if(next_block_likelihood*trimming_ratio <= current_block_likelihood && block_snp_count >= min_snps)
             {
                 current_block_likelihood = next_block_likelihood;
                 current_start = next_start_position;
@@ -780,7 +782,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
             block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, next_end_position, length_of_sequence);
 			  
             double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-            if(next_block_likelihood <= current_block_likelihood*trimming_ratio)
+            if(next_block_likelihood*trimming_ratio <= current_block_likelihood && block_snp_count >= min_snps)
             {
                 current_block_likelihood = next_block_likelihood;
                 current_end = next_end_position;

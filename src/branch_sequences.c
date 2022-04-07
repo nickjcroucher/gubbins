@@ -933,7 +933,6 @@ int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, i
 		return 0;	
 	}
 	
-    printf("Uncorrected p value: %f", uncorrected_p_value);
 	threshold = uncorrected_p_value/branch_genome_size;
 	
 	while( cutoff < block_snp_count)

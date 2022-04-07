@@ -622,7 +622,7 @@ def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, curre
                            p_value, trimming_ratio):
     command = [gubbins_exec, "-r", "-v", vcf_filename, "-a", str(min_window_size),
                "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
-               "-m", str(min_snps), "-p", p_value, "-i", trimming_ratio, alignment_filename]
+               "-m", str(min_snps), "-p", str(p_value), "-i", str(trimming_ratio), alignment_filename]
     return " ".join(command)
 
 

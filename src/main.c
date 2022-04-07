@@ -81,6 +81,7 @@ int main (argc, argv) int argc; char **argv;
   int window_min = 100;
   int window_max = 10000;
     float uncorrected_p_value = 0.05;
+    float trimming_ratio = 1.0;
   program_name = argv[0];
   
   while (1)
@@ -96,12 +97,13 @@ int main (argc, argv) int argc; char **argv;
             {"window_min",          required_argument, 0, 'a'},
             {"window_max",          required_argument, 0, 'b'},
             {"p_value",             required_argument, 0, 'p'},
+            {"trimming_ratio",      required_argument, 0, 'i'},
 		  
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
-      c = getopt_long (argc, argv, "hrv:f:t:m:a:b:p:",
+      c = getopt_long (argc, argv, "hrv:f:t:m:a:b:p:i:",
                        long_options, &option_index);
       /* Detect the end of the options. */
       if (c == -1)
@@ -141,6 +143,9 @@ int main (argc, argv) int argc; char **argv;
           case 'p':
             uncorrected_p_value = atof(optarg);
             break;
+          case 'i':
+            trimming_ratio = atof(optarg);
+            break;
           case 't':
             memcpy(tree_filename, optarg, size_of_string(optarg) +1);
             break;
@@ -166,7 +171,7 @@ int main (argc, argv) int argc; char **argv;
         check_file_exists_or_exit(vcf_filename);
         check_file_exists_or_exit(tree_filename);
         check_file_exists_or_exit(original_multi_fasta_filename);
-        run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value);
+        run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value, trimming_ratio);
     }
     else
     {

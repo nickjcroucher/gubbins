@@ -21,10 +21,10 @@
 #define _BRANCH_SEQUENCES_H_
 #include "seqUtil.h"
 #include "Newickform.h"
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value);
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio);
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites,int length_of_original_genome);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value);
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio);
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps);
 int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max);
 double calculate_threshold(int branch_genome_size, int window_size);
@@ -40,7 +40,7 @@ int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coord
 int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps, FILE * gff_file_pointer, double * block_likelihooods);
 int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int length_of_original_genome);
 void carry_unambiguous_gaps_up_tree(newick_node *root);
-void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value);
+void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value, float trimming_ratio);
 int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence, int * snp_locations, int number_of_snps);
 int extend_lower_part_of_window(int starting_coord, int initial_min_coord, int genome_size, int8_t * gaps_in_original_genome_space);
 int extend_upper_part_of_window(int starting_coord, int initial_max_coord, int genome_size, int8_t * gaps_in_original_genome_space);

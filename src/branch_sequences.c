@@ -263,14 +263,14 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value)
+char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio)
 {
 	newick_child *child;
 	int child_counter = 0;
 	int current_branch =0;
 	int branch_genome_size = 0;
 	int number_of_branch_snps=0;
-  root->current_node_id = ++node_counter;
+    root->current_node_id = ++node_counter;
 	
 	if (root->childNum == 0)
 	{
@@ -298,7 +298,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		while (child != NULL)
 		{
 			// recursion
-			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,  child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer, window_min, window_max, uncorrected_p_value);
+			child_sequences[child_counter] = generate_branch_sequences(child->node, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,  child_sequences[child_counter],length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer, window_min, window_max, uncorrected_p_value,  trimming_ratio);
 			child_nodes[child_counter] = child->node;
 			
 			char delimiter_string[3] = {" "};
@@ -336,7 +336,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 			child_nodes[current_branch]->number_of_snps = number_of_branch_snps;
 			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,root->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome,leaf_sequence, window_min, window_max, uncorrected_p_value);
+			get_likelihood_for_windows(child_sequences[current_branch], number_of_snps, branches_snp_sites, branch_genome_size, number_of_branch_snps,snp_locations, child_nodes[current_branch], block_file_pointer, root, branch_snp_sequence,gff_file_pointer,min_snps,length_of_original_genome,leaf_sequence, window_min, window_max, uncorrected_p_value, trimming_ratio);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(child_sequences[current_branch]);
@@ -376,7 +376,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int 
 }
 
 
-void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value)
+void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio)
 {
 	int i = 0;
 	int window_size = 0;
@@ -447,7 +447,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
 			block_coordinates[3][i] = block_genome_size_without_gaps;
 		}
 
-		move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates, min_snps, snp_site_coords, number_of_branch_snps, branch_snp_sequence, snp_locations, branch_genome_size, child_sequence, length_of_sequence,block_likelihoods,cutoff);
+		move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates, min_snps, snp_site_coords, number_of_branch_snps, branch_snp_sequence, snp_locations, branch_genome_size, child_sequence, length_of_sequence,block_likelihoods,cutoff, trimming_ratio);
 
 		int * candidate_blocks[4];
 		candidate_blocks[0] = (int *) calloc((number_of_blocks+1),sizeof(int));
@@ -664,7 +664,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 
 
 
-void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value)
+void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value, float trimming_ratio)
 {
 	int i;
 	
@@ -743,7 +743,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
 			  
             double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
 				
-            if(next_block_likelihood <= current_block_likelihood)
+            if(next_block_likelihood <= current_block_likelihood*trimming_ratio)
             {
                 current_block_likelihood = next_block_likelihood;
                 current_start = next_start_position;
@@ -780,7 +780,7 @@ void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** b
             block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence, snp_locations, current_start, next_end_position, length_of_sequence);
 			  
             double next_block_likelihood = get_block_likelihood(branch_genome_size, number_of_branch_snps, block_genome_size_without_gaps, block_snp_count);
-            if(next_block_likelihood <= current_block_likelihood)
+            if(next_block_likelihood <= current_block_likelihood*trimming_ratio)
             {
                 current_block_likelihood = next_block_likelihood;
                 current_end = next_end_position;

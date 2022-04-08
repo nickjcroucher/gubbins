@@ -124,31 +124,31 @@ int main (argc, argv) int argc; char **argv;
                 break;
             case 'h':
                 print_usage(stdout, EXIT_SUCCESS);
-                case 'r':
+            case 'r':
                 recombination_flag = 1;
                 break;
             case 'f':
                 memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
                 break;
-                case 'v':
+            case 'v':
                 memcpy(vcf_filename, optarg, size_of_string(optarg) +1);
                 break;
             case 'm':
                 min_snps = atoi(optarg);
                 break;
-                case 'a':
+            case 'a':
                 window_min = atoi(optarg);
                 break;
             case 'b':
                 window_max = atoi(optarg);
                 break;
-                case 'p':
+            case 'p':
                 uncorrected_p_value = atof(optarg);
                 break;
             case 'i':
                 trimming_ratio = atof(optarg);
                 break;
-                case 't':
+            case 't':
                 memcpy(tree_filename, optarg, size_of_string(optarg) +1);
                 break;
             case '?':
@@ -173,7 +173,15 @@ int main (argc, argv) int argc; char **argv;
         check_file_exists_or_exit(vcf_filename);
         check_file_exists_or_exit(tree_filename);
         check_file_exists_or_exit(original_multi_fasta_filename);
-        run_gubbins(vcf_filename,tree_filename,multi_fasta_filename, min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value, trimming_ratio);
+        run_gubbins(vcf_filename,
+                    tree_filename,
+                    multi_fasta_filename,
+                    min_snps,
+                    original_multi_fasta_filename,
+                    window_min,
+                    window_max,
+                    uncorrected_p_value,
+                    trimming_ratio);
     }
     else
     {

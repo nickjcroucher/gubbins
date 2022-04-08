@@ -353,7 +353,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 // calculate window size
 // starting at coord of first snp, count number of snps which fall into window
 // if region is blank, move on
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max)
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps)
 {
 	int window_size = 0;
 	if(number_of_branch_snps == 0)
@@ -361,7 +361,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int 
 		return window_min;
 	}
 	
-	window_size = (int) ((branch_genome_size*1.0)/(number_of_branch_snps*1.0/WINDOW_SNP_MODE_TARGET));
+	window_size = (int) ((branch_genome_size*1.0)/(number_of_branch_snps*1.0/min_snps));
 	
 	if(window_size < window_min)
 	{
@@ -425,10 +425,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
         window_size = calculate_window_size(branch_genome_size,
                                             number_of_branch_snps,
                                             window_min,
-                                            window_max);
+                                            window_max,
+                                            min_snps);
 
         // return a cutoff number of SNPs in a window
-        int cutoff = calculate_cutoff(branch_genome_size, window_size, number_of_branch_snps);
+        int cutoff = calculate_cutoff(branch_genome_size,
+                                      window_size,
+                                      number_of_branch_snps,
+                                      min_snps,
+                                      uncorrected_p_value);
 
         // populate block coordinate data structure by identifying windows containing
         // a greater number of SNPs than the threshold and trimming them based on SNP
@@ -971,24 +976,24 @@ double snp_density(int length_of_sequence, int number_of_snps)
 	return number_of_snps*1.0/length_of_sequence;
 }
 
-
-
-
-double calculate_threshold(int branch_genome_size, int window_size)
+// calculate an approximate p value threshold corrected to multiple testing
+double calculate_threshold(int branch_genome_size, int window_size, float uncorrected_p_value)
 {
-	return 1-(RANDOMNESS_DAMPNER/((branch_genome_size*1.0)/((window_size*1.0)/WINDOW_SNP_MODE_TARGET)));
+	return 1-(uncorrected_p_value/((branch_genome_size*1.0)/(window_size*1.0)));
 }
 
-int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps)
+int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snps, int min_snps, float uncorrected_p_value)
 {
 	double threshold = 0.0;
 	int cutoff = 0;
 	double pvalue = 0.0;
 	double part1, part2, part3 = 0.0;
 	
-	threshold = calculate_threshold(branch_genome_size, window_size);
+	threshold = calculate_threshold(branch_genome_size,
+                                    window_size,
+                                    uncorrected_p_value);
 	
-	while( pvalue <= threshold)
+	while(pvalue <= threshold)
 	{
 		part1 = reduce_factorial(window_size,cutoff)-reduce_factorial(cutoff,cutoff);
 		part2 = log10((num_branch_snps*1.0)/branch_genome_size)*cutoff;
@@ -998,7 +1003,11 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 	}
 	cutoff--;
 
-	
+    if (cutoff < min_snps)
+    {
+        cutoff = min_snps;
+    }
+    
 	return cutoff;
 }
 

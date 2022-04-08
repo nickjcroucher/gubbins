@@ -49,6 +49,8 @@ void print_usage(FILE* stream, int exit_code)
            "  -m    Min SNPs for identifying a recombination block\n"
 		   "  -a    Min window size\n"
 		   "  -b    Max window size\n"
+           "  -p    p value for detecting recombinations\n"
+           "  -i    p value ratio for trimming recombinations\n"
            "  -h    Display this usage information.\n\n"
 );
   exit (exit_code);

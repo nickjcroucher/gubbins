@@ -28,7 +28,7 @@
 
 #define STR_OUT	"out"
 
-newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio)
+newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	int iLen, iMaxLen;
 	char *pcTreeStr;
@@ -98,7 +98,23 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     char * root_sequence = NULL;
 
 	carry_unambiguous_gaps_up_tree(root);
-	root_sequence = generate_branch_sequences(root, vcf_file_pointer, snp_locations, number_of_snps, column_names, number_of_columns,root_sequence, length_of_original_genome, block_file_pointer,gff_file_pointer,min_snps,branch_snps_file_pointer,window_min, window_max, uncorrected_p_value, trimming_ratio);
+	root_sequence = generate_branch_sequences(root,
+                                              vcf_file_pointer,
+                                              snp_locations,
+                                              number_of_snps,
+                                              column_names,
+                                              number_of_columns,
+                                              root_sequence,
+                                              length_of_original_genome,
+                                              block_file_pointer,
+                                              gff_file_pointer,
+                                              min_snps,
+                                              branch_snps_file_pointer,
+                                              window_min,
+                                              window_max,
+                                              uncorrected_p_value,
+                                              trimming_ratio,
+                                              extensive_search_flag);
 	free(root_sequence);
     int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);

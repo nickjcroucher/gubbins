@@ -84,6 +84,7 @@ int main (argc, argv) int argc; char **argv;
     int window_max = 10000;
     float uncorrected_p_value = 0.05;
     float trimming_ratio = 1.0;
+    int extensive_search_flag = 0;
     program_name = argv[0];
   
     while (1)
@@ -100,12 +101,13 @@ int main (argc, argv) int argc; char **argv;
             {"window_max",          required_argument, 0, 'b'},
             {"p_value",             required_argument, 0, 'p'},
             {"trimming_ratio",      required_argument, 0, 'i'},
+            {"extended_search",     required_argument, 0, 'x'},
 
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long (argc, argv, "hrv:f:t:m:a:b:p:i:",
+        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:",
                            long_options, &option_index);
         /* Detect the end of the options. */
         if (c == -1)
@@ -126,6 +128,9 @@ int main (argc, argv) int argc; char **argv;
                 print_usage(stdout, EXIT_SUCCESS);
             case 'r':
                 recombination_flag = 1;
+                break;
+            case 'x':
+                extensive_search_flag = 1;
                 break;
             case 'f':
                 memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
@@ -181,7 +186,8 @@ int main (argc, argv) int argc; char **argv;
                     window_min,
                     window_max,
                     uncorrected_p_value,
-                    trimming_ratio);
+                    trimming_ratio,
+                    extensive_search_flag);
     }
     else
     {

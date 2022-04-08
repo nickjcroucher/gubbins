@@ -128,6 +128,10 @@ def parse_input_args():
                                                       help='Ratio of log probabilities used to trim recombinations',
                                                       type=float,
                                                       default=1.0)
+    gubbinsGroup.add_argument('--extensive-search',
+                                                      help='Undertake slower, more thorough, search for recombination',
+                                                      action='store_true',
+                                                      default=False)
 
     stopGroup = parser.add_argument_group('Algorithm stop options')
     stopGroup.add_argument('--iterations',      '-i', help='Maximum No. of iterations', type=int, default=5)

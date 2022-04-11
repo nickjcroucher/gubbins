@@ -601,7 +601,7 @@ def get_base_patterns(prefix, verbose, threads = 1):
 
 def reconstruct_alignment_column(column_indices,
                                 base_pattern_positions,
-                                tree = None,
+                                tree_dest = None,
                                 preordered_nodes = None,
                                 postordered_nodes = None,
                                 leaf_nodes = None,
@@ -628,6 +628,7 @@ def reconstruct_alignment_column(column_indices,
     out_aln = numpy.ndarray(new_aln.shape, dtype = numpy.int8, buffer = out_aln_shm.buf)
     
     # Generate data structures for reconstructions
+    tree = read_tree(tree_dest)
     num_nodes = len(tree.nodes())
     Lmat = numpy.full((num_nodes,4), numpy.NINF, dtype = numpy.float32)
     Cmat = numpy.full((num_nodes,4), [0,1,2,3], dtype = numpy.uint8)
@@ -846,12 +847,12 @@ def jar(sequence_names = None,
         ntaxa_jumps = ceil(npatterns / threads)
         base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
-
+        #tree.print_plot()
         # Parallelise reconstructions across alignment columns using multiprocessing
         with multiprocessing.get_context(method=mp_metho).Pool(processes = threads) as pool:
             reconstruction_results = pool.starmap(partial(
                                         reconstruct_alignment_column,
-                                            tree = tree,
+                                            tree_dest = tree_filename,
                                             preordered_nodes = preordered_nodes,
                                             postordered_nodes = postordered_nodes,
                                             leaf_nodes = leaf_nodes,

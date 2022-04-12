@@ -469,7 +469,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
         int cutoff = min_snps;
         if (extensive_search_flag == 0)
         {
-            calculate_cutoff(branch_genome_size,
+            cutoff = calculate_cutoff(branch_genome_size,
                                           window_size,
                                           number_of_branch_snps,
                                           min_snps,
@@ -740,7 +740,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
     int block_lower_bound = 0;
     // Scan across the pileup and record where blocks are above the cutoff
     int i;
-    for(i = 0; i < genome_size; i++)
+    for(i = 0; i <= genome_size; i++)
     {
         // Just entered the start of a block
         if(window_count[i] > cutoff && in_block == 0)
@@ -749,8 +749,16 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
             in_block = 1;
         }
 
+        // Reached end of genome
+        if(i == genome_size && in_block == 1)
+        {
+            block_coordinates[0][number_of_blocks] = block_lower_bound;
+            block_coordinates[1][number_of_blocks] = i;
+            number_of_blocks++;
+            in_block = 0;
+        }
         // Just left a block
-        if((window_count[i] <= cutoff || i+1 == genome_size ) && in_block == 1)
+        else if(window_count[i] <= cutoff && in_block == 1)
         {
             block_coordinates[0][number_of_blocks] = block_lower_bound;
             block_coordinates[1][number_of_blocks] = i-1;

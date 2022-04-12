@@ -535,7 +535,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
         }
 
         // trim the edges of candidate recombinations
-        move_blocks_inwards_while_likelihood_improves(number_of_blocks,block_coordinates,
+        move_blocks_inwards_while_likelihood_improves(number_of_blocks,
+                                                      block_coordinates,
                                                       min_snps,
                                                       snp_site_coords,
                                                       number_of_branch_snps,

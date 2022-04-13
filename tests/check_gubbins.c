@@ -68,7 +68,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	remove("../tests/data/multiple_recombinations.tre");
 	cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
 
-	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.aln.snp_sites.aln",3,"../tests/data/multiple_recombinations.aln.snp_sites.aln",100,10000,0.05,1,0);
+	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.aln",3,"../tests/data/multiple_recombinations.jar.aln",30,100,0.05,1,0);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.phylip") == 1);
@@ -76,9 +76,9 @@ START_TEST (check_gubbins_multiple_recombinations)
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.gff") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
-	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 3);
-  ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
-  ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
+	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 5);
+    ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
+    ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
 
 	remove("../tests/data/multiple_recombinations.tre");
 	remove("../tests/data/multiple_recombinations.tre.tab");

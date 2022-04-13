@@ -68,7 +68,13 @@ START_TEST (check_gubbins_multiple_recombinations)
 	remove("../tests/data/multiple_recombinations.tre");
 	cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
 
-	run_gubbins("../tests/data/multiple_recombinations.aln.vcf", "../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.aln",3,"../tests/data/multiple_recombinations.jar.aln",30,100,0.05,1,0);
+	run_gubbins("../tests/data/multiple_recombinations.aln.vcf",
+                "../tests/data/multiple_recombinations.tre",
+                "../tests/data/multiple_recombinations.jar.aln",
+                3,
+                "../tests/data/multiple_recombinations.aln",
+                30,100,0.05,1,0);
+
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.phylip") == 1);
@@ -97,10 +103,15 @@ START_TEST (check_recombination_at_root)
 	cp("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1", "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.original.tre");
 
     
-	run_gubbins("../tests/data/recombination_at_root/recombination_at_root.aln.gaps.vcf", "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1", "../tests/data/recombination_at_root/recombination_at_root.aln.gaps.snp_sites.aln",3,"../tests/data/recombination_at_root/recombination_at_root.aln",100,10000,0.05,1,0);
-    
+	run_gubbins("../tests/data/recombination_at_root/recombination_at_root.aln.gaps.vcf",
+                "../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1",
+                "../tests/data/recombination_at_root/recombination_at_root.aln.gaps.snp_sites.aln",
+                3,
+                "../tests/data/recombination_at_root/recombination_at_root.aln",
+                100,10000,0.05,1,0);
+
     ck_assert(compare_files("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab","../tests/data/recombination_at_root/expected_RAxML_result.recombination_at_root.iteration_1.tab") == 1);
-    
+
     ck_assert(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.vcf")             == 1);
     ck_assert(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab")             == 1);
     ck_assert(file_exists("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.stats")           == 1);

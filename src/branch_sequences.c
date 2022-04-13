@@ -475,6 +475,15 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
                                           min_snps,
                                           uncorrected_p_value);
         }
+        
+        // If returned cutoff == 0, then exit the program and error
+        if (cutoff == 0)
+        {
+            fprintf(stderr,
+                    "Cannot identify recombinations on at least one branch with window size %d; try increasing this value\n",
+                    window_size);
+            exit(EXIT_FAILURE);
+        }
 
         // populate block coordinate data structure by identifying windows containing
         // a greater number of SNPs than the threshold and trimming them based on SNP
@@ -1056,6 +1065,11 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
     if (cutoff < min_snps)
     {
         cutoff = min_snps;
+    }
+    
+    if (cutoff >= 2*(int)(window_size/2)) // Account for integer division/rounding in this condition
+    {
+        return 0; // In this case, it is impossible to call recombinations on the branch
     }
     
 	return cutoff;

@@ -66,8 +66,7 @@ END_TEST
 START_TEST (check_gubbins_multiple_recombinations)
 {
 	remove("../tests/data/multiple_recombinations.tre");
-//	cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
-    cp("../tests/data/multiple_recombinations.original.tre", "../tests/data/multiple_recombinations.tre");
+	cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
 
 	run_gubbins("../tests/data/multiple_recombinations.aln.vcf",
                 "../tests/data/multiple_recombinations.tre",

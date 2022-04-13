@@ -1,2 +1,1 @@
-(sequence_10:0.0,(((((sequence_7:0.0,sequence_8:0.0)Node_1:0.0,sequence_9:1.0)Node_2:22.0,sequence_6:0.0)Node_3:1.0,sequence_5:30.0)Node_4:0.0,((sequence_3:0.0,(sequence_2:1.0,sequence_4:1.0)Node_5:0.0)Node_6:32.0,sequence_1:0.0)Node_7:1.0)Node_8:180.0)Node_9:0.0;
-
+(sequence_10:0.1703565,(((((sequence_7:0.0,sequence_8:0.0)Node_1:0.027617,sequence_9:0.0053553)Node_2:0.025071,sequence_6:0.00866)Node_3:0.013915,sequence_5:0.0)Node_4:0.01589,(sequence_1:0.005232,(sequence_3:0.0,(sequence_2:0.0,sequence_4:0.0)Node_5:0.0)Node_6:0.020858)Node_7:0.018451)Node_8:0.08786350000000001)Node_9;

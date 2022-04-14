@@ -281,6 +281,7 @@ def parse_and_run(input_args, program_description=""):
                 info_filename = info_filename, # file containing evolutionary model parameters
                 info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
+                outgroup_name = input_args.outgroup, # outgroup for rooting and reconstruction
                 threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose,
                 max_pos = max_pos)
@@ -738,14 +739,13 @@ def reroot_tree(tree_name, outgroups):
 
 def reroot_tree_with_outgroup(tree_name, outgroups):
     clade_outgroups = get_monophyletic_outgroup(tree_name, outgroups)
-    outgroups = [{'name': taxon_name} for taxon_name in clade_outgroups]
-
-    tree = Phylo.read(tree_name, 'newick')
-    tree.root_with_outgroup(*outgroups)
-    Phylo.write(tree, tree_name, 'newick')
-
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
-    tree.deroot()
+    outgroup_mrca = tree.mrca(taxon_labels=clade_outgroups)
+    print('Edge length is: ' + str(outgroup_mrca.edge.length))
+    tree.reroot_at_edge(outgroup_mrca.edge,
+                        length1 = outgroup_mrca.edge.length/2,
+                        length2 = outgroup_mrca.edge.length/2,
+                        update_bipartitions=False)
     tree.update_bipartitions()
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:

@@ -705,6 +705,7 @@ def jar(sequence_names = None,
         info_filename = None,
         info_filetype = None,
         output_prefix = None,
+        outgroup_name = None,
         threads = 1,
         verbose = False,
         mp_metho = "spawn", 
@@ -753,6 +754,7 @@ def jar(sequence_names = None,
     seed_node_edge_truncation = True
     node_index_to_aln_row = numpy.full(num_nodes, -1, dtype=numpy.int32)
     ancestral_node_indices = {}
+
     for node_index,node in zip(postordered_nodes,tree.postorder_node_iter()):
         if node.taxon == None:
             nodecounter+=1
@@ -776,8 +778,15 @@ def jar(sequence_names = None,
             # Set the length of one root-to-child branch to ~zero
             # as reconstruction should occur with rooting at a node
             # midpoint rooting causes problems at the root, especially w/JC69
-            seed_node_edge_truncation = False
-            node_pij[node_index,:]=calculate_pij(node.edge_length/1e6, rm)
+            # With outgroup:
+            # Prefer to truncate the ingroup branch to force the recombinations
+            # onto the outgroup branch
+            if outgroup_name is None or \
+                            (outgroup_name is not None and node.taxon.label != outgroup_name):
+                seed_node_edge_truncation = False
+                node_pij[node_index,:]=calculate_pij(node.edge_length/1e6, rm)
+            else:
+                node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
         else:
             node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
         # Store information to avoid subsequent recalculation as

@@ -442,6 +442,8 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
     // Keep searching while there is the possibility of detecting a small recombination containing
     // the minimum number of SNPs
     int window_factor = 1;
+    int cutoff = min_snps - 1;
+    int previous_cutoff = number_of_branch_snps + 1;
     while(number_of_branch_snps >= min_snps && window_size > window_min)
     {
         
@@ -460,7 +462,6 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
         // for extensive search, this is every window containing min SNPs count
         // otherwise focus only on windows likely to exceed the statistical threshold
         // for detecting recombination (faster)
-        int cutoff = min_snps - 1;
         if (extensive_search_flag == 0)
         {
             cutoff = calculate_cutoff(branch_genome_size,
@@ -479,171 +480,159 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
             exit(EXIT_FAILURE);
         }
 
-        // populate block coordinate data structure by identifying windows containing
-        // a greater number of SNPs than the threshold and trimming them based on SNP
-        // positions
-        number_of_blocks = get_blocks(block_coordinates,
-                                      length_of_original_genome,
-                                      snp_site_coords,
-                                      number_of_branch_snps,
-                                      window_size,
-                                      cutoff,
-                                      child_sequence,
-                                      snp_locations,
-                                      length_of_sequence);
-        
-        // iterate over blocks
-        for(i = 0; i < number_of_blocks; i++)
+        // Test if reduction in window size has reduced the cutoff
+        int number_of_candidate_blocks = 0;
+        if (cutoff < previous_cutoff)
         {
-            // get number of SNPs in block
-            number_of_snps_in_block = find_number_of_snps_in_block(block_coordinates[0][i],
-                                                                   block_coordinates[1][i],
+            // populate block coordinate data structure by identifying windows containing
+            // a greater number of SNPs than the threshold and trimming them based on SNP
+            // positions
+            number_of_blocks = get_blocks(block_coordinates,
+                                          length_of_original_genome,
+                                          snp_site_coords,
+                                          number_of_branch_snps,
+                                          window_size,
+                                          cutoff,
+                                          child_sequence,
+                                          snp_locations,
+                                          length_of_sequence);
+            
+            // iterate over blocks
+            for(i = 0; i < number_of_blocks; i++)
+            {
+                // get number of SNPs in block
+                number_of_snps_in_block = find_number_of_snps_in_block(block_coordinates[0][i],
+                                                                       block_coordinates[1][i],
+                                                                       snp_site_coords,
+                                                                       branch_snp_sequence,
+                                                                       number_of_branch_snps);
+                
+                // get number of bases in block
+                block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,
+                                                                                   snp_locations,
+                                                                                   block_coordinates[0][i],
+                                                                                   block_coordinates[1][i],
+                                                                                   length_of_sequence);
+
+                // minimum number of snps to be statistically significant in block
+                if(number_of_snps_in_block <= min_snps)
+                {
+                    block_coordinates[0][i] = -1;
+                    block_coordinates[1][i] = -1;
+                    continue;
+                }
+
+                // calculate SNP density of block
+                block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
+                
+                // region with low number of snps so skip over
+                if(block_snp_density <= branch_snp_density)
+                {
+                    block_coordinates[0][i] = -1;
+                    block_coordinates[1][i] = -1;
+                    continue;
+                }
+
+                // calculate block log likelihood under null model
+                block_likelihoods[i] = get_block_likelihood(branch_genome_size,
+                                                            number_of_branch_snps,
+                                                            block_genome_size_without_gaps,
+                                                            number_of_snps_in_block);
+                block_coordinates[2][i] = (int) block_likelihoods[i]; // casts double log likelihood to int
+                block_coordinates[3][i] = block_genome_size_without_gaps;
+                
+            }
+
+            // trim the edges of candidate recombinations
+            move_blocks_inwards_while_likelihood_improves(number_of_blocks,
+                                                          block_coordinates,
+                                                          min_snps,
+                                                          snp_site_coords,
+                                                          number_of_branch_snps,
+                                                          branch_snp_sequence,
+                                                          snp_locations,
+                                                          branch_genome_size,
+                                                          child_sequence,
+                                                          length_of_sequence,
+                                                          block_likelihoods,
+                                                          cutoff,
+                                                          trimming_ratio);
+
+            int * candidate_blocks[4];
+            double * candidate_block_likelihoods;
+            
+            candidate_blocks[0] = (int *) calloc((number_of_blocks+1),sizeof(int));
+            candidate_blocks[1] = (int *) calloc((number_of_blocks+1),sizeof(int));
+            candidate_blocks[2] = (int *) calloc((number_of_blocks+1),sizeof(int));
+            candidate_blocks[3] = (int *) calloc((number_of_blocks+1),sizeof(int));
+
+            candidate_block_likelihoods = (double *) calloc((number_of_blocks+1),sizeof(double));
+
+            for(i = 0 ; i < number_of_blocks; i++)
+            {
+                if(block_coordinates[0][i] == -1 || block_coordinates[1][i] == -1)
+                {
+                    continue;
+                }
+                int current_start = block_coordinates[0][i];
+                int current_end = block_coordinates[1][i];
+                int block_snp_count = find_number_of_snps_in_block(current_start,
+                                                                   current_end,
                                                                    snp_site_coords,
                                                                    branch_snp_sequence,
                                                                    number_of_branch_snps);
-            
-            // get number of bases in block
-            block_genome_size_without_gaps = calculate_block_size_without_gaps(child_sequence,
-                                                                               snp_locations,
-                                                                               block_coordinates[0][i],
-                                                                               block_coordinates[1][i],
-                                                                               length_of_sequence);
+                int block_genome_size_without_gaps = block_coordinates[3][i];
 
-            // minimum number of snps to be statistically significant in block
-            if(number_of_snps_in_block <= min_snps)
-            {
-                block_coordinates[0][i] = -1;
-                block_coordinates[1][i] = -1;
-                continue;
+                if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count, min_snps, uncorrected_p_value) == 1)
+                {
+                    
+                    candidate_blocks[0][number_of_candidate_blocks] = block_coordinates[0][i];
+                    candidate_blocks[1][number_of_candidate_blocks] = block_coordinates[1][i];
+                    // TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
+                    candidate_blocks[2][number_of_candidate_blocks] = block_coordinates[2][i];
+                    candidate_blocks[3][number_of_candidate_blocks] = block_genome_size_without_gaps;
+
+                    candidate_block_likelihoods[number_of_candidate_blocks] = block_likelihoods[i];
+                    number_of_candidate_blocks++;
+                }
             }
-
-            // calculate SNP density of block
-            block_snp_density = snp_density(block_genome_size_without_gaps, number_of_snps_in_block);
             
-            // region with low number of snps so skip over
-            if(block_snp_density <= branch_snp_density)
+            if(number_of_candidate_blocks > 0)
             {
-                block_coordinates[0][i] = -1;
-                block_coordinates[1][i] = -1;
-                continue;
-            }
-
-            // calculate block log likelihood under null model
-            block_likelihoods[i] = get_block_likelihood(branch_genome_size,
-                                                        number_of_branch_snps,
-                                                        block_genome_size_without_gaps,
-                                                        number_of_snps_in_block);
-            block_coordinates[2][i] = (int) block_likelihoods[i]; // casts double log likelihood to int
-            block_coordinates[3][i] = block_genome_size_without_gaps;
-            
-        }
-
-        // trim the edges of candidate recombinations
-        move_blocks_inwards_while_likelihood_improves(number_of_blocks,
-                                                      block_coordinates,
-                                                      min_snps,
-                                                      snp_site_coords,
-                                                      number_of_branch_snps,
-                                                      branch_snp_sequence,
-                                                      snp_locations,
-                                                      branch_genome_size,
-                                                      child_sequence,
-                                                      length_of_sequence,
-                                                      block_likelihoods,
-                                                      cutoff,
-                                                      trimming_ratio);
-
-        int * candidate_blocks[4];
-        candidate_blocks[0] = (int *) calloc((number_of_blocks+1),sizeof(int));
-        candidate_blocks[1] = (int *) calloc((number_of_blocks+1),sizeof(int));
-        candidate_blocks[2] = (int *) calloc((number_of_blocks+1),sizeof(int));
-        candidate_blocks[3] = (int *) calloc((number_of_blocks+1),sizeof(int));
-
-        double * candidate_block_likelihoods;
-        candidate_block_likelihoods = (double *) calloc((number_of_blocks+1),sizeof(double));
-
-        int number_of_candidate_blocks = 0;
-
-        for(i = 0 ; i < number_of_blocks; i++)
-        {
-            if(block_coordinates[0][i] == -1 || block_coordinates[1][i] == -1)
-            {
-                continue;
-            }
-            int current_start = block_coordinates[0][i];
-            int current_end = block_coordinates[1][i];
-            int block_snp_count = find_number_of_snps_in_block(current_start,
-                                                               current_end,
-                                                               snp_site_coords,
-                                                               branch_snp_sequence,
-                                                               number_of_branch_snps);
-            int block_genome_size_without_gaps = block_coordinates[3][i];
-
-            if(p_value_test(branch_genome_size, block_genome_size_without_gaps, number_of_branch_snps, block_snp_count, min_snps, uncorrected_p_value) == 1)
-            {
+                // remove recombination with smallest log likelihood and
+                // correspondingly reduce the number of branch SNPs
+                number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks,
+                                                                                    number_of_candidate_blocks,
+                                                                                    number_of_branch_snps,
+                                                                                    snp_site_coords,
+                                                                                    current_node->recombinations,
+                                                                                    current_node->num_recombinations,
+                                                                                    current_node,
+                                                                                    block_file_pointer,
+                                                                                    root,
+                                                                                    snp_locations,
+                                                                                    length_of_sequence,
+                                                                                    gff_file_pointer,
+                                                                                    candidate_block_likelihoods);
                 
-                candidate_blocks[0][number_of_candidate_blocks] = block_coordinates[0][i];
-                candidate_blocks[1][number_of_candidate_blocks] = block_coordinates[1][i];
-                // TODO use a float in a struct here, should be okay for the moment but assumes that there will be a clear integer difference between best and second best
-                candidate_blocks[2][number_of_candidate_blocks] = block_coordinates[2][i];
-                candidate_blocks[3][number_of_candidate_blocks] = block_genome_size_without_gaps;
+                branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
 
-                candidate_block_likelihoods[number_of_candidate_blocks] = block_likelihoods[i];
-                number_of_candidate_blocks++;
             }
+            
+            free(candidate_blocks[0]);
+            free(candidate_blocks[1]);
+            free(candidate_blocks[2]);
+            free(candidate_blocks[3]);
+            free(candidate_block_likelihoods);
+
         }
         
         if(number_of_candidate_blocks == 0)
         {
-//            free(block_coordinates[0]) ;
-//            free(block_coordinates[1]) ;
-//            free(block_coordinates[2]) ;
-//            free(block_coordinates[3]) ;
-//            free(block_likelihoods);
-//            free(candidate_blocks[0]);
-//            free(candidate_blocks[1]);
-//            free(candidate_blocks[2]);
-//            free(candidate_blocks[3]);
-//            free(candidate_block_likelihoods);
-
-//            int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
-//            if(new_recombination_size > 1024)
-//            {
-//                current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
-//            }
-//            return;
             window_factor = window_factor * 2;
+            previous_cutoff = cutoff;
         }
-        else
-        {
-            // remove recombination with smallest log likelihood and
-            // correspondingly reduce the number of branch SNPs
-            number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks,
-                                                                                number_of_candidate_blocks,
-                                                                                number_of_branch_snps,
-                                                                                snp_site_coords,
-                                                                                current_node->recombinations,
-                                                                                current_node->num_recombinations,
-                                                                                current_node,
-                                                                                block_file_pointer,
-                                                                                root,
-                                                                                snp_locations,
-                                                                                length_of_sequence,
-                                                                                gff_file_pointer,
-                                                                                candidate_block_likelihoods);
-            
-            branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
-//            free(candidate_blocks[0]);
-//            free(candidate_blocks[1]);
-//            free(candidate_blocks[2]);
-//            free(candidate_blocks[3]);
-//            free(candidate_block_likelihoods);
-        }
-        free(candidate_blocks[0]);
-        free(candidate_blocks[1]);
-        free(candidate_blocks[2]);
-        free(candidate_blocks[3]);
-        free(candidate_block_likelihoods);
+        
     }
     
     free(block_coordinates[0]) ;
@@ -651,6 +640,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
     free(block_coordinates[2]) ;
     free(block_coordinates[3]) ;
     free(block_likelihoods);
+    
     int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
     if(new_recombination_size > 1024)
     {

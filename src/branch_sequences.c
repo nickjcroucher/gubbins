@@ -387,7 +387,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 // calculate window size
 // starting at coord of first snp, count number of snps which fall into window
 // if region is blank, move on
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps)
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor)
 {
 	int window_size = 0;
 	if(number_of_branch_snps == 0)
@@ -395,7 +395,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int 
 		return window_min;
 	}
 	
-	window_size = (int) ((branch_genome_size*1.0)/(number_of_branch_snps*1.0/min_snps));
+	window_size = (int) ((branch_genome_size*1.0)/(window_factor*number_of_branch_snps*1.0/(min_snps - 1)));
 	
 	if(window_size < window_min)
 	{
@@ -415,7 +415,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
     
     // define variables
     int i = 0;
-    int window_size = 0;
+    int window_size = window_max;
     int number_of_snps_in_block = 0;
     int block_genome_size_without_gaps = 0;
     double branch_snp_density = 0.0;
@@ -439,18 +439,11 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
     block_likelihoods = (double *) calloc((number_of_windows+1),sizeof(double));
 
     // iterate over SNPs
-    while(number_of_branch_snps > min_snps)
+    // Keep searching while there is the possibility of detecting a small recombination containing
+    // the minimum number of SNPs
+    int window_factor = 1;
+    while(number_of_branch_snps >= min_snps && window_size > window_min)
     {
-        // ignore branch if there are insufficient SNPs to call a recombination
-        if(number_of_branch_snps <= min_snps)
-        {
-            free(block_coordinates[0]) ;
-            free(block_coordinates[1]) ;
-            free(block_coordinates[2]) ;
-            free(block_coordinates[3]) ;
-            free(block_likelihoods);
-            return;
-        }
         
         // return SNP density as double
         branch_snp_density = snp_density(branch_genome_size, number_of_branch_snps);
@@ -460,13 +453,14 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
                                             number_of_branch_snps,
                                             window_min,
                                             window_max,
-                                            min_snps);
+                                            min_snps,
+                                            window_factor);
 
         // return a cutoff number of SNPs in a window
         // for extensive search, this is every window containing min SNPs count
         // otherwise focus only on windows likely to exceed the statistical threshold
         // for detecting recombination (faster)
-        int cutoff = min_snps;
+        int cutoff = min_snps - 1;
         if (extensive_search_flag == 0)
         {
             cutoff = calculate_cutoff(branch_genome_size,
@@ -541,6 +535,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
                                                         number_of_snps_in_block);
             block_coordinates[2][i] = (int) block_likelihoods[i]; // casts double log likelihood to int
             block_coordinates[3][i] = block_genome_size_without_gaps;
+            
         }
 
         // trim the edges of candidate recombinations
@@ -600,48 +595,55 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
         
         if(number_of_candidate_blocks == 0)
         {
-            free(block_coordinates[0]) ;
-            free(block_coordinates[1]) ;
-            free(block_coordinates[2]) ;
-            free(block_coordinates[3]) ;
-            free(block_likelihoods);
-            free(candidate_blocks[0]);
-            free(candidate_blocks[1]);
-            free(candidate_blocks[2]);
-            free(candidate_blocks[3]);
-            free(candidate_block_likelihoods);
+//            free(block_coordinates[0]) ;
+//            free(block_coordinates[1]) ;
+//            free(block_coordinates[2]) ;
+//            free(block_coordinates[3]) ;
+//            free(block_likelihoods);
+//            free(candidate_blocks[0]);
+//            free(candidate_blocks[1]);
+//            free(candidate_blocks[2]);
+//            free(candidate_blocks[3]);
+//            free(candidate_block_likelihoods);
 
-            int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
-            if(new_recombination_size > 1024)
-            {
-                current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
-            }
-            return;
+//            int new_recombination_size = (current_node->num_recombinations+1)*sizeof(int);
+//            if(new_recombination_size > 1024)
+//            {
+//                current_node->recombinations = (int *) realloc(current_node->recombinations, new_recombination_size);
+//            }
+//            return;
+            window_factor = window_factor * 2;
         }
-        
-        // remove recombination with smallest log likelihood and
-        // correspondingly reduce the number of branch SNPs
-        number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks,
-                                                                            number_of_candidate_blocks,
-                                                                            number_of_branch_snps,
-                                                                            snp_site_coords,
-                                                                            current_node->recombinations,
-                                                                            current_node->num_recombinations,
-                                                                            current_node,
-                                                                            block_file_pointer,
-                                                                            root,
-                                                                            snp_locations,
-                                                                            length_of_sequence,
-                                                                            gff_file_pointer,
-                                                                            candidate_block_likelihoods);
-        
-        branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
+        else
+        {
+            // remove recombination with smallest log likelihood and
+            // correspondingly reduce the number of branch SNPs
+            number_of_branch_snps = flag_smallest_log_likelihood_recombinations(candidate_blocks,
+                                                                                number_of_candidate_blocks,
+                                                                                number_of_branch_snps,
+                                                                                snp_site_coords,
+                                                                                current_node->recombinations,
+                                                                                current_node->num_recombinations,
+                                                                                current_node,
+                                                                                block_file_pointer,
+                                                                                root,
+                                                                                snp_locations,
+                                                                                length_of_sequence,
+                                                                                gff_file_pointer,
+                                                                                candidate_block_likelihoods);
+            
+            branch_genome_size = original_branch_genome_size  - current_node->total_bases_removed_excluding_gaps;
+//            free(candidate_blocks[0]);
+//            free(candidate_blocks[1]);
+//            free(candidate_blocks[2]);
+//            free(candidate_blocks[3]);
+//            free(candidate_block_likelihoods);
+        }
         free(candidate_blocks[0]);
         free(candidate_blocks[1]);
         free(candidate_blocks[2]);
         free(candidate_blocks[3]);
         free(candidate_block_likelihoods);
-
     }
     
     free(block_coordinates[0]) ;
@@ -742,6 +744,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
         {
             window_count[j] += 1;
         }
+        
     }
 
     int number_of_blocks = 0;
@@ -1064,13 +1067,16 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 
     if (cutoff < min_snps)
     {
-        cutoff = min_snps;
+        cutoff = min_snps - 1;
     }
     
+    // End if the SNP density of the branch is too high for the specified window size
     if (cutoff >= 2*(int)(window_size/2)) // Account for integer division/rounding in this condition
     {
         return 0; // In this case, it is impossible to call recombinations on the branch
     }
+    
+//    printf("Window size %i cutoff %i num_snps %i\n", window_size,cutoff,num_branch_snps);
     
 	return cutoff;
 }

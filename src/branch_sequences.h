@@ -26,7 +26,7 @@ void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
 void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps);
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps);
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor);
 double calculate_threshold(int branch_genome_size, int window_size, float uncorrected_p_value);
 int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps, float uncorrected_p_value);
 double reduce_factorial(int l, int i);

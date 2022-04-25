@@ -123,12 +123,12 @@ if __name__ == "__main__":
         with open(args.fastq,'r') as fastq_list:
             for line in fastq_list.readlines():
                 info = line.strip().split()
-                if os.path.isfile(fns[1]) and os.path.isfile(fns[2]):
+                if os.path.isfile(info[1]) and os.path.isfile(info[2]):
                     fastq_names.append((info[1],info[2]))
                     seq_names[info[1]] = info[0]
                     all_names.append(info[0])
                 else:
-                    sys.stderr.write('Unable to find files ' + fns[1] + ' and ' + fns[2] + '\n')
+                    sys.stderr.write('Unable to find files ' + info[1] + ' and ' + info[2] + '\n')
         # Sketch into split kmers
         with Pool(processes = args.threads) as pool:
             return_codes = pool.map(partial(map_fastq_sequence,

@@ -20,6 +20,7 @@ from numba import jit, njit, types, from_dtype
 from math import ceil
 import collections
 import datetime
+import psutil
 import multiprocessing
 try:
     from multiprocessing import Pool, shared_memory

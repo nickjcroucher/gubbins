@@ -667,7 +667,14 @@ def reconstruct_alignment_column(column_indices,
     
 
     # Extract information for iterations
+    with open(printer, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Creating square_numpy  " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     column_positions = convert_to_square_numpy_array(base_pattern_positions)
+    with open(printer, "a") as printero:
+        printero.write("Created square_numpy  " + str(datetime.datetime.now()) + "\n")
+        printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     columns = base_patterns[column_indices]
         
 

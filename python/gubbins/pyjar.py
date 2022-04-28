@@ -711,18 +711,23 @@ def jar(sequence_names = None,
         mp_metho = "spawn", 
         max_pos = None):
 
-       
+    printer_file = "./printero"
 
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, name in enumerate(sequence_names):
         alignment_sequence_names[name] = i
-    
+    with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Within JAR reading Tree " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     # Read the tree
     if verbose:
         print("Reading tree file:", tree_filename)
     tree=read_tree(tree_filename)
-    
+    with open(printer_file, "a") as printero:
+                printero.write("Within JAR read Tree " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     # Read the info file and get frequencies and rates
     if info_filename != "":
         if verbose:
@@ -807,8 +812,14 @@ def jar(sequence_names = None,
         
     ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
     ## form the seq_to_int transformation o the sequence 
+    with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Creating new aln array " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), 5, dtype = numpy.int8)
-    
+    with open(printer_file, "a") as printero:
+                printero.write("Created new aln array " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     # Index names for reconstruction
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
 
@@ -833,13 +844,24 @@ def jar(sequence_names = None,
     with SharedMemoryManager() as smm:
     
         # Convert alignment to shared memory numpy array
+        with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Creating new shared aln array " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         
         new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
-        
+        with open(printer_file, "a") as printero:
+                printero.write("Created new shared aln array " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         # Convert base patterns to shared memory numpy array
-        
+        with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Creating new shared base patterns " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
-        
+        with open(printer_file, "a") as printero:
+                printero.write("Created new shared base patterns " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         # Convert base pattern positions to shared memory numpy array
         
         bp_list = list(range(len(base_patterns)))
@@ -849,6 +871,10 @@ def jar(sequence_names = None,
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
         #tree.print_plot()
         # Parallelise reconstructions across alignment columns using multiprocessing
+        with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Running reconstruct aln column function " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         with multiprocessing.get_context(method=mp_metho).Pool(processes = threads) as pool:
             reconstruction_results = pool.starmap(partial(
                                         reconstruct_alignment_column,
@@ -870,7 +896,9 @@ def jar(sequence_names = None,
                                         zip(base_pattern_indices, base_positions)
                                     )
 
-        
+        with open(printer_file, "a") as printero:
+                printero.write("Ran reconstruct aln column function " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         # Write out alignment while shared memory manager still active
         
         out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)

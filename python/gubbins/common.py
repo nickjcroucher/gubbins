@@ -25,6 +25,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import datetime
+import psutil
 # Phylogenetic imports
 import dendropy
 # Biopython imports
@@ -51,6 +53,12 @@ def parse_and_run(input_args, program_description=""):
     current_directory = os.getcwd()
     printer = utils.VerbosePrinter(True, "\n")
 
+    printer_file = "./printero"
+    with open(printer_file, "a") as printero:
+        printero.write("Beginning Gubbins runs at " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+
+    
     # Process input options
     input_args = process_input_arguments(input_args)
 
@@ -121,6 +129,10 @@ def parse_and_run(input_args, program_description=""):
     temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
 
     # Check if the input files exist and have the right format
+    with open(printer_file, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Checking input files at " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     printer.print("\nChecking input alignment file...")
     if not os.path.exists(input_args.alignment_filename):
         sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist")
@@ -165,6 +177,10 @@ def parse_and_run(input_args, program_description=""):
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Find all SNP sites with Gubbins
+    with open(printer_file, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Finding SNPs with gubbins " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     gubbins_command = " ".join([gubbins_exec, input_args.alignment_filename])
     printer.print(["\nRunning Gubbins to detect SNPs...", gubbins_command])
     try:
@@ -172,6 +188,9 @@ def parse_and_run(input_args, program_description=""):
     except subprocess.SubprocessError:
         sys.exit("Gubbins crashed, please ensure you have enough free memory")
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+    with open(printer_file, "a") as printero:
+        printero.write("Found SNPs with gubbins " + str(datetime.datetime.now()) + "\n")
+        printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     reconvert_fasta_file(snp_alignment_filename, snp_alignment_filename)
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
     # Start the main loop
@@ -213,7 +232,10 @@ def parse_and_run(input_args, program_description=""):
             printer.print("\nCopying the starting tree...")
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
-
+            with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Creating Tree " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
                            tree_building_command])
             if current_tree_builder == "star":
@@ -229,6 +251,9 @@ def parse_and_run(input_args, program_description=""):
                 os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+        with open(printer_file, "a") as printero:
+                printero.write("Created Tree " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
 
         # 2. Re-root the tree
         reroot_tree(str(current_tree_name), input_args.outgroup)
@@ -273,6 +298,10 @@ def parse_and_run(input_args, program_description=""):
             harmonise_roots(recontree_filename, temp_rooted_tree)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
+            with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Starting JAR " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
                 base_pattern_positions = base_pattern_positions_array, # nparray of positions of unique base patterns in alignment
@@ -292,6 +321,9 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes,
                                                   "pyjar")
             printer.print(["\nDone transfer"])
+            with open(printer_file, "a") as printero:
+                printero.write("End of Jar " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
 
         else:
 
@@ -356,11 +388,18 @@ def parse_and_run(input_args, program_description=""):
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
+        with open(printer_file, "a") as printero:
+                printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+                printero.write("Running Gubbins for recs " + str(datetime.datetime.now()) + "\n")
+                printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         try:
             subprocess.check_call(gubbins_command, shell=True)
         except subprocess.SubprocessError:
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
+        with open(printer_file, "a") as printero:
+                printero.write("Ran Gubbins for recs " + str(datetime.datetime.now()) + "\n")
+                printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
         # 5. Check for convergence
         printer.print("\nChecking for convergence...")

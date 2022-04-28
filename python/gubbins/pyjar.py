@@ -618,6 +618,12 @@ def reconstruct_alignment_column(column_indices,
                                 threads = 1,
                                 verbose = False):
     
+    printer = "./printero"
+    with open(printer, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Within reconstruct aln column  " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+
     ### TIMING
     if verbose:
         prep_time = 0.0
@@ -625,8 +631,22 @@ def reconstruct_alignment_column(column_indices,
         prep_time_start = time.process_time()
 
     # Load shared memory output alignment
+    with open(printer, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Loading up shared memory aln  " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
+    with open(printer, "a") as printero:
+        printero.write("Loaded up shared memory aln  " + str(datetime.datetime.now()) + "\n")
+        printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
+    with open(printer, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("Creating out aln  " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     out_aln = numpy.ndarray(new_aln.shape, dtype = numpy.int8, buffer = out_aln_shm.buf)
+    with open(printer, "a") as printero:
+        printero.write("Created out aln  " + str(datetime.datetime.now()) + "\n")
+        printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     
     # Generate data structures for reconstructions
     tree = read_tree(tree_dest)
@@ -657,6 +677,10 @@ def reconstruct_alignment_column(column_indices,
         prep_time = prep_time_end - prep_time_start
         calc_time_start = time.process_time()
 
+    with open(printer, "a") as printero:
+        printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
+        printero.write("About to iterate over bases  " + str(datetime.datetime.now()) + "\n")
+        printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
     # Iterate over columns
     iterate_over_base_patterns(columns,
                                 column_positions,
@@ -676,7 +700,9 @@ def reconstruct_alignment_column(column_indices,
                                 node_index_to_aln_row,
                                 reconstructed_base_indices,
                                 node_snps)
-
+    with open(printer, "a") as printero:
+        printero.write("Iterated over bases  " + str(datetime.datetime.now()) + "\n")
+        printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
 
     ### TIMING
     if verbose:

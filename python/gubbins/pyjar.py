@@ -831,45 +831,73 @@ def jar(sequence_names = None,
         bp_list = list(range(len(base_patterns)))
         npatterns = len(base_patterns)
 
-        
-        
         if verbose:
             prep_time_end = time.process_time()
             prep_time = prep_time_end - prep_time_start
             calc_time_start = time.process_time()
 
-        # Parallelise reconstructions across alignment columns using multiprocessing
-        with multiprocessing.get_context(method=mp_method).Pool(processes = threads) as pool:
-            reconstruction_results = pool.starmap(partial(
-                                        reconstruct_alignment_column,
-                                            tree = tree,
-                                            preordered_nodes = preordered_nodes,
-                                            postordered_nodes = postordered_nodes,
-                                            leaf_nodes = leaf_nodes,
-                                            parent_nodes = parent_nodes,
-                                            child_nodes = child_nodes,
-                                            seed_node = seed_node,
-                                            node_pij = node_pij,
-                                            node_index_to_aln_row = node_index_to_aln_row,
-                                            ancestral_node_order = ancestral_node_order,
-                                            base_patterns = base_patterns_shared_array,
-                                            base_frequencies = f,
-                                            new_aln = new_aln_shared_array,
-                                            threads = threads,
-                                            verbose = verbose),
-                                        zip(bp_list, base_pattern_positions)
-                                    )
 
-        if verbose:
-            calc_time_end = time.process_time()
-            calc_time = (calc_time_end - calc_time_start)
+        if threads > 1:
 
-        # Write out alignment while shared memory manager still active
+            # Parallelise reconstructions across alignment columns using multiprocessing
+            with multiprocessing.get_context(method=mp_method).Pool(processes = threads) as pool:
+                reconstruction_results = pool.starmap(partial(
+                                            reconstruct_alignment_column,
+                                                tree = tree,
+                                                preordered_nodes = preordered_nodes,
+                                                postordered_nodes = postordered_nodes,
+                                                leaf_nodes = leaf_nodes,
+                                                parent_nodes = parent_nodes,
+                                                child_nodes = child_nodes,
+                                                seed_node = seed_node,
+                                                node_pij = node_pij,
+                                                node_index_to_aln_row = node_index_to_aln_row,
+                                                ancestral_node_order = ancestral_node_order,
+                                                base_patterns = base_patterns_shared_array,
+                                                base_frequencies = f,
+                                                new_aln = new_aln_shared_array,
+                                                threads = threads,
+                                                verbose = verbose),
+                                            zip(bp_list, base_pattern_positions)
+                                        )
+            
+            # Write out alignment while shared memory manager still active
+            out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
+            out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
+                     
+            # Release pool nodes
+            pool.join()
         
-        out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
-        out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
+        else:
         
-        
+            # Run as a loop on a single core
+            reconstruction_results = \
+                [
+                            reconstruct_alignment_column(
+                                b,
+                                p,
+                                tree = tree,
+                                preordered_nodes = preordered_nodes,
+                                postordered_nodes = postordered_nodes,
+                                leaf_nodes = leaf_nodes,
+                                parent_nodes = parent_nodes,
+                                child_nodes = child_nodes,
+                                seed_node = seed_node,
+                                node_pij = node_pij,
+                                node_index_to_aln_row = node_index_to_aln_row,
+                                ancestral_node_order = ancestral_node_order,
+                                base_patterns = base_patterns_shared_array,
+                                base_frequencies = f,
+                                new_aln = new_aln_shared_array,
+                                threads = threads,
+                                verbose = verbose) for b,p in zip(bp_list, base_pattern_positions)
+                ]
+            
+            # Extract final result
+            out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
+            out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
+
+        # Process outputs
         aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
         if verbose:
             print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
@@ -882,9 +910,6 @@ def jar(sequence_names = None,
                 asr_output.write('>' + taxon + '\n')
                 int_to_seq(out_aln[:,i], aln_line)
                 asr_output.write(''.join(aln_line) + "\n")
-             
-        # Release pool nodes
-        pool.join()
 
         # Combine results for each base across the alignment
         for node in tree.preorder_node_iter():

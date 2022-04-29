@@ -671,7 +671,8 @@ def reconstruct_alignment_column(column_indices,
         printero.write("~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~@~"  "\n")
         printero.write("Creating square_numpy  " + str(datetime.datetime.now()) + "\n")
         printero.write("Starting memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
-    column_positions = convert_to_square_numpy_array(base_pattern_positions)
+    #column_positions = convert_to_square_numpy_array(base_pattern_positions)
+    column_positions = base_pattern_positions
     with open(printer, "a") as printero:
         printero.write("Created square_numpy  " + str(datetime.datetime.now()) + "\n")
         printero.write("End memory usage: " + str(psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3) + "\n")
@@ -900,7 +901,8 @@ def jar(sequence_names = None,
         
         bp_list = list(range(len(base_patterns)))
         npatterns = len(base_patterns)
-        ntaxa_jumps = ceil(npatterns / threads)
+        #ntaxa_jumps = ceil(npatterns / threads)
+        ntaxa_jumps = npatterns
         base_pattern_indices = [bp_list[i: i + ntaxa_jumps] for i in range(0, len(bp_list), ntaxa_jumps)]
         base_positions = [base_pattern_positions[i:i + ntaxa_jumps] for i in range(0, len(base_pattern_positions), ntaxa_jumps)]
         #tree.print_plot()

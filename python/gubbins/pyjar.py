@@ -600,10 +600,10 @@ def reconstruct_alignment_column(column_index,
                                 verbose = False):
     
     ### TIMING
-    if verbose:
-        prep_time = 0.0
-        calc_time = 0.0
-        prep_time_start = time.process_time()
+    # if verbose:
+    #     prep_time = 0.0
+    #     calc_time = 0.0
+    #     prep_time_start = time.process_time()
 
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
@@ -629,10 +629,10 @@ def reconstruct_alignment_column(column_index,
     column = base_patterns[column_index]
 
     ### TIMING
-    if verbose:
-        prep_time_end = time.process_time()
-        prep_time = prep_time_end - prep_time_start
-        calc_time_start = time.process_time()
+    # if verbose:
+    #     prep_time_end = time.process_time()
+    #     prep_time = prep_time_end - prep_time_start
+    #     calc_time_start = time.process_time()
 
     # Iterate over columns
     iterate_over_base_patterns(column,
@@ -656,9 +656,9 @@ def reconstruct_alignment_column(column_index,
 
 
     ### TIMING
-    if verbose:
-        calc_time_end = time.process_time()
-        calc_time = (calc_time_end - calc_time_start)
+    # if verbose:
+    #     calc_time_end = time.process_time()
+    #     calc_time = (calc_time_end - calc_time_start)
 
     # Close shared memory
     out_aln_shm.close()
@@ -666,9 +666,9 @@ def reconstruct_alignment_column(column_index,
     
 
     ### TIMING
-    if verbose:
-        print('Time for JAR preparation:\t' + str(prep_time))
-        print('Time for JAR calculation:\t' + str(calc_time))
+    # if verbose:
+    #     print('Time for JAR preparation:\t' + str(prep_time))
+    #     print('Time for JAR calculation:\t' + str(calc_time))
 
     return node_snps
 
@@ -690,6 +690,10 @@ def jar(sequence_names = None,
         mp_method = "spawn",
         max_pos = None):
 
+    if verbose:
+            prep_time = 0.0
+            calc_time = 0.0
+            prep_time_start = time.process_time()
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, name in enumerate(sequence_names):
@@ -827,6 +831,12 @@ def jar(sequence_names = None,
         bp_list = list(range(len(base_patterns)))
         npatterns = len(base_patterns)
 
+        if verbose:
+            prep_time_end = time.process_time()
+            prep_time = prep_time_end - prep_time_start
+            calc_time_start = time.process_time()
+
+
         if threads > 1:
 
             # Parallelise reconstructions across alignment columns using multiprocessing
@@ -926,3 +936,6 @@ def jar(sequence_names = None,
 
     if verbose:
         print("Done")
+        print('Time for JAR preparation:\t' + str(prep_time))
+        print('Time for JAR calculation:\t' + str(calc_time))
+

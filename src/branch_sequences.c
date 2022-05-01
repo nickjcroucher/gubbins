@@ -515,7 +515,7 @@ void get_likelihood_for_windows(char * child_sequence, int length_of_sequence, i
                                                                                    length_of_sequence);
 
                 // minimum number of snps to be statistically significant in block
-                if(number_of_snps_in_block <= min_snps)
+                if(number_of_snps_in_block < min_snps)
                 {
                     block_coordinates[0][i] = -1;
                     block_coordinates[1][i] = -1;

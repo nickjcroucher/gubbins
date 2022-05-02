@@ -150,8 +150,7 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 			break;	
 		}
 	}
-    printf("i %i\tstart_index %i\twindow_start_coordinate %i\twindow_end_coordinate %i\n",
-           i,start_index,window_start_coordinate,window_end_coordinate);
+
 	if(last_snp_location > 0)
 	{
 		return snp_locations[last_snp_location] + 1 ;
@@ -218,7 +217,7 @@ int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence
 	
 	for(i = start_index; i < length_of_original_genome ; i++)
 	{
-		if(snp_locations[i]< ending_coordinate && snp_locations[i]>= starting_coordinate)
+		if(snp_locations[i]<= ending_coordinate && snp_locations[i]>= starting_coordinate)
 		{
 			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 			{

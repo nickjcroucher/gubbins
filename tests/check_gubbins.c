@@ -82,7 +82,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.gff") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
-	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 5);
+	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 4);
     ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
     ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
 

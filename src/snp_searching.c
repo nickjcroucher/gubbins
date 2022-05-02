@@ -150,7 +150,8 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 			break;	
 		}
 	}
-	
+    printf("i %i\tstart_index %i\twindow_start_coordinate %i\twindow_end_coordinate %i\n",
+           i,start_index,window_start_coordinate,window_end_coordinate);
 	if(last_snp_location > 0)
 	{
 		return snp_locations[last_snp_location] + 1 ;

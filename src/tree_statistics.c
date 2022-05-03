@@ -35,7 +35,7 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	char extension[7] = {".stats"};
 	concat_strings_created_with_malloc(base_filename,extension);
 	file_pointer = fopen(base_filename, "w");
-	fprintf( file_pointer, "Node\tTotal SNPs\tNumber of SNPs Inside Recombinations\tNum of SNPs Outside Recombinations\tNumber of Recombination Blocks\tBases in Recombinations\tCumulative Bases in Recombinations\tr/m\trho/theta\tGenome Length\tBases in Clonal Frame\n");
+	fprintf( file_pointer, "Node\tTotal SNPs\tNumber of SNPs Inside Recombinations\tNumber of SNPs Outside Recombinations\tNumber of Recombination Blocks\tBases in Recombinations\tCumulative Bases in Recombinations\tr/m\trho/theta\tGenome Length\tBases in Clonal Frame\n");
 
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{

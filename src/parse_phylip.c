@@ -299,6 +299,17 @@ void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, 
 	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_excluding_blocks_and_gaps = genome_length_excluding_blocks_and_gaps;
 }
 
+void set_number_of_branch_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
+{
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+    ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations = bases_in_recombinations;
+}
+
 void set_number_of_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
 {
 	int sample_index ;

@@ -152,7 +152,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	
 	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks);
     set_number_of_branch_bases_in_recombinations(root->taxon,
-                                                 calculate_number_of_bases_in_recombations_excluding_gaps(root->block_coordinates,
+                                                 calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates,
                                                                                                           root->number_of_blocks,
                                                                                                           child_sequence,
                                                                                                           snp_locations,

@@ -468,45 +468,27 @@ def iterate_over_base_patterns(column,
                         )
 
 # Convert integers to bases
-
 ###########################
 
 @njit(numba.void(numba.int8[:],
-
                  numba.typeof(numpy.dtype('U1'))[:]),
-
                 cache = True)
-
 def int_to_seq(seq,out_seq):
 
     for i,b in enumerate(seq):
-
         if b == 0:
-
             out_seq[i] = 'A'
-
         elif b == 1:
-
             out_seq[i] = 'C'
-
         elif b == 2:
-
             out_seq[i] = 'G'
-
         elif b == 3:
-
             out_seq[i] = 'T'
-
         elif b == 4:
-
             out_seq[i] = '-'
-
         elif b == 5:
-
             out_seq[i] = 'N'
-
         else:
-
             print('Unable to process integer')
 
 ##################
@@ -566,7 +548,8 @@ def get_base_patterns(prefix, verbose, threads = 1):
             array_of_position_arrays.append(subarray)
             subarray_max = numpy.amax(subarray)
             if subarray_max > array_max:
-                    array_max = subarray_max
+                array_max = subarray_max
+    array_max = array_max + 1
 
     # Record timing
     t2=time.process_time()

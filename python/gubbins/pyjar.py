@@ -600,10 +600,10 @@ def reconstruct_alignment_column(column_index,
                                 verbose = False):
     
     ### TIMING
-    # if verbose:
-    #     prep_time = 0.0
-    #     calc_time = 0.0
-    #     prep_time_start = time.process_time()
+    if verbose:
+        prep_time = 0.0
+        calc_time = 0.0
+        prep_time_start = time.process_time()
 
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
@@ -629,10 +629,10 @@ def reconstruct_alignment_column(column_index,
     column = base_patterns[column_index]
 
     ### TIMING
-    # if verbose:
-    #     prep_time_end = time.process_time()
-    #     prep_time = prep_time_end - prep_time_start
-    #     calc_time_start = time.process_time()
+    if verbose:
+        prep_time_end = time.process_time()
+        prep_time = prep_time_end - prep_time_start
+        calc_time_start = time.process_time()
 
     # Iterate over columns
     iterate_over_base_patterns(column,
@@ -654,21 +654,9 @@ def reconstruct_alignment_column(column_index,
                                 reconstructed_base_indices,
                                 node_snps)
 
-
-    ### TIMING
-    # if verbose:
-    #     calc_time_end = time.process_time()
-    #     calc_time = (calc_time_end - calc_time_start)
-
     # Close shared memory
     out_aln_shm.close()
     base_patterns_shm.close()
-    
-
-    ### TIMING
-    # if verbose:
-    #     print('Time for JAR preparation:\t' + str(prep_time))
-    #     print('Time for JAR calculation:\t' + str(calc_time))
 
     return node_snps
 
@@ -691,9 +679,9 @@ def jar(sequence_names = None,
         max_pos = None):
 
     if verbose:
-            prep_time = 0.0
-            calc_time = 0.0
-            prep_time_start = time.process_time()
+        prep_time = 0.0
+        calc_time = 0.0
+        prep_time_start = time.process_time()
     # Create a new alignment for the output containing all taxa in the input alignment
     alignment_sequence_names = {}
     for i, name in enumerate(sequence_names):
@@ -897,42 +885,47 @@ def jar(sequence_names = None,
             out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
             out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
 
-        # Process outputs
-        aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
-        if verbose:
-            print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
-        source = alignment_filename
-        destination = output_prefix+".joint.aln"
-        dest = shutil.copy(source, destination)
-        with open(dest, "a") as asr_output:
-            for i,node_index in enumerate(ancestral_node_order):
-                taxon = ancestral_node_indices[node_index]
-                asr_output.write('>' + taxon + '\n')
-                int_to_seq(out_aln[:,i], aln_line)
-                asr_output.write(''.join(aln_line) + "\n")
+    # Process outputs
+    aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
+    if verbose:
+        print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
+    source = alignment_filename
+    destination = output_prefix+".joint.aln"
+    dest = shutil.copy(source, destination)
+    with open(dest, "a") as asr_output:
+        for i,node_index in enumerate(ancestral_node_order):
+            taxon = ancestral_node_indices[node_index]
+            asr_output.write('>' + taxon + '\n')
+            int_to_seq(out_aln[:,i], aln_line)
+            asr_output.write(''.join(aln_line) + "\n")
 
-        # Combine results for each base across the alignment
-        for node in tree.preorder_node_iter():
-            node.edge_length = 0.0 # reset lengths to convert to SNPs
-            node_index = node_indices[node.taxon.label]
-            for x in range(len(reconstruction_results)):
-                try:
-                    node.edge_length += reconstruction_results[x][node_index];
-                except AttributeError:
-                    continue
+    # Combine results for each base across the alignment
+    for node in tree.preorder_node_iter():
+        node.edge_length = 0.0 # reset lengths to convert to SNPs
+        node_index = node_indices[node.taxon.label]
+        for x in range(len(reconstruction_results)):
+            try:
+                node.edge_length += reconstruction_results[x][node_index];
+            except AttributeError:
+                continue
 
-        # Print tree
-        from gubbins.common import tree_as_string
-        
-        if verbose:
-            print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
-        with open(output_prefix+".joint.tre", "w") as tree_output:
-        
-            recon_tree = tree_as_string(tree,
-                                        suppress_rooting=True,
-                                        suppress_internal=False)
-            print(recon_tree.replace('\'', ''),
-                  file = tree_output)
+    ### TIMING
+    if verbose:
+        calc_time_end = time.process_time()
+        calc_time = (calc_time_end - calc_time_start)
+
+    # Print tree
+    from gubbins.common import tree_as_string
+    
+    if verbose:
+        print("Printing tree with internal nodes labelled: ", output_prefix+".joint.tre")
+    with open(output_prefix+".joint.tre", "w") as tree_output:
+    
+        recon_tree = tree_as_string(tree,
+                                    suppress_rooting=True,
+                                    suppress_internal=False)
+        print(recon_tree.replace('\'', ''),
+              file = tree_output)
 
     if verbose:
         print("Done")

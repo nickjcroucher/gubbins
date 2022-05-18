@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         suppress_item_comments=True,
                         node_label_element_separator=' '
                     )
-    with open(output_tree_name) as tree_out:
+    with open(output_tree_name,'w') as tree_out:
         tree_out.write(clade_tree_string.replace('\'', '') + '\n')
 
     # Identify relevant recombination blocks

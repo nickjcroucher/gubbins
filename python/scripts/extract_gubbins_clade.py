@@ -99,8 +99,26 @@ if __name__ == "__main__":
                              schema = 'newick',
                              preserve_underscores = True)
     tree.retain_taxa_with_labels(subset)
-    tree.write_to_path(output_tree_name,
-                        'newick')
+    
+    # Output tree
+    clade_tree_string = tree.as_string(
+                        schema='newick',
+                        suppress_leaf_taxon_labels=False,
+                        suppress_leaf_node_labels=True,
+                        suppress_internal_taxon_labels=True,
+                        suppress_internal_node_labels=True,
+                        suppress_rooting=True,
+                        suppress_edge_lengths=False,
+                        unquoted_underscores=True,
+                        preserve_spaces=False,
+                        store_tree_weights=False,
+                        suppress_annotations=True,
+                        annotations_as_nhx=False,
+                        suppress_item_comments=True,
+                        node_label_element_separator=' '
+                    )
+    with open(output_tree_name) as tree_out:
+        tree_out.write(clade_tree_string.replace('\'', '') + '\n')
 
     # Identify relevant recombination blocks
     output_gff_name = args.out + '.gff'

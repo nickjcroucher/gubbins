@@ -199,7 +199,7 @@ if __name__ == "__main__":
                                         node_label_element_separator=' '
                                     )
                 with open(clade_name + '.tre','w') as tree_out:
-                    tree_out.write(clade_tree_string + '\n')
+                    tree_out.write(clade_tree_string.replace('\'', '') + '\n')
             clade_info = {label:0 for label in info_labels + tree_info_labels}
             for node in clade_tree.preorder_node_iter():
                 if node != clade_tree.seed_node:

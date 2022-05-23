@@ -31,62 +31,62 @@ int * column_data;
 
 void get_integers_from_column_in_vcf(FILE * vcf_file_pointer, int * integer_values, int number_of_snps, int column_number)
 {
-	rewind(vcf_file_pointer);
-	char * szBuffer;
-	szBuffer = (char *) calloc(MAX_READ_BUFFER,sizeof(char));
-	int reference_index = 0;
-	char result[1000] = {0};  
-	
-	do{
-		szBuffer[0] = '\0';
- 		// check the first character of the line to see if its in the header
-  	szBuffer = read_line(szBuffer, vcf_file_pointer);
-		
-		if(szBuffer[0] == '\0')
-		{
-			break;
-		}
-		
-		if(szBuffer[0] != '#')
-		{
-			split_string_and_return_specific_index(result, szBuffer, column_number,100000);
-			integer_values[reference_index] = atoi(result);
-			reference_index++;
-		}
-		
-	}while(szBuffer[0] != '\0');
-	free(szBuffer);
+    rewind(vcf_file_pointer);
+    char * szBuffer;
+    szBuffer = (char *) calloc(MAX_READ_BUFFER,sizeof(char));
+    int reference_index = 0;
+    char result[1000] = {0};
+
+    do{
+        szBuffer[0] = '\0';
+        // check the first character of the line to see if its in the header
+        szBuffer = read_line(szBuffer, vcf_file_pointer);
+
+        if(szBuffer[0] == '\0')
+        {
+            break;
+        }
+
+        if(szBuffer[0] != '#')
+        {
+            split_string_and_return_specific_index(result, szBuffer, column_number,100000);
+            integer_values[reference_index] = atoi(result);
+            reference_index++;
+        }
+
+    }while(szBuffer[0] != '\0');
+    free(szBuffer);
 }
 
 
 void get_sequence_from_column_in_vcf(FILE * vcf_file_pointer, char * sequence_bases, int number_of_snps, int column_number)
 {
-	rewind(vcf_file_pointer);
-	char * szBuffer;
-	szBuffer = (char *) calloc(MAX_READ_BUFFER,sizeof(char));
-	int reference_index = 0;
-	char result[1000] = {0};  
-		
-	do{
-		szBuffer[0] = '\0';
-		// check the first character of the line to see if its in the header
-		szBuffer = read_line(szBuffer, vcf_file_pointer);
-		
-		if(szBuffer[0] == '\0')
-		{
-			break;
-		}
-		
-		if(szBuffer[0] != '#')
-		{
-			split_string_and_return_specific_index(result, szBuffer, column_number, 1000);
-			sequence_bases[reference_index] = result[0];
-			reference_index++;
-		}
-		
-	}while(szBuffer[0] != '\0');
-	
-	sequence_bases[reference_index] = '\0';
+    rewind(vcf_file_pointer);
+    char * szBuffer;
+    szBuffer = (char *) calloc(MAX_READ_BUFFER,sizeof(char));
+    int reference_index = 0;
+    char result[1000] = {0};
+
+    do{
+        szBuffer[0] = '\0';
+        // check the first character of the line to see if its in the header
+        szBuffer = read_line(szBuffer, vcf_file_pointer);
+
+        if(szBuffer[0] == '\0')
+        {
+            break;
+        }
+
+        if(szBuffer[0] != '#')
+        {
+            split_string_and_return_specific_index(result, szBuffer, column_number, 1000);
+            sequence_bases[reference_index] = result[0];
+            reference_index++;
+        }
+
+    }while(szBuffer[0] != '\0');
+
+    sequence_bases[reference_index] = '\0';
 }
 
 void split_string_and_return_specific_index(char * result, char * input_string, int token_index, int input_string_length)

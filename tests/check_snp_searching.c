@@ -150,73 +150,72 @@ END_TEST
 
 START_TEST (check_get_window_end_coordinates_excluding_gaps)
 {
-  int coords_empty[0] = {};
-  int coords_one[1]   = {1};
-  int coords_odd[3]   = {1,3,5};
-  int coords_even[8]  = {1,3,5,7,11,13,17,19};
-	char *child_sequence_without_gaps = "ACGTACGT";
-	char *child_sequence_with_gaps = "-AC-GT-A";
-	
-	//int get_window_end_coordinates_excluding_gaps(1, 3, coords_even, char * child_sequence, int number_of_snps)
+    int coords_empty[0] = {};
+    int coords_one[1]   = {1};
+    int coords_odd[3]   = {1,3,5};
+    int coords_even[8]  = {1,3,5,7,11,13,17,19};
+    char *child_sequence_without_gaps = "ACGTACGT";
+    char *child_sequence_with_gaps = "-AC-GT-A";
 
-	ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_empty,child_sequence_without_gaps,  0) == 3);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_one,  child_sequence_without_gaps,  1) == 3);
-	ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_without_gaps,  1) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
+    //int get_window_end_coordinates_excluding_gaps(1, 3, coords_even, char * child_sequence, int number_of_snps)
 
-  ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_without_gaps,  3) == 3);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_empty,child_sequence_without_gaps,  0) == 3);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_one,  child_sequence_without_gaps,  1) == 3);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_without_gaps,  1) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
 
-  ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_without_gaps,  3) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_without_gaps,  8) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_without_gaps,  8) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_without_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_without_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_without_gaps,  8) == 12);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_without_gaps,  8) == 3);
-  ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_without_gaps,  8) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_without_gaps,  8) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_without_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_without_gaps,  8) == 11);
-           
-	ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_empty,child_sequence_with_gaps,  0) == 3);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_one,  child_sequence_with_gaps,  1) == 4);
-	ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_with_gaps,  1) == 5);
-  ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_with_gaps,  8) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_with_gaps,  8) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_with_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_with_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_with_gaps,  8) == 12);
-  ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_with_gaps,  8) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_with_gaps,  8) == 4);
-  ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_with_gaps,  8) == 6);
-  ck_assert( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_with_gaps,  8) == 8);
-  ck_assert( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_with_gaps,  8) == 11);
-	
+    ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_without_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_without_gaps,  8) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_without_gaps,  8) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_without_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_without_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_without_gaps,  8) == 12);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_without_gaps,  8) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_without_gaps,  8) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_without_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_without_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_without_gaps,  8) == 12);
+
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_empty,child_sequence_with_gaps,  0) == 3);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_one,  child_sequence_with_gaps,  1) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_one,  child_sequence_with_gaps,  1) == 5);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_odd,  child_sequence_with_gaps,  3) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_odd,  child_sequence_with_gaps,  3) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(1, 3, coords_even, child_sequence_with_gaps,  8) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(3, 3, coords_even, child_sequence_with_gaps,  8) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(5, 3, coords_even, child_sequence_with_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(7, 3, coords_even, child_sequence_with_gaps,  8) == 12);
+    ck_assert( get_window_end_coordinates_excluding_gaps(9, 3, coords_even, child_sequence_with_gaps,  8) == 12);
+    ck_assert( get_window_end_coordinates_excluding_gaps(0, 3, coords_even, child_sequence_with_gaps,  8) == 4);
+    ck_assert( get_window_end_coordinates_excluding_gaps(2, 3, coords_even, child_sequence_with_gaps,  8) == 6);
+    ck_assert( get_window_end_coordinates_excluding_gaps(4, 3, coords_even, child_sequence_with_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(6, 3, coords_even, child_sequence_with_gaps,  8) == 8);
+    ck_assert( get_window_end_coordinates_excluding_gaps(8, 3, coords_even, child_sequence_with_gaps,  8) == 12);
+
 }
 END_TEST
 
 START_TEST (check_find_number_of_snps_in_block)
 {
-  int coords_empty[0] = {};
-  int coords_even[8]  = {1,3,5,7,11,13,17,19};
-	char *child_sequence = "AAAAA-AAAAAAAAAAAAA";
+    int coords_empty[0] = {};
+    int coords_even[8]  = {1,3,5,7,11,13,17,19};
+    char *child_sequence = "AAAAA-AAAAAAAAAAAAA";
 
-	ck_assert( find_number_of_snps_in_block(1,3,  coords_empty, child_sequence, 0) == 0);
-	ck_assert( find_number_of_snps_in_block(2,2,  coords_even, child_sequence, 8) == 0);
-	ck_assert( find_number_of_snps_in_block(1,3,  coords_even, child_sequence, 8) == 1);
-  ck_assert( find_number_of_snps_in_block(1,4,  coords_even, child_sequence, 8) == 2);
-  ck_assert( find_number_of_snps_in_block(1,5,  coords_even, child_sequence, 8) == 2);
-  ck_assert( find_number_of_snps_in_block(1,19, coords_even, child_sequence, 8) == 7);
-  ck_assert( find_number_of_snps_in_block(0,20, coords_even, child_sequence, 8) == 8);
+    ck_assert( find_number_of_snps_in_block(1,3,  coords_empty, child_sequence, 0) == 0);
+    ck_assert( find_number_of_snps_in_block(2,2,  coords_even, child_sequence, 8) == 0);
+    ck_assert( find_number_of_snps_in_block(1,3,  coords_even, child_sequence, 8) == 2);
+    ck_assert( find_number_of_snps_in_block(1,4,  coords_even, child_sequence, 8) == 2);
+    ck_assert( find_number_of_snps_in_block(1,5,  coords_even, child_sequence, 8) == 3);
+    ck_assert( find_number_of_snps_in_block(1,19, coords_even, child_sequence, 8) == 8);
+    ck_assert( find_number_of_snps_in_block(0,20, coords_even, child_sequence, 8) == 8);
 	
 }
 END_TEST

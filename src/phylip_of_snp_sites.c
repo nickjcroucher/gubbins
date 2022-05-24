@@ -66,6 +66,6 @@ void create_phylip_of_snp_sites(char filename[], int number_of_snps, char ** bas
 		}
 		fprintf( fasta_file_pointer, "\n");
 	}
-  fclose(fasta_file_pointer);
-	free(base_filename);
+    fclose(fasta_file_pointer);
+    free(base_filename);
 }

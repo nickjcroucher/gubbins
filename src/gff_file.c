@@ -31,16 +31,16 @@ void print_gff_header(FILE * gff_file_pointer, int genome_length)
 
 void print_gff_line(FILE * gff_file_pointer, int start_coordinate, int end_coordinate, int number_of_snps, char * current_node_id, char * parent_node_id, char * taxon_names, double  neg_log_likelihood)
 {
-	fprintf(gff_file_pointer, "SEQUENCE\tGUBBINS\tCDS\t");
-  fprintf(gff_file_pointer, "%d\t",start_coordinate);
-  fprintf(gff_file_pointer, "%d\t",end_coordinate);
-	fprintf(gff_file_pointer, "0.000\t.\t0\t");
-	
-	fprintf(gff_file_pointer, "node=\"%s->%s\";", parent_node_id, current_node_id );
-	fprintf(gff_file_pointer, "neg_log_likelihood=\"%f\";", neg_log_likelihood);
-	fprintf(gff_file_pointer, "taxa=\"%s\";", taxon_names);
-	fprintf(gff_file_pointer, "snp_count=\"%d\";", number_of_snps);
-	fprintf(gff_file_pointer, "\n");
-	
-  fflush(gff_file_pointer);
+    fprintf(gff_file_pointer, "SEQUENCE\tGUBBINS\tCDS\t");
+    fprintf(gff_file_pointer, "%d\t",start_coordinate);
+    fprintf(gff_file_pointer, "%d\t",end_coordinate);
+    fprintf(gff_file_pointer, "0.000\t.\t0\t");
+
+    fprintf(gff_file_pointer, "node=\"%s->%s\";", parent_node_id, current_node_id );
+    fprintf(gff_file_pointer, "neg_log_likelihood=\"%f\";", neg_log_likelihood);
+    fprintf(gff_file_pointer, "taxa=\"%s\";", taxon_names);
+    fprintf(gff_file_pointer, "snp_count=\"%d\";", number_of_snps);
+    fprintf(gff_file_pointer, "\n");
+
+    fflush(gff_file_pointer);
 }

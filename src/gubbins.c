@@ -39,16 +39,16 @@
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
-void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max)
+void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	load_sequences_from_multifasta_file(multi_fasta_filename);
-	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename,window_min, window_max);
+	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value, trimming_ratio, extensive_search_flag);
 	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
 	freeup_memory();
 }
 
 
-void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[],int min_snps, char original_multi_fasta_filename[], int window_min, int window_max)
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[],int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
@@ -74,7 +74,7 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	
 	get_integers_from_column_in_vcf(vcf_file_pointer, snp_locations, number_of_snps, column_number_for_column_name(column_names, "POS", number_of_columns));
 
-	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, length_of_original_genome,min_snps,window_min, window_max);
+	root_node = build_newick_tree(tree_filename, vcf_file_pointer,snp_locations, number_of_snps, column_names, number_of_columns, length_of_original_genome,min_snps,window_min, window_max, uncorrected_p_value, trimming_ratio, extensive_search_flag);
 	fclose(vcf_file_pointer);
 
 	int* filtered_snp_locations = calloc((number_of_snps+1), sizeof(int));

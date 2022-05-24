@@ -108,11 +108,28 @@ def parse_and_run(input_args, program_description=""):
     gaps_vcf_filename = base_filename + ".gaps.vcf"
     joint_sequences_filename = base_filename + ".seq.joint.aln"
 
+    # If restarting from a previous run
+    starting_iteration = 1
+    if input_args.resume is not None:
+        search_itr = re.search(r'iteration_(\d+)', input_args.resume)
+        if search_itr is None:
+            sys.stderr.write('Resuming a Gubbins run requires a tree file name containing the phrase "iteration_X"\n')
+            exit(1)
+        else:
+            starting_iteration = int(search_itr.group(1)) + 1
+            if starting_iteration >= input_args.iterations:
+                sys.stderr.write('Run has already reached the number of specified iterations\n')
+                exit(1)
+            else:
+                sys.stderr.write('Resuming Gubbins analysis at iteration ' + str(starting_iteration) + '\n')
+            input_args.starting_tree = input_args.resume
+            current_tree_name = input_args.starting_tree
+
     # Check if intermediate files from a previous run exist
     intermediate_files = [basename + ".iteration_"]
-    if not input_args.no_cleanup:
+    if not input_args.no_cleanup and input_args.resume is None:
         utils.delete_files(".", intermediate_files, "", input_args.verbose)
-    if utils.do_files_exist(".", intermediate_files, "", input_args.verbose):
+    if utils.do_files_exist(".", intermediate_files, "", input_args.verbose) and input_args.resume is None:
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
@@ -176,11 +193,11 @@ def parse_and_run(input_args, program_description=""):
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
     # Start the main loop
     printer.print("\nEntering the main loop.")
-    for i in range(1, input_args.iterations+1):
+    for i in range(starting_iteration, input_args.iterations+1):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2:
+        if i == 2 or input_args.resume is not None:
             # Select the algorithms used for the subsequent iterations
             current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
             # Initialise tree builder
@@ -247,7 +264,7 @@ def parse_and_run(input_args, program_description=""):
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
             
-            if i == 1:
+            if i == starting_iteration:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 
@@ -281,6 +298,7 @@ def parse_and_run(input_args, program_description=""):
                 info_filename = info_filename, # file containing evolutionary model parameters
                 info_filetype = input_args.model_fitter, # model fitter - format of file containing evolutionary model parameters
                 output_prefix = temp_working_dir + "/" + ancestral_sequence_basename, # output prefix
+                outgroup_name = input_args.outgroup, # outgroup for rooting and reconstruction
                 threads = input_args.threads, # number of cores to use
                 verbose = input_args.verbose,
                 max_pos = max_pos)
@@ -354,7 +372,8 @@ def parse_and_run(input_args, program_description=""):
         shutil.copyfile(current_tree_name_with_internal_nodes, current_tree_name)
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
-            input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size)
+            input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size,
+            input_args.p_value, input_args.trimming_ratio, input_args.extensive_search)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         try:
             subprocess.check_call(gubbins_command, shell=True)
@@ -617,12 +636,15 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     return initialised_algorithm
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
-                           original_alignment_filename, min_snps, min_window_size, max_window_size):
+                           original_alignment_filename, min_snps, min_window_size, max_window_size,
+                           p_value, trimming_ratio, extensive_search):
     command = [gubbins_exec, "-r", "-v", vcf_filename, "-a", str(min_window_size),
                "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
-               "-m", str(min_snps), alignment_filename]
+               "-m", str(min_snps), "-p", str(p_value), "-i", str(trimming_ratio)]
+    if extensive_search:
+            command.append("-x")
+    command.append(alignment_filename)
     return " ".join(command)
-
 
 def number_of_sequences_in_alignment(filename):
     return len(get_sequence_names_from_alignment(filename))
@@ -734,14 +756,13 @@ def reroot_tree(tree_name, outgroups):
 
 def reroot_tree_with_outgroup(tree_name, outgroups):
     clade_outgroups = get_monophyletic_outgroup(tree_name, outgroups)
-    outgroups = [{'name': taxon_name} for taxon_name in clade_outgroups]
-
-    tree = Phylo.read(tree_name, 'newick')
-    tree.root_with_outgroup(*outgroups)
-    Phylo.write(tree, tree_name, 'newick')
-
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
-    tree.deroot()
+    outgroup_mrca = tree.mrca(taxon_labels=clade_outgroups)
+    print('Edge length is: ' + str(outgroup_mrca.edge.length))
+    tree.reroot_at_edge(outgroup_mrca.edge,
+                        length1 = outgroup_mrca.edge.length/2,
+                        length2 = outgroup_mrca.edge.length/2,
+                        update_bipartitions=False)
     tree.update_bipartitions()
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:

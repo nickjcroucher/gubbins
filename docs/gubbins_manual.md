@@ -170,7 +170,7 @@ Gubbins was originally designed to use a [joint ancestral state reconstruction](
 
 ### Recombination detection options
 
-Recombination is detected using a [spatial scanning statistic](https://link.springer.com/chapter/10.1007/978-1-4612-1578-3_14), which relies on a sliding window. The size of this window may need to be reduced if you apply Gubbins to very small genomes (e.g. viruses).
+Recombination is detected using a [spatial scanning statistic](https://link.springer.com/chapter/10.1007/978-1-4612-1578-3_14), which relies on a sliding window. The size of this window may need to be reduced if you apply Gubbins to very small genomes (e.g. viruses). To increase the sensitivity for detecting recombinations, `--min-snps` can be set at the minimum value of 2; the `--p-value` threshold required to detect recombinations can be increased; the `--trimming-ratio` can be raised above 1.0, to disfavour the trimming of recombination edges; and the `--extensive-search` mode can be used.
 
 ```
   --min-snps MIN_SNPS, -m MIN_SNPS
@@ -179,18 +179,25 @@ Recombination is detected using a [spatial scanning statistic](https://link.spri
                         Minimum window size (default: 100)
   --max-window-size MAX_WINDOW_SIZE, -b MAX_WINDOW_SIZE
                         Maximum window size (default: 10000)
+  --p-value P_VALUE     Uncorrected p value used to identify recombinations (default: 0.05)
+  --trimming-ratio TRIMMING_RATIO
+                        Ratio of log probabilities used to trim recombinations (default: 1.0)
+  --extensive-search    Undertake slower, more thorough, search for recombination (default: False)
 ```
 
-### Algorithm stop options
+### Algorithm stop and restart options
 
-Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG). In practice, there is little improvement to the tree after three iterations.
+Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Normally the algorithm will stop after reaching the maximum number of iterations. Should the run fail or stall before this point, the analysis can be restarted from the last iteration that successfully completed by providing a tree through the `--resume` flag (all other flags should be kept identical to the original commend, including `--iterations`). Note that although only the tree is provided to `--resume`, the corresponding alignment generated at the end of the same iteration also needs to be available within the same directory.
 
 ```
   --iterations ITERATIONS, -i ITERATIONS
                         Maximum No. of iterations (default: 5)
   --converge-method {weighted_robinson_foulds,robinson_foulds,recombination}, -z {weighted_robinson_foulds,robinson_foulds,recombination}
                         Criteria to use to know when to halt iterations (default: weighted_robinson_foulds)
+  --resume RESUME       Intermediate tree from previous run (must include "iteration_X" in file name) (default: None)
 ```
+
+Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG).
 
 ## Output files
 
@@ -221,13 +228,15 @@ The `.per_branch_statistics.csv` file contains summary statistics for each branc
 
 * **Node** - Name of the node subtended by the branch. This can either be one of the taxa included in the input alignment, or an internal node, which are numbered 
 * **Total SNPs** - Total number of base substitutions reconstructed onto the branch
-* **Num of SNPs inside recombinations** - Number of base substitutions reconstructed onto the branch that fall within a predicted recombination (*r*)
-* **Num of SNPs outside recombinations** - Number of base substitutions reconstructed onto the branch that fall outside of a predicted recombination. i.e. predicted to have arisen by point mutation (*m*)
-* **Num of Recombination Blocks** - Total number of recombination blocks reconstructed onto the branch
-* **Bases in recombinations** - Total length of all recombination events reconstructed onto the branch
+* **Number of SNPs Inside Recombinations** - Number of base substitutions reconstructed onto the branch that fall within a predicted recombination (*r*)
+* **Number of SNPs Outside Recombinations** - Number of base substitutions reconstructed onto the branch that fall outside of a predicted recombination. i.e. predicted to have arisen by point mutation (*m*)
+* **Number of Recombination Blocks** - Total number of recombination blocks reconstructed onto the branch
+* **Bases in Recombinations** - Total length of all recombination events reconstructed onto the branch
+* **Cumulative Bases in Recombinations** - Total number of bases in the alignment affected by recombination on this branch and its ancestors
 * ***r/m*** - The r/m value for the branch. This value gives a measure of the relative impact of recombination and mutation on the variation accumulated on the branch
 * ***rho/theta*** - The ratio of the number of recombination events to point mutations on a branch; a measure of the relative rates of recombination and point mutation
 * **Genome Length** - The total number of aligned bases between the ancestral and descendent nodes for the branch excluding any missing data or gaps in either
+* **Bases in Clonal Frame** - The number of called bases at the descendant node that have not been affected by recombination on this branch or an ancestor (i.e., the length of sequence that can be used for phylogenetic interpretation)
 
 Note that all positions in the output files are relative to the input alignment. If you wish to compare the positions of recombinations relative to a reference annotation, their coordinates will need to be adjusted to account for any gaps in the reference sequence introduced when generating the alignment.
 

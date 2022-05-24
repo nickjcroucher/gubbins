@@ -64,7 +64,7 @@ int number_of_recombinations_in_file(char * fileName)
 	{
 		++lines;
 	}
-  return  (int) lines/5;
+  return  (int) lines/6;
 }
 
 int file_exists(char * fileName)

@@ -120,12 +120,33 @@ def parse_input_args():
                                                       help='Minimum window size', type=int, default=100)
     gubbinsGroup.add_argument('--max-window-size','-b',
                                                       help='Maximum window size', type=int, default=10000)
+    gubbinsGroup.add_argument('--p-value',
+                                                      help='Uncorrected p value used to identify recombinations',
+                                                      type=float,
+                                                      default=0.05)
+    gubbinsGroup.add_argument('--trimming-ratio',
+                                                      help='Ratio of log probabilities used to trim recombinations',
+                                                      type=float,
+                                                      default=1.0)
+    gubbinsGroup.add_argument('--extensive-search',
+                                                      help='Undertake slower, more thorough, search for recombination',
+                                                      action='store_true',
+                                                      default=False)
 
-    stopGroup = parser.add_argument_group('Algorithm stop options')
-    stopGroup.add_argument('--iterations',      '-i', help='Maximum No. of iterations', type=int, default=5)
-    stopGroup.add_argument('--converge-method', '-z', help='Criteria to use to know when to halt iterations',
-                        default='weighted_robinson_foulds', choices=['weighted_robinson_foulds', 'robinson_foulds',
+    stopGroup = parser.add_argument_group('Algorithm start/stop options')
+    stopGroup.add_argument('--iterations',      '-i',
+                                                        help='Maximum No. of iterations',
+                                                        type=int,
+                                                        default=5)
+    stopGroup.add_argument('--converge-method', '-z',
+                                                        help='Criteria to use to know when to halt iterations',
+                                                        default='weighted_robinson_foulds',
+                                                        choices=['weighted_robinson_foulds', 'robinson_foulds',
                                                                      'recombination'])
+    stopGroup.add_argument('--resume',
+                                                        help='Intermediate tree from previous run (must include'
+                                                        ' "iteration_X" in file name)',
+                                                        default=None)
     return parser
 
 

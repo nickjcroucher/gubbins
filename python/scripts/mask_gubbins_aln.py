@@ -29,6 +29,7 @@ from Bio import Phylo
 from Bio import SeqIO
 from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
+from Bio.Seq import MutableSeq
 
 # command line parsing
 def get_options():
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     alignment = AlignIO.read(args.aln,'fasta')
     for taxon in alignment:
         overall_taxon_list.append(taxon.id)
-        taxon.seq = taxon.seq.tomutable()
+        taxon.seq = MutableSeq(taxon.seq)
     overall_taxon_set = set(overall_taxon_list)
     
     # Read recombinant regions from GFF

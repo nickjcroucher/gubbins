@@ -61,15 +61,15 @@ int get_internal_node(int sequence_index)
 
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 {
-	int sequence_index;
-	sequence_index = find_sequence_index_from_sample_name( sample_name);
-	if(sequence_index < 0)
-	{
-    printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
-	  exit(1);
-  }
+    int sequence_index;
+    sequence_index = find_sequence_index_from_sample_name( sample_name);
+    if(sequence_index < 0)
+    {
+        printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
+        exit(1);
+    }
 
-	memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
+    memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
 }
 
 
@@ -99,36 +99,36 @@ void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index,
 
 void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(int parent_sequence_index, int * child_sequence_indices, int num_children)
 {
-	int snp_counter = 0; 
+    int snp_counter = 0;
 
-	for(snp_counter = 0; snp_counter < num_snps ; snp_counter++)
-	{
-		if(toupper(sequences[parent_sequence_index][snp_counter]) != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
-		{
-			break;
-		}
-		
-		int child_counter = 0;
+    for(snp_counter = 0; snp_counter < num_snps ; snp_counter++)
+    {
+        if(toupper(sequences[parent_sequence_index][snp_counter]) != 'N' && sequences[parent_sequence_index][snp_counter] != '-')
+        {
+            break;
+        }
+
+        int child_counter = 0;
         char comparison_base = '\0';
-		for(child_counter = 0 ; child_counter < num_children ; child_counter++)
-		{
-			int child_index = child_sequence_indices[child_counter];
-		  if(child_counter == 0)
-			{
-				comparison_base = toupper(sequences[child_index][snp_counter]);
-			}
-		
-			if(comparison_base !=  toupper(sequences[child_index][snp_counter])  )
-			{
-				break;
-			}
-		}
-		
-		if(toupper(sequences[parent_sequence_index][snp_counter]) != comparison_base)
-		{
-			sequences[parent_sequence_index][snp_counter] = comparison_base;
-		}
-	}
+        for(child_counter = 0 ; child_counter < num_children ; child_counter++)
+        {
+            int child_index = child_sequence_indices[child_counter];
+            if(child_counter == 0)
+            {
+                comparison_base = toupper(sequences[child_index][snp_counter]);
+            }
+
+            if(comparison_base !=  toupper(sequences[child_index][snp_counter])  )
+            {
+                break;
+            }
+        }
+
+        if(toupper(sequences[parent_sequence_index][snp_counter]) != comparison_base)
+        {
+            sequences[parent_sequence_index][snp_counter] = comparison_base;
+        }
+    }
 }
 
 int does_column_contain_snps(int snp_column, char reference_base)
@@ -239,52 +239,52 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 
 void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-  if( sample_index == -1)
-  {
-		return;
-	}
-	((sample_statistics *) statistics_for_samples[sample_index])->number_of_recombinations = number_of_recombinations;
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+    ((sample_statistics *) statistics_for_samples[sample_index])->number_of_recombinations = number_of_recombinations;
 }
 
 
 void set_number_of_snps_for_sample(char * sample_name, int number_of_snps)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-  if( sample_index == -1)
-  {
-		return;
-	}
-	
-	((sample_statistics *) statistics_for_samples[sample_index])->number_of_snps = number_of_snps;
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+
+    ((sample_statistics *) statistics_for_samples[sample_index])->number_of_snps = number_of_snps;
 }
 
 void set_number_of_blocks_for_sample(char * sample_name,int num_blocks)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-  if( sample_index == -1)
-  {
-		return;
-	}
-	
-	((sample_statistics *) statistics_for_samples[sample_index])->number_of_blocks = num_blocks;
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+
+    ((sample_statistics *) statistics_for_samples[sample_index])->number_of_blocks = num_blocks;
 }
 
 
 
 void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-  if( sample_index == -1)
-  {
-		return;
-	}
-	
-	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_without_gaps = genome_length_without_gaps;
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+
+    ((sample_statistics *) statistics_for_samples[sample_index])->genome_length_without_gaps = genome_length_without_gaps;
 }
 
 void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, int genome_length_excluding_blocks_and_gaps)
@@ -299,15 +299,26 @@ void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, 
 	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_excluding_blocks_and_gaps = genome_length_excluding_blocks_and_gaps;
 }
 
+void set_number_of_branch_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
+{
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+    ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations = bases_in_recombinations;
+}
+
 void set_number_of_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-  if( sample_index == -1)
-  {
-		return;
-	}
-	((sample_statistics *) statistics_for_samples[sample_index])->bases_in_recombinations = bases_in_recombinations;
+    int sample_index ;
+    sample_index = find_sequence_index_from_sample_name( sample_name);
+    if( sample_index == -1)
+    {
+        return;
+    }
+    ((sample_statistics *) statistics_for_samples[sample_index])->bases_in_recombinations = bases_in_recombinations;
 }
 
 
@@ -360,61 +371,61 @@ int number_of_snps_in_phylip()
 
 void load_sequences_from_multifasta_file(char filename[])
 {
-	int i;
+    int i;
 
-	num_snps    = genome_length(filename);
-	num_samples = number_of_sequences_in_file(filename);
-	
-	sequences = (char **) calloc((num_samples+1),sizeof(char *));
-	phylip_sample_names = (char **) calloc((num_samples+1),sizeof(char *));
-	
-	for(i = 0; i < num_samples; i++)
-	{
-		sequences[i] = (char *) calloc((num_snps+1),sizeof(char));
-		phylip_sample_names[i] = (char *) calloc((MAX_SAMPLE_NAME_SIZE+1),sizeof(char));
-	}
-	get_sample_names_for_header(filename, phylip_sample_names, num_samples);
-	
-  int l;
-  i = 0;
-  int sequence_number = 0;
+    num_snps    = genome_length(filename);
+    num_samples = number_of_sequences_in_file(filename);
 
- 	gzFile fp;
- 	kseq_t *seq;
+    sequences = (char **) calloc((num_samples+1),sizeof(char *));
+    phylip_sample_names = (char **) calloc((num_samples+1),sizeof(char *));
 
- 	fp = gzopen(filename, "r");
- 	seq = kseq_init(fp);
+    for(i = 0; i < num_samples; i++)
+    {
+        sequences[i] = (char *) calloc((num_snps+1),sizeof(char));
+        phylip_sample_names[i] = (char *) calloc((MAX_SAMPLE_NAME_SIZE+1),sizeof(char));
+    }
+    get_sample_names_for_header(filename, phylip_sample_names, num_samples);
 
- 	while ((l = kseq_read(seq)) >= 0) 
- 	{
-     for(i = 0; i< num_snps; i++)
- 		{
- 			sequences[sequence_number][i] = toupper(((char *) seq->seq.s)[i]);
- 			if(sequences[sequence_number][i] == 'N')
- 			{
- 				sequences[sequence_number][i]  = '-';
- 			}
- 		}
-     sequence_number++;
-   }
+    int l;
+    i = 0;
+    int sequence_number = 0;
 
- 	kseq_destroy(seq);
- 	gzclose(fp);
+    gzFile fp;
+    kseq_t *seq;
 
-	initialise_statistics();
-	initialise_internal_node();
+    fp = gzopen(filename, "r");
+    seq = kseq_init(fp);
+
+    while ((l = kseq_read(seq)) >= 0)
+    {
+        for(i = 0; i< num_snps; i++)
+        {
+            sequences[sequence_number][i] = toupper(((char *) seq->seq.s)[i]);
+            if(sequences[sequence_number][i] == 'N')
+            {
+                sequences[sequence_number][i]  = '-';
+            }
+        }
+        sequence_number++;
+    }
+
+    kseq_destroy(seq);
+    gzclose(fp);
+
+    initialise_statistics();
+    initialise_internal_node();
 }
 
 void freeup_memory()
 {
-	int i;
-	for(i = 0; i < num_samples; i++)
-	{
-	  free(sequences[i]);
-		free(phylip_sample_names[i]);
-  }
-  free(sequences);
-	free(phylip_sample_names);
-	free(internal_node);
+    int i;
+    for(i = 0; i < num_samples; i++)
+    {
+        free(sequences[i]);
+        free(phylip_sample_names[i]);
+    }
+    free(sequences);
+    free(phylip_sample_names);
+    free(internal_node);
 }
 

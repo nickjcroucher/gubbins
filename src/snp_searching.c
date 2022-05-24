@@ -137,7 +137,7 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
+		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] <= window_end_coordinate)
 		{
 			last_snp_location = i;
 			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
@@ -150,7 +150,7 @@ int get_window_end_coordinates_excluding_gaps_with_start_end_index(int window_st
 			break;	
 		}
 	}
-	
+
 	if(last_snp_location > 0)
 	{
 		return snp_locations[last_snp_location] + 1 ;
@@ -175,12 +175,15 @@ int find_number_of_snps_in_block_with_start_end_index(int window_start_coordinat
 		return number_of_snps;
 	}
 	int i;
-	int number_of_snps_in_block =0;
-	start_index = find_starting_index( window_start_coordinate, snp_locations,start_index, end_index);
+	int number_of_snps_in_block = 0;
+	start_index = find_starting_index(window_start_coordinate,
+                                      snp_locations,
+                                      start_index,
+                                      end_index);
 	
 	for(i = start_index; i < number_of_snps; i++)
 	{
-		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] < window_end_coordinate)
+		if(snp_locations[i]>= window_start_coordinate && snp_locations[i] <= window_end_coordinate)
 		{
 			if(child_sequence[i] != '-' || child_sequence[i] != 'N')
 			{
@@ -214,7 +217,7 @@ int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence
 	
 	for(i = start_index; i < length_of_original_genome ; i++)
 	{
-		if(snp_locations[i]< ending_coordinate && snp_locations[i]>= starting_coordinate)
+		if(snp_locations[i]<= ending_coordinate && snp_locations[i]>= starting_coordinate)
 		{
 			if(child_sequence[i] == '-' || child_sequence[i] == 'N')
 			{

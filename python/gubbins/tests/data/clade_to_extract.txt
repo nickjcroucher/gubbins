@@ -1,7 +1,4 @@
 sequence_1
-sequence_2
-sequence_3
-sequence_4
 sequence_5
 sequence_6
 sequence_7

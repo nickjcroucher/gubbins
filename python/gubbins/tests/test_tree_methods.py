@@ -102,11 +102,12 @@ class TestTreeMethods(unittest.TestCase):
         self.reroot_tree_check(outgroups, expected_output_file, expected_monophyletic_outgroup)
 
     def reroot_tree_check(self, outgroups, expected_output_file, expected_monophyletic_outgroup):
-        shutil.copyfile(os.path.join(data_dir, 'outgroups_input.tre'), '.tmp.outgroups_input.tre')
-        assert expected_monophyletic_outgroup == common.get_monophyletic_outgroup('.tmp.outgroups_input.tre', outgroups)
-        common.reroot_tree_with_outgroup('.tmp.outgroups_input.tre', outgroups)
-        assert filecmp.cmp('.tmp.outgroups_input.tre', expected_output_file)
-        os.remove('.tmp.outgroups_input.tre')
+        tmp_tree_file_name = expected_output_file.replace('expected_','generated_')
+        shutil.copyfile(os.path.join(data_dir, 'outgroups_input.tre'), tmp_tree_file_name)
+        assert expected_monophyletic_outgroup == common.get_monophyletic_outgroup(tmp_tree_file_name, outgroups)
+        common.reroot_tree_with_outgroup(tmp_tree_file_name, outgroups)
+        assert filecmp.cmp(tmp_tree_file_name, expected_output_file)
+        os.remove(tmp_tree_file_name)
 
     def test_split_all_non_bi_nodes(self):
         # best way to access it is via reroot_tree_at_midpoint because it outputs to a file

@@ -1,7 +1,18 @@
 # Change Log
 
-## [v3.1.6](https://github.com/sanger-pathogens/gubbins/tree/v3.1.6) (2021-1-20)
+## [v3.2.1](https://github.com/sanger-pathogens/gubbins/tree/v3.2.1) (2022-5-24)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.6...v3.2.1)
+
+- Fix problem with sequence reconstruction
+- Improve detection of small recombinations by modifying window sizes
+- Enable resumption of stalled analyses
+- Clean C code
+- Fixes to scripts
+- Add CI tests and update expected results
+
+## [v3.1.6](https://github.com/sanger-pathogens/gubbins/tree/v3.1.6) (2022-1-20)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.5...v3.1.6)
+
 
 - Fix problem with sequence reconstruction
 - Add test for consistency of reconstructions

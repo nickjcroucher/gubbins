@@ -210,6 +210,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
                                             "--verbose", "--iterations", "3",
                                             "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--model","JC",
                                             "--threads", "1",
                                             os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')

@@ -56,6 +56,26 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    # Test resuming a default analysis
+    def test_fasttree_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_iqtree(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
@@ -67,6 +87,26 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    # Test resuming a default analysis
+    def test_iqtree_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_raxml(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
@@ -75,6 +115,26 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test resuming a default analysis
+    def test_raxml_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
@@ -101,6 +161,26 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    # Test resuming a default analysis
+    def test_raxmlng_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_rapidnj(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
@@ -113,6 +193,27 @@ class TestExternalDependencies(unittest.TestCase):
         # Copy file for subsequent tests
         shutil.copyfile(os.path.join(data_dir, 'multiple_recombinations.recombination_predictions.embl'),
                         os.path.join(data_dir, 'new_rapidnj_jc_output.recombination_predictions.embl'))
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test resuming a default analysis
+    def test_rapidnj_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--model","JC",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "rapidnj",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 

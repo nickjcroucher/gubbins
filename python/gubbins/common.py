@@ -108,11 +108,28 @@ def parse_and_run(input_args, program_description=""):
     gaps_vcf_filename = base_filename + ".gaps.vcf"
     joint_sequences_filename = base_filename + ".seq.joint.aln"
 
+    # If restarting from a previous run
+    starting_iteration = 1
+    if input_args.resume is not None:
+        search_itr = re.search(r'iteration_(\d+)', input_args.resume)
+        if search_itr is None:
+            sys.stderr.write('Resuming a Gubbins run requires a tree file name containing the phrase "iteration_X"\n')
+            exit(1)
+        else:
+            starting_iteration = int(search_itr.group(1)) + 1
+            if starting_iteration >= input_args.iterations:
+                sys.stderr.write('Run has already reached the number of specified iterations\n')
+                exit(1)
+            else:
+                sys.stderr.write('Resuming Gubbins analysis at iteration ' + str(starting_iteration) + '\n')
+            input_args.starting_tree = input_args.resume
+            current_tree_name = input_args.starting_tree
+
     # Check if intermediate files from a previous run exist
     intermediate_files = [basename + ".iteration_"]
-    if not input_args.no_cleanup:
+    if not input_args.no_cleanup and input_args.resume is None:
         utils.delete_files(".", intermediate_files, "", input_args.verbose)
-    if utils.do_files_exist(".", intermediate_files, "", input_args.verbose):
+    if utils.do_files_exist(".", intermediate_files, "", input_args.verbose) and input_args.resume is None:
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
@@ -176,11 +193,11 @@ def parse_and_run(input_args, program_description=""):
     reconvert_fasta_file(gaps_alignment_filename, base_filename + ".start")
     # Start the main loop
     printer.print("\nEntering the main loop.")
-    for i in range(1, input_args.iterations+1):
+    for i in range(starting_iteration, input_args.iterations+1):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2:
+        if i == 2 or input_args.resume is not None:
             # Select the algorithms used for the subsequent iterations
             current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
             # Initialise tree builder
@@ -247,7 +264,7 @@ def parse_and_run(input_args, program_description=""):
             # 3.2a. Joint ancestral reconstruction
             printer.print(["\nReconstructing ancestral sequences with pyjar..."])
             
-            if i == 1:
+            if i == starting_iteration:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
                 

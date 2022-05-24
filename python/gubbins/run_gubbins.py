@@ -133,11 +133,20 @@ def parse_input_args():
                                                       action='store_true',
                                                       default=False)
 
-    stopGroup = parser.add_argument_group('Algorithm stop options')
-    stopGroup.add_argument('--iterations',      '-i', help='Maximum No. of iterations', type=int, default=5)
-    stopGroup.add_argument('--converge-method', '-z', help='Criteria to use to know when to halt iterations',
-                        default='weighted_robinson_foulds', choices=['weighted_robinson_foulds', 'robinson_foulds',
+    stopGroup = parser.add_argument_group('Algorithm start/stop options')
+    stopGroup.add_argument('--iterations',      '-i',
+                                                        help='Maximum No. of iterations',
+                                                        type=int,
+                                                        default=5)
+    stopGroup.add_argument('--converge-method', '-z',
+                                                        help='Criteria to use to know when to halt iterations',
+                                                        default='weighted_robinson_foulds',
+                                                        choices=['weighted_robinson_foulds', 'robinson_foulds',
                                                                      'recombination'])
+    stopGroup.add_argument('--resume',
+                                                        help='Intermediate tree from previous run (must include'
+                                                        ' "iteration_X" in file name)',
+                                                        default=None)
     return parser
 
 

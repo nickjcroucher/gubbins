@@ -185,16 +185,19 @@ Recombination is detected using a [spatial scanning statistic](https://link.spri
   --extensive-search    Undertake slower, more thorough, search for recombination (default: False)
 ```
 
-### Algorithm stop options
+### Algorithm stop and restart options
 
-Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG). In practice, there is little improvement to the tree after three iterations.
+Given the scale of available dataset sizes, and the size of tree space, it is unlikely that any Gubbins analysis will ever converge based on identifying identical trees in subsequent iterations. Normally the algorithm will stop after reaching the maximum number of iterations. Should the run fail or stall before this point, the analysis can be restarted from the last iteration that successfully completed by providing a tree through the `--resume` flag (all other flags should be kept identical to the original commend, including `--iterations`). Note that although only the tree is provided to `--resume`, the corresponding alignment generated at the end of the same iteration also needs to be available within the same directory.
 
 ```
   --iterations ITERATIONS, -i ITERATIONS
                         Maximum No. of iterations (default: 5)
   --converge-method {weighted_robinson_foulds,robinson_foulds,recombination}, -z {weighted_robinson_foulds,robinson_foulds,recombination}
                         Criteria to use to know when to halt iterations (default: weighted_robinson_foulds)
+  --resume RESUME       Intermediate tree from previous run (must include "iteration_X" in file name) (default: None)
 ```
+
+Note that trees from previous iterations are used as starting trees for inference in subsequent iterations with IQTree and RAxML (although not RAxML-NG).
 
 ## Output files
 

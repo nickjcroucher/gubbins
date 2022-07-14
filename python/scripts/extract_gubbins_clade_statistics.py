@@ -169,6 +169,7 @@ if __name__ == "__main__":
                              schema = 'newick',
                              preserve_underscores = True,
                              rooting='force-rooted')
+    taxon_names = [taxon.label for taxon in tree.taxon_namespace]
     
     # Calculate statistics per clade
     rec_length_string = ''
@@ -179,8 +180,16 @@ if __name__ == "__main__":
         for clade_name in clade_names:
             out_file.write(clade_name + ',')
             clade_members = [sequence for sequence in clades if clades[sequence] == clade_name]
+            # Check all isolates are in the tree
+            for isolate in clade_members:
+                if isolate not in taxon_names:
+                    sys.stderr.write('Isolate ' + isolate + ' not in tree\n')
+                    sys.stderr.write('Tree contains ' + ','.join(taxon_names) + '\n')
+                    #exit(1)
+            # Extract clade tree
             clade_tree = tree.clone(depth = 1)
             clade_tree.retain_taxa_with_labels(clade_members)
+            # Print tree
             if args.print_trees:
                 clade_tree_string = clade_tree.as_string(
                                         schema='newick',
@@ -200,6 +209,7 @@ if __name__ == "__main__":
                                     )
                 with open(clade_name + '.tre','w') as tree_out:
                     tree_out.write(clade_tree_string.replace('\'', '') + '\n')
+            # Print statistics
             clade_info = {label:0 for label in info_labels + tree_info_labels}
             for node in clade_tree.preorder_node_iter():
                 if node != clade_tree.seed_node:

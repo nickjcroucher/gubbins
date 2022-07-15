@@ -204,18 +204,18 @@ int find_number_of_snps_in_block(int window_start_coordinate, int window_end_coo
 	return find_number_of_snps_in_block_with_start_end_index( window_start_coordinate,  window_end_coordinate, snp_locations,   child_sequence, number_of_snps, 0, number_of_snps);
 }
 
-int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome)
+int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int current_snp_count)
 {
-	return calculate_block_size_without_gaps_with_start_end_index( child_sequence,  snp_locations,starting_coordinate,  ending_coordinate,   length_of_original_genome,0, length_of_original_genome);
+	return calculate_block_size_without_gaps_with_start_end_index( child_sequence,  snp_locations,starting_coordinate,  ending_coordinate,   current_snp_count,0, current_snp_count);
 }
 
-int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate,  int length_of_original_genome, int start_index,int end_index)
+int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate, int current_snp_count, int start_index,int end_index)
 {
 	int i;
 	int block_size = ending_coordinate - starting_coordinate;
 	start_index = find_starting_index( starting_coordinate, snp_locations,start_index, end_index);
 	
-	for(i = start_index; i < length_of_original_genome ; i++)
+	for(i = start_index; i < current_snp_count ; i++)
 	{
 		if(snp_locations[i]<= ending_coordinate && snp_locations[i]>= starting_coordinate)
 		{

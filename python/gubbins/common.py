@@ -493,6 +493,9 @@ def process_input_arguments(input_args):
         input_args.iterations = 1
         input_args.model_fitter = 'fasttree'
         input_args.first_tree_builder = 'star'
+        if input_args.mar:
+            sys.stderr.write('Cannot use marginal reconstruction for a pairwise comparison; switching to joint reconstruction')
+            input_args.mar = False
     else:
         # Make model fitting consistent with tree building
         if input_args.model_fitter is None:

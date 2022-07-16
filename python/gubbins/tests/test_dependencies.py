@@ -44,6 +44,17 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('pairwise')
         assert exit_code == 0
 
+    def test_pairwise_altered_recon(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--pairwise",
+                                                    "--threads", "1",
+                                                    "--mar",
+                                                    os.path.join(data_dir, 'pairwise.aln')]))
+        exit_code = self.check_for_output_files('pairwise')
+        self.cleanup('pairwise')
+        assert exit_code == 0
+
     # Test individual tree builders
     def test_fasttree(self):
         exit_code = 1

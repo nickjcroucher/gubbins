@@ -35,6 +35,7 @@ class Star:
         self.tree_suffix = ".tre"
         self.alignment_suffix = ".snp_sites.aln"
         # Reproducibility
+        self.name = 'Star'
         self.version = "unspecified"
         self.citation = "no citation"
     
@@ -76,6 +77,7 @@ class RapidNJ:
             sys.exit("No usable version of rapidnj could be found.")
 
         # Reproducibility
+        self.name = 'RapidNJ'
         self.version = "unspecified"
         self.citation = "https://doi.org/10.1007/978-3-540-87361-7_10"
 
@@ -144,6 +146,7 @@ class FastTree:
             sys.exit("No usable version of FastTree could be found.")
 
         # Reproducibility
+        self.name = 'FastTree'
         self.version = self.get_version(self.executable)
         self.citation = "https://doi.org/10.1371/journal.pone.0009490"
 
@@ -275,6 +278,7 @@ class IQTree:
         command = [self.executable]
 
         # Reproducibility
+        self.name = 'IQTree'
         self.version = self.get_version(self.executable)
         self.citation = "https://doi.org/10.1093/molbev/msaa015"
 
@@ -423,6 +427,7 @@ class RAxML:
         command = [self.executable]
         
         # Reproducibility
+        self.name = 'RAxML'
         self.version = self.get_version(self.executable)
         self.citation = "https://doi.org/10.1093/bioinformatics/btu033"
 
@@ -596,6 +601,7 @@ class RAxMLNG:
         command = [self.executable]
         
         # Reproducibility
+        self.name = 'RAxMLNG'
         self.version = self.get_version(self.executable)
         self.citation = "https://doi.org/10.1093/bioinformatics/btz305"
         

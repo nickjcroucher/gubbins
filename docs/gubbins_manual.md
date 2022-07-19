@@ -210,7 +210,7 @@ A successful Gubbins run will generate files with the suffixes:
 * `.per_branch_statistics.csv` -	per branch reporting of the base substitutions inside and outside recombination events
 * `.filtered_polymorphic_sites.fasta` -	FASTA format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
 * `.filtered_polymorphic_sites.phylip` -	Phylip format alignment of filtered polymorphic sites used to generate the phylogeny in the final iteration
-* `.final_tree.tree` - this file contains the final phylogeny in Newick format; branch lengths are in point mutations
+* `.final_tree.tre - this file contains the final phylogeny in Newick format; branch lengths are in point mutations
 * `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels; branch lengths are in point mutations
 * `.log` - log file specifying the software used at each step of the analysis, with accompanying citations
 

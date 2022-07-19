@@ -287,7 +287,7 @@ def parse_and_run(input_args, program_description=""):
             recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)
             # Set root of reconstruction tree to match that of the current tree
             # Cannot just midpoint root both, because the branch lengths differ between them
-            harmonise_roots(recontree_filename, temp_rooted_tree)
+            harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
@@ -789,7 +789,7 @@ def unroot_tree(input_filename, output_filename):
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
-def harmonise_roots(new_tree_fn, tree_for_root_fn):
+def harmonise_roots(new_tree_fn, tree_for_root_fn, algorithm = None):
     # Read in tree and get nodes adjacent to root
     taxa = dendropy.TaxonNamespace()
     tree_for_root = dendropy.Tree.get_from_path(tree_for_root_fn,
@@ -826,7 +826,9 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn):
                                                                                     is_bipartitions_updated=False)
     
     if len(missing_bipartitions) > 0:
-        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.stderr.write('Bipartitions missing when harmonising roots between trees: ' + str([str(x) for x in missing_bipartitions]) + '\n')
+        if algorithm == 'FastTree':
+            sys.stderr.write('This is a known issue when using FastTree to fit a phylogenetic model; use an alternative algorithm\n')
         sys.exit(1)
 
     # Write output
@@ -935,7 +937,7 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
                                                                                     destination_tree,
                                                                                     is_bipartitions_updated=False)
     if len(missing_bipartitions) > 0:
-        sys.stderr.write('Bipartitions missing when transferring node label transfer: ' + str([str(x) for x in missing_bipartitions]))
+        sys.stderr.write('Bipartitions missing when transferring node labels: ' + str([str(x) for x in missing_bipartitions]))
         sys.exit(1)
     
     root_alternative = ''

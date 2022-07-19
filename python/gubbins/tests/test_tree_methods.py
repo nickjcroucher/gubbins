@@ -16,6 +16,30 @@ data_dir = os.path.join(modules_dir, 'tests', 'data')
 
 class TestTreeMethods(unittest.TestCase):
 
+    def initialise_Star(self):
+        algorithm = treebuilders.Star()
+        assert algorithm.name == 'Star'
+
+    def initialise_RapidNJ(self):
+        algorithm = treebuilders.RapidNJ()
+        assert algorithm.name == 'RapidNJ'
+
+    def initialise_FastTree(self):
+        algorithm = treebuilders.FastTree()
+        assert algorithm.name == 'FastTree'
+
+    def initialise_IQTree(self):
+        algorithm = treebuilders.IQTree()
+        assert algorithm.name == 'IQTree'
+
+    def initialise_RAxML(self):
+        algorithm = treebuilders.RAxML()
+        assert algorithm.name == 'RAxML'
+
+    def initialise_RAxMLNG(self):
+        algorithm = treebuilders.RAxMLNG()
+        assert algorithm.name == 'RAxMLNG'
+
     def test_robinson_foulds_distance(self):
         # two tree with different distances
         assert common.robinson_foulds_distance(os.path.join(data_dir, 'robinson_foulds_distance_tree1.tre'),

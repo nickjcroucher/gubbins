@@ -117,7 +117,7 @@ def parse_and_run(input_args, program_description=""):
             exit(1)
         else:
             starting_iteration = int(search_itr.group(1)) + 1
-            if starting_iteration >= input_args.iterations:
+            if starting_iteration > input_args.iterations:
                 sys.stderr.write('Run has already reached the number of specified iterations\n')
                 exit(1)
             else:

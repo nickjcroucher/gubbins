@@ -162,6 +162,36 @@ def parse_and_run(input_args, program_description=""):
         if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
             sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
+    # If outgroup is specified, check it is still in the alignment
+    if input_args.outgroup is not None:
+        if input_args.outgroup in taxa_removed:
+            sys.stderr.write('Outgroup removed due to proportion of missing bases\n')
+            sys.exit(1)
+
+    # Initialise tree dating algorithm if dates supplied
+    if input_args.date is not None:
+        if os.path.isfile(input_args.date):
+            # Get sequence names from alignment
+            sequence_names_in_alignment = pre_process_fasta.get_sequence_names()
+            # Edit taxon names as in tree
+            new_date_file = os.path.join(temp_working_dir,input_args.prefix + '.dates')
+            with open(input_args.date,'r') as in_dates, open(new_date_file,'w') as out_dates:
+                for line in in_dates.readlines():
+                    info = line.rstrip().split()
+                    if len(info) == 2:
+                        new_name = utils.process_sequence_names(info[0])
+                        if new_name in sequence_names_in_alignment:
+                            out_dates.write(new_name + '\t' + info[1] + '\n')
+            input_args.date = new_date_file
+            # Initialise IQtree
+            tree_dater = IQTree(threads = input_args.threads,
+                                    model = input_args.model,
+                                    verbose = input_args.verbose
+                                )
+        else:
+            sys.stderr.write('Cannot open dates file ' + input_args.date + '\n')
+            sys.exit(1)
+
     # If a starting tree has been provided check its validity
     # Also make sure that taxa filtered out in the previous step are removed from it
     if input_args.starting_tree is not None and input_args.starting_tree != "":
@@ -467,6 +497,19 @@ def parse_and_run(input_args, program_description=""):
                             algorithm = current_tree_builder,
                             outgroup = input_args.outgroup)
 
+    # 8. Run time calibration of final tree
+    if input_args.date is not None:
+        dating_command = tree_dater.run_time_tree(final_aln,
+                                                    current_tree_name,
+                                                    input_args.date,
+                                                    temp_working_dir,
+                                                    basename,
+                                                    outgroup = input_args.outgroup)
+        try:
+            subprocess.check_call(dating_command, shell=True)
+        except subprocess.SubprocessError:
+            sys.exit("Failed running tree time calibration with LSD.")
+
     # Create the final output
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
@@ -475,6 +518,13 @@ def parse_and_run(input_args, program_description=""):
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
+    if input_args.date is not None:
+        # Save final output files
+        dating_files = {
+            os.path.join(temp_working_dir,basename + '.timetree.lsd'): input_args.prefix + '.lsd.out',
+            os.path.join(temp_working_dir,basename + '.timetree.nwk'): input_args.prefix + '.final_tree.timetree.tre'
+        }
+        utils.rename_files(dating_files)
 
     # Cleanup intermediate files
     if not input_args.no_cleanup:

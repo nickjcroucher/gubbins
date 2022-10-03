@@ -398,6 +398,19 @@ class IQTree:
         """Return bootstrapped tree files name"""
         file_name = tmp + "/" + basename + ".bootstrapped.ufboot"
         return file_name
+    
+    def run_time_tree(self, alignment_filename: str, input_tree: str, date_file: str, tmp: str, basename: str, outgroup=None) -> str:
+        """Run time calibration of tree"""
+        command = self.base_command.copy()
+        command.extend(["-s", alignment_filename])
+        command.extend(["-te", input_tree, "--tree-fix"])
+        command.extend(["--date", date_file])
+        command.extend(["--prefix", os.path.join(tmp,basename)])
+        if outgroup is not None:
+            command.extend(["-o", outgroup])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
 
 class RAxML:
     """Class for operations with the RAxML executable"""

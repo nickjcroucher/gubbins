@@ -35,6 +35,7 @@ def parse_input_args():
     ioGroup.add_argument('alignment_filename',        help='Multifasta alignment file')
     ioGroup.add_argument('--prefix',            '-p', help='Add a prefix to the final output filenames')
     ioGroup.add_argument('--starting-tree',     '-s', help='Starting tree')
+    ioGroup.add_argument('--date',              '-D', help='Starting tree', default = None)
     ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
     ioGroup.add_argument('--version',                 action='version',
                                                       version = version())
@@ -65,7 +66,8 @@ def parse_input_args():
     treeGroup.add_argument('--first-tree-args',       help='Further arguments passed to first tree building algorithm',
                                                       default = None)
     treeGroup.add_argument('--outgroup',        '-o', help='Outgroup name for rerooting. A list of comma separated '
-                                                      'names can be used if they form a clade')
+                                                      'names can be used if they form a clade',
+                                                      default = None)
     treeGroup.add_argument('--bootstrap',       '-#', help='Number of bootstrap replicates to perform with final alignment',
                                                       type = int, default = 0)
     treeGroup.add_argument('--transfer-bootstrap',    help='Calculate bootstrap supporting transfer bootstrap expectation',

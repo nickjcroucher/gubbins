@@ -174,7 +174,7 @@ def parse_and_run(input_args, program_description=""):
             # Get sequence names from alignment
             sequence_names_in_alignment = pre_process_fasta.get_sequence_names()
             # Edit taxon names as in tree
-            new_date_file = os.path.join(temp_working_dir,input_args.prefix + '.dates')
+            new_date_file = os.path.join(temp_working_dir,basename + '.dates')
             with open(input_args.date,'r') as in_dates, open(new_date_file,'w') as out_dates:
                 for line in in_dates.readlines():
                     info = line.rstrip().split()

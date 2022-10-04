@@ -56,13 +56,13 @@ def parse_input_args():
     treeGroup = parser.add_argument_group('Tree building options')
     treeGroup.add_argument('--tree-builder',    '-t', help='Application to use for tree building',
                                                       default='raxml',
-                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', 'hybrid', 'rapidnj'])
+                                                      choices=['raxml', 'raxmlng', 'iqtree', 'iqtree-fast', 'fasttree', 'hybrid', 'rapidnj'])
     treeGroup.add_argument('--tree-args',             help='Quoted string of further arguments passed to tree building algorithm'
                                                       ' (start string with a space if there is a risk of being interpreted as a flag)',
                                                       default = None)
     treeGroup.add_argument('--first-tree-builder',    help='Application to use for building the first tree',
                                                       default=None,
-                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', 'rapidnj', 'star'])
+                                                      choices=['raxml', 'raxmlng', 'iqtree', 'iqtree-fast', 'fasttree', 'rapidnj', 'star'])
     treeGroup.add_argument('--first-tree-args',       help='Further arguments passed to first tree building algorithm',
                                                       default = None)
     treeGroup.add_argument('--outgroup',        '-o', help='Outgroup name for rerooting. A list of comma separated '
@@ -82,11 +82,13 @@ def parse_input_args():
                                                       choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all '
                                                       'tree building algorithms)',
-                                                      default='GTRGAMMA',
+                                                      default=None,
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--model-args',           help='Quoted string of further arguments passed to model fitting algorithm'
                                                       ' (start string with a space if there is a risk of being interpreted as a flag)',
-                                                      default=None)
+                                                      default = None)
+    modelGroup.add_argument('--best-model',           help='Automatically select best substitution model using iqtree in later iterations',
+                                                      default = False, action = 'store_true')
     modelGroup.add_argument('--custom-model',         help='String corresponding to a substitution model for the selected tree'
                                                       ' building algorithm', default = None)
     modelGroup.add_argument('--first-model-fitter',   help='Application to use for model fitting in first iteration'

@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import gzip
 import time
 # Phylogenetic imports
 import dendropy
@@ -53,7 +54,6 @@ def parse_and_run(input_args, program_description=""):
 
     # Process input options
     input_args = process_input_arguments(input_args)
-
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
     os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
@@ -82,6 +82,7 @@ def parse_and_run(input_args, program_description=""):
     
     # Select the algorithms used for the first iteration
     current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
+    input_args = check_model_validity(input_args)
     # Initialise tree builder
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
@@ -183,11 +184,6 @@ def parse_and_run(input_args, program_description=""):
                         if new_name in sequence_names_in_alignment:
                             out_dates.write(new_name + '\t' + info[1] + '\n')
             input_args.date = new_date_file
-            # Initialise IQtree
-            tree_dater = IQTree(threads = input_args.threads,
-                                    model = input_args.model,
-                                    verbose = input_args.verbose
-                                )
         else:
             sys.stderr.write('Cannot open dates file ' + input_args.date + '\n')
             sys.exit(1)
@@ -230,13 +226,62 @@ def parse_and_run(input_args, program_description=""):
         if i == 2 or input_args.resume is not None:
             # Select the algorithms used for the subsequent iterations
             current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
+            # Pick best model through ML tests
+            if input_args.best_model:
+                model_test_command = model_fitter.run_model_comparison(snp_alignment_filename,basename)
+                try:
+                    subprocess.check_call(model_test_command, shell=True)
+                except subprocess.SubprocessError:
+                    sys.exit("Unable to identify best-fitting model")
+                tree_models = {
+                    'star': ['JC','GTRCAT','GTRGAMMA'],
+                    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+                    'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+                    'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+                    'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+                    'rapidnj': ['JC','K2P']
+                }
+                current_model = None
+                iqtree_specific_model = None
+                with gzip.open(basename + '.model.gz','rb') as model_file:
+                    for line in model_file:
+                        if line.decode().startswith('best_model_list_BIC:'):
+                            model_list = line.decode().rstrip().split()
+                            iqtree_specific_model = model_list[1]
+                            if current_tree_builder == 'iqtree':
+                                current_model = iqtree_specific_model
+                            else:
+                                for model in model_list:
+                                    model_aspects = model.split('+')
+                                    if model_aspects[0] == 'GTR' and 'G4' in model_aspects:
+                                        model_name = 'GTRGAMMA'
+                                    elif model_aspects[0] == 'GTR' and \
+                                        ('R2' in model_aspects or 'R3' in model_aspects):
+                                        model_name = 'GTRCAT'
+                                    else:
+                                        model_name = model_aspects[0]
+                                    if model_name in tree_models[current_tree_builder]:
+                                        current_model = model_name
+                                        break
+                print(current_model)
+                input_args.model = current_model
+                if current_tree_builder != 'iqtree':
+                    input_args = check_model_validity(input_args)
+                # Initialise model fitter
+                model_fitter = return_algorithm(current_model_fitter, iqtree_specific_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+                methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
+                # Initialise sequence reconstruction if MAR
+                if input_args.mar and input_args.seq_recon == 'iqtree':
+                    sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
+                    methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (later iterations)')
+            else:
+                # Initialise model fitter
+                model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+                methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
             # Initialise tree builder
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
             alignment_suffix = tree_builder.alignment_suffix
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
-            # Initialise model fitter
-            model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-            methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
 
         if i == 1:
             previous_tree_name = input_args.starting_tree
@@ -499,6 +544,11 @@ def parse_and_run(input_args, program_description=""):
 
     # 8. Run time calibration of final tree
     if input_args.date is not None:
+        # Initialise IQtree
+        tree_dater = IQTree(threads = input_args.threads,
+                                model = current_model,
+                                verbose = input_args.verbose
+                            )
         dating_command = tree_dater.run_time_tree(final_aln,
                                                     current_tree_name,
                                                     input_args.date,
@@ -508,7 +558,9 @@ def parse_and_run(input_args, program_description=""):
         try:
             subprocess.check_call(dating_command, shell=True)
         except subprocess.SubprocessError:
-            sys.exit("Failed running tree time calibration with LSD.")
+            # If this fails, continue to generate rest of output
+            sys.write("Failed running tree time calibration with LSD.")
+            input_args.date = None
 
     # Create the final output
     printer.print("\nCreating the final output...")
@@ -542,21 +594,48 @@ def process_input_arguments(input_args):
     if input_args.pairwise:
         input_args.iterations = 1
         input_args.model_fitter = 'fasttree'
-        input_args.first_tree_builder = 'star'
+        input_args.tree_builder = 'star'
+        input_args.model = 'GTRGAMMA'
         if input_args.mar:
             sys.stderr.write('Cannot use marginal reconstruction for a pairwise comparison; switching to joint reconstruction')
             input_args.mar = False
     else:
+        # Parse IQtree in fast mode
+        if input_args.tree_builder == "iqtree-fast":
+            input_args.tree_builder = "iqtree"
+            input_args.tree_args = utils.extend_args(input_args.tree_args,"--fast")
+        if input_args.first_tree_builder == "iqtree-fast":
+            input_args.first_tree_builder = "iqtree"
+            input_args.first_tree_args = utils.extend_args(input_args.first_tree_args,"--fast")
+        # Process model selection for first iteration
+        if input_args.first_model is None:
+            if input_args.first_tree_builder == "rapidnj" or \
+                (input_args.first_tree_builder is None and input_args.tree_builder == "rapidnj"):
+                input_args.first_model = "JC"
+            else:
+                input_args.first_model = "GTRGAMMA"
+        # Process model selection for later iterations
+        if input_args.best_model:
+            input_args.model = None
+            input_args.model_fitter = "iqtree"
+        elif input_args.tree_builder == "rapidnj" and input_args.model is None:
+            input_args.model = "JC"
+        elif input_args.model is None:
+            input_args.model = "GTRGAMMA"
         # Make model fitting consistent with tree building
         if input_args.model_fitter is None:
-            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
+            if input_args.best_model:
+                input_args.model_fitter = "iqtree"
+            elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
                 input_args.model_fitter = input_args.tree_builder
             else:
                 # Else use RAxML where not possible
                 input_args.model_fitter = 'raxml'
         # Make sequence reconstruction consistent with tree building where possible
         if input_args.seq_recon is None:
-            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
+            if input_args.best_model:
+                input_args.model_fitter = "iqtree"
+            elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
                 input_args.seq_recon = input_args.tree_builder
             else:
                 # Else use RAxML where not possible
@@ -565,51 +644,63 @@ def process_input_arguments(input_args):
             sys.stderr.write('Sequence reconstruction uses pyjar unless the '
             '--mar flag is specified\n')
             sys.exit()
-        # Check substitution model consistent with tree building algorithm
-        tree_models = {
-            'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
-            'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-            'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-            'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-            'rapidnj': ['JC','K2P']
-        }
-        invalid_model = False
-        # Check on first tree builder
+        # Check on arguments for measures of branch support
+        if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
+            sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
+            sys.exit()
+        if input_args.sh_test and input_args.tree_builder not in ["raxml","iqtree","fasttree"]:
+            sys.stderr.write("SH test only available for RAxML, IQtree or Fasttree\n")
+            sys.exit()
+    return input_args
+
+def check_model_validity(input_args):
+    # Check substitution model consistent with tree building algorithm
+    tree_models = {
+        'star': ['JC','GTRCAT','GTRGAMMA'],
+        'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+        'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+        'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+        'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+        'rapidnj': ['JC','K2P']
+    }
+    invalid_model = False
+    # Check on first tree builder
+    if input_args.first_tree_builder is not None:
+        # Raise error if first tree builder and starting tree
+        if input_args.starting_tree is not None:
+            sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+            sys.exit()
+    # Determine model to be used for first iteration, if specified
+    if input_args.custom_first_model is not None:
+        input_args.first_model = input_args.custom_first_model
+        sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
+    elif input_args.first_model is not None:
+        first_model = input_args.first_model
+        first_tree_builder = input_args.tree_builder
         if input_args.first_tree_builder is not None:
-            # Raise error if first tree builder and starting tree
-            if input_args.starting_tree is not None:
-                sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
-                sys.exit()
-        # Determine model to be used for first iteration, if specified
-        if input_args.custom_first_model is not None:
-            input_args.first_model = input_args.custom_first_model
-            sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
-        elif input_args.first_model is not None:
-            first_model = input_args.first_model
-            first_tree_builder = input_args.tree_builder
-            if input_args.first_tree_builder is not None:
-                first_tree_builder = input_args.first_tree_builder
-            first_model_fitter = input_args.model_fitter
-            if input_args.first_model_fitter is not None:
-                first_model_fitter = input_args.first_model_fitter
-            if first_model not in tree_models[first_tree_builder]:
-                sys.stderr.write('First evolutionary model ' + first_model +
-                                ' and algorithm ' + first_tree_builder +
-                                 ' are incompatible\n')
-                invalid_model = True
-            elif first_model not in tree_models[first_model_fitter]:
-                sys.stderr.write('First evolutionary model ' + first_model +
-                                ' and algorithm ' + first_model_fitter +
-                                 ' are incompatible\n')
-                invalid_model = True
-        # Check that at least 2 iterations will be run if customised options for 1st iteration
-        if input_args.iterations == 1:
-            if input_args.first_tree_builder is not None or input_args.first_model \
-                or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
-                sys.stderr.write('Please do not use options specific to the first iteration when'
-                                 ' only one iteration is to be run\n')
-                sys.exit()
-        # Determine model to be used for subsequent iterations
+            first_tree_builder = input_args.first_tree_builder
+        first_model_fitter = input_args.model_fitter
+        if input_args.first_model_fitter is not None:
+            first_model_fitter = input_args.first_model_fitter
+        if first_model not in tree_models[first_tree_builder]:
+            sys.stderr.write('First evolutionary model ' + first_model +
+                            ' and algorithm ' + first_tree_builder +
+                             ' are incompatible\n')
+            invalid_model = True
+        elif first_model not in tree_models[first_model_fitter]:
+            sys.stderr.write('First evolutionary model ' + first_model +
+                            ' and algorithm ' + first_model_fitter +
+                             ' are incompatible\n')
+            invalid_model = True
+    # Check that at least 2 iterations will be run if customised options for 1st iteration
+    if input_args.iterations == 1:
+        if input_args.first_tree_builder is not None or input_args.first_model \
+            or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
+            sys.stderr.write('Please do not use options specific to the first iteration when'
+                             ' only one iteration is to be run\n')
+            sys.exit()
+    # Determine model to be used for subsequent iterations
+    if input_args.model is not None:
         if input_args.custom_model is not None:
             input_args.model = input_args.custom_model
             sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
@@ -621,20 +712,13 @@ def process_input_arguments(input_args):
             sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
                         input_args.model_fitter + ' are incompatible\n')
             invalid_model = True
-        # Information for rectifying incompatible combinations
-        if invalid_model:
-            sys.stderr.write('Available combinations are:\n')
-            for algorithm in tree_models:
-                models = ', '.join(tree_models[algorithm])
-                sys.stderr.write(algorithm + ':\t' + models + '\n')
-            sys.exit()
-        # Check on arguments for measures of branch support
-        if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
-            sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
-            sys.exit()
-        if input_args.sh_test and input_args.tree_builder not in ["raxml","iqtree","fasttree"]:
-            sys.stderr.write("SH test only available for RAxML, IQtree or Fasttree\n")
-            sys.exit()
+    # Information for rectifying incompatible combinations
+    if invalid_model:
+        sys.stderr.write('Available combinations are:\n')
+        for algorithm in tree_models:
+            models = ', '.join(tree_models[algorithm])
+            sys.stderr.write(algorithm + ':\t' + models + '\n')
+        sys.exit()
     return input_args
 
 def return_algorithm_choices(args,i):
@@ -642,13 +726,9 @@ def return_algorithm_choices(args,i):
     current_tree_builder = args.tree_builder
     if args.first_tree_builder is not None and i==1:
         current_tree_builder = args.first_tree_builder
-    # Pick model
-    current_model = args.model
-    if args.first_model is not None and i==1:
-        current_model = args.first_model
     # Get tree builder arguments
     extra_tree_arguments = args.tree_args
-    if args.first_tree_args is not None and i==1:
+    if args.first_tree_builder is not None and i==1:
         extra_tree_arguments = args.first_tree_args
     # If RAXML-NG first tree builder use search1 option to decrease runtime
     if i == 1 and current_tree_builder == "raxmlng":
@@ -658,10 +738,17 @@ def return_algorithm_choices(args,i):
             extra_tree_arguments = [extra_tree_arguments]
             extra_tree_arguments.extend(["--search1"])
             extra_tree_arguments = " ".join(extra_tree_arguments)
-    # Pick model fitter
-    current_model_fitter = args.model_fitter
-    if args.first_model_fitter is not None and i==1:
-        current_model_fitter = args.first_model_fitter
+    # Pick model fitter and model
+    if args.best_model and i > 1:
+        current_model_fitter = "iqtree"
+        current_model = None
+    else:
+        current_model_fitter = args.model_fitter
+        current_model = args.model
+        if args.first_model_fitter is not None and i==1:
+            current_model_fitter = args.first_model_fitter
+        if args.first_model is not None and i==1:
+            current_model = args.first_model
     # Get model fitter arguments
     extra_model_arguments = args.model_args
     if args.first_model_args is not None and i==1:
@@ -678,7 +765,7 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     elif algorithm_choice == "raxmlng":
         initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":
@@ -876,7 +963,8 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn, algorithm = None):
                                                                                     is_bipartitions_updated=False)
     
     if len(missing_bipartitions) > 0:
-        sys.stderr.write('Bipartitions missing when harmonising roots between trees: ' + str([str(x) for x in missing_bipartitions]) + '\n')
+        sys.stderr.write('Bipartitions missing when harmonising roots between trees ' + new_tree_fn + ' and ' + tree_for_root_fn + '\n')
+        sys.stderr.write('The missing bipartitions are: ' + str([str(x) for x in missing_bipartitions]) + '\n')
         if algorithm == 'FastTree':
             sys.stderr.write('This is a known issue when using FastTree to fit a phylogenetic model; use an alternative algorithm\n')
         sys.exit(1)

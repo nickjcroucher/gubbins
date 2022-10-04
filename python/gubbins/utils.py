@@ -185,3 +185,13 @@ def process_sequence_names(name):
     """Replaces disalowed characters in names with underscores"""
     new_name = name.replace("#","_").replace(":","_")
     return new_name
+    
+def extend_args(var,add):
+    """Add an argument to a list for software input"""
+    if var is None:
+        var = "--fast"
+    else:
+        var = [var]
+        var.extend([add])
+        var = " ".join(var)
+    return var

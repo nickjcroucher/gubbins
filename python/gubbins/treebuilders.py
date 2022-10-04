@@ -255,7 +255,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -269,6 +269,7 @@ class IQTree:
         self.alignment_suffix = ".phylip"
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
+        self.use_best = use_best
         self.additional_args = additional_args
     
         # Construct base command
@@ -286,8 +287,10 @@ class IQTree:
         command.extend(["-nt", str(self.threads)])
 
         # Add flags
-        command.extend(["-safe"])
-        if self.model == 'JC':
+        command.extend(["-safe","-redo"])
+        if self.use_best:
+            pass
+        elif self.model == 'JC':
             command.extend(["-m", "JC"])
         elif self.model == 'K2P':
             command.extend(["-m", "K2P"])
@@ -408,6 +411,17 @@ class IQTree:
         command.extend(["--prefix", os.path.join(tmp,basename)])
         if outgroup is not None:
             command.extend(["-o", outgroup])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
+
+    def run_model_comparison(self, alignment_filename: str, basename: str) -> str:
+        """Pick best model based on ML fit to data"""
+        command = self.base_command.copy()
+        command.extend(["-s", alignment_filename])
+        command.extend(["-m TESTONLY"])
+        command.extend(["-mset JC,K2P,HKY,GTR -cmax 4"])
+        command.extend(["--prefix",basename])
         if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         return " ".join(command)

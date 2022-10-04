@@ -45,6 +45,15 @@ from gubbins.__init__ import version
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
+# Phylogenetic models valid for each algorithm
+tree_models = {
+    'star': ['JC','GTRCAT','GTRGAMMA'],
+    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+    'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+    'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+    'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+    'rapidnj': ['JC','K2P']
+}
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -228,42 +237,10 @@ def parse_and_run(input_args, program_description=""):
             current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
             # Pick best model through ML tests
             if input_args.best_model:
-                model_test_command = model_fitter.run_model_comparison(snp_alignment_filename,basename)
-                try:
-                    subprocess.check_call(model_test_command, shell=True)
-                except subprocess.SubprocessError:
-                    sys.exit("Unable to identify best-fitting model")
-                tree_models = {
-                    'star': ['JC','GTRCAT','GTRGAMMA'],
-                    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
-                    'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-                    'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-                    'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-                    'rapidnj': ['JC','K2P']
-                }
-                current_model = None
-                iqtree_specific_model = None
-                with gzip.open(basename + '.model.gz','rb') as model_file:
-                    for line in model_file:
-                        if line.decode().startswith('best_model_list_BIC:'):
-                            model_list = line.decode().rstrip().split()
-                            iqtree_specific_model = model_list[1]
-                            if current_tree_builder == 'iqtree':
-                                current_model = iqtree_specific_model
-                            else:
-                                for model in model_list:
-                                    model_aspects = model.split('+')
-                                    if model_aspects[0] == 'GTR' and 'G4' in model_aspects:
-                                        model_name = 'GTRGAMMA'
-                                    elif model_aspects[0] == 'GTR' and \
-                                        ('R2' in model_aspects or 'R3' in model_aspects):
-                                        model_name = 'GTRCAT'
-                                    else:
-                                        model_name = model_aspects[0]
-                                    if model_name in tree_models[current_tree_builder]:
-                                        current_model = model_name
-                                        break
-                print(current_model)
+                current_model,iqtree_specific_model = select_best_models(snp_alignment_filename,
+                                                                        basename,
+                                                                        model_fitter,
+                                                                        current_tree_builder)
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
                     input_args = check_model_validity(input_args)
@@ -572,11 +549,11 @@ def parse_and_run(input_args, program_description=""):
     utils.rename_files(output_filenames_to_final_filenames)
     if input_args.date is not None:
         # Save final output files
-        dating_files = {
-            os.path.join(temp_working_dir,basename + '.timetree.lsd'): input_args.prefix + '.lsd.out',
-            os.path.join(temp_working_dir,basename + '.timetree.nwk'): input_args.prefix + '.final_tree.timetree.tre'
-        }
-        utils.rename_files(dating_files)
+        output_dating_filenames_to_final_dating_filenames = \
+            translation_of_dating_filenames_to_final_filenames(temp_working_dir,
+                                                                basename,
+                                                                input_args.prefix)
+        utils.rename_files(output_dating_filenames_to_final_dating_filenames)
 
     # Cleanup intermediate files
     if not input_args.no_cleanup:
@@ -655,14 +632,6 @@ def process_input_arguments(input_args):
 
 def check_model_validity(input_args):
     # Check substitution model consistent with tree building algorithm
-    tree_models = {
-        'star': ['JC','GTRCAT','GTRGAMMA'],
-        'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
-        'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-        'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-        'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-        'rapidnj': ['JC','K2P']
-    }
     invalid_model = False
     # Check on first tree builder
     if input_args.first_tree_builder is not None:
@@ -774,6 +743,36 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         sys.stderr.write("Unrecognised algorithm: " + algorithm_choice + "\n")
         sys.exit()
     return initialised_algorithm
+
+def select_best_models(snp_alignment_filename,basename,model_fitter,current_tree_builder):
+    model_test_command = model_fitter.run_model_comparison(snp_alignment_filename,basename)
+    try:
+        subprocess.check_call(model_test_command, shell=True)
+    except subprocess.SubprocessError:
+        sys.exit("Unable to identify best-fitting model")
+    current_model = None
+    iqtree_specific_model = None
+    with gzip.open(basename + '.model.gz','rb') as model_file:
+        for line in model_file:
+            if line.decode().startswith('best_model_list_BIC:'):
+                model_list = line.decode().rstrip().split()
+                iqtree_specific_model = model_list[1]
+                if current_tree_builder == 'iqtree':
+                    current_model = iqtree_specific_model
+                else:
+                    for model in model_list:
+                        model_aspects = model.split('+')
+                        if model_aspects[0] == 'GTR' and 'G4' in model_aspects:
+                            model_name = 'GTRGAMMA'
+                        elif model_aspects[0] == 'GTR' and \
+                            ('R2' in model_aspects or 'R3' in model_aspects):
+                            model_name = 'GTRCAT'
+                        else:
+                            model_name = model_aspects[0]
+                        if model_name in tree_models[current_tree_builder]:
+                            current_model = model_name
+                            break
+    return current_model,iqtree_specific_model
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size,
@@ -1364,3 +1363,12 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names
+
+def translation_of_dating_filenames_to_final_filenames(temp_working_dir,
+                                                                basename,
+                                                                prefix):
+    dating_files = {
+        os.path.join(temp_working_dir,basename + '.timetree.lsd'): prefix + '.lsd.out',
+        os.path.join(temp_working_dir,basename + '.timetree.nwk'): prefix + '.final_tree.timetree.tre'
+    }
+    return dating_files

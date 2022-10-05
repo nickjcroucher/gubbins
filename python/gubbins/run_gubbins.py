@@ -94,7 +94,7 @@ def parse_input_args():
     reconGroup = parser.add_argument_group('Ancestral sequence reconstruction options')
     reconGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting for joint ancestral state'
                                                       ' reconstruction [if unspecified: same as tree builder if possible'
-                                                      ', else raxml]',
+                                                      ', else iqtree]',
                                                       default = None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
     reconGroup.add_argument('--recon-model',    '-R', help='Nucleotide substitution model used for ancestral state reconstruction'
@@ -106,7 +106,7 @@ def parse_input_args():
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',
                                                       action='store_true')
     reconGroup.add_argument('--seq-recon',            help='Algorithm to use for marginal reconstruction [if unspecified: '
-                                                      'same as tree builder if possible, else raxml; requires --mar flag]',
+                                                      'same as tree builder if possible, else iqtree; requires --mar flag]',
                                                       default=None,
                                                       choices=['raxml', 'raxmlng', 'iqtree', None])
     reconGroup.add_argument('--seq-recon-args',       help='Further arguments passed to sequence reconstruction algorithm'

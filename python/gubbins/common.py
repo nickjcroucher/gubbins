@@ -326,7 +326,10 @@ def parse_and_run(input_args, program_description=""):
                                                                 os.path.abspath(temp_rooted_tree),
                                                                 temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
-            subprocess.check_call(model_fitting_command, shell = True)
+            try:
+                subprocess.check_call(model_fitting_command, shell = True)
+            except:
+                sys.exit("Unable to fit model to data")
 
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
@@ -604,8 +607,8 @@ def process_input_arguments(input_args):
             elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
                 input_args.model_fitter = input_args.tree_builder
             else:
-                # Else use RAxML where not possible
-                input_args.model_fitter = 'raxml'
+                # Else use IQtree where not possible - raxml failed on some unrealistic test datasets
+                input_args.model_fitter = 'iqtree'
         # Make sequence reconstruction consistent with tree building where possible
         if input_args.seq_recon is None:
             if input_args.best_model:
@@ -614,7 +617,7 @@ def process_input_arguments(input_args):
                 input_args.seq_recon = input_args.tree_builder
             else:
                 # Else use RAxML where not possible
-                input_args.seq_recon = 'raxml'
+                input_args.seq_recon = 'iqtree'
         elif not input_args.mar:
             sys.stderr.write('Sequence reconstruction uses pyjar unless the '
             '--mar flag is specified\n')

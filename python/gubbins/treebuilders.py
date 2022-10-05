@@ -464,6 +464,9 @@ class RAxML:
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
 
+        # Set a seed
+        command.extend(["-p",str(randint(0, 10000))])
+
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':

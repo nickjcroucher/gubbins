@@ -36,7 +36,7 @@ class Star:
         self.alignment_suffix = ".snp_sites.aln"
         # Reproducibility
         self.name = "Star"
-        seld.model = "-"
+        self.model = "-"
         self.version = "unspecified"
         self.citation = "no citation"
     

@@ -237,6 +237,7 @@ def parse_and_run(input_args, program_description=""):
             current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
             # Pick best model through ML tests
             if input_args.best_model:
+                printer.print("\nSelecting best phylogenetic model")
                 current_model,iqtree_specific_model = select_best_models(snp_alignment_filename,
                                                                         basename,
                                                                         model_fitter,
@@ -244,11 +245,12 @@ def parse_and_run(input_args, program_description=""):
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
                     input_args = check_model_validity(input_args)
+                printer.print("Phylogeny will be constructed with a " + current_model + " model")
                 # Initialise model fitter
                 model_fitter = return_algorithm(current_model_fitter, iqtree_specific_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
                 methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
                 # Initialise sequence reconstruction if MAR
-                if input_args.mar and input_args.seq_recon == 'iqtree':
+                if input_args.mar:
                     sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
                     methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (later iterations)')
             else:
@@ -611,7 +613,7 @@ def process_input_arguments(input_args):
         # Make sequence reconstruction consistent with tree building where possible
         if input_args.seq_recon is None:
             if input_args.best_model:
-                input_args.model_fitter = "iqtree"
+                input_args.seq_recon = "iqtree"
             elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
                 input_args.seq_recon = input_args.tree_builder
             else:

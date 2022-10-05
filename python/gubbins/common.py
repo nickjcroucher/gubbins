@@ -105,6 +105,12 @@ def parse_and_run(input_args, program_description=""):
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
+    # Initialise IQtree
+    tree_dater = IQTree(threads = input_args.threads,
+                            model = current_model,
+                            verbose = input_args.verbose
+                        )
+
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
 
@@ -249,7 +255,8 @@ def parse_and_run(input_args, program_description=""):
                 printer.print("\nSelecting best phylogenetic model")
                 current_model = select_best_models(alignment_filename,
                                                     basename,
-                                                    current_tree_builder)
+                                                    current_tree_builder,
+                                                    input_args)
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
                     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter)
@@ -258,6 +265,9 @@ def parse_and_run(input_args, program_description=""):
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
             alignment_suffix = tree_builder.alignment_suffix
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
+            # Update date model (should not make a difference)
+            if input_args.date is not None:
+                tree_dater.model = current_model
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
@@ -337,7 +347,20 @@ def parse_and_run(input_args, program_description=""):
             # Set root of reconstruction tree to match that of the current tree
             # Cannot just midpoint root both, because the branch lengths differ between them
             harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
-            
+            # If requested, use a time-calibrated tree for sequence reconstruction
+            if input_args.date is not None and input_args.recon_with_dates:
+                dating_command = tree_dater.run_time_tree(snp_alignment_filename,
+                                                recontree_filename,
+                                                input_args.date,
+                                                temp_working_dir,
+                                                base_filename,
+                                                outgroup = input_args.outgroup)
+                try:
+                    subprocess.check_call(dating_command, shell=True)
+                except subprocess.SubprocessError:
+                    # If this fails, continue to generate rest of output
+                    sys.stderr.write("Unable to use time calibrated tree for iteration " + str(i))
+                
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment
@@ -518,11 +541,6 @@ def parse_and_run(input_args, program_description=""):
 
     # 8. Run time calibration of final tree
     if input_args.date is not None:
-        # Initialise IQtree
-        tree_dater = IQTree(threads = input_args.threads,
-                                model = current_model,
-                                verbose = input_args.verbose
-                            )
         dating_command = tree_dater.run_time_tree(final_aln,
                                                     current_tree_name,
                                                     input_args.date,
@@ -734,8 +752,12 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         sys.exit()
     return initialised_algorithm
 
-def select_best_models(snp_alignment_filename,basename,current_tree_builder):
-    model_test_command = model_fitter.run_model_comparison(snp_alignment_filename,basename)
+def select_best_models(snp_alignment_filename,basename,current_tree_builder,input_args):
+    model_tester = IQTree(threads = input_args.threads,
+                            model = 'GTR',
+                            verbose = input_args.verbose
+                    )
+    model_test_command = model_tester.run_model_comparison(snp_alignment_filename,basename)
     try:
         subprocess.check_call(model_test_command, shell=True)
     except subprocess.SubprocessError:

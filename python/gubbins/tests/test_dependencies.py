@@ -122,6 +122,17 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    def test_iqtree_fast(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree-fast",
+                                                "--verbose", "--iterations", "3",
+                                                "--threads", "1",
+                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_iqtree_with_dates(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
@@ -158,6 +169,26 @@ class TestExternalDependencies(unittest.TestCase):
                                                     "--prefix", "original",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                            "--verbose", "--iterations", "3",
+                                            "--resume", "multiple_recombinations.iteration_1.tre",
+                                            "--threads", "1",
+                                            os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('original')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test resuming a default analysis
+    def test_iqtree_fast_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree-fast",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    "--no-cleanup",
+                                                    "--prefix", "original",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree-fast",
                                             "--verbose", "--iterations", "3",
                                             "--resume", "multiple_recombinations.iteration_1.tre",
                                             "--threads", "1",
@@ -327,6 +358,18 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
                                                     "--tree-builder", "iqtree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_starting_star_iqtree_fast(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--first-tree-builder","star",
+                                                    "--tree-builder", "iqtree-fast",
                                                     "--verbose", "--iterations", "3",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))

@@ -35,7 +35,8 @@ class Star:
         self.tree_suffix = ".tre"
         self.alignment_suffix = ".snp_sites.aln"
         # Reproducibility
-        self.name = 'Star'
+        self.name = "Star"
+        seld.model = "-"
         self.version = "unspecified"
         self.citation = "no citation"
     

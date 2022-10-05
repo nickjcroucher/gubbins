@@ -35,6 +35,16 @@ from gubbins.utils import generate_shared_mem_array
 # Python-native functions #
 ###########################
 
+class Pyjar:
+    def __init__(self, model: str):
+        """Initialises the object"""
+        self.citation = "https://doi.org/10.1093/oxfordjournals.molbev.a026369"
+        self.process = "Sequence reconstructor"
+        self.version = "1.0"
+        self.algorithm = "pyjar"
+        self.executable = "pyjar"
+        self.model = model
+
 # Split a list into chunks for multiprocessing
 # from https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length/37414115#37414115
 def chunks(l, k):

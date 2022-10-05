@@ -42,7 +42,7 @@ from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
-from gubbins.pyjar import jar, get_base_patterns
+from gubbins.pyjar import jar, get_base_patterns, Pyjar
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
 # Phylogenetic models valid for each algorithm
@@ -77,11 +77,12 @@ def parse_and_run(input_args, program_description=""):
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
     # Log algorithms used
-    methods_log = {property:[] for property in ['citation','process','version','algorithm']}
+    methods_log = {property:[] for property in ['citation','process','version','algorithm','model']}
     methods_log['algorithm'].append("Gubbins")
     methods_log['citation'].append("https://doi.org/10.1093/nar/gku1196")
     methods_log['process'].append("Overall")
     methods_log['version'].append(program_version)
+    methods_log['model'].append("-")
 
     # Initialize tree builder and check if all required dependencies are available
     printer.print("\nChecking dependencies and input files...")
@@ -102,7 +103,7 @@ def parse_and_run(input_args, program_description=""):
     # Initialise sequence reconstruction if MAR
     if input_args.mar:
         sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
-        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
+        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -321,13 +322,15 @@ def parse_and_run(input_args, program_description=""):
             if i == starting_iteration:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
-                
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array, max_pos = \
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
+                # 3.3b. Record in methods log (just once)
+                pyjar_method = Pyjar(current_model)
+                methods_log = update_methods_log(methods_log, method = pyjar_method, step = 'Sequence reconstructor')
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
@@ -364,7 +367,7 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes,
                                                   "pyjar")
             printer.print(["\nDone transfer"])
-
+            
         else:
 
             # 3.2b. Marginal ancestral reconstruction with RAxML, RAxML-NG or IQTree
@@ -545,7 +548,6 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
-    print_log(methods_log, input_args.prefix)
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
@@ -556,6 +558,11 @@ def parse_and_run(input_args, program_description=""):
                                                                 basename,
                                                                 input_args.prefix)
         utils.rename_files(output_dating_filenames_to_final_dating_filenames)
+        # Add dating method to methods log
+        tree_dater.model = "LSD"
+        tree_dater.citation = "https://doi.org/10.1093/sysbio/syv068"
+        methods_log = update_methods_log(methods_log, method = tree_dater, step = 'Time calibration of tree')
+    print_log(methods_log, input_args.prefix)
 
     # Cleanup intermediate files
     if not input_args.no_cleanup:
@@ -1340,15 +1347,16 @@ def update_methods_log(log, method = None, step = ''):
     log['process'].append(step)
     log['version'].append(method.version)
     log['algorithm'].append(method.executable)
+    log['model'].append(method.model)
     return log
 
 def print_log(log, prefix):
     """Print a records of the methods used"""
     log_file_name = prefix + ".log"
     with open(log_file_name,'w') as log_file:
-        log_file.write("Process,Algorithm,Version,Citation\n")
+        log_file.write("Process,Algorithm,Version,Model,Citation\n")
         for index,process in enumerate(log['process']):
-            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['citation'][index] + "\n")
+            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['model'][index] + "," + log['citation'][index] + "\n")
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {

@@ -657,6 +657,21 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('bootstrapping_test')
         assert exit_code == 0
 
+    # Test combining multiple methods
+    def test_method_combination(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--best-model",
+                                                    "--iterations", "3",
+                                                    "--mar",
+                                                    "--seq-recon", "raxmlng",
+                                                    "--first-tree-builder", "fasttree",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     # Test convergence
     def test_converge_on_rec(self):
         exit_code = 1

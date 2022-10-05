@@ -344,9 +344,6 @@ def parse_and_run(input_args, program_description=""):
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
             recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)
-            # Set root of reconstruction tree to match that of the current tree
-            # Cannot just midpoint root both, because the branch lengths differ between them
-            harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
             # If requested, use a time-calibrated tree for sequence reconstruction
             if input_args.date is not None and input_args.recon_with_dates:
                 dating_command = tree_dater.run_time_tree(snp_alignment_filename,
@@ -357,10 +354,19 @@ def parse_and_run(input_args, program_description=""):
                                                 outgroup = input_args.outgroup)
                 try:
                     subprocess.check_call(dating_command, shell=True)
+                    recontree_filename = os.path.join(temp_working_dir,base_filename + '.timetree.nwk')
+                    # Set root of reconstruction tree to match that of the current tree
+                    # Cannot just midpoint root both, because the branch lengths differ between them
+                    harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
                 except subprocess.SubprocessError:
                     # If this fails, continue to generate rest of output
-                    sys.stderr.write("Unable to use time calibrated tree for iteration " + str(i))
-                
+                    sys.stderr.write("Unable to use time calibrated tree for sequence reconstruction in "
+                    " iteration " + str(i))
+            else:
+                # Set root of reconstruction tree to match that of the current tree
+                # Cannot just midpoint root both, because the branch lengths differ between them
+                harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
+            
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
                 base_patterns = base_pattern_bases_array, # array of unique base patterns in alignment

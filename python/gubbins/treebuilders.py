@@ -411,6 +411,7 @@ class IQTree:
         command.extend(["--date", date_file])
         command.extend(["--prefix", os.path.join(tmp,basename)])
         command.extend(["-blfix"])
+        command.extend(["--date-options","' -l 0'"])
         if outgroup is not None:
             command.extend(["-o", outgroup])
         if not self.verbose:

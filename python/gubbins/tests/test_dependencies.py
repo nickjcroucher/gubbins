@@ -145,6 +145,19 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    def test_iqtree_with_dates_for_recon(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
+                                                "--recon-with-dates",
+                                                "--date",os.path.join(data_dir, 'taxon.times'),
+                                                "--threads", "1",
+                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_iqtree_with_dates_and_outgroup(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()

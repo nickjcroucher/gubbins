@@ -105,7 +105,7 @@ def parse_input_args():
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     reconGroup.add_argument('--recon-with-dates',     help='Use isolate date information in ancestral joint sequence'
                                                       ' reconstruction',
-                                                      default=None)
+                                                      default=False, action='store_true')
     reconGroup.add_argument('--model-fitter-args',    help='Further arguments passed to model fitting algorithm',
                                                       default=None)
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',

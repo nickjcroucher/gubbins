@@ -409,6 +409,7 @@ class IQTree:
         command.extend(["-te", input_tree, "--tree-fix"])
         command.extend(["--date", date_file])
         command.extend(["--prefix", os.path.join(tmp,basename)])
+        command.extend(["-blfix"])
         if outgroup is not None:
             command.extend(["-o", outgroup])
         if not self.verbose:

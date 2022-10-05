@@ -189,7 +189,7 @@ def process_sequence_names(name):
 def extend_args(var,add):
     """Add an argument to a list for software input"""
     if var is None:
-        var = "--fast"
+        var = add
     else:
         var = [var]
         var.extend([add])

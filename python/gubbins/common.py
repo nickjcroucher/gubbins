@@ -91,8 +91,8 @@ def parse_and_run(input_args, program_description=""):
     internal_node_label_prefix = "internal_"
     
     # Select the algorithms used for the first iteration
-    current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
-    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter)
+    current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,1)
+    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
     # Initialise tree builder
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
@@ -249,7 +249,7 @@ def parse_and_run(input_args, program_description=""):
         # 1.1. Construct the tree-building command depending on the iteration and employed options
         if i == 2 or input_args.resume is not None:
             # Select the algorithms used for the subsequent iterations
-            current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
+            current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,i)
             # Pick best model through ML tests
             if input_args.best_model:
                 printer.print("\nSelecting best phylogenetic model")
@@ -259,7 +259,7 @@ def parse_and_run(input_args, program_description=""):
                                                     input_args)
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
-                    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter)
+                    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
                 printer.print("Phylogeny will be constructed with a " + current_model + " model")
             # Initialise tree builder
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
@@ -609,21 +609,6 @@ def process_input_arguments(input_args):
         if input_args.first_tree_builder == "iqtree-fast":
             input_args.first_tree_builder = "iqtree"
             input_args.first_tree_args = utils.extend_args(input_args.first_tree_args,"--fast")
-        # Process model selection for first iteration
-        if input_args.first_model is None:
-            if input_args.first_tree_builder == "rapidnj" or \
-                (input_args.first_tree_builder is None and input_args.tree_builder == "rapidnj"):
-                input_args.first_model = "JC"
-            else:
-                input_args.first_model = "GTRGAMMA"
-        # Process model selection for later iterations
-        if input_args.best_model:
-            input_args.model = None
-            input_args.model_fitter = "iqtree"
-        elif input_args.tree_builder == "rapidnj" and input_args.model is None:
-            input_args.model = "JC"
-        elif input_args.model is None:
-            input_args.model = "GTRGAMMA"
         # Make model fitting consistent with tree building
         if input_args.model_fitter is None:
             if input_args.best_model:
@@ -646,6 +631,11 @@ def process_input_arguments(input_args):
             sys.stderr.write('Sequence reconstruction uses pyjar unless the '
             '--mar flag is specified\n')
             sys.exit()
+        # Only allow time calibration to be used where it makes sense
+        if input_args.recon_with_dates:
+            if input_args.date is None or input_args.mar:
+                sys.stderr.write("Reconstruction using dates is only possible with joint reconstruction and a dates file\n")
+                sys.exit()
         # Check on arguments for measures of branch support
         if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
             sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
@@ -655,18 +645,18 @@ def process_input_arguments(input_args):
             sys.exit()
     return input_args
 
-def check_model_validity(current_model,current_tree_builder,mar,recon_model,model_fitter):
+def check_model_validity(current_model,current_tree_builder,mar,recon_model,model_fitter,custom_model,custom_recon_model):
     # Check substitution model consistent with tree building algorithm
     invalid_model = False
     # Determine model to be used for subsequent iterations
-    if current_model not in tree_models[current_tree_builder]:
+    if not custom_model and current_model not in tree_models[current_tree_builder]:
         sys.stderr.write('Evolutionary model ' + current_model +
                         ' and algorithm ' + current_tree_builder +
                          ' are incompatible\n')
         invalid_model = True
     # Determine model to be used for ancestral state reconstruction
     if not mar:
-        if recon_model not in tree_models[model_fitter]:
+        if not custom_recon_model and recon_model not in tree_models[model_fitter]:
             sys.stderr.write('Evolutionary model ' + recon_model +
                             ' and algorithm ' + model_fitter +
                              ' are incompatible\n')
@@ -710,13 +700,16 @@ def return_algorithm_choices(args,i):
             extra_tree_arguments.extend(["--search1"])
             extra_tree_arguments = " ".join(extra_tree_arguments)
     # Current model
+    custom_model = False
     if i == 1:
         if args.custom_first_model is not None:
             current_model = args.custom_first_model
+            custom_model = True
         elif args.first_model is not None:
             current_model = args.first_model
         elif args.custom_model is not None:
             current_model = args.custom_model
+            custom_model = True
         elif args.model is not None:
             current_model = args.model
         elif current_tree_builder == "rapidnj":
@@ -726,6 +719,7 @@ def return_algorithm_choices(args,i):
     else:
         if args.custom_model is not None:
             current_model = args.custom_model
+            custom_model = True
         elif args.model is not None:
             current_model = args.model
         elif current_tree_builder == "rapidnj":
@@ -733,11 +727,16 @@ def return_algorithm_choices(args,i):
         else:
             current_model = "GTRGAMMA"
     # Pick model fitter and model
+    custom_recon_model = False
     current_model_fitter = args.model_fitter
-    current_recon_model = args.recon_model
+    if args.custom_recon_model is not None:
+        current_recon_model = args.custom_recon_model
+        custom_recon_model = True
+    else:
+        current_recon_model = args.recon_model
     extra_recon_arguments = args.model_fitter_args
     # Return choices
-    return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments
+    return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments, custom_model, current_recon_model
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None

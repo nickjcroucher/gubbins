@@ -103,6 +103,9 @@ def parse_input_args():
                                                       ' (not all available for all tree building algorithms)',
                                                       default='GTRGAMMA',
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    reconGroup.add_argument('--custom-recon-model',   help='String corresponding to a substitution model for the selected '
+                                                      ' model fitting algorithm',
+                                                      default=None)
     reconGroup.add_argument('--recon-with-dates',     help='Use isolate date information in ancestral joint sequence'
                                                       ' reconstruction',
                                                       default=False, action='store_true')

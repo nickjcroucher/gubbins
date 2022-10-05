@@ -91,18 +91,18 @@ def parse_and_run(input_args, program_description=""):
     internal_node_label_prefix = "internal_"
     
     # Select the algorithms used for the first iteration
-    current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
-    input_args = check_model_validity(input_args)
+    current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
+    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter)
     # Initialise tree builder
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
     methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
     # Initialise model fitter
-    model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+    model_fitter = return_algorithm(current_model_fitter, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
     methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
     # Initialise sequence reconstruction if MAR
     if input_args.mar:
-        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
+        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
         methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
     # Check - and potentially correct - further input parameters
@@ -232,43 +232,32 @@ def parse_and_run(input_args, program_description=""):
     for i in range(starting_iteration, input_args.iterations+1):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
-        # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2 or input_args.resume is not None:
-            # Select the algorithms used for the subsequent iterations
-            current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
-            # Pick best model through ML tests
-            if input_args.best_model:
-                printer.print("\nSelecting best phylogenetic model")
-                current_model,iqtree_specific_model = select_best_models(snp_alignment_filename,
-                                                                        basename,
-                                                                        model_fitter,
-                                                                        current_tree_builder)
-                input_args.model = current_model
-                if current_tree_builder != 'iqtree':
-                    input_args = check_model_validity(input_args)
-                printer.print("Phylogeny will be constructed with a " + current_model + " model")
-                # Initialise model fitter
-                model_fitter = return_algorithm(current_model_fitter, iqtree_specific_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-                methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
-                # Initialise sequence reconstruction if MAR
-                if input_args.mar:
-                    sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
-                    methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (later iterations)')
-            else:
-                # Initialise model fitter
-                model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-                methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
-            # Initialise tree builder
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-            alignment_suffix = tree_builder.alignment_suffix
-            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
-
+        # Define file names
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
+
+        # 1.1. Construct the tree-building command depending on the iteration and employed options
+        if i == 2 or input_args.resume is not None:
+            # Select the algorithms used for the subsequent iterations
+            current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
+            # Pick best model through ML tests
+            if input_args.best_model:
+                printer.print("\nSelecting best phylogenetic model")
+                current_model = select_best_models(alignment_filename,
+                                                    basename,
+                                                    current_tree_builder)
+                input_args.model = current_model
+                if current_tree_builder != 'iqtree':
+                    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter)
+                printer.print("Phylogeny will be constructed with a " + current_model + " model")
+            # Initialise tree builder
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            alignment_suffix = tree_builder.alignment_suffix
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
@@ -639,56 +628,21 @@ def process_input_arguments(input_args):
             sys.exit()
     return input_args
 
-def check_model_validity(input_args):
+def check_model_validity(current_model,current_tree_builder,mar,recon_model,model_fitter):
     # Check substitution model consistent with tree building algorithm
     invalid_model = False
-    # Check on first tree builder
-    if input_args.first_tree_builder is not None:
-        # Raise error if first tree builder and starting tree
-        if input_args.starting_tree is not None:
-            sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
-            sys.exit()
-    # Determine model to be used for first iteration, if specified
-    if input_args.custom_first_model is not None:
-        input_args.first_model = input_args.custom_first_model
-        sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
-    elif input_args.first_model is not None:
-        first_model = input_args.first_model
-        first_tree_builder = input_args.tree_builder
-        if input_args.first_tree_builder is not None:
-            first_tree_builder = input_args.first_tree_builder
-        first_model_fitter = input_args.model_fitter
-        if input_args.first_model_fitter is not None:
-            first_model_fitter = input_args.first_model_fitter
-        if first_model not in tree_models[first_tree_builder]:
-            sys.stderr.write('First evolutionary model ' + first_model +
-                            ' and algorithm ' + first_tree_builder +
-                             ' are incompatible\n')
-            invalid_model = True
-        elif first_model not in tree_models[first_model_fitter]:
-            sys.stderr.write('First evolutionary model ' + first_model +
-                            ' and algorithm ' + first_model_fitter +
-                             ' are incompatible\n')
-            invalid_model = True
-    # Check that at least 2 iterations will be run if customised options for 1st iteration
-    if input_args.iterations == 1:
-        if input_args.first_tree_builder is not None or input_args.first_model \
-            or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
-            sys.stderr.write('Please do not use options specific to the first iteration when'
-                             ' only one iteration is to be run\n')
-            sys.exit()
     # Determine model to be used for subsequent iterations
-    if input_args.model is not None:
-        if input_args.custom_model is not None:
-            input_args.model = input_args.custom_model
-            sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
-        elif input_args.model not in tree_models[input_args.tree_builder]:
-            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
-                        input_args.tree_builder + ' are incompatible\n')
-            invalid_model = True
-        elif input_args.model not in tree_models[input_args.model_fitter]:
-            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
-                        input_args.model_fitter + ' are incompatible\n')
+    if current_model not in tree_models[current_tree_builder]:
+        sys.stderr.write('Evolutionary model ' + current_model +
+                        ' and algorithm ' + current_tree_builder +
+                         ' are incompatible\n')
+        invalid_model = True
+    # Determine model to be used for ancestral state reconstruction
+    if not mar:
+        if recon_model not in tree_models[model_fitter]:
+            sys.stderr.write('Evolutionary model ' + recon_model +
+                            ' and algorithm ' + model_fitter +
+                             ' are incompatible\n')
             invalid_model = True
     # Information for rectifying incompatible combinations
     if invalid_model:
@@ -697,17 +651,29 @@ def check_model_validity(input_args):
             models = ', '.join(tree_models[algorithm])
             sys.stderr.write(algorithm + ':\t' + models + '\n')
         sys.exit()
-    return input_args
 
 def return_algorithm_choices(args,i):
+    # Check that at least 2 iterations will be run if customised options for 1st iteration
+    if args.iterations == 1:
+        if args.first_tree_builder is not None or args.first_model \
+            or args.custom_first_model is not None or args.first_tree_args is not None:
+            sys.stderr.write('Please do not use options specific to the first iteration when'
+                             ' only one iteration is to be run\n')
+            sys.exit()
+    # Check on first tree builder
+    if args.first_tree_builder is not None:
+        # Raise error if first tree builder and starting tree
+        if args.starting_tree is not None:
+            sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+            sys.exit()
     # Pick tree builder
-    current_tree_builder = args.tree_builder
     if args.first_tree_builder is not None and i==1:
         current_tree_builder = args.first_tree_builder
-    # Get tree builder arguments
-    extra_tree_arguments = args.tree_args
-    if args.first_tree_builder is not None and i==1:
         extra_tree_arguments = args.first_tree_args
+    else:
+        current_tree_builder = args.tree_builder
+        # Get tree builder arguments
+        extra_tree_arguments = args.tree_args
     # If RAXML-NG first tree builder use search1 option to decrease runtime
     if i == 1 and current_tree_builder == "raxmlng":
         if extra_tree_arguments is None:
@@ -716,23 +682,27 @@ def return_algorithm_choices(args,i):
             extra_tree_arguments = [extra_tree_arguments]
             extra_tree_arguments.extend(["--search1"])
             extra_tree_arguments = " ".join(extra_tree_arguments)
-    # Pick model fitter and model
-    if args.best_model and i > 1:
-        current_model_fitter = "iqtree"
-        current_model = None
-    else:
-        current_model_fitter = args.model_fitter
-        current_model = args.model
-        if args.first_model_fitter is not None and i==1:
-            current_model_fitter = args.first_model_fitter
-        if args.first_model is not None and i==1:
+    # Current model
+    if i == 1:
+        if args.custom_first_model is not None:
+            current_model = args.custom_first_model
+        elif args.first_model is not None:
             current_model = args.first_model
-    # Get model fitter arguments
-    extra_model_arguments = args.model_args
-    if args.first_model_args is not None and i==1:
-        extra_model_arguments = args.first_model_args
+        elif args.custom_model is not None:
+            current_model = args.custom_model
+        elif args.model is not None:
+            current_model = args.model
+    else:
+        if args.custom_model is not None:
+            current_model = args.custom_model
+        elif args.model is not None:
+            current_model = args.model
+    # Pick model fitter and model
+    current_model_fitter = args.model_fitter
+    current_recon_model = args.recon_model
+    extra_recon_arguments = args.model_fitter_args
     # Return choices
-    return current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments
+    return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
@@ -753,7 +723,7 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         sys.exit()
     return initialised_algorithm
 
-def select_best_models(snp_alignment_filename,basename,model_fitter,current_tree_builder):
+def select_best_models(snp_alignment_filename,basename,current_tree_builder):
     model_test_command = model_fitter.run_model_comparison(snp_alignment_filename,basename)
     try:
         subprocess.check_call(model_test_command, shell=True)
@@ -781,7 +751,7 @@ def select_best_models(snp_alignment_filename,basename,model_fitter,current_tree
                         if model_name in tree_models[current_tree_builder]:
                             current_model = model_name
                             break
-    return current_model,iqtree_specific_model
+    return current_model
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size,

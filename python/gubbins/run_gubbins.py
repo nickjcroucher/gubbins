@@ -76,36 +76,33 @@ def parse_input_args():
                                                       action = 'store_true')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
-    modelGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting [if unspecified: same as'
-                                                      ' tree builder if possible, else raxml]',
-                                                      default = None,
-                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
     modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all '
                                                       'tree building algorithms)',
                                                       default=None,
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
-    modelGroup.add_argument('--model-args',           help='Quoted string of further arguments passed to model fitting algorithm'
-                                                      ' (start string with a space if there is a risk of being interpreted as a flag)',
-                                                      default = None)
+    modelGroup.add_argument('--first-model',          help='Nucleotide substitution model used for first tree',
+                                                      default=None,
+                                                      choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
     modelGroup.add_argument('--best-model',           help='Automatically select best substitution model using iqtree in later iterations',
                                                       default = False, action = 'store_true')
     modelGroup.add_argument('--custom-model',         help='String corresponding to a substitution model for the selected tree'
                                                       ' building algorithm', default = None)
-    modelGroup.add_argument('--first-model-fitter',   help='Application to use for model fitting in first iteration'
-                                                      ' [if unspecified: same as tree builder if possible, else raxml]',
-                                                      default = None,
-                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
-    modelGroup.add_argument('--first-model',          help='Nucleotide substitution model used for first tree',
-                                                      default=None,
-                                                      choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
-    modelGroup.add_argument('--first-model-args',     help='Further arguments passed to model fitting algorithm used in first'
-                                                      'iteration (if unspecified: same as --first-tree-builder-args)',
-                                                      default=None)
     modelGroup.add_argument('--custom-first-model',   help='String corresponding to a substitution model for the selected tree'
                                                       ' building algorithm for the first iteration',
                                                       default = None)
 
     reconGroup = parser.add_argument_group('Ancestral sequence reconstruction options')
+    reconGroup.add_argument('--model-fitter',   '-F', help='Application to use for model fitting for joint ancestral state'
+                                                      ' reconstruction [if unspecified: same as tree builder if possible'
+                                                      ', else raxml]',
+                                                      default = None,
+                                                      choices=['raxml', 'raxmlng', 'iqtree', 'fasttree', None])
+    reconGroup.add_argument('--recon-model',    '-R', help='Nucleotide substitution model used for ancestral state reconstruction'
+                                                      ' (not all available for all tree building algorithms)',
+                                                      default='GTRGAMMA',
+                                                      choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    reconGroup.add_argument('--model-fitter-args',    help='Further arguments passed to model fitting algorithm',
+                                                      default=None)
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',
                                                       action='store_true')
     reconGroup.add_argument('--seq-recon',            help='Algorithm to use for marginal reconstruction [if unspecified: '

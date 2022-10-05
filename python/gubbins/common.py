@@ -695,11 +695,19 @@ def return_algorithm_choices(args,i):
             current_model = args.custom_model
         elif args.model is not None:
             current_model = args.model
+        elif current_tree_builder == "rapidnj":
+            current_model = "JC"
+        else:
+            current_model = "GTRGAMMA"
     else:
         if args.custom_model is not None:
             current_model = args.custom_model
         elif args.model is not None:
             current_model = args.model
+        elif current_tree_builder == "rapidnj":
+            current_model = "JC"
+        else:
+            current_model = "GTRGAMMA"
     # Pick model fitter and model
     current_model_fitter = args.model_fitter
     current_recon_model = args.recon_model

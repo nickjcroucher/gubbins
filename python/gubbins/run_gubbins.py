@@ -35,7 +35,9 @@ def parse_input_args():
     ioGroup.add_argument('alignment_filename',        help='Multifasta alignment file')
     ioGroup.add_argument('--prefix',            '-p', help='Add a prefix to the final output filenames')
     ioGroup.add_argument('--starting-tree',     '-s', help='Starting tree')
-    ioGroup.add_argument('--date',              '-D', help='Starting tree', default = None)
+    ioGroup.add_argument('--date',              '-D', help='Two-column text file in which the second column is the'
+                                                      ' date of isolation in YYYY,YYYY-MM or YYYY-MM-DD format',
+                                                      default = None)
     ioGroup.add_argument('--use-time-stamp',    '-u', help='Use a time stamp in file names', action='store_true')
     ioGroup.add_argument('--version',                 action='version',
                                                       version = version())
@@ -101,6 +103,9 @@ def parse_input_args():
                                                       ' (not all available for all tree building algorithms)',
                                                       default='GTRGAMMA',
                                                       choices=['JC','K2P','HKY','GTR','GTRGAMMA','GTRCAT'])
+    reconGroup.add_argument('--use-dates',            help='Use isolate date information in ancestral joint sequence'
+                                                      ' reconstruction',
+                                                      default=None)
     reconGroup.add_argument('--model-fitter-args',    help='Further arguments passed to model fitting algorithm',
                                                       default=None)
     reconGroup.add_argument('--mar',                  help='Use marginal, rather than joint, ancestral reconstruction',

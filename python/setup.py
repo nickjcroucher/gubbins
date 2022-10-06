@@ -8,7 +8,7 @@ setuptools.setup(
     description='Frontend to the Gubbins BioInformatics tool',
     author='Andrew Page, Nicholas Croucher, Aidan Delaney, Christoph Puethe and Simon Harris',
     author_email='n.croucher@imperial.ac.uk',
-    url='https://github.com/sanger-pathogens/gubbins/',
+    url='https://github.com/nickjcroucher/gubbins/',
     packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
@@ -19,7 +19,8 @@ setuptools.setup(
         'scripts/generate_ska_alignment.py',
         'scripts/extract_gubbins_clade.py',
         'scripts/mask_gubbins_aln.py',
-        'scripts/gubbins_alignment_checker.py'
+        'scripts/gubbins_alignment_checker.py',
+        'scripts/generate_files_for_clade_analysis.py'
     ],
     tests_require=[
         "pytest >= 4.6",

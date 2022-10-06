@@ -1,6 +1,7 @@
 # Change Log
 
-## [v3.3]
+## [v3.3](https://github.com/nickjcroucher/gubbins/releases/tag/v3.3) (2022-10-6)
+[Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.2.1...v3.3)
 
 - Enable time calibration of final tree
 - Use separate models for tree construction and SNP reconstruction

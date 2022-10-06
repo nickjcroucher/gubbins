@@ -602,8 +602,11 @@ def process_input_arguments(input_args):
             sys.stderr.write('Cannot use marginal reconstruction for a pairwise comparison; switching to joint reconstruction')
             input_args.mar = False
     else:
+        if input_args.tree_builder == 'hybrid':
+            input_args.first_tree_builder = "fasttree"
+            input_args.tree_builder = "raxml"
         # Parse IQtree in fast mode
-        if input_args.tree_builder == "iqtree-fast":
+        elif input_args.tree_builder == "iqtree-fast":
             input_args.tree_builder = "iqtree"
             input_args.tree_args = utils.extend_args(input_args.tree_args,"--fast")
         if input_args.first_tree_builder == "iqtree-fast":

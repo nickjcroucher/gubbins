@@ -295,7 +295,7 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
                                                     "--model","GTR",
                                                     "--verbose", "--iterations", "3",
-                                                    "--custom-model","HKY+G"
+                                                    "--custom-model","HKY+G",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')

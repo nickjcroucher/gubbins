@@ -32,7 +32,6 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(output_csv)
 
     ## Test the clade extraction script
-
     def test_clade_extraction(self):
         multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
         clade_list = os.path.join(data_dir, "clade_to_extract.txt")
@@ -57,7 +56,7 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(out_gff)
         os.remove(out_tree)
 
-    ## Test the masking aln script 
+    ## Test the masking aln script
     def test_masking_aln(self):
         multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
         multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
@@ -97,6 +96,31 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(aln_out)
         os.remove(fasta_loc)
         assert exit_code == 0
+
+    # Test clade file extraction script
+    def test_clade_file_generation(self):
+        multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
+        clade_list = os.path.join(data_dir, "clade_to_extract.txt")
+        multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
+        multiple_tree = os.path.join(data_dir, "multiple_recombinations_gubbins.node_labelled.final_tree.tre")
+        out_aln = os.path.join(data_dir, "multiple_recombinations_generate.aln")
+        out_gff = os.path.join(data_dir, "multiple_recombinations_generate.gff")
+        out_tree = os.path.join(data_dir, "multiple_recombinations_generate.tree")
+        base_path = os.path.join(data_dir, "multiple_recombinations_generate")
+        ## Get the test files
+        test_aln = os.path.join(data_dir, "multiple_recombinations_clade_generate.aln")
+        test_gff = os.path.join(data_dir, "multiple_recombinations_clade_generate.gff")
+        test_tree = os.path.join(data_dir, "multiple_recombinations_clade_generate.tree")
+        # Script name
+        clade_file_generation_cmd = "generate_files_for_clade_analysis.py --list " + clade_list + " --aln " + multiple_aln +\
+            " --gff " + multiple_gff + " --tree " + multiple_tree + " --out " + base_path
+        subprocess.check_call(clade_file_generation_cmd, shell=True)
+        assert self.md5_check(out_aln, test_aln)
+        assert self.md5_check(out_gff, test_gff)
+        assert self.md5_check(out_tree, test_tree)
+        os.remove(out_aln)
+        os.remove(out_gff)
+        os.remove(out_tree)
 
     @staticmethod
     def check_for_output_files(prefix):

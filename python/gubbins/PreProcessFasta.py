@@ -100,3 +100,12 @@ class PreProcessFasta(object):
             AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
 
         return taxa_to_remove
+
+    def get_sequence_names(self):
+        sequence_names = []
+        with open(self.input_filename) as input_handle:
+            alignments = AlignIO.parse(input_handle, "fasta")
+            for alignment in alignments:
+                for record in alignment:
+                    sequence_names.append(record.id)
+        return sequence_names

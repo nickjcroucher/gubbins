@@ -1,3 +1,5 @@
+#! python
+
 # encoding: utf-8
 # Wellcome Trust Sanger Institute and Imperial College London
 # Copyright (C) 2020  Wellcome Trust Sanger Institute and Imperial College London
@@ -77,12 +79,12 @@ if __name__ == "__main__":
     # Extract from alignment
     output_aln_name = args.out + '.aln'
     names_in_alignment = set()
-    with open(output_aln_name,'w') as out_aln:
-        alignment = AlignIO.read(args.aln,'fasta')
-        for taxon in alignment:
-            names_in_alignment.add(taxon.id)
-            if taxon.id in subset:
-                SeqIO.write(taxon, out_aln, args.out_fmt)
+    sequences_to_print = []
+    alignment = AlignIO.read(args.aln,'fasta')
+    for taxon in alignment:
+        names_in_alignment.add(taxon.id)
+        if taxon.id in subset:
+            sequences_to_print.append(taxon)
 
     # Check subset sequences are found in alignment
     not_found_in_dataset = subset - names_in_alignment
@@ -101,6 +103,9 @@ if __name__ == "__main__":
                         'newick')
 
     # Identify relevant recombination blocks
+    recombination_starts = []
+    recombination_ends = []
+    recombination_taxa = []
     output_gff_name = args.out + '.gff'
     taxon_pattern = re.compile('taxa="([^"]*)"')
     with open(args.gff,'r') as in_gff, open(output_gff_name,'w') as out_gff:
@@ -112,3 +117,18 @@ if __name__ == "__main__":
                 taxon_set = set(taxon_pattern.search(info[8]).group(1).split())
                 if not taxon_set.isdisjoint(subset):
                     out_gff.write(line)
+                    if len(taxon_set) < len(subset):
+                        recombination_starts.append(int(info[3]))
+                        recombination_ends.append(int(info[4]))
+                        recombination_taxa.append(frozenset(taxon_set))
+
+    # Write out masked alignment for clade
+    with open(output_aln_name,'w') as out_aln:
+        for taxon in sequences_to_print:
+            for index,taxa in enumerate(recombination_taxa):
+                if taxon.id in taxa:
+                    seq_string = str(taxon.seq)
+                    replacement_string = args.missing_char*(recombination_ends[index] - recombination_starts[index] + 1)
+                    seq_string = seq_string[:recombination_starts[index]-1] + replacement_string + seq_string[recombination_ends[index]:]
+                    taxon.seq = Seq(seq_string)
+            SeqIO.write(taxon, out_aln, args.out_fmt)

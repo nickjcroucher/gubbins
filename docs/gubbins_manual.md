@@ -10,16 +10,21 @@ Gubbins cannot distinguish elevated densities of polymorphisms arising through r
 
 ## Description of the algorithm
 
-A brief overview of the algorithm is, within each iteration:
+In the first iteration,
 
-* A set of polymorphic sites assumed to have arisen through point mutation is extracted from the whole genome alignment
-* A tree is generated from these sites
-* A phylogenetic model is fitted to the tree and all polymorphic sites in the alignment
-* The pattern of base substitutions resulting in the observed distribution of alleles across polymorphic sites is reconstructed
-* A spatial scanning statistic is iteratively applied to the base substitutions reconstructed as occurring on each branch, to identify all regions with an elevated density of base substitutions
-* These regions are assumed to have arisen through recombination, and base substitutions within these regions in the taxa descended from the branch are excluded from the set used to generate the tree in the next iteration
+* Gubbins first identifies a full set of polymorphic sites, F, and uses these to construct a phylogeny.
+* The base substitutions explaining F is then reconstructed using this tree and a nucleotide substitution model.
+* A spatial scanning statistic is then iteratively applied to the base substitutions reconstructed as occurring on each branch, to identify all regions with an elevated density of base substitutions.
+* These regions are assumed to have arisen through recombination, and base substitutions within these regions in the taxa descended from the branch are excluded from the set F, to leave a set of substitutions assumed to occur through point mutation, P
 
-Iterations continue until the same tree is observed in multiple iterations, or the maximum number of iterations is reached. In terms of runtime, the first iteration requires a tree to be generated from all polymorphic sites, as none have yet been excluded as recombinant, and therefore this step is usually the slowest part of the analysis.
+Then in subsequent iterations,
+
+* A new, more accurate, phylogeny is constructed from the recombination-filtered set of polymorphic sites P, and the full set of polymorphisms, F, reconstructed onto this tree
+* Recombinations are identified, improving the selection of P from F, enabling the improvement of the tree in the next iteration
+
+Iterations continue until the same tree is observed in multiple iterations, or the maximum number of iterations is reached.
+
+In terms of runtime, the first iteration requires a tree to be generated from all polymorphic sites (i.e. F rather than P), as none have yet been excluded as recombinant, and therefore this step is usually the slowest part of the analysis. Hence options are provided for faster tree building algorithms to be used in the first iteration, and more accurate tree building algorithms to be used in later iterations.
 
 ## Installation and dependencies
 
@@ -47,7 +52,7 @@ These will automatically be installed within the conda environment. Please cite 
 
 The required input file for Gubbins is a whole genome FASTA alignment. Each sequence should have a unique identifier, and special characters should be avoided. The sequences should only use the characters `ACGT` (DNA bases), `N` (unknown base) or `-` (alignment gap). If a starting tree is to be included, then this should be a Newick format.
 
-The alignment is most easily generated through mapping sequences against a reference sequence. This can be achieved with the popular mapping software Snippy, following the instructions on the relevant [Github repository](https://github.com/tseemann/snippy). Alternatively, the alignment can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA](https://github.com/simonrharris/SKA), which can be installed through `conda install -c bioconda ska`. For instance,
+The alignment is most easily generated through mapping sequences against a reference sequence. This can be achieved with the popular mapping software Snippy, following the instructions on the relevant [Github repository](https://github.com/tseemann/snippy). Alternatively, the alignment can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA](https://github.com/simonrharris/SKA), which can be installed through `conda install -c bioconda ska` (SKA is included when installing Gubbins through conda). For instance,
 
 ```
 generate_ska_alignment.py --reference seq_X.fa --fasta fasta_files.list --fastq fastq_files.list --out out.aln
@@ -69,13 +74,16 @@ Version 3 of Gubbins has an extended range of analysis options:
 
 ### Input and output options
 
-Gubbins can take a starting tree, to speed up the analysis - you may have generated one as part of an initial analysis, e.g. with [PopPUNK](https://poppunk.net/). This must contain all the taxa, but superfluous taxa will be ignored (e.g. within a species-wide tree). The analysis can also be sped up by using multiple threads, if you have multiple processors available to you, using `--threads`. Almost all parts of the Gubbins algorithm are multithreaded.
+Gubbins can take a starting tree, to speed up the analysis - you may have generated one as part of an initial analysis, e.g. with [PopPUNK](https://poppunk.net/). This must contain all the taxa in the input alignment, but superfluous taxa will be ignored (e.g. within a species-wide tree). The analysis can also be sped up by using multiple threads, if you have multiple processors available to you, using `--threads`. Almost all parts of the Gubbins algorithm are multithreaded.
+
+Additionally, the final Gubbins tree can be time calibrated using [LSD](https://github.com/tothuhien/lsd2), implemented within [IQtree](https://github.com/iqtree/iqtree2). This requires an input dating file to be provided using the `--date` flag. This file should contain two tab-separated columns: the first with the names of the sequences in the alignment, and the second with dates of isolation in YYYY-MM-DD, YYYY-MM, or YYYY format (ranges are also acceptable; see the IQtree manual for details on parsing date information). The LSD method can analyse datasets in which dates are missing. 
 
 ```
   --prefix PREFIX, -p PREFIX
                         Add a prefix to the final output filenames (default: None)
   --starting-tree STARTING_TREE, -s STARTING_TREE
                         Starting tree (default: None)
+  --date DATE, -D DATE  Two-column text file in which the second column is the date of isolation in YYYY,YYYY-MM or YYYY-MM-DD format (default: None)
   --use-time-stamp, -u  Use a time stamp in file names (default: False)
   --version             show program's version number and exit
   --threads THREADS, -c THREADS
@@ -98,16 +106,16 @@ Gubbins can remove duplicate or low-quality sequences from samples. It can also 
 
 ### Tree building options
 
-Multiple phylogenetic packages can be used to run a Gubbins analysis. Typically, we would recommend a fast, simple tree builder is used for the first phylogeny (`--first-tree-builder` set to `star`,`rapidnj` or `fasttree`), and a more accurate, slower maximum-likelihood tree builder is used for subsequent iterations (`--tree-builder` set to `raxml`, `raxmlng` or `iqtree`).
+Multiple phylogenetic packages can be used to run a Gubbins analysis. Typically, we would recommend a fast, simple tree builder is used for the first phylogeny (`--first-tree-builder` set to `star`,`rapidnj`, `iqtree-fast` or `fasttree`), and a more accurate, slower maximum-likelihood tree builder is used for subsequent iterations (`--tree-builder` set to `raxml`, `raxmlng` or `iqtree`). The `hybrid` mode replicates the behaviour from earlier versions of Gubbins, in which `fasttree` is used for the first tree, and `raxml` is used for later iterations.
 
 The robustness of the final tree can be assessed using [bootstraps](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.1985.tb00420.x), [transfer bootstraps](https://www.nature.com/articles/s41586-018-0043-0) or a [Shimodaira–Hasegawa test](https://academic.oup.com/sysbio/article/49/4/652/1678908) (`--sh-test`) of node likelihoods.
 
 ```
-  --tree-builder {raxml,raxmlng,iqtree,fasttree,hybrid,rapidnj}, -t {raxml,raxmlng,iqtree,fasttree,hybrid,rapidnj}
+  --tree-builder {raxml,raxmlng,iqtree,iqtree-fast,fasttree,hybrid,rapidnj}, -t {raxml,raxmlng,iqtree,iqtree-fast,fasttree,hybrid,rapidnj}
                         Application to use for tree building (default: raxml)
   --tree-args TREE_ARGS
                         Quoted string of further arguments passed to tree building algorithm (start string with a space if there is a risk of being interpreted as a flag) (default: None)
-  --first-tree-builder {raxml,raxmlng,iqtree,fasttree,rapidnj,star}
+  --first-tree-builder {raxml,raxmlng,iqtree,iqtree-fast,fasttree,rapidnj,star}
                         Application to use for building the first tree (default: None)
   --first-tree-args FIRST_TREE_ARGS
                         Further arguments passed to first tree building algorithm (default: None)
@@ -135,42 +143,44 @@ The selected nucleotide substitution model is used for both constructing the tre
 
 - **GTRCAT** - General time reversible with a categorisation of between-site rate heterogeneity - available for RAxML
 
-The tree building and model fitting software must be consistent with the selected model - by default, the fitting software will be the same as the tree builder, but this can be changed with `--model-fitter` and `--first-model-fitter`. To reduce run time, it may be most efficient to use a simple model (e.g. `--first-model JC`) for the first tree, which is likely to be inaccurate, and a more realistic model (e.g. `--model GTR`) for later trees.
+The tree building and model fitting software must be consistent with the selected model - by default, the fitting software will be the same as the tree builder, but this can be changed with `--model-fitter` and `--first-model-fitter`. To reduce run time, it may be most efficient to use a simple model (e.g. `--first-model JC`) for the first tree, which is likely to be inaccurate, and a more realistic model (e.g. `--model GTR`) for later trees. By default, `JC` is used for `rapidnj`, and `GTRGAMMA` is used for all other tree building algorithms. Custom models can be specified in the format appropriate for the tree building software being used, and the `--best-model` option uses IQtree to identify the most appropriate tree building model, given the set of recombination-filtered polymorphic sites identified in iteration 2.
 
 ```
-  --model-fitter {raxml,raxmlng,iqtree,fasttree,None}, -F {raxml,raxmlng,iqtree,fasttree,None}
-                        Application to use for model fitting [if unspecified: same as tree builder if possible, else raxml] (default: None)
   --model {JC,K2P,HKY,GTR,GTRGAMMA,GTRCAT}, -M {JC,K2P,HKY,GTR,GTRGAMMA,GTRCAT}
-                        Nucleotide substitution model (not all available for all tree building algorithms) (default: GTRGAMMA)
-  --model-args MODEL_ARGS
-                        Quoted string of further arguments passed to model fitting algorithm (start string with a space if there is a risk of being interpreted as a flag) (default: None)
-  --custom-model CUSTOM_MODEL
-                        String corresponding to a substitution model for the selected tree building algorithm (default: None)
-  --first-model-fitter {raxml,raxmlng,iqtree,fasttree,None}
-                        Application to use for model fitting in first iteration [if unspecified: same as tree builder if possible, else raxml] (default: None)
+                        Nucleotide substitution model (not all available for all tree building algorithms) (default: None)
   --first-model {JC,K2P,HKY,GTR,GTRGAMMA,GTRCAT}
                         Nucleotide substitution model used for first tree (default: None)
-  --first-model-args FIRST_MODEL_ARGS
-                        Further arguments passed to model fitting algorithm used in firstiteration (if unspecified: same as --first-tree-builder-args) (default: None)
+  --best-model          Automatically select best substitution model using iqtree in later iterations (default: False)
+  --custom-model CUSTOM_MODEL
+                        String corresponding to a substitution model for the selected tree building algorithm (default: None)
   --custom-first-model CUSTOM_FIRST_MODEL
                         String corresponding to a substitution model for the selected tree building algorithm for the first iteration (default: None)
 ```
 
 ### Ancestral sequence reconstruction options
 
-Gubbins was originally designed to use a [joint ancestral state reconstruction](http://www.tau.ac.il/~talp/publications/fastAncestralSequences.pdf), which identifies the most likely pattern of base substitutions across the entire tree. Version 2 used a marginal ancestral state reconstruction, which reconstructed each branch independently, to maintain the package as being open source and easy to install. Version 3 now implements a multi-threaded version of [pyjar](https://github.com/simonrharris/pyjar) to enable rapid joint ancestral state reconstruction by default, although marginal ancestral state reconstructions are still possible by specifying `--mar`.
+Gubbins was originally designed to use a [joint ancestral state reconstruction](http://www.tau.ac.il/~talp/publications/fastAncestralSequences.pdf), which identifies the most likely pattern of base substitutions across the entire tree. Version 2 used a marginal ancestral state reconstruction, which reconstructed each branch independently, to maintain the package as being open source and easy to install. Version 3 now implements a multi-threaded version of [pyjar](https://github.com/simonrharris/pyjar) to enable rapid joint ancestral state reconstruction by default, although marginal ancestral state reconstructions are still possible by specifying `--mar`. The use of `pyjar` requires a fitted nucleotide substitution model; this differs from that used to construct the tree, because it is applied to the full set of polymorphisms, including those predicted to be introduced by recombination (a `GTRGAMMA` model is used by default). If date information has been supplied as an input file, then the tree onto which the base substitutions are reconstructed can be time calibrated.
 
 ```
+  --model-fitter {raxml,raxmlng,iqtree,fasttree,None}, -F {raxml,raxmlng,iqtree,fasttree,None}
+                        Application to use for model fitting for joint ancestral state reconstruction [if unspecified: same as tree builder if possible, else iqtree] (default: None)
+  --recon-model {JC,K2P,HKY,GTR,GTRGAMMA,GTRCAT}, -R {JC,K2P,HKY,GTR,GTRGAMMA,GTRCAT}
+                        Nucleotide substitution model used for ancestral state reconstruction (not all available for all tree building algorithms) (default: GTRGAMMA)
+  --custom-recon-model CUSTOM_RECON_MODEL
+                        String corresponding to a substitution model for the selected model fitting algorithm (default: None)
+  --recon-with-dates    Use isolate date information in ancestral joint sequence reconstruction (default: False)
+  --model-fitter-args MODEL_FITTER_ARGS
+                        Further arguments passed to model fitting algorithm (default: None)
   --mar                 Use marginal, rather than joint, ancestral reconstruction (default: False)
   --seq-recon {raxml,raxmlng,iqtree,None}
-                        Algorithm to use for marginal reconstruction [if unspecified: same as tree builder if possible, else raxml; requires --mar flag] (default: None)
+                        Algorithm to use for marginal reconstruction [if unspecified: same as tree builder if possible, else iqtree; requires --mar flag] (default: None)
   --seq-recon-args SEQ_RECON_ARGS
                         Further arguments passed to sequence reconstruction algorithm (start string with a space if there is a risk of being interpreted as a flag) (default: None)
 ```
 
 ### Recombination detection options
 
-Recombination is detected using a [spatial scanning statistic](https://link.springer.com/chapter/10.1007/978-1-4612-1578-3_14), which relies on a sliding window. The size of this window may need to be reduced if you apply Gubbins to very small genomes (e.g. viruses). To increase the sensitivity for detecting recombinations, `--min-snps` can be set at the minimum value of 2; the `--p-value` threshold required to detect recombinations can be increased; the `--trimming-ratio` can be raised above 1.0, to disfavour the trimming of recombination edges; and the `--extensive-search` mode can be used.
+Recombination is detected using a [spatial scanning statistic](https://link.springer.com/chapter/10.1007/978-1-4612-1578-3_14), which relies on a sliding window. The size of this window may need to be reduced if you apply Gubbins to very small genomes (e.g. viruses), or enlarged if you are expecting large recombinations (e.g. in eukaryotes). To increase the sensitivity for detecting recombinations, `--min-snps` can be set at the minimum value of 2; the `--p-value` threshold required to detect recombinations can be increased; the `--trimming-ratio` can be raised above 1.0, to disfavour the trimming of recombination edges; and the `--extensive-search` mode can be used to switch off some heuristics when scanning for recombinations at larger window sizes, which may increase sensivity, but at the cost of a slower run time.
 
 ```
   --min-snps MIN_SNPS, -m MIN_SNPS
@@ -214,13 +224,12 @@ A successful Gubbins run will generate files with the suffixes:
 * `.node_labelled.final_tree.tre`	- final phylogenetic tree in Newick format but with internal node labels; branch lengths are in point mutations
 * `.log` - log file specifying the software used at each step of the analysis, with accompanying citations
 
-To generate a recombination-masked alignment (i.e., with sequences predicted to have been introduced by recombination removed, leaving just the clonal frame), the post-processing script `mask_gubbins_aln.py` can be used:
-
-```
-mask_gubbins_aln.py --aln out.aln --gff out.recombination_predictions.gff --out out.masked.aln
-```
-
 Note that the final tree branch lengths are in point mutations (i.e. the number of recombination-filtered substitutions across the genome), not the more common mean number of substitutions per site. The branch lengths can be converted to substitutions per site by dividing them by the number of sites in the input alignment. 
+
+If you used a `--date` input file, then two futher outputs will be generated, if a temporal signal could be identified:
+
+* `.final_tree.timetree.tre` - Time-calibrated final tree
+* `.lsd.out` - Statistics for the time-calibration of the final tree
 
 ## Output statistics
 
@@ -233,12 +242,38 @@ The `.per_branch_statistics.csv` file contains summary statistics for each branc
 * **Number of Recombination Blocks** - Total number of recombination blocks reconstructed onto the branch
 * **Bases in Recombinations** - Total length of all recombination events reconstructed onto the branch
 * **Cumulative Bases in Recombinations** - Total number of bases in the alignment affected by recombination on this branch and its ancestors
-* ***r/m*** - The r/m value for the branch. This value gives a measure of the relative impact of recombination and mutation on the variation accumulated on the branch
-* ***rho/theta*** - The ratio of the number of recombination events to point mutations on a branch; a measure of the relative rates of recombination and point mutation
+* ***r***/***m*** - The r/m value for the branch. This value gives a measure of the relative impact of recombination and mutation on the variation accumulated on the branch
+* ***rho***/***theta*** - The ratio of the number of recombination events to point mutations on a branch; a measure of the relative rates of recombination and point mutation
 * **Genome Length** - The total number of aligned bases between the ancestral and descendent nodes for the branch excluding any missing data or gaps in either
 * **Bases in Clonal Frame** - The number of called bases at the descendant node that have not been affected by recombination on this branch or an ancestor (i.e., the length of sequence that can be used for phylogenetic interpretation)
 
 Note that all positions in the output files are relative to the input alignment. If you wish to compare the positions of recombinations relative to a reference annotation, their coordinates will need to be adjusted to account for any gaps in the reference sequence introduced when generating the alignment.
+
+To calculate the overall ***r***/***m***, the sum of the recombination base substitutions across all branches should be divided by the sum of point mutations across all branches - ***rho***/***theta*** can be similarly estimated.
+
+If you used a `--date` input file, then `.lsd.out` will include a `rate`, corresponding to the estimate of the point mutation molecular clock in substitutions per genome per year, and a `tMRCA`, corresponding to the estimated root date (i.e. year of origin). The rate of recombination is this molecular clock rate multiplied by ***rho***/***theta***.
+
+## Processing scripts
+
+To generate a recombination-masked alignment (i.e., with sequences predicted to have been introduced by recombination removed, leaving just the clonal frame), the post-processing script `mask_gubbins_aln.py` can be used:
+
+```
+mask_gubbins_aln.py --aln out.aln --gff out.recombination_predictions.gff --out out.masked.aln
+```
+
+To get the tree, masked alignment and recombination predictions for a specific clade, use:
+
+```
+generate_files_for_clade_analysis.py --list [file containing one isolate per line] --aln in.aln --gff out.recombination_predictions.gff --tree out.final_tree.tre
+```
+
+Note that the recombinations will include recombinations shared by all taxa in the clade, but the masking only corresponds to recombinations occurring within the clade - hence a tree generated from this alignment may have greater precision than the subtree pruned from the overall tree.
+
+To get summary statistics (e.g. ***r***/***m***) and subtrees for distinct clades within your tree:
+
+```
+extract_gubbins_clade_statistics.py --clades [file designating isolates to clades] --gff out.recombination_predictions.gff --snps out.branch_base_reconstruction.embl --tree out.final_tree.tre --out tree_anaysis
+```
 
 ## Examples
 

@@ -1,5 +1,13 @@
 # Change Log
 
+## [v3.3]
+
+- Enable time calibration of final tree
+- Use separate models for tree construction and SNP reconstruction
+- Enable use of iqtree in fast mode
+- Allow model testing to identify the best-fitting model for tree construction
+- Fix processing of custom phylogenetic models
+
 ## [v3.2.1](https://github.com/sanger-pathogens/gubbins/tree/v3.2.1) (2022-5-24)
 [Full Changelog](https://github.com/sanger-pathogens/gubbins/compare/v3.1.6...v3.2.1)
 

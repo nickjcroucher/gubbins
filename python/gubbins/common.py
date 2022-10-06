@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import gzip
 import time
 # Phylogenetic imports
 import dendropy
@@ -41,9 +42,18 @@ from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
-from gubbins.pyjar import jar, get_base_patterns
+from gubbins.pyjar import jar, get_base_patterns, Pyjar
 from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
+# Phylogenetic models valid for each algorithm
+tree_models = {
+    'star': ['JC','GTRCAT','GTRGAMMA'],
+    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+    'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+    'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
+    'fasttree': ['JC','GTRCAT','GTRGAMMA'],
+    'rapidnj': ['JC','K2P']
+}
 
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
@@ -53,7 +63,6 @@ def parse_and_run(input_args, program_description=""):
 
     # Process input options
     input_args = process_input_arguments(input_args)
-
     # Check if the Gubbins C-program is available. If so, print a welcome message. Otherwise exit.
     os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     gubbins_exec = 'gubbins'
@@ -68,11 +77,12 @@ def parse_and_run(input_args, program_description=""):
     program_version = version()
     printer.print(["\n--- Gubbins " + program_version + " ---\n", program_description])
     # Log algorithms used
-    methods_log = {property:[] for property in ['citation','process','version','algorithm']}
+    methods_log = {property:[] for property in ['citation','process','version','algorithm','model']}
     methods_log['algorithm'].append("Gubbins")
     methods_log['citation'].append("https://doi.org/10.1093/nar/gku1196")
     methods_log['process'].append("Overall")
     methods_log['version'].append(program_version)
+    methods_log['model'].append("-")
 
     # Initialize tree builder and check if all required dependencies are available
     printer.print("\nChecking dependencies and input files...")
@@ -81,18 +91,25 @@ def parse_and_run(input_args, program_description=""):
     internal_node_label_prefix = "internal_"
     
     # Select the algorithms used for the first iteration
-    current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,1)
+    current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,1)
+    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
     # Initialise tree builder
     tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
     alignment_suffix = tree_builder.alignment_suffix
     methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
     # Initialise model fitter
-    model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
+    model_fitter = return_algorithm(current_model_fitter, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
     methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
     # Initialise sequence reconstruction if MAR
     if input_args.mar:
-        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
-        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor')
+        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
+        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
+
+    # Initialise IQtree
+    tree_dater = IQTree(threads = input_args.threads,
+                            model = current_model,
+                            verbose = input_args.verbose
+                        )
 
     # Check - and potentially correct - further input parameters
     check_and_fix_window_size(input_args)
@@ -162,6 +179,31 @@ def parse_and_run(input_args, program_description=""):
         if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
             sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
+    # If outgroup is specified, check it is still in the alignment
+    if input_args.outgroup is not None:
+        if input_args.outgroup in taxa_removed:
+            sys.stderr.write('Outgroup removed due to proportion of missing bases\n')
+            sys.exit(1)
+
+    # Initialise tree dating algorithm if dates supplied
+    if input_args.date is not None:
+        if os.path.isfile(input_args.date):
+            # Get sequence names from alignment
+            sequence_names_in_alignment = pre_process_fasta.get_sequence_names()
+            # Edit taxon names as in tree
+            new_date_file = os.path.join(temp_working_dir,basename + '.dates')
+            with open(input_args.date,'r') as in_dates, open(new_date_file,'w') as out_dates:
+                for line in in_dates.readlines():
+                    info = line.rstrip().split()
+                    if len(info) == 2:
+                        new_name = utils.process_sequence_names(info[0])
+                        if new_name in sequence_names_in_alignment:
+                            out_dates.write(new_name + '\t' + info[1] + '\n')
+            input_args.date = new_date_file
+        else:
+            sys.stderr.write('Cannot open dates file ' + input_args.date + '\n')
+            sys.exit(1)
+
     # If a starting tree has been provided check its validity
     # Also make sure that taxa filtered out in the previous step are removed from it
     if input_args.starting_tree is not None and input_args.starting_tree != "":
@@ -196,24 +238,36 @@ def parse_and_run(input_args, program_description=""):
     for i in range(starting_iteration, input_args.iterations+1):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
-        # 1.1. Construct the tree-building command depending on the iteration and employed options
-        if i == 2 or input_args.resume is not None:
-            # Select the algorithms used for the subsequent iterations
-            current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments = return_algorithm_choices(input_args,i)
-            # Initialise tree builder
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-            alignment_suffix = tree_builder.alignment_suffix
-            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
-            # Initialise model fitter
-            model_fitter = return_algorithm(current_model_fitter, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-            methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (later iterations)')
-
+        # Define file names
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
+
+        # 1.1. Construct the tree-building command depending on the iteration and employed options
+        if i == 2 or input_args.resume is not None:
+            # Select the algorithms used for the subsequent iterations
+            current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,i)
+            # Pick best model through ML tests
+            if input_args.best_model:
+                printer.print("\nSelecting best phylogenetic model")
+                current_model = select_best_models(alignment_filename,
+                                                    basename,
+                                                    current_tree_builder,
+                                                    input_args)
+                input_args.model = current_model
+                if current_tree_builder != 'iqtree':
+                    check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
+                printer.print("Phylogeny will be constructed with a " + current_model + " model")
+            # Initialise tree builder
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            alignment_suffix = tree_builder.alignment_suffix
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
+            # Update date model (should not make a difference)
+            if input_args.date is not None:
+                tree_dater.model = current_model
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
@@ -267,27 +321,51 @@ def parse_and_run(input_args, program_description=""):
             if i == starting_iteration:
 
                 # 3.3a. Read alignment and identify unique base patterns in first iteration only
-                
                 alignment_filename = base_filename + ".start"
                 alignment_type = 'fasta' # input starting polymorphism alignment file assumed to be fasta format
                 ordered_sequence_names, base_pattern_bases_array, base_pattern_positions_array, max_pos = \
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
+                # 3.3b. Record in methods log (just once)
+                pyjar_method = Pyjar(current_model)
+                methods_log = update_methods_log(methods_log, method = pyjar_method, step = 'Sequence reconstructor')
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
                                                                 os.path.abspath(temp_rooted_tree),
                                                                 temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
-            subprocess.check_call(model_fitting_command, shell = True)
+            try:
+                subprocess.check_call(model_fitting_command, shell = True)
+            except:
+                sys.exit("Unable to fit model to data")
 
             # 3.5a. Joint ancestral reconstruction with new tree and info file in each iteration
             info_filename = model_fitter.get_info_filename(temp_working_dir,current_basename)
             recontree_filename = model_fitter.get_recontree_filename(temp_working_dir,current_basename)
-            # Set root of reconstruction tree to match that of the current tree
-            # Cannot just midpoint root both, because the branch lengths differ between them
-            harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
+            # If requested, use a time-calibrated tree for sequence reconstruction
+            if input_args.date is not None and input_args.recon_with_dates:
+                dating_command = tree_dater.run_time_tree(snp_alignment_filename,
+                                                recontree_filename,
+                                                input_args.date,
+                                                temp_working_dir,
+                                                base_filename,
+                                                outgroup = input_args.outgroup)
+                try:
+                    subprocess.check_call(dating_command, shell=True)
+                    recontree_filename = os.path.join(temp_working_dir,base_filename + '.timetree.nwk')
+                    # Set root of reconstruction tree to match that of the current tree
+                    # Cannot just midpoint root both, because the branch lengths differ between them
+                    harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
+                except subprocess.SubprocessError:
+                    # If this fails, continue to generate rest of output
+                    sys.stderr.write("Unable to use time calibrated tree for sequence reconstruction in "
+                    " iteration " + str(i))
+            else:
+                # Set root of reconstruction tree to match that of the current tree
+                # Cannot just midpoint root both, because the branch lengths differ between them
+                harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
@@ -310,7 +388,7 @@ def parse_and_run(input_args, program_description=""):
                                                   current_tree_name_with_internal_nodes,
                                                   "pyjar")
             printer.print(["\nDone transfer"])
-
+            
         else:
 
             # 3.2b. Marginal ancestral reconstruction with RAxML, RAxML-NG or IQTree
@@ -467,14 +545,40 @@ def parse_and_run(input_args, program_description=""):
                             algorithm = current_tree_builder,
                             outgroup = input_args.outgroup)
 
+    # 8. Run time calibration of final tree
+    if input_args.date is not None:
+        dating_command = tree_dater.run_time_tree(final_aln,
+                                                    current_tree_name,
+                                                    input_args.date,
+                                                    temp_working_dir,
+                                                    basename,
+                                                    outgroup = input_args.outgroup)
+        try:
+            subprocess.check_call(dating_command, shell=True)
+        except subprocess.SubprocessError:
+            # If this fails, continue to generate rest of output
+            sys.write("Failed running tree time calibration with LSD.")
+            input_args.date = None
+
     # Create the final output
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
-    print_log(methods_log, input_args.prefix)
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
+    if input_args.date is not None:
+        # Save final output files
+        output_dating_filenames_to_final_dating_filenames = \
+            translation_of_dating_filenames_to_final_filenames(temp_working_dir,
+                                                                basename,
+                                                                input_args.prefix)
+        utils.rename_files(output_dating_filenames_to_final_dating_filenames)
+        # Add dating method to methods log
+        tree_dater.model = "LSD"
+        tree_dater.citation = "https://doi.org/10.1093/sysbio/syv068"
+        methods_log = update_methods_log(methods_log, method = tree_dater, step = 'Time calibration of tree')
+    print_log(methods_log, input_args.prefix)
 
     # Cleanup intermediate files
     if not input_args.no_cleanup:
@@ -492,92 +596,49 @@ def process_input_arguments(input_args):
     if input_args.pairwise:
         input_args.iterations = 1
         input_args.model_fitter = 'fasttree'
-        input_args.first_tree_builder = 'star'
+        input_args.tree_builder = 'star'
+        input_args.model = 'GTRGAMMA'
         if input_args.mar:
             sys.stderr.write('Cannot use marginal reconstruction for a pairwise comparison; switching to joint reconstruction')
             input_args.mar = False
     else:
+        if input_args.tree_builder == 'hybrid':
+            input_args.first_tree_builder = "fasttree"
+            input_args.tree_builder = "raxml"
+        # Parse IQtree in fast mode
+        elif input_args.tree_builder == "iqtree-fast":
+            input_args.tree_builder = "iqtree"
+            input_args.tree_args = utils.extend_args(input_args.tree_args,"--fast")
+        if input_args.first_tree_builder == "iqtree-fast":
+            input_args.first_tree_builder = "iqtree"
+            input_args.first_tree_args = utils.extend_args(input_args.first_tree_args,"--fast")
         # Make model fitting consistent with tree building
         if input_args.model_fitter is None:
-            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
+            if input_args.best_model:
+                input_args.model_fitter = "iqtree"
+            elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree', 'fasttree']:
                 input_args.model_fitter = input_args.tree_builder
             else:
-                # Else use RAxML where not possible
-                input_args.model_fitter = 'raxml'
+                # Else use IQtree where not possible - raxml failed on some unrealistic test datasets
+                input_args.model_fitter = 'iqtree'
         # Make sequence reconstruction consistent with tree building where possible
         if input_args.seq_recon is None:
-            if input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
+            if input_args.best_model:
+                input_args.seq_recon = "iqtree"
+            elif input_args.tree_builder in ['raxml', 'raxmlng', 'iqtree']:
                 input_args.seq_recon = input_args.tree_builder
             else:
                 # Else use RAxML where not possible
-                input_args.seq_recon = 'raxml'
+                input_args.seq_recon = 'iqtree'
         elif not input_args.mar:
             sys.stderr.write('Sequence reconstruction uses pyjar unless the '
             '--mar flag is specified\n')
             sys.exit()
-        # Check substitution model consistent with tree building algorithm
-        tree_models = {
-            'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
-            'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-            'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
-            'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-            'rapidnj': ['JC','K2P']
-        }
-        invalid_model = False
-        # Check on first tree builder
-        if input_args.first_tree_builder is not None:
-            # Raise error if first tree builder and starting tree
-            if input_args.starting_tree is not None:
-                sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+        # Only allow time calibration to be used where it makes sense
+        if input_args.recon_with_dates:
+            if input_args.date is None or input_args.mar:
+                sys.stderr.write("Reconstruction using dates is only possible with joint reconstruction and a dates file\n")
                 sys.exit()
-        # Determine model to be used for first iteration, if specified
-        if input_args.custom_first_model is not None:
-            input_args.first_model = input_args.custom_first_model
-            sys.stderr.write('Using specified model ' + input_args.first_model + ' for the first tree\n')
-        elif input_args.first_model is not None:
-            first_model = input_args.first_model
-            first_tree_builder = input_args.tree_builder
-            if input_args.first_tree_builder is not None:
-                first_tree_builder = input_args.first_tree_builder
-            first_model_fitter = input_args.model_fitter
-            if input_args.first_model_fitter is not None:
-                first_model_fitter = input_args.first_model_fitter
-            if first_model not in tree_models[first_tree_builder]:
-                sys.stderr.write('First evolutionary model ' + first_model +
-                                ' and algorithm ' + first_tree_builder +
-                                 ' are incompatible\n')
-                invalid_model = True
-            elif first_model not in tree_models[first_model_fitter]:
-                sys.stderr.write('First evolutionary model ' + first_model +
-                                ' and algorithm ' + first_model_fitter +
-                                 ' are incompatible\n')
-                invalid_model = True
-        # Check that at least 2 iterations will be run if customised options for 1st iteration
-        if input_args.iterations == 1:
-            if input_args.first_tree_builder is not None or input_args.first_model \
-                or input_args.custom_first_model is not None or input_args.first_tree_args is not None:
-                sys.stderr.write('Please do not use options specific to the first iteration when'
-                                 ' only one iteration is to be run\n')
-                sys.exit()
-        # Determine model to be used for subsequent iterations
-        if input_args.custom_model is not None:
-            input_args.model = input_args.custom_model
-            sys.stderr.write('Using specified model ' + input_args.model + ' for trees\n')
-        elif input_args.model not in tree_models[input_args.tree_builder]:
-            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
-                        input_args.tree_builder + ' are incompatible\n')
-            invalid_model = True
-        elif input_args.model not in tree_models[input_args.model_fitter]:
-            sys.stderr.write('Tree model ' + input_args.model + ' and algorithm ' +
-                        input_args.model_fitter + ' are incompatible\n')
-            invalid_model = True
-        # Information for rectifying incompatible combinations
-        if invalid_model:
-            sys.stderr.write('Available combinations are:\n')
-            for algorithm in tree_models:
-                models = ', '.join(tree_models[algorithm])
-                sys.stderr.write(algorithm + ':\t' + models + '\n')
-            sys.exit()
         # Check on arguments for measures of branch support
         if input_args.bootstrap > 0 and input_args.bootstrap < 1000 and input_args.tree_builder == "iqtree":
             sys.stderr.write("IQtree requires at least 1,000 bootstrap replicates\n")
@@ -587,19 +648,52 @@ def process_input_arguments(input_args):
             sys.exit()
     return input_args
 
+def check_model_validity(current_model,current_tree_builder,mar,recon_model,model_fitter,custom_model,custom_recon_model):
+    # Check substitution model consistent with tree building algorithm
+    invalid_model = False
+    # Determine model to be used for subsequent iterations
+    if not custom_model and current_model not in tree_models[current_tree_builder]:
+        sys.stderr.write('Evolutionary model ' + current_model +
+                        ' and algorithm ' + current_tree_builder +
+                         ' are incompatible\n')
+        invalid_model = True
+    # Determine model to be used for ancestral state reconstruction
+    if not mar:
+        if not custom_recon_model and recon_model not in tree_models[model_fitter]:
+            sys.stderr.write('Evolutionary model ' + recon_model +
+                            ' and algorithm ' + model_fitter +
+                             ' are incompatible\n')
+            invalid_model = True
+    # Information for rectifying incompatible combinations
+    if invalid_model:
+        sys.stderr.write('Available combinations are:\n')
+        for algorithm in tree_models:
+            models = ', '.join(tree_models[algorithm])
+            sys.stderr.write(algorithm + ':\t' + models + '\n')
+        sys.exit()
+
 def return_algorithm_choices(args,i):
+    # Check that at least 2 iterations will be run if customised options for 1st iteration
+    if args.iterations == 1:
+        if args.first_tree_builder is not None or args.first_model \
+            or args.custom_first_model is not None or args.first_tree_args is not None:
+            sys.stderr.write('Please do not use options specific to the first iteration when'
+                             ' only one iteration is to be run\n')
+            sys.exit()
+    # Check on first tree builder
+    if args.first_tree_builder is not None:
+        # Raise error if first tree builder and starting tree
+        if args.starting_tree is not None:
+            sys.stderr.write('Initial tree builder is not used if a starting tree is provided\n')
+            sys.exit()
     # Pick tree builder
-    current_tree_builder = args.tree_builder
     if args.first_tree_builder is not None and i==1:
         current_tree_builder = args.first_tree_builder
-    # Pick model
-    current_model = args.model
-    if args.first_model is not None and i==1:
-        current_model = args.first_model
-    # Get tree builder arguments
-    extra_tree_arguments = args.tree_args
-    if args.first_tree_args is not None and i==1:
         extra_tree_arguments = args.first_tree_args
+    else:
+        current_tree_builder = args.tree_builder
+        # Get tree builder arguments
+        extra_tree_arguments = args.tree_args
     # If RAXML-NG first tree builder use search1 option to decrease runtime
     if i == 1 and current_tree_builder == "raxmlng":
         if extra_tree_arguments is None:
@@ -608,16 +702,44 @@ def return_algorithm_choices(args,i):
             extra_tree_arguments = [extra_tree_arguments]
             extra_tree_arguments.extend(["--search1"])
             extra_tree_arguments = " ".join(extra_tree_arguments)
-    # Pick model fitter
+    # Current model
+    custom_model = False
+    if i == 1:
+        if args.custom_first_model is not None:
+            current_model = args.custom_first_model
+            custom_model = True
+        elif args.first_model is not None:
+            current_model = args.first_model
+        elif args.custom_model is not None:
+            current_model = args.custom_model
+            custom_model = True
+        elif args.model is not None:
+            current_model = args.model
+        elif current_tree_builder == "rapidnj":
+            current_model = "JC"
+        else:
+            current_model = "GTRGAMMA"
+    else:
+        if args.custom_model is not None:
+            current_model = args.custom_model
+            custom_model = True
+        elif args.model is not None:
+            current_model = args.model
+        elif current_tree_builder == "rapidnj":
+            current_model = "JC"
+        else:
+            current_model = "GTRGAMMA"
+    # Pick model fitter and model
+    custom_recon_model = False
     current_model_fitter = args.model_fitter
-    if args.first_model_fitter is not None and i==1:
-        current_model_fitter = args.first_model_fitter
-    # Get model fitter arguments
-    extra_model_arguments = args.model_args
-    if args.first_model_args is not None and i==1:
-        extra_model_arguments = args.first_model_args
+    if args.custom_recon_model is not None:
+        current_recon_model = args.custom_recon_model
+        custom_recon_model = True
+    else:
+        current_recon_model = args.recon_model
+    extra_recon_arguments = args.model_fitter_args
     # Return choices
-    return current_tree_builder, current_model_fitter, current_model, extra_tree_arguments, extra_model_arguments
+    return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments, custom_model, current_recon_model
 
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
@@ -628,7 +750,7 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     elif algorithm_choice == "raxmlng":
         initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":
@@ -637,6 +759,40 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         sys.stderr.write("Unrecognised algorithm: " + algorithm_choice + "\n")
         sys.exit()
     return initialised_algorithm
+
+def select_best_models(snp_alignment_filename,basename,current_tree_builder,input_args):
+    model_tester = IQTree(threads = input_args.threads,
+                            model = 'GTR',
+                            verbose = input_args.verbose
+                    )
+    model_test_command = model_tester.run_model_comparison(snp_alignment_filename,basename)
+    try:
+        subprocess.check_call(model_test_command, shell=True)
+    except subprocess.SubprocessError:
+        sys.exit("Unable to identify best-fitting model")
+    current_model = None
+    iqtree_specific_model = None
+    with gzip.open(basename + '.model.gz','rb') as model_file:
+        for line in model_file:
+            if line.decode().startswith('best_model_list_BIC:'):
+                model_list = line.decode().rstrip().split()
+                iqtree_specific_model = model_list[1]
+                if current_tree_builder == 'iqtree':
+                    current_model = iqtree_specific_model
+                else:
+                    for model in model_list:
+                        model_aspects = model.split('+')
+                        if model_aspects[0] == 'GTR' and 'G4' in model_aspects:
+                            model_name = 'GTRGAMMA'
+                        elif model_aspects[0] == 'GTR' and \
+                            ('R2' in model_aspects or 'R3' in model_aspects):
+                            model_name = 'GTRCAT'
+                        else:
+                            model_name = model_aspects[0]
+                        if model_name in tree_models[current_tree_builder]:
+                            current_model = model_name
+                            break
+    return current_model
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size,
@@ -826,7 +982,8 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn, algorithm = None):
                                                                                     is_bipartitions_updated=False)
     
     if len(missing_bipartitions) > 0:
-        sys.stderr.write('Bipartitions missing when harmonising roots between trees: ' + str([str(x) for x in missing_bipartitions]) + '\n')
+        sys.stderr.write('Bipartitions missing when harmonising roots between trees ' + new_tree_fn + ' and ' + tree_for_root_fn + '\n')
+        sys.stderr.write('The missing bipartitions are: ' + str([str(x) for x in missing_bipartitions]) + '\n')
         if algorithm == 'FastTree':
             sys.stderr.write('This is a known issue when using FastTree to fit a phylogenetic model; use an alternative algorithm\n')
         sys.exit(1)
@@ -1201,15 +1358,16 @@ def update_methods_log(log, method = None, step = ''):
     log['process'].append(step)
     log['version'].append(method.version)
     log['algorithm'].append(method.executable)
+    log['model'].append(method.model)
     return log
 
 def print_log(log, prefix):
     """Print a records of the methods used"""
     log_file_name = prefix + ".log"
     with open(log_file_name,'w') as log_file:
-        log_file.write("Process,Algorithm,Version,Citation\n")
+        log_file.write("Process,Algorithm,Version,Model,Citation\n")
         for index,process in enumerate(log['process']):
-            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['citation'][index] + "\n")
+            log_file.write(process + "," + log['algorithm'][index] + "," + log['version'][index] + "," + log['model'][index] + "," + log['citation'][index] + "\n")
 
 def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
     input_names_to_output_names = {
@@ -1226,3 +1384,12 @@ def translation_of_filenames_to_final_filenames(input_prefix, output_prefix):
         str(input_prefix):                      str(output_prefix) + ".final_tree.tre"
     }
     return input_names_to_output_names
+
+def translation_of_dating_filenames_to_final_filenames(temp_working_dir,
+                                                                basename,
+                                                                prefix):
+    dating_files = {
+        os.path.join(temp_working_dir,basename + '.timetree.lsd'): prefix + '.lsd.out',
+        os.path.join(temp_working_dir,basename + '.timetree.nwk'): prefix + '.final_tree.timetree.tre'
+    }
+    return dating_files

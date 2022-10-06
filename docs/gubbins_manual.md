@@ -261,11 +261,13 @@ To generate a recombination-masked alignment (i.e., with sequences predicted to 
 mask_gubbins_aln.py --aln out.aln --gff out.recombination_predictions.gff --out out.masked.aln
 ```
 
-To get the tree, alignment and recombination predictions for a specific clade, use:
+To get the tree, masked alignment and recombination predictions for a specific clade, use:
 
 ```
-extract_clade.py --list [file containing one isolate per line] --aln in.aln --gff out.recombination_predictions.gff --tree out.final_tree.tre
+generate_files_for_clade_analysis.py --list [file containing one isolate per line] --aln in.aln --gff out.recombination_predictions.gff --tree out.final_tree.tre
 ```
+
+Note that the recombinations will include recombinations shared by all taxa in the clade, but the masking only corresponds to recombinations occurring within the clade - hence a tree generated from this alignment may have greater precision than the subtree pruned from the overall tree.
 
 To get summary statistics (e.g. ***r***/***m***) and subtrees for distinct clades within your tree:
 

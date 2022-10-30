@@ -105,12 +105,12 @@ class TestPythonScripts(unittest.TestCase):
         with open(fastq_loc,'w') as list_file:
             for i in range(1,5):
                 list_file.write('sequence_t' + str(i) + '\t' + \
-                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '_1.fastq\n') + \
-                    '\t' + os.path.join(preprocess_dir,'sequence_t' + str(i) + '_2.fastq\n'))
+                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '_1.fastq') + \
+                    '\t' + os.path.join(preprocess_dir,'sequence_t' + str(i) + '_2.fastq') + '\n')
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_fastq_test.aln')
         # Script name
-        ska_cmd = "generate_ska_alignment.py --fasta " + fastq_loc +\
+        ska_cmd = "generate_ska_alignment.py --fastq " + fastq_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
                 " --k 6"
         subprocess.check_call(ska_cmd, shell=True)
@@ -122,7 +122,7 @@ class TestPythonScripts(unittest.TestCase):
         exit_code = self.check_for_output_files('ska_fastq_test')
         self.cleanup('ska_fastq_test')
         os.remove(aln_out)
-        os.remove(fasta_loc)
+        os.remove(fastq_loc)
         assert exit_code == 0
 
     # Test clade file extraction script

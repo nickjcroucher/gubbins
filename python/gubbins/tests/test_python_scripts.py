@@ -74,13 +74,13 @@ class TestPythonScripts(unittest.TestCase):
     def test_generate_ska_alignment(self):
         exit_code = 1
         ## Run the generate_ska_alignment script
-        fasta_loc = os.path.join(preprocess_dir, './ska_fasta_list.txt')
+        fasta_loc = os.path.join(preprocess_dir, 'ska_fasta_list.txt')
         with open(fasta_loc,'w') as list_file:
             for i in range(1,5):
                 list_file.write('sequence_t' + str(i) + '\t' + \
                     os.path.join(preprocess_dir,'sequence_t' + str(i) + '.fasta\n'))
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
-        aln_out = os.path.join(preprocess_dir, 'ska_test_aln.aln')
+        aln_out = os.path.join(preprocess_dir, 'ska_test.aln')
         # Script name
         ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
@@ -93,6 +93,34 @@ class TestPythonScripts(unittest.TestCase):
                                                     aln_out]))
         exit_code = self.check_for_output_files('ska_test')
         self.cleanup('ska_test')
+        os.remove(aln_out)
+        os.remove(fasta_loc)
+        assert exit_code == 0
+
+    ## Test the ska alignment generator with FASTQs
+    def test_generate_ska_alignment_fastq(self):
+        exit_code = 1
+        ## Run the generate_ska_alignment script
+        fastq_loc = os.path.join(preprocess_dir, 'ska_fastq_list.txt')
+        with open(fastq_loc,'w') as list_file:
+            for i in range(1,5):
+                list_file.write('sequence_t' + str(i) + '\t' + \
+                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '_1.fastq\n') + \
+                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '_2.fastq\n'))
+        ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
+        aln_out = os.path.join(preprocess_dir, 'ska_fastq_test.aln')
+        # Script name
+        ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
+            " --reference " + ref_seq + " --out " + aln_out +\
+                " --k 6"
+        subprocess.check_call(ska_cmd, shell=True)
+        ## Now run gubbins on the aln and check all the output is produced
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--prefix", "ska_fastq_test",
+                                                    "--verbose", "--mar",
+                                                    aln_out]))
+        exit_code = self.check_for_output_files('ska_fastq_test')
+        self.cleanup('ska_fastq_test')
         os.remove(aln_out)
         os.remove(fasta_loc)
         assert exit_code == 0

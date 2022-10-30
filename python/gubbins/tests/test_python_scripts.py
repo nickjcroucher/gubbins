@@ -110,7 +110,7 @@ class TestPythonScripts(unittest.TestCase):
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_fastq_test.aln')
         # Script name
-        ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
+        ska_cmd = "generate_ska_alignment.py --fasta " + fastq_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
                 " --k 6"
         subprocess.check_call(ska_cmd, shell=True)

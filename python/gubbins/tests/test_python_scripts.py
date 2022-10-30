@@ -106,7 +106,7 @@ class TestPythonScripts(unittest.TestCase):
             for i in range(1,5):
                 list_file.write('sequence_t' + str(i) + '\t' + \
                     os.path.join(preprocess_dir,'sequence_t' + str(i) + '_1.fastq\n') + \
-                    os.path.join(preprocess_dir,'sequence_t' + str(i) + '_2.fastq\n'))
+                    '\t' + os.path.join(preprocess_dir,'sequence_t' + str(i) + '_2.fastq\n'))
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_fastq_test.aln')
         # Script name

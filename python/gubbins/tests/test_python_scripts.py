@@ -46,7 +46,7 @@ class TestPythonScripts(unittest.TestCase):
         test_gff = os.path.join(data_dir, "multiple_recombinations_clade_extract.gff")
         test_tree = os.path.join(data_dir, "multiple_recombinations_clade_extract.tree")
         # Script name
-        extract_clade_cmd = "extract_gubbins_clade.py --list " + clade_list + " --aln " + multiple_aln +\
+        extract_clade_cmd = "analyse_gubbins_subset.py --list " + clade_list + " --aln " + multiple_aln +\
             " --gff " + multiple_gff + " --tree " + multiple_tree + " --out " + base_path +  " --out-fmt fasta"
         subprocess.check_call(extract_clade_cmd, shell=True)
         assert self.md5_check(out_aln, test_aln)
@@ -140,7 +140,7 @@ class TestPythonScripts(unittest.TestCase):
         test_gff = os.path.join(data_dir, "multiple_recombinations_clade_generate.gff")
         test_tree = os.path.join(data_dir, "multiple_recombinations_clade_generate.tree")
         # Script name
-        clade_file_generation_cmd = "generate_files_for_clade_analysis.py --list " + clade_list + " --aln " + multiple_aln +\
+        clade_file_generation_cmd = "analyse_gubbins_subset.py --list " + clade_list + " --aln " + multiple_aln +\
             " --gff " + multiple_gff + " --tree " + multiple_tree + " --out " + base_path
         subprocess.check_call(clade_file_generation_cmd, shell=True)
         assert self.md5_check(out_aln, test_aln)

@@ -17,10 +17,9 @@ setuptools.setup(
     },
     scripts=[
         'scripts/generate_ska_alignment.py',
-        'scripts/extract_gubbins_clade.py',
         'scripts/mask_gubbins_aln.py',
         'scripts/gubbins_alignment_checker.py',
-        'scripts/generate_files_for_clade_analysis.py'
+        'scripts/analyse_gubbins_subset.py'
     ],
     tests_require=[
         "pytest >= 4.6",

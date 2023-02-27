@@ -557,7 +557,7 @@ def parse_and_run(input_args, program_description=""):
             subprocess.check_call(dating_command, shell=True)
         except subprocess.SubprocessError:
             # If this fails, continue to generate rest of output
-            sys.write("Failed running tree time calibration with LSD.")
+            sys.stderr.write("Failed running tree time calibration with LSD.")
             input_args.date = None
 
     # Create the final output

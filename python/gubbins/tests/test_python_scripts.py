@@ -122,6 +122,17 @@ class TestPythonScripts(unittest.TestCase):
         os.remove(out_gff)
         os.remove(out_tree)
 
+    # Test clade file extraction script
+    def test_recombination_counting_per_gene(self):
+        multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
+        annnotation_gff = os.path.join(data_dir, "multiple_recombinations_annotation.gff")
+        out_tab = os.path.join(data_dir, "test_multiple_recombinations_annotation.gff")
+        check_tab = os.path.join(data_dir, "multiple_recombinations_rec_per_gene.tab")
+        rec_count_cmd = "count_recombinations_per_gene.py --rec-gff " + multiple_gff + " --anno-gff " + annnotation_gff + " --out " + out_tab
+        subprocess.check_call(rec_count_cmd, shell=True)
+        assert self.md5_check(out_tab, check_tab)
+        os.remove(out_tab)
+                
     @staticmethod
     def check_for_output_files(prefix):
         assert os.path.exists(prefix + '.summary_of_snp_distribution.vcf')

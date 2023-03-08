@@ -65,7 +65,7 @@ if __name__ == "__main__":
                 # Record stats
                 rec_start.append(start)
                 rec_end.append(end)
-                rec_affected.append(len(taxon_set))
+                rec_affected.append(taxon_set)
 
     # Read annotation from GFF
     cds_start = []
@@ -113,15 +113,19 @@ if __name__ == "__main__":
 
     # Write out summary statistics
     with open(args.out,'w') as out_file:
-        out_file.write('CDS\tGeneName\tStart\tEnd\tNumRec\tNumAffectedTaxa\n')
+        out_file.write('CDS\tGeneName\tStart\tEnd\tNumRec\tNumAffectedTaxa\tAffectedTaxa\n')
         for cnum,cindex in enumerate(cds_index):
             num_rec = 0
-            num_affected_taxa = 0
+            affected_taxa = set()
             cstart = cds_start[cnum]
             cend = cds_end[cnum]
             for rnum,rstart in enumerate(rec_start):
                 rend = rec_end[rnum]
-                if (rstart < cend and rend > cend) or (rstart < cstart and rend > cend):
+                if (rstart < cend and rend > cend) or \
+                   (rstart < cstart and rend > cstart) or \
+                   (rstart > cstart and rend < cend):
                     num_rec = num_rec + 1
-                    num_affected_taxa = num_affected_taxa + rec_affected[rnum]
-            out_file.write(cds_index[cnum] + '\t' + cds_name[cnum] + '\t' + str(cds_start[cnum]) + '\t' + str(cds_end[cnum]) + '\t' + str(num_rec) + '\t' + str(num_affected_taxa) + '\n')
+                    affected_taxa = affected_taxa.union(rec_affected[rnum])
+            sorted_affected_taxa = list(affected_taxa)
+            sorted_affected_taxa.sort()
+            out_file.write(cds_index[cnum] + '\t' + cds_name[cnum] + '\t' + str(cds_start[cnum]) + '\t' + str(cds_end[cnum]) + '\t' + str(num_rec) + '\t' + str(len(affected_taxa)) + '\t' + ';'.join(sorted_affected_taxa) + '\n')

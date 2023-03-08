@@ -1,0 +1,3 @@
+CDS	GeneName	Start	End	NumRec	NumAffectedTaxa	AffectedTaxa
+CDS1	CDS1	70	100	3	9	sequence_1;sequence_2;sequence_3;sequence_4;sequence_5;sequence_6;sequence_7;sequence_8;sequence_9
+CDS2	CDS2	100	140	1	1	sequence_10

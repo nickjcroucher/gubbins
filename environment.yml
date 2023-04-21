@@ -25,7 +25,7 @@ dependencies:
   - dendropy
   - biopython
   - multiprocess
-  - numpy
+  - numpy<=1.23.0
   - numba
 # phylogenetics
   - raxml=8.2.12

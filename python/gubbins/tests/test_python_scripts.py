@@ -19,8 +19,7 @@ working_dir = os.path.join(modules_dir, 'tests')
 
 class TestPythonScripts(unittest.TestCase):
 
-    ## Test the alignment_checker script 
-
+    ## Test the alignment_checker script
     def test_alignment_checker(self):
         small_aln = os.path.join(data_dir, "valid_alignment.aln")
         output_file = os.path.join(working_dir, "valid_alignment_test.csv")
@@ -30,6 +29,19 @@ class TestPythonScripts(unittest.TestCase):
         subprocess.check_call(aln_cmd, shell=True)
         assert self.md5_check(output_csv, test_csv)
         os.remove(output_csv)
+
+    def test_alignment_reformatting(self):
+        invalid_aln = os.path.join(data_dir, "invalid_alignment.aln")
+        output_file = os.path.join(working_dir, "invalid_alignment_test.aln")
+        output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
+        test_aln = os.path.join(data_dir, "corrected_alignment.aln")
+        test_csv = os.path.join(data_dir, "corrected_alignment.csv")
+        aln_cmd = "gubbins_alignment_checker.py --aln " + invalid_aln + " --out-aln " + output_file + " --out " + output_csv
+        subprocess.check_call(aln_cmd, shell=True)
+        assert self.md5_check(output_csv, test_csv)
+        assert self.md5_check(output_file, test_aln)
+        os.remove(output_csv)
+        os.remove(output_file)
 
     ## Test the clade extraction script
     def test_clade_extraction(self):

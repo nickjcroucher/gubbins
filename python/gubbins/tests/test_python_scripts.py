@@ -23,7 +23,7 @@ class TestPythonScripts(unittest.TestCase):
 
     def test_alignment_checker(self):
         small_aln = os.path.join(data_dir, "valid_alignment.aln")
-        output_file = os.path.join(working_dir, "valid_alignment_test")
+        output_file = os.path.join(working_dir, "valid_alignment_test.csv")
         output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
         test_csv = os.path.join(data_dir, "test_valid_output.csv")
         aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_file

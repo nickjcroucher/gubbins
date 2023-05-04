@@ -31,6 +31,8 @@ def parse_input_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--aln', '-a', dest="aln",
                         help='Multifasta alignment file', required=True)
+    parser.add_argument('--out-aln', '-a', dest="aln",
+                        help='Reformatted alignment file', required=False)
     parser.add_argument('--out', '-o',
                         dest="out",
                         help="Out csv name for writing results too", required=True)
@@ -49,8 +51,6 @@ def main(input_args):
             tot_lines += 1
 
     # Going to use counter in a first pass to store sequence counts and the range of sequences
-    
-
     total_base_counts = []
     iso_data = []
     total_headers = []
@@ -88,7 +88,7 @@ def main(input_args):
     total_headers.insert(0, "isolate")
     write_out_headers = [re.sub("-","gap",i) for i in total_headers]
     print("Writing out results...")
-    with open((input_args.out + ".csv"), "w") as output:
+    with open((input_args.out), "w") as output:
         output.write(",".join(write_out_headers) + "\n")
         for i, aln_row in enumerate(isolate_bases):
             aln_row_str = list(map(str, aln_row))

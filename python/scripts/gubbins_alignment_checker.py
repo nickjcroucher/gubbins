@@ -27,15 +27,22 @@ from collections import Counter
 def parse_input_args():
 
     parser = argparse.ArgumentParser(
-        description='Script to output bases in an alignment by isolate',
+        description='Script to evaluate and reformat an alignment prior to Gubbins analysis',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--aln', '-a', dest="aln",
-                        help='Multifasta alignment file', required=True)
-    parser.add_argument('--out-aln', '-a', dest="aln",
-                        help='Reformatted alignment file', required=False)
-    parser.add_argument('--out', '-o',
+    parser.add_argument('--aln',
+                        '-a',
+                        dest="aln",
+                        help='Multifasta alignment filename',
+                        required=True)
+    parser.add_argument('--out-aln',
+                        dest="out_aln",
+                        help='Reformatted alignment filename',
+                        required=False)
+    parser.add_argument('--out',
+                        '-o',
                         dest="out",
-                        help="Out csv name for writing results too", required=True)
+                        help='Output CSV filename',
+                        required=True)
 
     return parser.parse_args()
 

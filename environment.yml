@@ -34,4 +34,4 @@ dependencies:
   - raxml-ng=1.0.1
   - fasttree=2.1.10
 # Scripts
-  - ska
+  - ska2

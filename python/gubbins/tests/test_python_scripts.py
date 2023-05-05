@@ -19,17 +19,28 @@ working_dir = os.path.join(modules_dir, 'tests')
 
 class TestPythonScripts(unittest.TestCase):
 
-    ## Test the alignment_checker script 
-
+    ## Test the alignment_checker script
     def test_alignment_checker(self):
         small_aln = os.path.join(data_dir, "valid_alignment.aln")
-        output_file = os.path.join(working_dir, "valid_alignment_test")
         output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
         test_csv = os.path.join(data_dir, "test_valid_output.csv")
-        aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_file
+        aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_csv
         subprocess.check_call(aln_cmd, shell=True)
         assert self.md5_check(output_csv, test_csv)
         os.remove(output_csv)
+
+    def test_alignment_reformatting(self):
+        invalid_aln = os.path.join(data_dir, "invalid_alignment.aln")
+        output_file = os.path.join(working_dir, "invalid_alignment_test.aln")
+        output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
+        test_aln = os.path.join(data_dir, "corrected_alignment.aln")
+        test_csv = os.path.join(data_dir, "corrected_alignment.csv")
+        aln_cmd = "gubbins_alignment_checker.py --aln " + invalid_aln + " --out-aln " + output_file + " --out " + output_csv
+        subprocess.check_call(aln_cmd, shell=True)
+        assert self.md5_check(output_csv, test_csv)
+        assert self.md5_check(output_file, test_aln)
+        os.remove(output_csv)
+        os.remove(output_file)
 
     ## Test the clade extraction script
     def test_clade_extraction(self):
@@ -82,9 +93,9 @@ class TestPythonScripts(unittest.TestCase):
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
         aln_out = os.path.join(preprocess_dir, 'ska_test_aln.aln')
         # Script name
-        ska_cmd = "generate_ska_alignment.py --fasta " + fasta_loc +\
+        ska_cmd = "generate_ska_alignment.py --input " + fasta_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
-                " --k 6"
+                " --k 7"
         subprocess.check_call(ska_cmd, shell=True)
         ## Now run gubbins on the aln and check all the output is produced 
         parser = run_gubbins.parse_input_args()

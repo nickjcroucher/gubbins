@@ -20,7 +20,6 @@
 #
 
 import argparse
-from asyncore import write
 import re
 from collections import Counter
 

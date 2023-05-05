@@ -100,6 +100,7 @@ def main(input_args):
     ## Second pass to line up all the counts across the isolates 
     print("")
     print("Assessing counts...")
+    total_headers.sort()
     isolate_bases = []
     for count in total_base_counts:
         iso_row = []

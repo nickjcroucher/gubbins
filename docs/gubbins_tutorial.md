@@ -10,10 +10,10 @@ tar xfz PMEN3_assemblies.tar.gz
 
 ## Generating the alignment
 
-The draft genomes can be aligned to the reference using [SKA](https://github.com/simonrharris/SKA). This is first installed through conda:
+The draft genomes can be aligned to the reference using [SKA2](https://github.com/bacpop/ska.rust). This is first installed through conda:
 
 ```
-conda install -c bioconda ska
+conda install -c bioconda ska2
 ```
 
 An index file is then generated to name the isolates to be aligned:
@@ -38,7 +38,7 @@ The `PMEN3_isolates.list` should contain this text:
 The alignment is then constructed using the Gubbins script `generate_ska_alignment.py`:
 
 ```
-generate_ska_alignment.py --reference RMV4.fa --fasta PMEN3_isolates.list --out PMEN3.aln
+generate_ska_alignment.py --reference RMV4.fa --input PMEN3_isolates.list --out PMEN3.aln
 ```
 
 ## Analysis with Gubbins

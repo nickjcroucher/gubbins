@@ -1,5 +1,5 @@
-isolate,A,N,C,G,T
-sequence1,6,4,0,0,0
-sequence2,0,0,10,0,0
-sequence3,0,0,0,10,0
+isolate,A,C,G,N,T
+sequence1,6,0,0,4,0
+sequence2,0,10,0,0,0
+sequence3,0,0,10,0,0
 sequence4,0,0,0,0,10

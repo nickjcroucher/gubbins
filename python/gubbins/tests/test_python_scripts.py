@@ -22,12 +22,11 @@ class TestPythonScripts(unittest.TestCase):
     ## Test the alignment_checker script
     def test_alignment_checker(self):
         small_aln = os.path.join(data_dir, "valid_alignment.aln")
-        output_file = os.path.join(working_dir, "valid_alignment_test.csv")
         output_csv = os.path.join(working_dir, "valid_alignment_test.csv")
         test_csv = os.path.join(data_dir, "test_valid_output.csv")
-        aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_file
+        aln_cmd = "gubbins_alignment_checker.py --aln " + small_aln + " --out " + output_csv
         subprocess.check_call(aln_cmd, shell=True)
-        assert self.md5_check(output_csv, test_csv)
+        assert self.md5_check(output_file, test_csv)
         os.remove(output_csv)
 
     def test_alignment_reformatting(self):

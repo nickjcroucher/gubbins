@@ -52,13 +52,13 @@ These will automatically be installed within the conda environment. Please cite 
 
 The required input file for Gubbins is a whole genome FASTA alignment. Each sequence should have a unique identifier, and special characters should be avoided. The sequences should only use the characters `ACGT` (DNA bases), `N` (unknown base) or `-` (alignment gap). If a starting tree is to be included, then this should be a Newick format.
 
-The alignment is most easily generated through mapping sequences against a reference sequence. This can be achieved with the popular mapping software Snippy, following the instructions on the relevant [Github repository](https://github.com/tseemann/snippy). Alternatively, the alignment can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA](https://github.com/simonrharris/SKA), which can be installed through `conda install -c bioconda ska` (SKA is included when installing Gubbins through conda). For instance,
+The alignment is most easily generated through mapping sequences against a reference sequence. This can be achieved with the popular mapping software Snippy, following the instructions on the relevant [Github repository](https://github.com/tseemann/snippy). Alternatively, the alignment can be generated using the Gubbins script `generate_ska_alignment.py`, which creates an alignment using [SKA2](https://github.com/bacpop/ska.rust), which can be installed through `conda install -c bioconda ska2` (SKA2 is included when installing Gubbins through conda). For instance,
 
 ```
-generate_ska_alignment.py --reference seq_X.fa --fasta fasta_files.list --fastq fastq_files.list --out out.aln
+generate_ska_alignment.py --reference seq_X.fa --input input.list --out out.aln
 ```
 
-Where `fasta_files.list` is a two column tab-delimited file containing sequence names (in the first column) and FASTA sequence assembly file paths (in the second column); `fastq_files.list` contains the same for unassembled FASTQ-format read data.
+Where `input.list` is a tab-delimited file with one row per isolate. The first column should be the isolate name, and the subsequent entries on the same row should contain the corresponding sequence data - this may be a single FASTA assembly, or multiple FASTQ raw read files. The alignment will be reformatted for Gubbins (e.g. modifying isolate names and removing non-N IUPAC ambiguity codes) by this script.
 
 The alignment can then be analysed with Gubbins:
 

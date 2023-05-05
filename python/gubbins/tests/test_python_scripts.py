@@ -96,7 +96,7 @@ class TestPythonScripts(unittest.TestCase):
         # Script name
         ska_cmd = "generate_ska_alignment.py --input " + fasta_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
-                " --k 6"
+                " --k 7"
         subprocess.check_call(ska_cmd, shell=True)
         ## Now run gubbins on the aln and check all the output is produced 
         parser = run_gubbins.parse_input_args()

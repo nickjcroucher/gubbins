@@ -136,8 +136,7 @@ There is no specific support for development or maintenance of Gubbins. However,
 ## Citation
 If you use this software please cite:
 [Croucher N. J., Page A. J., Connor T. R., Delaney A. J., Keane J. A., Bentley S. D., Parkhill J., Harris S.R.
-"Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". doi:10.1093/nar/gku1196, Nucleic Acids Research, 2014.]
-(http://nar.oxfordjournals.org/content/43/3/e15)
+"Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins". doi:10.1093/nar/gku1196, Nucleic Acids Research, 2014.](http://nar.oxfordjournals.org/content/43/3/e15)
 
 ## Further Information
 For more information on this software see the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/).

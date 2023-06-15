@@ -147,7 +147,7 @@ For more information on this software see the [Gubbins webpage](http://nickjcrou
 
 ### Midpoint rerooting
 From version 1.3.5 (25/6/15) to version 1.4.6 (29/2/16) trees were not midpoint rerooted by default.
-This doesnt have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.
+This does not have any effect on the recombination detection, but the output trees may not look as expected. Users are advised to upgrade to the latest version.
 
 ### Ancestral sequence reconstruction
 From version 3.0.0 onwards, Gubbins will use joint ancestral reconstructions with a modified version of [pyjar](https://github.com/simonrharris/pyjar) by default. Version 2 used marginal ancestral reconstruction with RAxML; this is still available in version 3, using the `--mar` flag (IQtree can also be used for reconstruction in version >3.0.0). This may useful in cases where memory use is limiting. Version 1 used joint ancestral reconstruction with [fastML](http://fastml.tau.ac.il/).

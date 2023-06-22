@@ -34,5 +34,4 @@ dependencies:
   - raxml-ng=1.0.1
   - fasttree=2.1.10
 # Scripts
-  - ska2
-  - jellyfish>2.2
+  - ska2>=0.3.0

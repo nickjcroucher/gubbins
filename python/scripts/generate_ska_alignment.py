@@ -122,6 +122,5 @@ if __name__ == "__main__":
 
     # Clean up
     if not args.no_cleanup:
-        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln + ' ' + args.out + '.toweed ' \
-                                + args.out + '_mer_counts.jf',
+        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln + ' ' + args.out + '.toweed ',
                                 shell = True)

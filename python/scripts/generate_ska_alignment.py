@@ -122,5 +122,5 @@ if __name__ == "__main__":
 
     # Clean up
     if not args.no_cleanup:
-        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln + ' ' + args.out + '.toweed ',
+        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln,
                                 shell = True)

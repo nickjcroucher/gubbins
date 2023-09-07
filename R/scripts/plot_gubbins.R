@@ -1,4 +1,4 @@
-#! Rscript
+#!/usr/bin/env Rscript
 
 #############
 # Libraries #

@@ -1,0 +1,4 @@
+##sequence-region gubbins_test 1 242
+NC_017592.1	RefSeq	region	1	242	.	+	.	ID=NC_017592.1:1..2036867;Dbxref=taxon:869215;Is_circular=true;Name=ANONYMOUS;gbkey=Src;genome=chromosome;mol_type=genomic DNA;strain=OXC141
+NC_017592.1	RefSeq	CDS	1	100	.	+	.	ID=gene-SPNOXC_RS00005;Name=dnaA;gbkey=Gene;gene=dnaA;gene_biotype=protein_coding;locus_tag=SPNOXC_RS00005;old_locus_tag=SPNOXC00010%2CSPNOXC_00010
+NC_017592.1	RefSeq	CDS	110	210	.	+	.	ID=gene-SPNOXC_RS00010;Name=dnaN;gbkey=Gene;gene=dnaN;gene_biotype=protein_coding;locus_tag=SPNOXC_RS00010;old_locus_tag=SPNOXC00020%2CSPNOXC_00020

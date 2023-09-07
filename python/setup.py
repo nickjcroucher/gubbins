@@ -21,7 +21,8 @@ setuptools.setup(
         'scripts/mask_gubbins_aln.py',
         'scripts/gubbins_alignment_checker.py',
         'scripts/generate_files_for_clade_analysis.py',
-        'scripts/count_recombinations_per_gene.py'
+        'scripts/count_recombinations_per_gene.py',
+        '../R/scripts/plot_gubbins.R'
     ],
     tests_require=[
         "pytest >= 4.6",

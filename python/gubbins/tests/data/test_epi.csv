@@ -1,0 +1,11 @@
+Id,italic(property1),property2~delta,bold(property3),property4,property5
+sequence_1,true,fail,lower,0.1,value1
+sequence_2,false,pass,lower,0.9,value4
+sequence_3,true,fail,lower,4.0,value1
+sequence_4,false,fail,lower,4.0,value3
+sequence_5,true,fail,lower,2.3,value3
+sequence_6,false,fail,higher,2.1,value2
+sequence_7,true,pass,higher,2.6,value2
+sequence_8,false,fail,higher,2.9,value2
+sequence_9,true,fail,higher,1.7,value1
+sequence_10,false,pass,higher,1.2,value2

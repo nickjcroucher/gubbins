@@ -87,7 +87,7 @@ class TestPythonScripts(unittest.TestCase):
         ## Run the generate_ska_alignment script
         fasta_loc = os.path.join(preprocess_dir, './ska_fasta_list.txt')
         with open(fasta_loc,'w') as list_file:
-            for i in range(1,5):
+            for i in range(1,7):
                 list_file.write('sequence_t' + str(i) + '\t' + \
                     os.path.join(preprocess_dir,'sequence_t' + str(i) + '.fasta\n'))
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')

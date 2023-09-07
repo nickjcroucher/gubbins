@@ -35,3 +35,13 @@ dependencies:
   - fasttree=2.1.10
 # Scripts
   - ska2>=0.3.0
+# R
+  - r-argparser
+  - r-magrittr
+  - r-tidyverse
+  - bioconductor-treeio
+  - bioconductor-ggtree
+  - r-aplot
+  - r-patchwork
+  - r-cowplot
+  - r-rcolorbrewer

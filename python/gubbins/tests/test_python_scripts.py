@@ -143,7 +143,20 @@ class TestPythonScripts(unittest.TestCase):
         subprocess.check_call(rec_count_cmd, shell=True)
         assert self.md5_check(out_tab, check_tab)
         os.remove(out_tab)
-                
+
+    # Test plotting script (an R exception)
+    def test_recombination_counting_per_gene(self):
+        tree_input = os.path.join(data_dir, "expected_RAxML_result.multiple_recombinations.iteration_5")
+        rec_input = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
+        anno_input = os.path.join(data_dir, "test_annotation.gff")
+        markup_input = os.path.join(data_dir, "test_markup.csv")
+        meta_input = os.path.join(data_dir, "test_epi.csv")
+        fig_output = os.path.join(data_dir, "test_plot.pdf")
+        plot_cmd = "plot_gubbins.R --tree " + tree_input + " --rec " + rec_input + " --markup " + markup_input + " --annotation " +  anno_input \
+                      + " --meta " + meta_input + " --output " + fig_output
+        subprocess.check_call(plot_cmd, shell=True)
+        os.remove(fig_output)
+
     @staticmethod
     def check_for_output_files(prefix):
         assert os.path.exists(prefix + '.summary_of_snp_distribution.vcf')

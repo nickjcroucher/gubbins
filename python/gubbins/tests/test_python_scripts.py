@@ -151,9 +151,10 @@ class TestPythonScripts(unittest.TestCase):
         anno_input = os.path.join(data_dir, "test_annotation.gff")
         markup_input = os.path.join(data_dir, "test_markup.csv")
         meta_input = os.path.join(data_dir, "test_epi.csv")
+        clades_input = os.path.join(data_dir, "test_clades.csv")
         fig_output = os.path.join(data_dir, "test_plot.pdf")
         plot_cmd = "plot_gubbins.R --tree " + tree_input + " --rec " + rec_input + " --markup " + markup_input + " --annotation " +  anno_input \
-                      + " --meta " + meta_input + " --output " + fig_output
+                      + " --meta " + meta_input + " --clades " + clades_input + " --output " + fig_output
         subprocess.check_call(plot_cmd, shell=True)
         os.remove(fig_output)
 

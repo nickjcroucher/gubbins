@@ -491,7 +491,7 @@ generate_markup_plot <- function(markup_df) {
 # Functions: Processing recombination #
 #######################################
 
-process_gubbins_recombination_df <- function(rec_gff_fn) {
+process_gubbins_recombination_gff <- function(rec_gff_fn) {
   
   # Load and process recombination
   gubbins_rec <-
@@ -634,13 +634,14 @@ plot_gubbins <- function(tree = NA,
   # Read tree
   gubbins_tree_obj <- process_gubbins_tree(tree)
   
+  # Read metadata to establish orientation of legends
   if (!is.na(meta)) {
     # Read file
     meta.df <-
       read.csv(meta, row.names = 1, check.names = FALSE)
   }
   
-  # Optimise direction
+  # Optimise direction of legends
   if (is.na(legend_direction)) {
     if (is.na(meta)) {
       legend_direction = "horizontal"
@@ -650,24 +651,35 @@ plot_gubbins <- function(tree = NA,
       legend_direction = "horizontal"
     }
   }
+  
+  # Process Gubbins tree to establish order of taxa
   gubbins_tree <- generate_gubbins_ggtree(gubbins_tree_obj,
                                           clades = clades,
                                           bl_threshold = max_branch_length,
                                           show_taxa = show_taxa,
                                           label_size = taxon_label_size,
                                           legend_direction = legend_direction)
-  gubbins_rec_df <- process_gubbins_recombination_df(rec)
+  
+  # Parse Gubbins GFF to establish genome length
+  gubbins_rec_df <- process_gubbins_recombination_gff(rec)
+  
+  # Initialise genome length as the last recombination in the absence of better evidence
   genome_length <- max(gubbins_rec_df$end)
   
+  # Parse metadata fully to plot relative to tree
   gubbins_meta <- NA
   gubbins_anno <- NA
   gubbins_legends <- list()
   if (!is.na(meta)) {
-    meta_plot_info <- return_metadata_plot(meta.df,gubbins_tree,legend_direction = legend_direction, meta_label_size = meta_label_size)
+    meta_plot_info <- return_metadata_plot(meta.df,
+                                           gubbins_tree,
+                                           legend_direction = legend_direction,
+                                           meta_label_size = meta_label_size)
     gubbins_meta <- meta_plot_info[[1]]
     gubbins_legends <- meta_plot_info[[2]]
   }
   
+  # Parse annotation and use this to update the genome length
   if (!is.na(anno)) {
     anno_features <- c("CDS")
     anno_df <- return_annotation_df(anno,
@@ -677,6 +689,8 @@ plot_gubbins <- function(tree = NA,
     gubbins_anno <- generate_annotation_plot(anno_df)
     genome_length <- max(max(anno_df$end),genome_length)
   }
+  
+  # Parse genome markup
   if (!is.na(markup)) {
     markup_df <- markup_df_from_csv(markup,
                                     start_pos = start_coordinate,
@@ -694,6 +708,7 @@ plot_gubbins <- function(tree = NA,
     end_coordinate <- genome_length
   }
   
+  # Parse recombinations in region to be plotted
   gubbins_rec <- 
     plot_gubbins_recombination(gubbins_rec_df,
                                gubbins_tree,
@@ -707,7 +722,7 @@ plot_gubbins <- function(tree = NA,
     heatmap_plot <- generate_heatmap(gubbins_rec_df,start_coordinate, end_coordinate)
   }
   
-  # Combine components
+  # Combine components on the main row of the figure
   options("aplot_guides" = "keep")
   if (!is.na(meta)) {
     combined_plot <-
@@ -720,7 +735,7 @@ plot_gubbins <- function(tree = NA,
         aplot::insert_left(gubbins_meta, width = tree_width)
   }
   
-  # Add heatmap
+  # Add heatmap above the recombination panel
   if (plot_heatmap) {
     suppressWarnings( # Suppress warnings here because of the missing first and last tiles when subsetting a region
       combined_plot <-
@@ -729,21 +744,21 @@ plot_gubbins <- function(tree = NA,
     )
   }
   
-  # Add annotation to plot
+  # Add annotation to plot above the recombination panel
   if (!is.na(anno)) {
     combined_plot <-
       combined_plot %>%
         aplot::insert_top(gubbins_anno, height = annotation_height)
   }
 
-  # Add markup to plot
+  # Add markup to plot above the recombination panel
   if (!is.na(markup) | annotation_labels) {
     combined_plot <-
       combined_plot %>%
         aplot::insert_top(gubbins_markup, height = markup_height)
   }
   
-  # Now add legends
+  # Now add legends below the other panels
   gubbins_plot_with_legends <- NA
   if (!is.na(clades) | !is.na(meta)) {
     if (!is.na(clades)) {
@@ -756,12 +771,22 @@ plot_gubbins <- function(tree = NA,
       cowplot::plot_grid(plotlist = list(aplot::as.patchwork(combined_plot),
                                          gubbins_legends_plot),
                          nrow = 2,
-                         rel_heights = c(1,legend_height)) +
-      annotation_custom(cowplot::get_legend(heatmap_plot), xmin  = -0.8 + heatmap_x_nudge, ymin = 0.925 + heatmap_y_nudge)
+                         rel_heights = c(1,legend_height))
   } else {
     gubbins_plot_with_legends <- aplot::as.patchwork(combined_plot)
   }
   
+  # Add heatmap legend above the tree
+  if (plot_heatmap) {
+    gubbins_plot_with_legends <-
+      gubbins_plot_with_legends +
+      annotation_custom(cowplot::get_legend(heatmap_plot),
+                        xmin  = -0.8 + heatmap_x_nudge,
+                        ymin = 0.925 + heatmap_y_nudge
+      )
+  }
+  
+  # Return final plot
   return(gubbins_plot_with_legends)
 }
 
@@ -877,7 +902,7 @@ parse_command_line <- function() {
   p <- add_argument(p,
                     "--heatmap-y-nudge",
                     "Size of metadata labels",
-                    default = 6,
+                    default = 0.0,
                     type = "numeric"
   )
   p <- add_argument(p,

@@ -631,13 +631,15 @@ plot_gubbins <- function(tree = NA,
                          heatmap_x_nudge = NA,
                          legend_direction = NA) {
   
-  # Generate individual components
+  # Read tree
   gubbins_tree_obj <- process_gubbins_tree(tree)
+  
   if (!is.na(meta)) {
     # Read file
     meta.df <-
       read.csv(meta, row.names = 1, check.names = FALSE)
   }
+  
   # Optimise direction
   if (is.na(legend_direction)) {
     if (is.na(meta)) {
@@ -935,23 +937,37 @@ parse_command_line <- function() {
   return(p)
 }
 
+check_file <- function(fn, f_type) {
+  
+  args_error <- FALSE
+  
+  if (is.na(args[["tree"]])) {
+    message(paste(f_type,"is required"))
+    args_error <- TRUE
+  } else if (!file.exists(args[["tree"]])) {
+    message(paste(f_type,"does not exist"))
+    args_error <- TRUE
+  }
+  
+  return(args_error)
+  
+}
+
 evaluate_args <- function(args) {
 
   args_error <- FALSE
   
-  if (is.na(args[["tree"]])) {
-    message("Tree file is required")
-    args_error <- TRUE
-  } else if (!file.exists(args[["tree"]])) {
-    message("Tree file does not exist")
-    args_error <- TRUE
-  }
+  # Check file validity
+  args_error <- (check_file(args[["tree"]],"Tree file") | args_error)
+  args_error <- (check_file(args[["rec"]],"Recombination GFF") | args_error)
+  args_error <- (check_file(args[["anno"]],"Annotation GFF") | args_error)
+  args_error <- (check_file(args[["markup"]],"Markup CSV") | args_error)
+  args_error <- (check_file(args[["meta"]],"Metadata CSV") | args_error)
+  args_error <- (check_file(args[["clades"]],"Clade CSV") | args_error)
   
-  if (is.na(args[["rec"]])) {
-    message("Recombination GFF file is required")
-    args_error <- TRUE
-  } else if (!file.exists(args[["rec"]])) {
-    message("Recombination GFF file does not exist")
+  # Check legend orientation argument
+  if (!(args[["legend_direction"]] %in% c(NA,"horizontal","vertical"))) {
+    message("Legend direction should be horizontal or vertcal")
     args_error <- TRUE
   }
   

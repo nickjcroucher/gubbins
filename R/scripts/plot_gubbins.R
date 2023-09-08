@@ -30,7 +30,7 @@ process_gubbins_tree <- function(tree_fn) {
   
 }
 
-generate_gubbins_ggtree <- function(gubbins_tree, show_taxa = FALSE, bl_threshold = Inf, truncated_col = "red") {
+generate_gubbins_ggtree <- function(gubbins_tree, show_taxa = FALSE, bl_threshold = Inf, truncated_col = "red", label_size = 4) {
   
   # Colour for truncated branches
   branch_palette <-
@@ -63,7 +63,7 @@ generate_gubbins_ggtree <- function(gubbins_tree, show_taxa = FALSE, bl_threshol
   if (show_taxa) {
     gubbins_ggtree <-
       gubbins_ggtree + 
-      geom_tiplab()
+      geom_tiplab(size = label_size)
   }
   
   return(gubbins_ggtree)
@@ -597,26 +597,30 @@ plot_gubbins <- function(tree = NULL,
                          markup = NULL,
                          anno = NULL,
                          meta = NULL,
-                         plot_heatmap = TRUE,
+                         plot_heatmap = NULL,
                          start_coordinate = NULL,
                          end_coordinate = NULL,
-                         show_taxa = FALSE,
-                         max_branch_length = Inf,
-                         annotation_labels = FALSE,
-                         tree_width = 0.4,
-                         meta_width = 0.25,
-                         annotation_height = 0.05,
-                         markup_height = 0.075,
-                         heatmap_height = 0.025,
-                         legend_height = 0.2,
-                         meta_label_size = 6,
-                         heatmap_y_nudge = 0.0,
-                         heatmap_x_nudge = 0.0,
+                         show_taxa = NULL,
+                         taxon_label_size = NULL,
+                         max_branch_length = NULL,
+                         annotation_labels = NULL,
+                         tree_width = NULL,
+                         meta_width = NULL,
+                         annotation_height = NULL,
+                         markup_height = NULL,
+                         heatmap_height = NULL,
+                         legend_height = NULL,
+                         meta_label_size = NULL,
+                         heatmap_y_nudge = NULL,
+                         heatmap_x_nudge = NULL,
                          legend_direction = NULL) {
   
   # Generate individual components
   gubbins_tree_obj <- process_gubbins_tree(tree)
-  gubbins_tree <- generate_gubbins_ggtree(gubbins_tree_obj, bl_threshold = max_branch_length, show_taxa = show_taxa)
+  gubbins_tree <- generate_gubbins_ggtree(gubbins_tree_obj,
+                                          bl_threshold = max_branch_length,
+                                          show_taxa = show_taxa,
+                                          label_size = taxon_label_size)
   gubbins_rec_df <- process_gubbins_recombination_df(rec)
   genome_length <- max(gubbins_rec_df$end)
   
@@ -819,10 +823,50 @@ parse_command_line <- function() {
                     flag=TRUE
   )
   p <- add_argument(p,
+                    "--heatmap-y-nudge",
+                    "Size of metadata labels",
+                    default = 6,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
+                    "--heatmap-x-nudge",
+                    "Size of metadata labels",
+                    default = 0.0,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
                     "--legend-direction",
                     "Orientation of legends (horizontal or vertical)",
-                    default = NULL,
+                    default = 0.0,
                     type = "character"
+  )
+  p <- add_argument(p,
+                    "--show-taxa",
+                    "Show taxa names on tree",
+                    flag = TRUE
+  )
+  p <- add_argument(p,
+                    "--taxon-label-size",
+                    "Size of taxon labels",
+                    default = 4,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
+                    "--annotation-labels",
+                    "Show GFF gene names on annotation",
+                    flag = TRUE
+  )
+  p <- add_argument(p,
+                    "--meta-label-size",
+                    "Size of metadata labels",
+                    default = 4,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
+                    "--max-branch-length",
+                    "Maximum length at which to truncate branches",
+                    default = Inf,
+                    type = "numeric"
   )
   p <- add_argument(p,
                     "--output-height",
@@ -882,7 +926,25 @@ gubbins_plot <-
                rec = args[["rec"]],
                markup = args[["markup"]],
                anno = args[["annotation"]],
-               meta = args[["meta"]])
+               meta = args[["meta"]],
+               plot_heatmap = !args[["no_heatmap"]],
+               start_coordinate = args[["start_coordinate"]],
+               end_coordinate = args[["end_coordinate"]],
+               show_taxa = args[["show_taxa"]],
+               taxon_label_size = args[["taxon_label_size"]],
+               max_branch_length = args[["max_branch_length"]],
+               annotation_labels = args[["annotation_labels"]],
+               tree_width = args[["tree_width"]],
+               meta_width = args[["meta_width"]],
+               annotation_height = args[["anno_height"]],
+               markup_height = args[["markup_height"]],
+               heatmap_height = args[["heatmap_height"]],
+               legend_height = args[["legend_height"]],
+               meta_label_size = args[["meta_label_size"]],
+               heatmap_y_nudge = args[["heatmap_y_nudge"]],
+               heatmap_x_nudge = args[["heatmap_x_nudge"]],
+               legend_direction = args[["legend_direction"]]
+          )
 
 ggsave(file=args[["output"]],
        height = args[["output_height"]],

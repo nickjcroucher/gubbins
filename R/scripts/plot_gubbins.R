@@ -719,7 +719,9 @@ plot_gubbins <- function(tree = NA,
   
   # Calculate heatmap
   if (plot_heatmap) {
-    heatmap_plot <- generate_heatmap(gubbins_rec_df,start_coordinate, end_coordinate)
+    heatmap_plot <- generate_heatmap(gubbins_rec_df,
+                                     start_coordinate,
+                                     end_coordinate)
   }
   
   # Combine components on the main row of the figure
@@ -728,11 +730,13 @@ plot_gubbins <- function(tree = NA,
     combined_plot <-
       gubbins_rec %>%
         aplot::insert_left(gubbins_meta, width = meta_width) %>%
-        aplot::insert_left(gubbins_tree + theme(legend.position = "none"),width = tree_width)
+        aplot::insert_left(gubbins_tree + theme(legend.position = "none"),
+                           width = tree_width)
   } else {
     combined_plot <-
       gubbins_rec %>%
-        aplot::insert_left(gubbins_meta, width = tree_width)
+        aplot::insert_left(gubbins_tree + theme(legend.position = "none"),
+                           width = tree_width)
   }
   
   # Add heatmap above the recombination panel
@@ -757,7 +761,7 @@ plot_gubbins <- function(tree = NA,
       combined_plot %>%
         aplot::insert_top(gubbins_markup, height = markup_height)
   }
-  
+
   # Now add legends below the other panels
   gubbins_plot_with_legends <- NA
   if (!is.na(clades) | !is.na(meta)) {
@@ -767,14 +771,17 @@ plot_gubbins <- function(tree = NA,
     }
     gubbins_legends_plot <- cowplot::plot_grid(plotlist = gubbins_legends,
                                                 nrow = 1)
-    gubbins_plot_with_legends <-
-      cowplot::plot_grid(plotlist = list(aplot::as.patchwork(combined_plot),
-                                         gubbins_legends_plot),
-                         nrow = 2,
-                         rel_heights = c(1,legend_height))
+
   } else {
-    gubbins_plot_with_legends <- aplot::as.patchwork(combined_plot)
+    gubbins_legends_plot <- NULL # Without this the positioning of the heatmap legend is unpredictable
+    legend_height <- 0.01
+#    gubbins_plot_with_legends <- aplot::as.patchwork(combined_plot)
   }
+  gubbins_plot_with_legends <-
+    cowplot::plot_grid(plotlist = list(aplot::as.patchwork(combined_plot),
+                                       gubbins_legends_plot),
+                       nrow = 2,
+                       rel_heights = c(1,legend_height))
   
   # Add heatmap legend above the tree
   if (plot_heatmap) {
@@ -785,7 +792,7 @@ plot_gubbins <- function(tree = NA,
                         ymin = 0.925 + heatmap_y_nudge
       )
   }
-  
+
   # Return final plot
   return(gubbins_plot_with_legends)
 }
@@ -962,16 +969,24 @@ parse_command_line <- function() {
   return(p)
 }
 
-check_file <- function(fn, f_type) {
+check_file <- function(fn, f_type, essential = FALSE) {
   
   args_error <- FALSE
+
+  # Check if file provided
+  if (essential) {
+    if (is.na(fn)) {
+      message(paste(f_type,"is required"))
+      args_error <- TRUE
+    }
+  }
   
-  if (is.na(args[["tree"]])) {
-    message(paste(f_type,"is required"))
-    args_error <- TRUE
-  } else if (!file.exists(args[["tree"]])) {
-    message(paste(f_type,"does not exist"))
-    args_error <- TRUE
+  # Check if file exists
+  if (!is.na(fn)) {
+    if (!file.exists(fn)) {
+      message(paste(f_type,"does not exist"))
+      args_error <- TRUE
+    }
   }
   
   return(args_error)
@@ -983,16 +998,22 @@ evaluate_args <- function(args) {
   args_error <- FALSE
   
   # Check file validity
-  args_error <- (check_file(args[["tree"]],"Tree file") | args_error)
-  args_error <- (check_file(args[["rec"]],"Recombination GFF") | args_error)
-  args_error <- (check_file(args[["anno"]],"Annotation GFF") | args_error)
-  args_error <- (check_file(args[["markup"]],"Markup CSV") | args_error)
-  args_error <- (check_file(args[["meta"]],"Metadata CSV") | args_error)
-  args_error <- (check_file(args[["clades"]],"Clade CSV") | args_error)
+  args_error <- (check_file(args[["tree"]], "Tree file", essential = TRUE) | args_error)
+  args_error <- (check_file(args[["rec"]], "Recombination GFF", essential = TRUE) | args_error)
+  args_error <- (check_file(args[["annotation"]], "Annotation GFF", essential = FALSE) | args_error)
+  args_error <- (check_file(args[["markup"]], "Markup CSV", essential = FALSE) | args_error)
+  args_error <- (check_file(args[["meta"]], "Metadata CSV", essential = FALSE) | args_error)
+  args_error <- (check_file(args[["clades"]], "Clade CSV", essential = FALSE) | args_error)
   
   # Check legend orientation argument
   if (!(args[["legend_direction"]] %in% c(NA,"horizontal","vertical"))) {
-    message("Legend direction should be horizontal or vertcal")
+    message("Legend direction should be horizontal or vertical")
+    args_error <- TRUE
+  }
+  
+  # Check output is provided
+  if (is.na(args[["output"]])) {
+    message("An output file name is required")
     args_error <- TRUE
   }
   
@@ -1039,5 +1060,6 @@ gubbins_plot <-
           )
 
 ggsave(file=args[["output"]],
+       gubbins_plot,
        height = args[["output_height"]],
        width = args[["output_width"]])

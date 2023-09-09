@@ -153,8 +153,15 @@ class TestPythonScripts(unittest.TestCase):
         meta_input = os.path.join(data_dir, "test_epi.csv")
         clades_input = os.path.join(data_dir, "test_clades.csv")
         fig_output = os.path.join(data_dir, "test_plot.pdf")
-        plot_cmd = "plot_gubbins.R --tree " + tree_input + " --rec " + rec_input + " --markup " + markup_input + " --annotation " +  anno_input \
-                      + " --meta " + meta_input + " --clades " + clades_input + " --output " + fig_output
+        plot_cmd = "plot_gubbins.R --tree " + tree_input + " --rec " + rec_input + " --output " + fig_output
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --annotation " +  anno_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --clades " + clades_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --markup " + markup_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --meta " + meta_input
         subprocess.check_call(plot_cmd, shell=True)
         os.remove(fig_output)
 

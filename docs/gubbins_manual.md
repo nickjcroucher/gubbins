@@ -66,7 +66,7 @@ The alignment can then be analysed with Gubbins:
 run_gubbins.py --prefix gubbins_out out.aln
 ```
 
-The output of this analysis can then be visualised using [Phandango](https://jameshadfield.github.io/phandango/#/) or [RCandy](https://github.com/ChrispinChaguza/RCandy). Further downstream analysis can use [BactDating](https://xavierdidelot.github.io/BactDating/) to generate a time-calibrated phylogeny, and [SkyGrowth](https://pubmed.ncbi.nlm.nih.gov/29432602/) for reconstructing past population sizes. For an example of such a workflow, see [D'Aeth *et al*](https://elifesciences.org/articles/67113).
+The output of this analysis can be interactively visualised and analysed using [Phandango](https://jameshadfield.github.io/phandango/#/), and publication-ready figures can be generated with [plot_gubbins.R](docs/gubbins_plotting.md) or [RCandy](https://github.com/ChrispinChaguza/RCandy). Further downstream analysis can use [BactDating](https://xavierdidelot.github.io/BactDating/) to generate a time-calibrated phylogeny, and [SkyGrowth](https://pubmed.ncbi.nlm.nih.gov/29432602/) for reconstructing past population sizes. For an example of such a workflow, see [D'Aeth *et al*](https://elifesciences.org/articles/67113).
 
 ## Input options
 
@@ -252,6 +252,10 @@ Note that all positions in the output files are relative to the input alignment.
 To calculate the overall ***r***/***m***, the sum of the recombination base substitutions across all branches should be divided by the sum of point mutations across all branches - ***rho***/***theta*** can be similarly estimated.
 
 If you used a `--date` input file, then `.lsd.out` will include a `rate`, corresponding to the estimate of the point mutation molecular clock in substitutions per genome per year, and a `tMRCA`, corresponding to the estimated root date (i.e. year of origin). The rate of recombination is this molecular clock rate multiplied by ***rho***/***theta***.
+
+## Generating a figure
+
+The Gubbins package includes the R script `plot_gubbins.R` for generating a figure. A short [guide](docs/gubbins_plotting.md) for using this script is provided. Alternative styles, and additional flexibility, are provided by the [RCandy](https://github.com/ChrispinChaguza/RCandy) package. Images can also be generated from Phandango by using the 'p' key to produce an SVG file.
 
 ## Processing scripts
 

@@ -26,18 +26,11 @@
     * [Ancestral sequence reconstruction](#ancestral-sequence-reconstruction)
 
 ## Introduction
-Since the introduction of high-throughput, second-generation DNA sequencing technologies, there has been an enormous
-increase in the size of datasets being used for estimating bacterial population phylodynamics.
-Although many phylogenetic techniques are scalable to hundreds of bacterial genomes, methods which have been used
-for mitigating the effect of horizontal sequence transfer on phylogenetic reconstructions cannot cope
-with these new datasets. Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm
-that iteratively identifies loci containing elevated densities of base substitutions while concurrently constructing
-a phylogeny based on the putative point mutations outside of these regions. Simulations demonstrate the algorithm
-generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run
-in only a few hours on alignments of hundreds of bacterial genome sequences.
+Gubbins (Genealogies Unbiased By recomBinations In Nucleotide Sequences) is an algorithm that iteratively identifies loci containing elevated densities of base substitutions, which are marked as recombinations, while concurrently constructing a phylogeny based on the putative point mutations outside of these regions.
+Simulations demonstrate the algorithm generates highly accurate reconstructions under realistic models of short-term bacterial evolution, and can be run in only a few hours on alignments of hundreds of bacterial genome sequences.
 
 ## Installation
-Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [manual](docs/gubbins_manual.md), [tutorial](docs/gubbins_tutorial.md) and [publication](https://academic.oup.com/nar/article/43/3/e15/2410982).
+Before starting your analysis, please have a look at the [Gubbins webpage](http://nickjcroucher.github.io/gubbins/), [manual](docs/gubbins_manual.md), [tutorial](docs/gubbins_tutorial.md), [plotting advice](docs/gubbins_plotting.md) and/or [publication](https://academic.oup.com/nar/article/43/3/e15/2410982).
 
 ### Required dependencies
 Phylogenetic software:
@@ -55,7 +48,7 @@ Python modules:
 * Multiprocessing
 * Numba
 
-See environment.yml for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
+See `environment.yml` for details. These are in addition to standard build environment tools (e.g. python >=3.8, pip3, make, autoconf, libtool, gcc, check, etc...). There are a number of ways to install Gubbins and details are provided below. If you encounter an issue when installing Gubbins please contact your local system administrator.
 
 ### Recommended installation method - conda
 Install conda and enable the bioconda channels. This can be done using the normal command line (Linux), with Terminal (OSX) or the Powershell (Windows versions >=10).
@@ -106,6 +99,12 @@ make
 sudo make install
 cd python
 python3 -m pip install .
+```
+
+You may encounter an issue with `clang` versions not being able to link to library files during `make check`. If you have installed into a conda environment called `gubbins_env`, this can be solved with the command:
+
+```
+FILES=`ls -l1 $CONDA_PREFIX/lib/clang/*/lib/darwin/*`; for clang_dir in $(ls -d1 $CONDA_PREFIX/lib/clang/*); do if [[ ! -d "$clang_dir/lib/darwin" ]]; then mkdir -p $clang_dir/lib/darwin; for clang_file in $(echo $FILES); do ln -s $clang_file $clang_dir/lib/darwin/; done; fi;  done
 ```
 
 ### OSX/Linux/Windows - Virtual Machine

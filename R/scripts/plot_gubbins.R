@@ -833,7 +833,7 @@ parse_command_line <- function() {
   )
   p <- add_argument(p,
                     "--meta",
-                    "Metadata for each sequence (CSV file; first columns is 'id')",
+                    "Metadata for each sequence (CSV file; first column is 'id')",
                     default = NA,
                     type = "character"
   )

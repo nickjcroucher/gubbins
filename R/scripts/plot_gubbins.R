@@ -37,6 +37,7 @@ annotate_clades <- function(gubbins_ggtree,clades_fn) {
       read.csv(clades_fn) %>%
         {if("Id" %in% names(.)) dplyr::rename(.,id = Id) else .} %>%
         {if("ID" %in% names(.)) dplyr::rename(.,id = ID) else .} %>%
+        {if("Clade" %in% names(.)) dplyr::rename(.,clade = Clade) else .} %>%
         dplyr::rename(label = id) %>%
         unstack(label ~ clade)
 
@@ -53,19 +54,43 @@ annotate_clades <- function(gubbins_ggtree,clades_fn) {
   return(gubbins_ggtree)
 }
 
-generate_gubbins_ggtree <- function(gubbins_tree, clades = NA, show_taxa = FALSE, bl_threshold = Inf, label_size = 4, legend_direction = NA) {
+make_ggtree <- function(raw_tree, branch_width, threshold) {
   
-  # Colour for truncated branches
+  # Linetypes for truncated branches
   branch_palette <-
     c("Truncated" = 2,
       "Normal" = 1)
   
-  # Truncate long branches
-  gubbins_tree$edge.length[gubbins_tree$edge.length > bl_threshold] <- bl_threshold
+  # Truncate branches
+  raw_tree$edge.length[raw_tree$edge.length > threshold] <- threshold
+  
+  # Plot initial tree
+  gubbins_ggtree <- 
+    ggtree(raw_tree, size = branch_width)
+  
+  # Mark truncated branches
+  if (threshold < Inf) {
+    gubbins_ggtree$data %<>%
+      dplyr::mutate(truncated = dplyr::if_else(branch.length==threshold,
+                                               "Truncated",
+                                               "Normal"))
+    
+    gubbins_ggtree <-
+      gubbins_ggtree +
+      aes(linetype = truncated) + 
+      scale_linetype_manual(values = branch_palette, name = "Branch type")
+    
+  }
+
+  return(gubbins_ggtree)
+
+}
+
+generate_gubbins_ggtree <- function(gubbins_tree, clades = NA, branch_width = NA, show_taxa = FALSE, bl_threshold = Inf, label_size = 4, tree_axis_expand = 5, legend_direction = NA) {
   
   # Read in tree
   gubbins_ggtree <- 
-    ggtree(gubbins_tree, size = 0.25)
+    make_ggtree(gubbins_tree, branch_width, bl_threshold)
   
   # Colour clades if defined
   if (!is.na(clades)) {
@@ -73,16 +98,11 @@ generate_gubbins_ggtree <- function(gubbins_tree, clades = NA, show_taxa = FALSE
       annotate_clades(gubbins_ggtree,clades)
   }
   
-  # Label truncated branches
-  gubbins_ggtree$data %<>%
-    dplyr::mutate(truncated = dplyr::if_else(branch.length>=bl_threshold,
-                                             "Truncated",
-                                             "Normal"))
   # Scale tree
   gubbins_ggtree <-
     gubbins_ggtree +
-    scale_linetype_manual(values = branch_palette) +
     theme_tree2() +
+    xlim_tree(c(0,max(gubbins_ggtree$data$x) + tree_axis_expand)) +
     theme(legend.position = "bottom",
           legend.direction = legend_direction,
           axis.line.x = element_line(linewidth = 0.25))
@@ -618,6 +638,7 @@ plot_gubbins <- function(tree = NA,
                          end_coordinate = NA,
                          show_taxa = NA,
                          taxon_label_size = NA,
+                         branch_width = NA,
                          max_branch_length = NA,
                          annotation_labels = NA,
                          tree_width = NA,
@@ -627,6 +648,7 @@ plot_gubbins <- function(tree = NA,
                          heatmap_height = NA,
                          legend_height = NA,
                          meta_label_size = NA,
+                         tree_axis_expand = NA,
                          heatmap_y_nudge = NA,
                          heatmap_x_nudge = NA,
                          legend_direction = NA) {
@@ -655,9 +677,11 @@ plot_gubbins <- function(tree = NA,
   # Process Gubbins tree to establish order of taxa
   gubbins_tree <- generate_gubbins_ggtree(gubbins_tree_obj,
                                           clades = clades,
+                                          branch_width = branch_width,
                                           bl_threshold = max_branch_length,
                                           show_taxa = show_taxa,
                                           label_size = taxon_label_size,
+                                          tree_axis_expand = tree_axis_expand,
                                           legend_direction = legend_direction)
   
   # Parse Gubbins GFF to establish genome length
@@ -764,8 +788,8 @@ plot_gubbins <- function(tree = NA,
 
   # Now add legends below the other panels
   gubbins_plot_with_legends <- NA
-  if (!is.na(clades) | !is.na(meta)) {
-    if (!is.na(clades)) {
+  if (!is.na(clades) | !is.na(meta) | max_branch_length < Inf) {
+    if (!is.na(clades) | max_branch_length < Inf) {
       tree_legend_obj <- cowplot::get_legend(gubbins_tree)
       gubbins_legends <- c(list(tree_legend_obj),(gubbins_legends))
     }
@@ -775,7 +799,6 @@ plot_gubbins <- function(tree = NA,
   } else {
     gubbins_legends_plot <- NULL # Without this the positioning of the heatmap legend is unpredictable
     legend_height <- 0.01
-#    gubbins_plot_with_legends <- aplot::as.patchwork(combined_plot)
   }
   gubbins_plot_with_legends <-
     cowplot::plot_grid(plotlist = list(aplot::as.patchwork(combined_plot),
@@ -864,7 +887,7 @@ parse_command_line <- function() {
                     type = "numeric"
   )
   p <- add_argument(p,
-                    "--anno-height",
+                    "--annotation-height",
                     "Height of annotation panel relative to recombination panel",
                     default = 0.05,
                     type = "numeric"
@@ -950,6 +973,18 @@ parse_command_line <- function() {
                     "--max-branch-length",
                     "Maximum length at which to truncate branches",
                     default = Inf,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
+                    "--branch-width",
+                    "Width of branches on tree plot",
+                    default = 0.25,
+                    type = "numeric"
+  )
+  p <- add_argument(p,
+                    "--tree-axis-expansion",
+                    "Space between tree and right panel",
+                    default = 5,
                     type = "numeric"
   )
   p <- add_argument(p,
@@ -1045,15 +1080,17 @@ gubbins_plot <-
                end_coordinate = args[["end_coordinate"]],
                show_taxa = args[["show_taxa"]],
                taxon_label_size = args[["taxon_label_size"]],
+               branch_width = args[["branch_width"]],
                max_branch_length = args[["max_branch_length"]],
                annotation_labels = args[["annotation_labels"]],
                tree_width = args[["tree_width"]],
                meta_width = args[["meta_width"]],
-               annotation_height = args[["anno_height"]],
+               annotation_height = args[["annotation_height"]],
                markup_height = args[["markup_height"]],
                heatmap_height = args[["heatmap_height"]],
                legend_height = args[["legend_height"]],
                meta_label_size = args[["meta_label_size"]],
+               tree_axis_expand = args[["tree_axis_expansion"]],
                heatmap_y_nudge = args[["heatmap_y_nudge"]],
                heatmap_x_nudge = args[["heatmap_x_nudge"]],
                legend_direction = args[["legend_direction"]]

@@ -1,17 +1,16 @@
 EXTRA_DIST=gubbins/*
 
 all-local:
-	${PYTHON} setup.py build
-
+	pip install .
 
 install-exec-local:
-	${PYTHON} setup.py install
+	pip install .
 
 uninstall-local:
 	rm -rf $(pythondir)/*gubbins*
 
 clean-local:
-	$(PYTHON) setup.py clean --all
+	rm -rf $(pythondir)/build
 
 check-local:
 	pytest --cov-report xml --cov=gubbins gubbins/tests/

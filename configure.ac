@@ -25,7 +25,7 @@ case $host_os in
 esac
 AM_CONDITIONAL([HOST_LINUX],[test x$HOST_OS = xlinux])
 
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_CC
 AC_PROG_CXX
 

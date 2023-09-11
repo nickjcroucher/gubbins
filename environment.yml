@@ -20,6 +20,7 @@ dependencies:
   - pkg-config
   - wheel
   - pillow
+  - llvm
 # algorithm
   - scipy
   - dendropy
@@ -34,5 +35,14 @@ dependencies:
   - raxml-ng=1.0.1
   - fasttree=2.1.10
 # Scripts
-  - ska2
-  - jellyfish>2.2
+  - ska2>=0.3.0
+# R
+  - r-argparser
+  - r-magrittr
+  - r-tidyverse
+  - bioconductor-treeio
+  - bioconductor-ggtree
+  - r-aplot
+  - r-patchwork
+  - r-cowplot
+  - r-rcolorbrewer

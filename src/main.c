@@ -70,7 +70,8 @@ int check_file_exists_or_exit(char * filename)
   }
 }
 
-int main (argc, argv) int argc; char **argv;
+//int main (argc, argv) int argc; char **argv;
+int main (int argc, char ** argv)
 {
     int c;
     char multi_fasta_filename[MAX_FILENAME_SIZE] = {""};

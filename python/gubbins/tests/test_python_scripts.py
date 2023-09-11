@@ -87,7 +87,7 @@ class TestPythonScripts(unittest.TestCase):
         ## Run the generate_ska_alignment script
         fasta_loc = os.path.join(preprocess_dir, './ska_fasta_list.txt')
         with open(fasta_loc,'w') as list_file:
-            for i in range(1,5):
+            for i in range(1,7):
                 list_file.write('sequence_t' + str(i) + '\t' + \
                     os.path.join(preprocess_dir,'sequence_t' + str(i) + '.fasta\n'))
         ref_seq = os.path.join(preprocess_dir, 'sequence_t1.fasta')
@@ -95,7 +95,7 @@ class TestPythonScripts(unittest.TestCase):
         # Script name
         ska_cmd = "generate_ska_alignment.py --input " + fasta_loc +\
             " --reference " + ref_seq + " --out " + aln_out +\
-                " --k 7"
+                " --k 13"
         subprocess.check_call(ska_cmd, shell=True)
         ## Now run gubbins on the aln and check all the output is produced 
         parser = run_gubbins.parse_input_args()
@@ -143,7 +143,28 @@ class TestPythonScripts(unittest.TestCase):
         subprocess.check_call(rec_count_cmd, shell=True)
         assert self.md5_check(out_tab, check_tab)
         os.remove(out_tab)
-                
+
+    # Test plotting script (an R exception)
+    def test_recombination_counting_per_gene(self):
+        tree_input = os.path.join(data_dir, "expected_RAxML_result.multiple_recombinations.iteration_5")
+        rec_input = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
+        anno_input = os.path.join(data_dir, "test_annotation.gff")
+        markup_input = os.path.join(data_dir, "test_markup.csv")
+        meta_input = os.path.join(data_dir, "test_epi.csv")
+        clades_input = os.path.join(data_dir, "test_clades.csv")
+        fig_output = os.path.join(data_dir, "test_plot.pdf")
+        plot_cmd = "plot_gubbins.R --tree " + tree_input + " --rec " + rec_input + " --output " + fig_output
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --annotation " +  anno_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --clades " + clades_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --markup " + markup_input
+        subprocess.check_call(plot_cmd, shell=True)
+        plot_cmd = plot_cmd + " --meta " + meta_input
+        subprocess.check_call(plot_cmd, shell=True)
+        os.remove(fig_output)
+
     @staticmethod
     def check_for_output_files(prefix):
         assert os.path.exists(prefix + '.summary_of_snp_distribution.vcf')

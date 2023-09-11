@@ -99,25 +99,14 @@ if __name__ == "__main__":
                             shell = True)
 
     # Remove repetitive sequences
-    if os.path.exists(args.reference):
-        # Count k-mers
-        subprocess.check_output('jellyfish count -L 2 -C -m ' + str(args.k + 1) + ' -o ' + args.out + \
-                                    '_mer_counts.jf -c 3 -s 10000000 ' + args.reference,
-                            shell = True)
-        # Extract repetitive k-mers
-        subprocess.check_output('jellyfish dump -o ' + args.out + '.toweed ' + args.out + '_mer_counts.jf',
-                            shell = True)
-        # Weed k-mers
-        subprocess.check_output('ska weed ' + args.out + '.skf ' + args.out + '.toweed',
-                            shell = True)
-    else:
+    if not os.path.exists(args.reference):
         sys.stderr.write('Reference file missing: ' + args.reference + '\n')
         sys.exit(1)
 
     # Run ska mapping
     if os.path.exists(args.out + '.skf'):
         tmp_aln = os.path.join(os.path.dirname(args.out), 'tmp.' + os.path.basename(args.out))
-        subprocess.check_output('ska map -o ' + tmp_aln + ' --threads ' + str(args.threads) + ' ' +  \
+        subprocess.check_output('ska map -o ' + tmp_aln + ' --threads ' + str(args.threads) + ' --repeat-mask ' +  \
                                     args.reference + ' ' + args.out + '.skf',
                                 shell = True)
     else:
@@ -133,6 +122,5 @@ if __name__ == "__main__":
 
     # Clean up
     if not args.no_cleanup:
-        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln + ' ' + args.out + '.toweed ' \
-                                + args.out + '_mer_counts.jf',
+        subprocess.check_output('rm ' + args.out + '.skf ' + tmp_aln,
                                 shell = True)

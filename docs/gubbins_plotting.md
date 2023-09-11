@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The R script `plot_gubbins.R` can be used to generate figures for publications. It should be installed automatically with the main algorithm. The script has a number of command line arguments, described below. Your particular dataset may well have percularities that require additional customisation, which is best addressed through [downloading](R/scripts/plot_gubbins.R) and manually editing the script yourself.
+The R script `plot_gubbins.R` can be used to generate figures for publications. It should be installed automatically with the main algorithm. The script has a number of command line arguments, described below. Your particular dataset may well have percularities that require additional customisation, which is best addressed through [downloading](../R/scripts/plot_gubbins.R) and manually editing the script yourself.
 
 ### Input files
 

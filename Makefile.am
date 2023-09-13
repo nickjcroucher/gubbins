@@ -5,12 +5,6 @@ CFLAGS := -std=gnu99
 # include "check-code-coverage" rule
 include $(top_srcdir)/aminclude_static.am
 
-all-local:
--  ${PYTHON} setup.py build
-
-install-exec-local:
--  ${PYTHON} setup.py install
-
 uninstall-local:
    rm -rf $(pythondir)/*gubbins*
 

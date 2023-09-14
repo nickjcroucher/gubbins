@@ -97,7 +97,7 @@ These options provide flexibility with regard to the labelling of different comp
 
 ### Example
 
-Using files from the associated [FigShare repository](dx.doi.org/10.6084/m9.figshare.24117117), we can replicate the analysis shown in [Kwun, Ion, Cheng *et al*](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01147-2) with the command:
+Using files from the associated [FigShare repository](https://dx.doi.org/10.6084/m9.figshare.24117117), we can replicate the analysis shown in [Kwun, Ion, Cheng *et al*](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-022-01147-2) with the command:
 
 ```
 plot_gubbins.R --tree serotype_3.tre --rec serotype_3_recombination.gff --annotation serotype_3_annotation.gff  --meta serotype_3_metadata.csv --max-branch-length 500 --clades serotype_3_clades.csv --markup serotype_3_markup.csv --legend-height 0.35  --tree-axis-expansion 30 --markup-height 0.1 --heatmap-x-nudge 0.05 --heatmap-y-nudge -0.05 --output serotype_3.png

@@ -1,18 +1,9 @@
-EXTRA_DIST=debian/* tests/*.h tests/data/* gubbins/* setup.py scripts/*
+EXTRA_DIST=debian/* tests/*.h tests/data/*
 SUBDIRS=src release python
 ACLOCAL_AMFLAGS=-I m4
 CFLAGS := -std=gnu99
 # include "check-code-coverage" rule
 include $(top_srcdir)/aminclude_static.am
-
-all-local:
--  ${PYTHON} setup.py build
-
-install-exec-local:
--  ${PYTHON} setup.py install
-
-uninstall-local:
-   rm -rf $(pythondir)/*gubbins*
 
 source: dist
 	cd release && make source

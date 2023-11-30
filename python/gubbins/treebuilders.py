@@ -141,7 +141,7 @@ class FastTree:
         self.seed = utils.set_seed(seed)
 
         # Identify executable
-        self.potential_executables = ["FastTree", "fasttree"]
+        self.potential_executables = ["FastTreeMP","fasttreeMP","FastTree", "fasttree"]
         self.executable = utils.choose_executable(self.potential_executables)
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")

@@ -76,6 +76,8 @@ def parse_input_args():
                                                       default = False, action = 'store_true')
     treeGroup.add_argument('--sh-test',               help='Perform an SH test of node likelihoods', default = False,
                                                       action = 'store_true')
+    treeGroup.add_argument('--seed',                  help='Set seed for reproducibility of analysis',
+                                                      default = None, type = int)
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
     modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all '

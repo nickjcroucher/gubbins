@@ -23,6 +23,7 @@ import subprocess
 import re
 import numpy as np
 import collections
+from random import randint
 try:
     from multiprocessing.managers import SharedMemoryManager
     NumpyShared = collections.namedtuple('NumpyShared', ('name', 'shape', 'dtype'))
@@ -195,3 +196,11 @@ def extend_args(var,add):
         var.extend([add])
         var = " ".join(var)
     return var
+
+def set_seed(seed):
+    """Set seed when specified"""
+    if seed is None:
+        seed = str(randint(0, 10000))
+    else:
+        seed = str(seed)
+    return seed

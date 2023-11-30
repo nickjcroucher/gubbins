@@ -79,6 +79,18 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    def test_fasttree_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--seed","42",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     # Test resuming a default analysis
     def test_fasttree_resume(self):
         exit_code = 1
@@ -116,6 +128,18 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                 "--verbose", "--iterations", "3",
+                                                "--threads", "1",
+                                                os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_iqtree_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                "--verbose", "--iterations", "3",
+                                                "--seed","42",
                                                 "--threads", "1",
                                                 os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')
@@ -246,6 +270,18 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
+    def test_raxml_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--seed","42",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
     def test_raxml_custom_model(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
@@ -295,6 +331,19 @@ class TestExternalDependencies(unittest.TestCase):
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
                                                     "--model","GTR",
                                                     "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_raxmlng_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--model","GTR",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--seed","42",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
         exit_code = self.check_for_output_files('multiple_recombinations')

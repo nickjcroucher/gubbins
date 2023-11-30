@@ -133,7 +133,7 @@ Gubbins is free software, licensed under [GPLv2](https://github.com/nickjcrouche
 There is no specific support for development or maintenance of Gubbins. However, we will try to help you out if you report any issues about usage of the software to the [issues page](https://github.com/nickjcroucher/gubbins/issues).
 
 ## Development plan
-Version 3 incorporates a number of features that were explicitly requested by users (e.g. ), improved the algorithm's accuracy (e.g. using joint ancestral reconstruction) and were commonly used in published analyses (e.g. using IQTREE2 for phylogeny construction).
+Version 3 incorporates a number of features that were explicitly requested by users (e.g. plotting functions), improved the algorithm's accuracy (e.g. using joint ancestral reconstruction) and were commonly used in published analyses (e.g. using IQTREE2 for phylogeny construction).
 
 Future development will prioritise:
 - More efficient phylogenetic processing with modern python libraries

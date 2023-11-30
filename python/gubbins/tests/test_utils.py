@@ -107,3 +107,9 @@ class TestUtilities(unittest.TestCase):
             printer.print(["AAA", "BBB"])
             printed = f.getvalue()
         assert printed == "AAA-BBB\n"
+
+    def test_seed(self):
+        set_seed_val = utils.set_seed(42)
+        assert set_seed_val == "42"
+        random_seed_val = utils.set_seed(None)
+        assert(int(random_seed_val) < 10001)

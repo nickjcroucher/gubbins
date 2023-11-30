@@ -74,7 +74,7 @@ autoreconf -i
 make
 [sudo] make install
 cd python
-[sudo] python3 -m pip install .
+[sudo] python3 -m pip install [--prefix=$PREFIX] .
 ```
 Use `sudo` to install Gubbins system-wide. If you don't have the permissions, run `configure` with a prefix to install Gubbins in your home directory.
 
@@ -131,6 +131,17 @@ Gubbins is free software, licensed under [GPLv2](https://github.com/nickjcrouche
 
 ## Feedback/Issues
 There is no specific support for development or maintenance of Gubbins. However, we will try to help you out if you report any issues about usage of the software to the [issues page](https://github.com/nickjcroucher/gubbins/issues).
+
+## Development plan
+Version 3 incorporates a number of features that were explicitly requested by users (e.g. plotting functions), improved the algorithm's accuracy (e.g. using joint ancestral reconstruction) and were commonly used in published analyses (e.g. using IQTREE2 for phylogeny construction).
+
+Future development will prioritise:
+- More efficient phylogenetic processing with modern python libraries
+- Parallelisation of recombination searches
+- Faster sequence reconstruction through hardware acceleration
+- Extension of existing analyses using phylogenetic placement
+
+If you believe there are other improvements that could be added, please describe them on the [issues page](https://github.com/nickjcroucher/gubbins/issues) and tag the suggestion as an "enhancement".
 
 ## Citation
 If you use this software please cite:

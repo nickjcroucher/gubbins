@@ -20,7 +20,6 @@
 import sys
 import os
 import subprocess
-from random import randint
 
 from Bio import SeqIO
 
@@ -129,7 +128,7 @@ class RapidNJ:
 class FastTree:
     """Class for operations with the FastTree executable"""
 
-    def __init__(self, threads: int, bootstrap = 0, model='GTRCAT', verbose=False, additional_args = None):
+    def __init__(self, threads: int, bootstrap = 0, model='GTRCAT', seed = None, verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -139,9 +138,10 @@ class FastTree:
         self.alignment_suffix = ".snp_sites.aln"
         self.bootstrap = bootstrap
         self.additional_args = additional_args
+        self.seed = utils.set_seed(seed)
 
         # Identify executable
-        self.potential_executables = ["FastTree", "fasttree"]
+        self.potential_executables = ["FastTreeMP","fasttreeMP","FastTree", "fasttree"]
         self.executable = utils.choose_executable(self.potential_executables)
         if self.executable is None:
             sys.exit("No usable version of FastTree could be found.")
@@ -164,6 +164,7 @@ class FastTree:
             command.extend(["-gtr"])
         else:
             command.extend([self.model])
+        command.extend(["-seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])
@@ -256,7 +257,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -271,6 +272,7 @@ class IQTree:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.use_best = use_best
+        self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
     
         # Construct base command
@@ -303,6 +305,7 @@ class IQTree:
             command.extend(["-m","GTR+G4"])
         else:
             command.extend(["-m",self.model])
+        command.extend(["-seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])
@@ -432,7 +435,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', bootstrap = 0, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -446,6 +449,7 @@ class RAxML:
         self.alignment_suffix = ".phylip"
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
+        self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
@@ -465,9 +469,6 @@ class RAxML:
         if self.threads > 1:
             command.extend(["-T", str(self.threads)])
 
-        # Set a seed
-        command.extend(["-p",str(randint(0, 10000))])
-
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
@@ -482,6 +483,7 @@ class RAxML:
             command.extend(["-m","GTRGAMMA"])
         else:
             command.extend(["-m", self.model])
+        command.extend(["-p",self.seed])
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])
@@ -579,9 +581,7 @@ class RAxML:
         command = self.base_command.copy()
         command.extend(["-s", alignment_filename, "-n", basename + ".bootstrapped_trees"])
         command.extend(["-w",tmp])
-        p_seed = str(randint(0, 10000))
-        command.extend(["-p",p_seed])
-        command.extend(["-x",p_seed])
+        command.extend(["-x",self.seed])
         command.extend(["-#",str(self.bootstrap)])
         # Output
         if not self.verbose:
@@ -592,8 +592,6 @@ class RAxML:
     def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a single branch support test"""
         command = self.base_command.copy()
-        p_seed = str(randint(0, 10000))
-        command.extend(["-p",p_seed])
         command.extend(["-f", "J"])
         command.extend(["-s", alignment_filename, "-n", input_tree + ".sh_support"])
         command.extend(["-t", input_tree])
@@ -610,7 +608,7 @@ class RAxML:
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, internal_node_prefix = "", verbose = False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -624,6 +622,7 @@ class RAxMLNG:
         self.alignment_suffix = ".phylip"
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
+        self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxml-ng']
@@ -655,6 +654,7 @@ class RAxMLNG:
             command.extend(["GTR+G"])
         else:
             command.extend([self.model])
+        command.extend(["--seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])

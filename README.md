@@ -74,7 +74,7 @@ autoreconf -i
 make
 [sudo] make install
 cd python
-[sudo] python3 -m pip install .
+[sudo] python3 -m pip install [--prefix=$PREFIX] .
 ```
 Use `sudo` to install Gubbins system-wide. If you don't have the permissions, run `configure` with a prefix to install Gubbins in your home directory.
 

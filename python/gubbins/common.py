@@ -744,13 +744,13 @@ def return_algorithm_choices(args,i):
 def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = FastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxML(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxmlng":
-        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "star":

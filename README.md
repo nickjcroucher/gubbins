@@ -1,4 +1,4 @@
-# Gubbins <img src='gpt_gubbins_logo.png' align="right" height="100" />
+# Gubbins <img src='docs/gpt_gubbins_logo.png' align="right" height="100" />
 **G**enealogies **U**nbiased **B**y recom**B**inations **I**n **N**ucleotide **S**equences
 
 <!-- badges: start -->

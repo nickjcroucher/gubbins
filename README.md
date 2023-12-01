@@ -1,6 +1,6 @@
 # Gubbins
 **G**enealogies **U**nbiased **B**y recom**B**inations **I**n **N**ucleotide **S**equences
-![](gpt_gubbins_logo.png)
+![](gpt_gubbins_logo.png){height=500px width=500px}
 ![build](https://github.com/nickjcroucher/gubbins/workflows/build/badge.svg)  
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-brightgreen.svg)](https://github.com/nickjcroucher/gubbins/blob/master/LICENSE)   
 [![status](https://img.shields.io/badge/NAR-10.1093-brightgreen.svg)](https://academic.oup.com/nar/article/43/3/e15/2410982)   

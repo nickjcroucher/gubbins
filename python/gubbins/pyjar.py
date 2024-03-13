@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/env python
+# encoding: utf-8
+#
 # pyjar written by Simon Harris
 # code modified from https://github.com/simonrharris/pyjar
 # pyjar is free software, licensed under GPLv3.

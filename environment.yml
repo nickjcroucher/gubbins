@@ -26,7 +26,6 @@ dependencies:
   - dendropy
   - biopython
   - multiprocess
-  - llvmlite=0.41.0
   - numpy>=1.25,<1.26
   - numba=0.58.0
 # phylogenetics

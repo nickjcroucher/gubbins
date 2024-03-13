@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # encoding: utf-8
+#
 # Wellcome Trust Sanger Institute
 # Copyright (C) 2013  Wellcome Trust Sanger Institute
 # 
@@ -224,7 +226,7 @@ def parse_and_run(input_args, program_description=""):
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # Find all SNP sites with Gubbins
-    gubbins_command = " ".join([gubbins_exec, input_args.alignment_filename])
+    gubbins_command = f"{gubbins_exec} \"{input_args.alignment_filename}\""
     printer.print(["\nRunning Gubbins to detect SNPs...", gubbins_command])
     try:
         subprocess.check_call(gubbins_command, shell=True)

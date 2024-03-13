@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # encoding: utf-8
+#
 # Wellcome Trust Sanger Institute
 # Copyright (C) 2013  Wellcome Trust Sanger Institute
 #

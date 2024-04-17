@@ -86,16 +86,10 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 		int current_index = 0;
     // convert the starting coordinates of block to the nearest SNP index
 		current_index = find_starting_index(current_block_coordinates[0][i],snp_locations,0, number_of_snps);
-		
-    //make sure that the index begins at start of block
-		int beginning_j = current_index;
-    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
-    {
-    }
     
+    // starting at the begining index of block, count all the snps until the end of the block.
     int j;
-    // starting at the begining index of block, count all the snps until the end of the bock.
-		for(j = beginning_j; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
+		for(j = current_index; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
 		{
 				snps_in_recombinations[num_snps_in_recombinations] = j;
 				num_snps_in_recombinations++;
@@ -744,6 +738,8 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
 
     // create the pileup of the snps and their sphere of influence
     int snp_counter = 0;
+    int min_postion = genome_size;
+    int max_position = 0;
     for(snp_counter = 0; snp_counter < number_of_branch_snps; snp_counter++)
     {
         int j = 0;
@@ -760,6 +756,11 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
             snp_sliding_window_counter = 0;
         }
 
+        if(snp_sliding_window_counter < min_postion)
+        {
+            min_postion = snp_sliding_window_counter;
+        }
+      
         // Upper bound of the window around a snp
         int max_snp_sliding_window_counter = snp_site_coords[snp_counter]+(window_size/2);
         max_snp_sliding_window_counter = extend_upper_part_of_window(snp_site_coords[snp_counter] + 1,
@@ -770,6 +771,11 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
         if(max_snp_sliding_window_counter>genome_size)
         {
             max_snp_sliding_window_counter = genome_size;
+        }
+      
+        if(max_snp_sliding_window_counter > max_position)
+        {
+          max_position= max_snp_sliding_window_counter;
         }
 
         for(j = snp_sliding_window_counter; j < max_snp_sliding_window_counter; j++)
@@ -784,7 +790,7 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
     int block_lower_bound = 0;
     // Scan across the pileup and record where blocks are above the cutoff
     int i;
-    for(i = 0; i <= genome_size; i++)
+    for(i = min_postion; i <= max_position; i++)
     {
         // Just entered the start of a block
         if(window_count[i] > cutoff && in_block == 0)
@@ -794,20 +800,23 @@ int get_blocks(int ** block_coordinates, int genome_size,int * snp_site_coords,i
         }
 
         // Reached end of genome
-        if(i == genome_size && in_block == 1)
+        if (in_block == 1)
         {
-            block_coordinates[0][number_of_blocks] = block_lower_bound;
-            block_coordinates[1][number_of_blocks] = i;
-            number_of_blocks++;
-            in_block = 0;
-        }
-        // Just left a block
-        else if(window_count[i] <= cutoff && in_block == 1)
-        {
-            block_coordinates[0][number_of_blocks] = block_lower_bound;
-            block_coordinates[1][number_of_blocks] = i-1;
-            number_of_blocks++;
-            in_block = 0;
+          if(i == genome_size)
+          {
+              block_coordinates[0][number_of_blocks] = block_lower_bound;
+              block_coordinates[1][number_of_blocks] = i;
+              number_of_blocks++;
+              in_block = 0;
+          }
+          // Just left a block
+          else if(window_count[i] <= cutoff)
+          {
+              block_coordinates[0][number_of_blocks] = block_lower_bound;
+              block_coordinates[1][number_of_blocks] = i-1;
+              number_of_blocks++;
+              in_block = 0;
+          }
         }
 
     }
@@ -1215,9 +1224,25 @@ double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, i
 
 int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks)
 {
-
     int genome_length = length_of_sequence;
     
+    // Process list of recombinations
+    int j = 0;
+    int * filtered_start_coords;
+    int * filtered_end_coords;
+    int num_filtered_blocks = 0;
+    filtered_start_coords = (int *) calloc(num_blocks,sizeof(int));
+    filtered_end_coords = (int *) calloc(num_blocks,sizeof(int));
+    for(j = 0; j<num_blocks; j++)
+    {
+        if(block_coordinates[0][j] != -1)
+        {
+          filtered_start_coords[num_filtered_blocks] = block_coordinates[0][j];
+          filtered_end_coords[num_filtered_blocks] = block_coordinates[1][j];
+          num_filtered_blocks++;
+        }
+    }
+  
     int i = 0;
     for(i = 0; i<length_of_sequence; i++)
     {
@@ -1227,15 +1252,11 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
         }
         else
         {
-            int j = 0;
-            for(j = 0; j<num_blocks; j++)
+            for(j = 0; j<num_filtered_blocks; j++)
             {
-                if(block_coordinates[0][j] != -1)
+                if (i >= filtered_start_coords[j] && i <= filtered_end_coords[j])
                 {
-                    if (i >= block_coordinates[0][j] && i <= block_coordinates[1][j])
-                    {
-                        genome_length--;
-                    }
+                    genome_length--;
                 }
             }
         }

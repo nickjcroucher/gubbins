@@ -33,9 +33,6 @@
 #include "gff_file.h"
 #include "string_cat.h"
 
-int node_counter = 0;
-
-
 // Order is not preserved.
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array)
 {
@@ -312,7 +309,6 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 	int current_branch =0;
 	int branch_genome_size = 0;
 	int number_of_branch_snps=0;
-    root->current_node_id = ++node_counter;
 	
 	if (root->childNum == 0)
 	{

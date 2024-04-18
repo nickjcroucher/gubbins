@@ -329,7 +329,7 @@ char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * 
 		newick_node * child_nodes[root->childNum];
 		root->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*number_of_columns,sizeof(char));
 
-		// generate pointers for each child seuqn
+		// generate pointers for each child sequence
 
 		while (child != NULL)
 		{

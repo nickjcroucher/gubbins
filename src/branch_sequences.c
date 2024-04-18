@@ -1170,54 +1170,70 @@ double reduce_factorial(int l, int i)
 // c = number_of_block_snps
 double get_block_likelihood(int branch_genome_size, int number_of_branch_snps, int block_genome_size_without_gaps, int number_of_block_snps)
 {
-	double part1, part2, part3, part4;
-	
-	if(block_genome_size_without_gaps == 0)
-	{
-		return 0.0;
-	}
-	if(number_of_block_snps == 0)
-	{
-		return 0.0;
-	}
-	
-	part1 = log10(number_of_block_snps*1.0/block_genome_size_without_gaps*1.0)*number_of_block_snps;
-	
-	if((block_genome_size_without_gaps-number_of_block_snps) == 0)
-	{
-		part2 = 0.0;	
-	}
-	else
-	{
-		part2 = log10( ((block_genome_size_without_gaps-number_of_block_snps)*1.0)/block_genome_size_without_gaps*1.0 )*(block_genome_size_without_gaps-number_of_block_snps);
-	}
-	
-	if((number_of_branch_snps-number_of_block_snps) == 0)
-	{
-		part3 = 0.0;
-	}
-	else
-	{
-		part3 = log10(((number_of_branch_snps-number_of_block_snps)*1.0)/((branch_genome_size-block_genome_size_without_gaps)*1.0))*(number_of_branch_snps-number_of_block_snps);
-	}
-			
-	if(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps))==0)
-	{
-	  part4 = 0.0;
-	}
-	else
-	{
-		part4=log10(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps)*1.0 )/((branch_genome_size-block_genome_size_without_gaps)*1.0)) * ((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps));
-	}
-	
-	return (part1+part2+part3+part4)*-1;
+  double part1, part2, part3, part4;
+  
+  if(block_genome_size_without_gaps == 0)
+  {
+    return 0.0;
+  }
+  if(number_of_block_snps == 0)
+  {
+    return 0.0;
+  }
+  
+  part1 = log10(number_of_block_snps*1.0/block_genome_size_without_gaps*1.0)*number_of_block_snps;
+  
+  if((block_genome_size_without_gaps-number_of_block_snps) == 0)
+  {
+    part2 = 0.0;
+  }
+  else
+  {
+    part2 = log10( ((block_genome_size_without_gaps-number_of_block_snps)*1.0)/block_genome_size_without_gaps*1.0 )*(block_genome_size_without_gaps-number_of_block_snps);
+  }
+  
+  if((number_of_branch_snps-number_of_block_snps) == 0)
+  {
+    part3 = 0.0;
+  }
+  else
+  {
+    part3 = log10(((number_of_branch_snps-number_of_block_snps)*1.0)/((branch_genome_size-block_genome_size_without_gaps)*1.0))*(number_of_branch_snps-number_of_block_snps);
+  }
+      
+  if(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps))==0)
+  {
+    part4 = 0.0;
+  }
+  else
+  {
+    part4=log10(((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps)*1.0 )/((branch_genome_size-block_genome_size_without_gaps)*1.0)) * ((branch_genome_size-block_genome_size_without_gaps)-(number_of_branch_snps-number_of_block_snps));
+  }
+  
+  return (part1+part2+part3+part4)*-1;
 }
 
 int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int length_of_sequence, int ** block_coordinates, int num_blocks)
 {
-
     int genome_length = length_of_sequence;
     
+    // Process list of recombinations
+    int j = 0;
+    int * filtered_start_coords;
+    int * filtered_end_coords;
+    int num_filtered_blocks = 0;
+    filtered_start_coords = (int *) calloc(num_blocks,sizeof(int));
+    filtered_end_coords = (int *) calloc(num_blocks,sizeof(int));
+    for(j = 0; j<num_blocks; j++)
+    {
+        if(block_coordinates[0][j] != -1)
+        {
+          filtered_start_coords[num_filtered_blocks] = block_coordinates[0][j];
+          filtered_end_coords[num_filtered_blocks] = block_coordinates[1][j];
+          num_filtered_blocks++;
+        }
+    }
+  
     int i = 0;
     for(i = 0; i<length_of_sequence; i++)
     {
@@ -1227,15 +1243,11 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
         }
         else
         {
-            int j = 0;
-            for(j = 0; j<num_blocks; j++)
+            for(j = 0; j<num_filtered_blocks; j++)
             {
-                if(block_coordinates[0][j] != -1)
+                if (i >= filtered_start_coords[j] && i <= filtered_end_coords[j])
                 {
-                    if (i >= block_coordinates[0][j] && i <= block_coordinates[1][j])
-                    {
-                        genome_length--;
-                    }
+                    genome_length--;
                 }
             }
         }
@@ -1243,5 +1255,3 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
 
     return genome_length;
 }
-
-

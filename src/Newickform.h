@@ -58,6 +58,8 @@ char* strip_quotes(char *taxon);
 extern newick_node* parseTree(char *str);
 extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
 extern void print_tree(newick_node *root, FILE * outputfile);
+void fill_nodeArray(newick_node *root, newick_node** nodeArray);
+int count_tree_nodes(newick_node* root);
 extern char* strip_quotes(char *taxon);
 #endif
 

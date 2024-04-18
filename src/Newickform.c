@@ -28,6 +28,73 @@
 
 #define STR_OUT	"out"
 
+void fill_nodeArray(newick_node *root,newick_node** nodeArray, int num_nodes)
+{
+  if (root->childNum != 0)
+  {
+    newick_child *child;
+    child = root->child;
+    while (child != NULL)
+    {
+      fill_nodeArray(child->node,nodeArray, num_nodes);
+      child = child->next;
+    }
+  }
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    if (nodeArray[i]->taxon == NULL)
+    {
+      nodeArray[i] = root;
+      break;
+    }
+  }
+}
+
+int count_tree_nodes(newick_node* root) {
+    if (root == NULL) return 0;
+    int count = 1; // Count the root node
+    // Recursively count nodes in the child subtree
+    if (root->childNum != 0)
+    {
+      newick_child *child;
+      child = root->child;
+      while (child != NULL)
+      {
+        count += count_tree_nodes(child->node);
+        child = child->next;
+      }
+    }
+    return count;
+}
+
+// Function to find the maximum distance from an internal node to the tips
+int max_distance_to_tips(newick_node *root) {
+    
+    // Initialize the maximum distance to 0
+    int max_distance = 0;
+  
+    // Distance is non-zero if not leaf node
+    if (root->childNum != 0)
+    {
+      // Traverse each child of the internal node
+      newick_child* child = root->child;
+      while (child != NULL)
+      {
+          // Recursively find the maximum distance from the child to the tips
+          int child_distance = max_distance_to_tips(child->node);
+          // Add one for the distance from the child to the parent
+          child_distance++;
+          // Update the maximum distance if the distance from this child is greater
+          if (child_distance > max_distance) {
+              max_distance = child_distance;
+          }
+          child = child->next;
+      }
+    }
+
+    return max_distance;
+}
+
 newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	int iLen, iMaxLen;
@@ -95,8 +162,26 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	gff_file_pointer = fopen(gff_file_name, "w");
 	print_gff_header(gff_file_pointer,length_of_original_genome);
 	
-    char * root_sequence = NULL;
-
+  // iterate through tree to get list of nodes
+  int num_nodes = 0;
+  newick_node * current_node = root;
+  num_nodes = count_tree_nodes(current_node);
+  newick_node** nodeArray = malloc(num_nodes * sizeof(newick_node*));
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    nodeArray[i] = (newick_node*)seqMalloc(sizeof(newick_node));
+  }
+  fill_nodeArray(current_node,nodeArray,num_nodes);
+  
+  // get depths of each node from tips
+  int max_depth = max_distance_to_tips(root);
+  int *node_depths = malloc(num_nodes * sizeof(int));
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    node_depths[i] = max_distance_to_tips(nodeArray[i]);
+  }
+  
+  char * root_sequence = NULL;
 	carry_unambiguous_gaps_up_tree(root);
 	root_sequence = generate_branch_sequences(root,
                                               vcf_file_pointer,
@@ -116,7 +201,10 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
                                               trimming_ratio,
                                               extensive_search_flag);
 	free(root_sequence);
-    int * parent_recombinations = NULL;
+  free(nodeArray);
+  free(node_depths);
+  
+  int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);
 
 	fclose(block_file_pointer);

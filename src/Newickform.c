@@ -28,6 +28,35 @@
 
 #define STR_OUT	"out"
 
+// Function to extract nodes relevant for each depth
+void get_job_nodes(newick_node** jobNodeArray, newick_node** nodeArray, int* node_depths, int depth, int num_nodes)
+{
+  int j = 0;
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    if (node_depths[i] == depth)
+    {
+      jobNodeArray[j] = nodeArray[i];
+      ++j;
+    }
+  }
+}
+
+// Function to count number of jobs to run at a particular depth
+int get_job_counts(int *node_depths, int depth, int num_nodes)
+{
+  int count = 0;
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    if (node_depths[i] == depth)
+    {
+      count++;
+    }
+  }
+  return count;
+}
+
+// Function to create an array of nodes
 void fill_nodeArray(newick_node *root,newick_node** nodeArray, int num_nodes)
 {
   if (root->childNum != 0)
@@ -50,6 +79,7 @@ void fill_nodeArray(newick_node *root,newick_node** nodeArray, int num_nodes)
   }
 }
 
+// Function to count the total number of tree nodes
 int count_tree_nodes(newick_node* root) {
     if (root == NULL) return 0;
     int count = 1; // Count the root node
@@ -179,6 +209,21 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   for (int i = 0; i < num_nodes; ++i)
   {
     node_depths[i] = max_distance_to_tips(nodeArray[i]);
+  }
+  
+  // iterate through depths and identify batches of analyses to be run
+  for (int depth = 0; depth <= max_depth; ++depth)
+  {
+    int num_jobs = get_job_counts(node_depths,depth,num_nodes);
+    newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
+    get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
+    printf("Depth is %d\n",depth);
+    for (int i = 0; i < num_nodes; ++i) {
+        if (jobNodeArray[i] != NULL) {
+            // Print or use jobNodeArray[i] to verify its content
+            printf("Node is %s\n",jobNodeArray[i]->taxon);
+        }
+    }
   }
   
   char * root_sequence = NULL;

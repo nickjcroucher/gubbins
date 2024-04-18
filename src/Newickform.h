@@ -60,6 +60,8 @@ extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,in
 extern void print_tree(newick_node *root, FILE * outputfile);
 void fill_nodeArray(newick_node *root, newick_node** nodeArray);
 int count_tree_nodes(newick_node* root);
+void get_job_nodes(newick_node** jobNodeArray,newick_node** nodeArray,int* node_depths,int depth,int num_nodes);
+void get_job_counts(int *node_depths, int depth, int num_nodes);
 extern char* strip_quotes(char *taxon);
 #endif
 

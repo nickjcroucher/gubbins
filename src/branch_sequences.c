@@ -77,33 +77,27 @@ int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** a
 // Loop over all recombination blocks and return a list of all snp indices that fall within those blocks.
 int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** current_block_coordinates,int num_blocks, int * snp_locations,int number_of_snps, int * snps_in_recombinations)
 {
-	int num_snps_in_recombinations =0;
-	int i = 0;
+  int num_snps_in_recombinations =0;
+  int i = 0;
   
   // loop over each block
-	for(i = 0; i<num_blocks; i++ )
-	{
-		int current_index = 0;
+  for(i = 0; i<num_blocks; i++ )
+  {
+    int current_index = 0;
     // convert the starting coordinates of block to the nearest SNP index
-		current_index = find_starting_index(current_block_coordinates[0][i],snp_locations,0, number_of_snps);
-		
-    //make sure that the index begins at start of block
-		int beginning_j = current_index;
-    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
-    {
-    }
+    current_index = find_starting_index(current_block_coordinates[0][i],snp_locations,0, number_of_snps);
     
+    // starting at the begining index of block, count all the snps until the end of the block.
     int j;
-    // starting at the begining index of block, count all the snps until the end of the bock.
-		for(j = beginning_j; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
-		{
-				snps_in_recombinations[num_snps_in_recombinations] = j;
-				num_snps_in_recombinations++;
-		}
-	}
+    for(j = current_index; (j < number_of_snps && snp_locations[j] <= current_block_coordinates[1][i]); j++)
+    {
+        snps_in_recombinations[num_snps_in_recombinations] = j;
+        num_snps_in_recombinations++;
+    }
+  }
 
   // may contain duplications
-	return num_snps_in_recombinations;
+  return num_snps_in_recombinations;
 }
 
 

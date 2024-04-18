@@ -19,6 +19,8 @@
 
 #define __NEWICKFORM_C__
 
+#include <pthread.h>
+#include "stdio.h"
 #include "seqUtil.h"
 #include "Newickform.h"
 #include "branch_sequences.h"
@@ -27,6 +29,27 @@
 
 
 #define STR_OUT	"out"
+
+// Function to be executed by each thread
+void* print_nodes(void* arg) {
+    ThreadArgs* args = (ThreadArgs*)arg;
+
+    int start = (args->thread_id) * (args->num_nodes / args->num_threads);
+    int end = (args->thread_id + 1) * (args->num_nodes / args->num_threads);
+
+    // Adjust the end index for the last thread to cover all remaining nodes
+    if (args->thread_id == args->num_threads - 1) {
+        end = args->num_nodes;
+    }
+
+    // Print the contents of the jobNodeArray for this thread's portion
+    for (int i = start; i < end; ++i) {
+        newick_node* node = args->jobNodeArray[i];
+        printf("Thread %d: Node %d: %s\n", args->thread_id, i, node->taxon);
+    }
+
+    pthread_exit(NULL);
+}
 
 // Function to extract nodes relevant for each depth
 void get_job_nodes(newick_node** jobNodeArray, newick_node** nodeArray, int* node_depths, int depth, int num_nodes)
@@ -218,11 +241,32 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
     get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
     printf("Depth is %d\n",depth);
-    for (int i = 0; i < num_nodes; ++i) {
+    for (int i = 0; i < num_jobs; ++i) {
         if (jobNodeArray[i] != NULL) {
             // Print or use jobNodeArray[i] to verify its content
             printf("Node is %s\n",jobNodeArray[i]->taxon);
         }
+    }
+    int num_threads = 4; // Adjust as needed
+    pthread_t threads[num_threads];
+    ThreadArgs thread_args[num_threads];
+    // Create and execute threads
+    for (int i = 0; i < num_threads; ++i) {
+        thread_args[i].thread_id = i;
+        thread_args[i].num_threads = num_threads;
+        thread_args[i].num_nodes = num_jobs;
+        thread_args[i].jobNodeArray = jobNodeArray;
+
+        int rc = pthread_create(&threads[i], NULL, print_nodes, (void*)&thread_args[i]);
+        if (rc) {
+            printf("Error: Unable to create thread %d\n", i);
+            exit(-1);
+        }
+    }
+
+    // Join threads
+    for (int i = 0; i < num_threads; ++i) {
+        pthread_join(threads[i], NULL);
     }
   }
   

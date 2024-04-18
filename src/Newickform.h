@@ -20,7 +20,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 typedef struct newick_child
 {
 	struct newick_node *node;
@@ -46,6 +45,14 @@ typedef struct newick_node
 	struct newick_child *child;
 	struct newick_node *parent;
 } newick_node;
+
+// Define the structure to hold thread arguments
+typedef struct {
+    int thread_id;
+    int num_threads;
+    int num_nodes;
+    newick_node** jobNodeArray;
+} ThreadArgs;
 
 #define MAX_FILENAME_SIZE 1024
 

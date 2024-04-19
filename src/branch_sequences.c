@@ -339,8 +339,8 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
 			// Retrieve child sequences from store
       for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
       {
-        if (node_names[seq_store_index] == *child->node->taxon) {
-          child_sequences[child_counter] = &node_sequences[seq_store_index];
+        if (node_names[seq_store_index] == child->node->taxon) {
+          child_sequences[child_counter] = node_sequences[seq_store_index];
           break;
         }
       }

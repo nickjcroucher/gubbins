@@ -234,22 +234,28 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     node_depths[i] = max_distance_to_tips(nodeArray[i]);
   }
   
+  // Initiate multithreading
+  int num_threads = 4; // Adjust as needed
+  pthread_t threads[num_threads];
+  ThreadArgs thread_args[num_threads];
+  
+  // First carry gaps up tree
+  carry_unambiguous_gaps_up_tree(root);
+  
+  // Allocate memory to store all sequences
+  // N.B. this can be reduced once memory management improves
+  char * node_sequences = (char *) calloc((length_of_original_genome + 1)*num_nodes,sizeof(char));
+  char * node_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*num_nodes,sizeof(char));
+  
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)
   {
+    
+    // Identify number of nodes at the current depth
     int num_jobs = get_job_counts(node_depths,depth,num_nodes);
     newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
     get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
-    printf("Depth is %d\n",depth);
-    for (int i = 0; i < num_jobs; ++i) {
-        if (jobNodeArray[i] != NULL) {
-            // Print or use jobNodeArray[i] to verify its content
-            printf("Node is %s\n",jobNodeArray[i]->taxon);
-        }
-    }
-    int num_threads = 4; // Adjust as needed
-    pthread_t threads[num_threads];
-    ThreadArgs thread_args[num_threads];
+
     // Create and execute threads
     for (int i = 0; i < num_threads; ++i) {
         thread_args[i].thread_id = i;
@@ -268,10 +274,28 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     for (int i = 0; i < num_threads; ++i) {
         pthread_join(threads[i], NULL);
     }
+    
+    // Generate branch sequences and identify recombinations
+//    generate_branch_sequences(root,
+//                              vcf_file_pointer,
+//                              snp_locations,
+//                              number_of_snps,
+//                              column_names,
+//                              number_of_columns,
+//                              root_sequence,
+//                              length_of_original_genome,
+//                              block_file_pointer,
+//                              gff_file_pointer,
+//                              min_snps,
+//                              branch_snps_file_pointer,
+//                              window_min,
+//                              window_max,
+//                              uncorrected_p_value,
+//                              trimming_ratio,
+//                              extensive_search_flag);
   }
   
   char * root_sequence = NULL;
-	carry_unambiguous_gaps_up_tree(root);
 	root_sequence = generate_branch_sequences(root,
                                               vcf_file_pointer,
                                               snp_locations,
@@ -292,6 +316,8 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	free(root_sequence);
   free(nodeArray);
   free(node_depths);
+  free(node_sequences);
+  free(node_names);
   
   int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);

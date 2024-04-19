@@ -253,58 +253,58 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   }
   
   // iterate through depths and identify batches of analyses to be run
-  for (int depth = 0; depth <= max_depth; ++depth)
-  {
-    
-    // Identify number of nodes at the current depth
-    int num_jobs = get_job_counts(node_depths,depth,num_nodes);
-    newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
-    get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
-
-    // Create and execute threads
-    for (int i = 0; i < num_threads; ++i) {
-        thread_args[i].thread_id = i;
-        thread_args[i].num_threads = num_threads;
-        thread_args[i].num_nodes = num_jobs;
-        thread_args[i].jobNodeArray = jobNodeArray;
-
-        int rc = pthread_create(&threads[i], NULL, print_nodes, (void*)&thread_args[i]);
-        if (rc) {
-            printf("Error: Unable to create thread %d\n", i);
-            exit(-1);
-        }
-    }
-
-    // Join threads
-    for (int i = 0; i < num_threads; ++i) {
-        pthread_join(threads[i], NULL);
-    }
-    
-    for (int node_index = 0; node_index < num_jobs; ++node_index)
-    {
-      // Generate branch sequences and identify recombinations
-      generate_branch_sequences(jobNodeArray[node_index],
-                                node_sequences,
-                                node_names,
-                                vcf_file_pointer,
-                                snp_locations,
-                                number_of_snps,
-                                column_names,
-                                number_of_columns,
-                                length_of_original_genome,
-                                num_stored_nodes,
-                                block_file_pointer,
-                                gff_file_pointer,
-                                min_snps,
-                                branch_snps_file_pointer,
-                                window_min,
-                                window_max,
-                                uncorrected_p_value,
-                                trimming_ratio,
-                                extensive_search_flag);
-    }
-
-  }
+//  for (int depth = 0; depth <= max_depth; ++depth)
+//  {
+//    
+//    // Identify number of nodes at the current depth
+//    int num_jobs = get_job_counts(node_depths,depth,num_nodes);
+//    newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
+//    get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
+//
+//    // Create and execute threads
+//    for (int i = 0; i < num_threads; ++i) {
+//        thread_args[i].thread_id = i;
+//        thread_args[i].num_threads = num_threads;
+//        thread_args[i].num_nodes = num_jobs;
+//        thread_args[i].jobNodeArray = jobNodeArray;
+//
+//        int rc = pthread_create(&threads[i], NULL, print_nodes, (void*)&thread_args[i]);
+//        if (rc) {
+//            printf("Error: Unable to create thread %d\n", i);
+//            exit(-1);
+//        }
+//    }
+//
+//    // Join threads
+//    for (int i = 0; i < num_threads; ++i) {
+//        pthread_join(threads[i], NULL);
+//    }
+//    
+//    for (int node_index = 0; node_index < num_jobs; ++node_index)
+//    {
+//      // Generate branch sequences and identify recombinations
+//      generate_branch_sequences(jobNodeArray[node_index],
+//                                node_sequences,
+//                                node_names,
+//                                vcf_file_pointer,
+//                                snp_locations,
+//                                number_of_snps,
+//                                column_names,
+//                                number_of_columns,
+//                                length_of_original_genome,
+//                                num_stored_nodes,
+//                                block_file_pointer,
+//                                gff_file_pointer,
+//                                min_snps,
+//                                branch_snps_file_pointer,
+//                                window_min,
+//                                window_max,
+//                                uncorrected_p_value,
+//                                trimming_ratio,
+//                                extensive_search_flag);
+//    }
+//
+//  }
   
   free(nodeArray);
   free(node_depths);

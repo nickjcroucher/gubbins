@@ -423,31 +423,31 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 //}
 //
 //
-//// Windows need to be of a fixed size
-//// calculate window size
-//// starting at coord of first snp, count number of snps which fall into window
-//// if region is blank, move on
-//int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor)
-//{
-//	int window_size = 0;
-//	if(number_of_branch_snps == 0)
-//	{
-//		return window_min;
-//	}
-//	
-//	window_size = (int) ((branch_genome_size*1.0)/(window_factor*number_of_branch_snps*1.0/(min_snps - 1)));
-//	
-//	if(window_size < window_min)
-//	{
-//		return window_min;
-//	}
-//	else if(window_size > window_max)
-//	{
-//		return 	window_max;
-//	}
-//
-//	return window_size;
-//}
+// Windows need to be of a fixed size
+// calculate window size
+// starting at coord of first snp, count number of snps which fall into window
+// if region is blank, move on
+int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor)
+{
+	int window_size = 0;
+	if(number_of_branch_snps == 0)
+	{
+		return window_min;
+	}
+	
+	window_size = (int) ((branch_genome_size*1.0)/(window_factor*number_of_branch_snps*1.0/(min_snps - 1)));
+	
+	if(window_size < window_min)
+	{
+		return window_min;
+	}
+	else if(window_size > window_max)
+	{
+		return 	window_max;
+	}
+
+	return window_size;
+}
 
 
 void get_likelihood_for_windows(char * child_sequence, int current_num_snps, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)

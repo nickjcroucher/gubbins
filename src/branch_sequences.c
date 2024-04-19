@@ -302,7 +302,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-void generate_branch_sequences(newick_node *node, char * node_sequences, char * node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
+void generate_branch_sequences(newick_node *node, char ** node_sequences, char ** node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -357,17 +357,13 @@ void generate_branch_sequences(newick_node *node, char * node_sequences, char * 
 			child = child->next;
 		}
 		
-		// For all bases update the parent sequence with N if all child sequences.
-		
+    // Get sequence reconstructed at internal node
 		node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-		// All child sequneces should be available use them to find the ancestor sequence
 		get_sequence_for_sample_name(node_sequence, node->taxon);
-		
 		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
 		
-		
-		
+    // Identify recombinations on descendant branches
 		for(current_branch = 0 ; current_branch< (node->childNum); current_branch++)
 		{
 			int * branches_snp_sites;
@@ -415,8 +411,8 @@ void generate_branch_sequences(newick_node *node, char * node_sequences, char * 
   for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
   {
     if (node_names[seq_store_index] == ' ') {
-      node_names[seq_store_index]  = *node->taxon;
-      node_sequences[seq_store_index]  = *node_sequence;
+      node_names[seq_store_index]  = node->taxon;
+      node_sequences[seq_store_index] = node_sequence;
       break;
     }
   }

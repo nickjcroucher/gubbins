@@ -302,17 +302,19 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-char *generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * node_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
+void generate_branch_sequences(newick_node *node, char * node_sequences, char * node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
 {
 	newick_child *child;
 	int child_counter = 0;
-	int current_branch =0;
+	int current_branch = 0;
 	int branch_genome_size = 0;
-	int number_of_branch_snps=0;
+	int number_of_branch_snps = 0;
 	
+  char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+  
 	if (node->childNum == 0)
 	{
-    node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+    
 		get_sequence_for_sample_name(node_sequence, node->taxon);
 		
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
@@ -322,7 +324,6 @@ char *generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * 
 		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
 		
-		return node_sequence;
 	}
 	else
 	{
@@ -331,30 +332,23 @@ char *generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * 
 		newick_node * child_nodes[node->childNum];
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*number_of_columns,sizeof(char));
 
-		// generate pointers for each child seuqn
+		// generate pointers for each child sequence
 
 		while (child != NULL)
 		{
-			// recursion
-			child_sequences[child_counter] = generate_branch_sequences(child->node,
-                                                                       vcf_file_pointer,
-                                                                       snp_locations,
-                                                                       number_of_snps,
-                                                                       column_names,
-                                                                       number_of_columns,
-                                                                       child_sequences[child_counter],
-                                                                       length_of_original_genome,
-                                                                       block_file_pointer,
-                                                                       gff_file_pointer,
-                                                                       min_snps,
-                                                                       branch_snps_file_pointer,
-                                                                       window_min,
-                                                                       window_max,
-                                                                       uncorrected_p_value,
-                                                                       trimming_ratio,
-                                                                       extensive_search_flag);
+			// Retrieve child sequences from store
+      for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+      {
+        if (node_names[seq_store_index] == *child->node->taxon) {
+          child_sequences[child_counter] = &node_sequences[seq_store_index];
+          break;
+        }
+      }
 			child_nodes[child_counter] = child->node;
 			
+      // Remove from store as cannot be children of any other nodes
+      // TO DO
+      
 			char delimiter_string[3] = {" "};
 			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
 			concat_strings_created_with_malloc(node->taxon_names, child_nodes[child_counter]->taxon_names);
@@ -411,12 +405,20 @@ char *generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * 
                                        extensive_search_flag);
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
-			free(child_sequences[current_branch]);
 			free(branches_snp_sites);
 			
 		}
 		
-		return node_sequence;
+    // Store node sequence
+    for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+    {
+      if (node_names[seq_store_index] == ' ') {
+        node_names[seq_store_index]  = *node->taxon;
+        node_sequences[seq_store_index]  = *node_sequence;
+        break;
+      }
+    }
+    
 	}
 }
 

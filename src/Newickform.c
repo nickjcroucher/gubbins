@@ -244,8 +244,13 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   // Allocate memory to store all sequences
   // N.B. this can be reduced once memory management improves
-  char * node_sequences = (char *) calloc((length_of_original_genome + 1)*num_nodes,sizeof(char));
-  char * node_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*num_nodes,sizeof(char));
+  int num_stored_nodes = num_nodes;
+  char * node_sequences = (char *) calloc((length_of_original_genome + 1)*num_stored_nodes,sizeof(char));
+  char * node_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*num_stored_nodes,sizeof(char));
+  for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+  {
+    node_names[seq_store_index] = ' ';
+  }
   
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)
@@ -275,45 +280,51 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
         pthread_join(threads[i], NULL);
     }
     
-    // Generate branch sequences and identify recombinations
-//    generate_branch_sequences(root,
-//                              vcf_file_pointer,
-//                              snp_locations,
-//                              number_of_snps,
-//                              column_names,
-//                              number_of_columns,
-//                              root_sequence,
-//                              length_of_original_genome,
-//                              block_file_pointer,
-//                              gff_file_pointer,
-//                              min_snps,
-//                              branch_snps_file_pointer,
-//                              window_min,
-//                              window_max,
-//                              uncorrected_p_value,
-//                              trimming_ratio,
-//                              extensive_search_flag);
+    for (int node_index = 0; node_index < num_jobs; ++node_index)
+    {
+      // Generate branch sequences and identify recombinations
+      generate_branch_sequences(jobNodeArray[node_index],
+                                node_sequences,
+                                node_names,
+                                vcf_file_pointer,
+                                snp_locations,
+                                number_of_snps,
+                                column_names,
+                                number_of_columns,
+                                length_of_original_genome,
+                                num_stored_nodes,
+                                block_file_pointer,
+                                gff_file_pointer,
+                                min_snps,
+                                branch_snps_file_pointer,
+                                window_min,
+                                window_max,
+                                uncorrected_p_value,
+                                trimming_ratio,
+                                extensive_search_flag);
+    }
+
   }
   
-  char * root_sequence = NULL;
-	root_sequence = generate_branch_sequences(root,
-                                              vcf_file_pointer,
-                                              snp_locations,
-                                              number_of_snps,
-                                              column_names,
-                                              number_of_columns,
-                                              root_sequence,
-                                              length_of_original_genome,
-                                              block_file_pointer,
-                                              gff_file_pointer,
-                                              min_snps,
-                                              branch_snps_file_pointer,
-                                              window_min,
-                                              window_max,
-                                              uncorrected_p_value,
-                                              trimming_ratio,
-                                              extensive_search_flag);
-	free(root_sequence);
+//  char * root_sequence = NULL;
+//	root_sequence = generate_branch_sequences(root,
+//                                              vcf_file_pointer,
+//                                              snp_locations,
+//                                              number_of_snps,
+//                                              column_names,
+//                                              number_of_columns,
+//                                              root_sequence,
+//                                              length_of_original_genome,
+//                                              block_file_pointer,
+//                                              gff_file_pointer,
+//                                              min_snps,
+//                                              branch_snps_file_pointer,
+//                                              window_min,
+//                                              window_max,
+//                                              uncorrected_p_value,
+//                                              trimming_ratio,
+//                                              extensive_search_flag);
+//	free(root_sequence);
   free(nodeArray);
   free(node_depths);
   free(node_sequences);

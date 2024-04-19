@@ -244,18 +244,18 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   // Allocate memory to store all sequences
   // N.B. this can be reduced once memory management improves
-  int num_stored_nodes = num_nodes;
-  char * node_sequences = (char *) calloc((length_of_original_genome + 1)*num_stored_nodes,sizeof(char));
-  char * node_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*num_stored_nodes,sizeof(char));
-  for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-  {
-    node_names[seq_store_index] = ' ';
-  }
+//  int num_stored_nodes = num_nodes;
+//  char * node_sequences = (char *) calloc((length_of_original_genome + 1)*num_stored_nodes,sizeof(char));
+//  char * node_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*num_stored_nodes,sizeof(char));
+//  for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+//  {
+//    node_names[seq_store_index] = ' ';
+//  }
   
   // iterate through depths and identify batches of analyses to be run
 //  for (int depth = 0; depth <= max_depth; ++depth)
 //  {
-//    
+//
 //    // Identify number of nodes at the current depth
 //    int num_jobs = get_job_counts(node_depths,depth,num_nodes);
 //    newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
@@ -279,7 +279,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 //    for (int i = 0; i < num_threads; ++i) {
 //        pthread_join(threads[i], NULL);
 //    }
-//    
+//
 //    for (int node_index = 0; node_index < num_jobs; ++node_index)
 //    {
 //      // Generate branch sequences and identify recombinations

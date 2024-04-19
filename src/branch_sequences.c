@@ -302,152 +302,152 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-void generate_branch_sequences(newick_node *node, char * node_sequences, char * node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
-{
-	newick_child *child;
-	int child_counter = 0;
-	int current_branch = 0;
-	int branch_genome_size = 0;
-	int number_of_branch_snps = 0;
-	
-  char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-  
-	if (node->childNum == 0)
-	{
-    
-		get_sequence_for_sample_name(node_sequence, node->taxon);
-		
-    node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
-		memcpy(node->taxon_names, node->taxon, size_of_string(node->taxon)+1);
-
-    // Save some statistics about the sequence
-		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
-		
-	}
-	else
-	{
-		child = node->child;
-		char * child_sequences[node->childNum];
-		newick_node * child_nodes[node->childNum];
-    node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*number_of_columns,sizeof(char));
-
-		// generate pointers for each child sequence
-
-		while (child != NULL)
-		{
-			// Retrieve child sequences from store
-      for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-      {
-        if (node_names[seq_store_index] == *child->node->taxon) {
-          child_sequences[child_counter] = &node_sequences[seq_store_index];
-          break;
-        }
-      }
-			child_nodes[child_counter] = child->node;
-			
-      // Remove from store as cannot be children of any other nodes
-      // TO DO
-      
-			char delimiter_string[3] = {" "};
-			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
-			concat_strings_created_with_malloc(node->taxon_names, child_nodes[child_counter]->taxon_names);
-			
-			child_counter++;
-			child = child->next;
-		}
-		
-		// For all bases update the parent sequence with N if all child sequences.
-		
-		node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-		// All child sequneces should be available use them to find the ancestor sequence
-		get_sequence_for_sample_name(node_sequence, node->taxon);
-		
-		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
-		
-		
-		
-		for(current_branch = 0 ; current_branch< (node->childNum); current_branch++)
-		{
-			int * branches_snp_sites;
-			branches_snp_sites = (int *) calloc((number_of_snps +1),sizeof(int));
-			char * branch_snp_sequence;
-			char * branch_snp_ancestor_sequence;
-			branch_snp_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-			branch_snp_ancestor_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-			
-			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
-			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(node_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
-			
-			
-			child_nodes[current_branch]->number_of_snps = number_of_branch_snps;
-			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,node->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
-			
-			get_likelihood_for_windows(child_sequences[current_branch],
-                                       number_of_snps,
-                                       branches_snp_sites,
-                                       branch_genome_size,
-                                       number_of_branch_snps,
-                                       snp_locations,
-                                       child_nodes[current_branch],
-                                       block_file_pointer,
-                                       node,
-                                       branch_snp_sequence,
-                                       gff_file_pointer,
-                                       min_snps,
-                                       length_of_original_genome,
-                                       node_sequence,
-                                       window_min,
-                                       window_max,
-                                       uncorrected_p_value,
-                                       trimming_ratio,
-                                       extensive_search_flag);
-			free(branch_snp_sequence);
-			free(branch_snp_ancestor_sequence);
-			free(branches_snp_sites);
-			
-		}
-		
-    // Store node sequence
-    for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-    {
-      if (node_names[seq_store_index] == ' ') {
-        node_names[seq_store_index]  = *node->taxon;
-        node_sequences[seq_store_index]  = *node_sequence;
-        break;
-      }
-    }
-    
-	}
-}
-
-
-// Windows need to be of a fixed size
-// calculate window size
-// starting at coord of first snp, count number of snps which fall into window
-// if region is blank, move on
-int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor)
-{
-	int window_size = 0;
-	if(number_of_branch_snps == 0)
-	{
-		return window_min;
-	}
-	
-	window_size = (int) ((branch_genome_size*1.0)/(window_factor*number_of_branch_snps*1.0/(min_snps - 1)));
-	
-	if(window_size < window_min)
-	{
-		return window_min;
-	}
-	else if(window_size > window_max)
-	{
-		return 	window_max;
-	}
-
-	return window_size;
-}
+//void generate_branch_sequences(newick_node *node, char * node_sequences, char * node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
+//{
+//	newick_child *child;
+//	int child_counter = 0;
+//	int current_branch = 0;
+//	int branch_genome_size = 0;
+//	int number_of_branch_snps = 0;
+//	
+//  char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+//  
+//	if (node->childNum == 0)
+//	{
+//    
+//		get_sequence_for_sample_name(node_sequence, node->taxon);
+//		
+//    node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
+//		memcpy(node->taxon_names, node->taxon, size_of_string(node->taxon)+1);
+//
+//    // Save some statistics about the sequence
+//		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
+//		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
+//		
+//	}
+//	else
+//	{
+//		child = node->child;
+//		char * child_sequences[node->childNum];
+//		newick_node * child_nodes[node->childNum];
+//    node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*number_of_columns,sizeof(char));
+//
+//		// generate pointers for each child sequence
+//
+//		while (child != NULL)
+//		{
+//			// Retrieve child sequences from store
+//      for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+//      {
+//        if (node_names[seq_store_index] == *child->node->taxon) {
+//          child_sequences[child_counter] = &node_sequences[seq_store_index];
+//          break;
+//        }
+//      }
+//			child_nodes[child_counter] = child->node;
+//			
+//      // Remove from store as cannot be children of any other nodes
+//      // TO DO
+//      
+//			char delimiter_string[3] = {" "};
+//			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
+//			concat_strings_created_with_malloc(node->taxon_names, child_nodes[child_counter]->taxon_names);
+//			
+//			child_counter++;
+//			child = child->next;
+//		}
+//		
+//		// For all bases update the parent sequence with N if all child sequences.
+//		
+//		node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+//		// All child sequneces should be available use them to find the ancestor sequence
+//		get_sequence_for_sample_name(node_sequence, node->taxon);
+//		
+//		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
+//		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
+//		
+//		
+//		
+//		for(current_branch = 0 ; current_branch< (node->childNum); current_branch++)
+//		{
+//			int * branches_snp_sites;
+//			branches_snp_sites = (int *) calloc((number_of_snps +1),sizeof(int));
+//			char * branch_snp_sequence;
+//			char * branch_snp_ancestor_sequence;
+//			branch_snp_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+//			branch_snp_ancestor_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+//			
+//			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
+//			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(node_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
+//			
+//			
+//			child_nodes[current_branch]->number_of_snps = number_of_branch_snps;
+//			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,node->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
+//			
+//			get_likelihood_for_windows(child_sequences[current_branch],
+//                                       number_of_snps,
+//                                       branches_snp_sites,
+//                                       branch_genome_size,
+//                                       number_of_branch_snps,
+//                                       snp_locations,
+//                                       child_nodes[current_branch],
+//                                       block_file_pointer,
+//                                       node,
+//                                       branch_snp_sequence,
+//                                       gff_file_pointer,
+//                                       min_snps,
+//                                       length_of_original_genome,
+//                                       node_sequence,
+//                                       window_min,
+//                                       window_max,
+//                                       uncorrected_p_value,
+//                                       trimming_ratio,
+//                                       extensive_search_flag);
+//			free(branch_snp_sequence);
+//			free(branch_snp_ancestor_sequence);
+//			free(branches_snp_sites);
+//			
+//		}
+//		
+//    // Store node sequence
+//    for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
+//    {
+//      if (node_names[seq_store_index] == ' ') {
+//        node_names[seq_store_index]  = *node->taxon;
+//        node_sequences[seq_store_index]  = *node_sequence;
+//        break;
+//      }
+//    }
+//    
+//	}
+//}
+//
+//
+//// Windows need to be of a fixed size
+//// calculate window size
+//// starting at coord of first snp, count number of snps which fall into window
+//// if region is blank, move on
+//int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int window_min, int window_max, int min_snps, int window_factor)
+//{
+//	int window_size = 0;
+//	if(number_of_branch_snps == 0)
+//	{
+//		return window_min;
+//	}
+//	
+//	window_size = (int) ((branch_genome_size*1.0)/(window_factor*number_of_branch_snps*1.0/(min_snps - 1)));
+//	
+//	if(window_size < window_min)
+//	{
+//		return window_min;
+//	}
+//	else if(window_size > window_max)
+//	{
+//		return 	window_max;
+//	}
+//
+//	return window_size;
+//}
 
 
 void get_likelihood_for_windows(char * child_sequence, int current_num_snps, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer, int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)

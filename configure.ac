@@ -31,6 +31,7 @@ AC_PROG_CXX
 
 # Checks for pthread
 AX_PTHREAD
+LDFLAGS="$LDFLAGS -pthread"
 
 # Checks for code coverage
 AX_CODE_COVERAGE

@@ -306,25 +306,6 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 
   }
   
-//  char * root_sequence = NULL;
-//	root_sequence = generate_branch_sequences(root,
-//                                              vcf_file_pointer,
-//                                              snp_locations,
-//                                              number_of_snps,
-//                                              column_names,
-//                                              number_of_columns,
-//                                              root_sequence,
-//                                              length_of_original_genome,
-//                                              block_file_pointer,
-//                                              gff_file_pointer,
-//                                              min_snps,
-//                                              branch_snps_file_pointer,
-//                                              window_min,
-//                                              window_max,
-//                                              uncorrected_p_value,
-//                                              trimming_ratio,
-//                                              extensive_search_flag);
-//	free(root_sequence);
   free(nodeArray);
   free(node_depths);
   free(node_sequences);

@@ -308,8 +308,8 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   free(nodeArray);
   free(node_depths);
-  free(node_sequences);
-  free(node_names);
+//  free(node_sequences);
+//  free(node_names);
   
   int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);

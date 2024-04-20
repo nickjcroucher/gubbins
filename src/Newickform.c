@@ -249,7 +249,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   char ** node_names = (char **) calloc(MAX_SAMPLE_NAME_SIZE*num_stored_nodes,sizeof(char));
   for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
   {
-    node_names[seq_store_index] = NULL;
+    node_names[seq_store_index] = " ";
   }
   
   // iterate through depths and identify batches of analyses to be run

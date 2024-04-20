@@ -410,7 +410,7 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
   // Store node sequence
   for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
   {
-    if (node_names[seq_store_index] == NULL) {
+    if (strcmp(node_names[seq_store_index]," ") == 0) {
       node_names[seq_store_index]  = node->taxon;
       node_sequences[seq_store_index] = node_sequence;
       break;

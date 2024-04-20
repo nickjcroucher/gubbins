@@ -1,15 +1,15 @@
-FT   variation       23
-FT                   /node="N2->sequence_6"
-FT                   /colour="4"
-FT                   /taxa="sequence_6"
-FT                   /parent_base="G"
-FT                   /replace="A"
 FT   variation       40
 FT                   /node="N6->sequence_4"
 FT                   /colour="4"
 FT                   /taxa="sequence_4"
 FT                   /parent_base="A"
 FT                   /replace="G"
+FT   variation       23
+FT                   /node="N2->sequence_6"
+FT                   /colour="4"
+FT                   /taxa="sequence_6"
+FT                   /parent_base="G"
+FT                   /replace="A"
 FT   variation       34
 FT                   /node="N5->sequence_2"
 FT                   /colour="4"

@@ -306,7 +306,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 {
 	newick_child *child;
 	int child_counter = 0;
-	int current_branch = 0;
 	int branch_genome_size = 0;
 	int number_of_branch_snps = 0;
 	
@@ -333,7 +332,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 		char ** child_sequences = calloc((number_of_snps + 1) * node->childNum, sizeof(char*));
     // Allocate memory for each string in child_sequences
     for (int i = 0; i < node->childNum; i++) {
-        child_sequences[i] = malloc((number_of_snps + 1) * sizeof(char)); // Assuming MAX_STRING_LENGTH is the maximum length of the string
+        child_sequences[i] = malloc((number_of_snps + 1) * sizeof(char));
     }
 
 		newick_node * child_nodes[node->childNum];
@@ -343,7 +342,8 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 
 		while (child != NULL)
 		{
-			// Retrieve child sequences from store
+			
+      // Retrieve child sequences from alignment
       get_sequence_for_sample_name(child_sequences[child_counter], child->node->taxon);
 			child_nodes[child_counter] = child->node;
       

@@ -249,7 +249,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   }
   
   // Initiate multithreading
-  int num_threads = 4; // Adjust as needed
+  int num_threads = 1; // Adjust as needed
   pthread_t threads[num_threads];
   struct ThreadData threadData[num_threads];
   

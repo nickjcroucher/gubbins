@@ -314,6 +314,10 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
   char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
   get_sequence_for_sample_name(node_sequence, node->taxon);
   
+  // Get sequence reconstructed at internal node
+  branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
+  set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
+  
 	if (node->childNum == 0)
 	{
     
@@ -321,10 +325,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 		
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(node->taxon_names, node->taxon, size_of_string(node->taxon)+1);
-
-    // Save some statistics about the sequence
-		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
 		
 	}
 	else
@@ -350,18 +350,8 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			char delimiter_string[3] = {" "};
 			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
 			concat_strings_created_with_malloc(node->taxon_names, child_nodes[child_counter]->taxon_names);
-			
-			child_counter++;
-			child = child->next;
-		}
-		
-    // Get sequence reconstructed at internal node
-		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
-		
-    // Identify recombinations on descendant branches
-		for(current_branch = 0 ; current_branch< (node->childNum); current_branch++)
-		{
+
+      // Identify recombinations on descendant branches
 			int * branches_snp_sites;
 			branches_snp_sites = (int *) calloc((number_of_snps +1),sizeof(int));
 			char * branch_snp_sequence;
@@ -369,20 +359,19 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			branch_snp_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
 			branch_snp_ancestor_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
 			
-			branch_genome_size = calculate_size_of_genome_without_gaps(child_sequences[current_branch], 0,number_of_snps, length_of_original_genome);
-			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(node_sequence, child_sequences[current_branch], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
+			number_of_branch_snps = calculate_number_of_snps_excluding_gaps(node_sequence, child_sequences[child_counter], number_of_snps, branches_snp_sites, snp_locations,branch_snp_sequence,branch_snp_ancestor_sequence);
 			
 			
-			child_nodes[current_branch]->number_of_snps = number_of_branch_snps;
-			print_branch_snp_details(branch_snps_file_pointer, child_nodes[current_branch]->taxon,node->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[current_branch]->taxon_names);
+			child_nodes[child_counter]->number_of_snps = number_of_branch_snps;
+			print_branch_snp_details(branch_snps_file_pointer, child_nodes[child_counter]->taxon,node->taxon, branches_snp_sites, number_of_branch_snps, branch_snp_sequence, branch_snp_ancestor_sequence,child_nodes[child_counter]->taxon_names);
 			
-			get_likelihood_for_windows(child_sequences[current_branch],
+			get_likelihood_for_windows(child_sequences[child_counter],
                                        number_of_snps,
                                        branches_snp_sites,
                                        branch_genome_size,
                                        number_of_branch_snps,
                                        snp_locations,
-                                       child_nodes[current_branch],
+                                       child_nodes[child_counter],
                                        block_file_pointer,
                                        node,
                                        branch_snp_sequence,
@@ -398,9 +387,19 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(branches_snp_sites);
-      free(child_sequences);
 			
+      child_counter++;
+      child = child->next;
+      
 		}
+    
+    // Deallocate memory for each string in child_sequences
+    for (int i = 0; i < node->childNum; i++) {
+        free(child_sequences[i]);
+    }
+
+    // Deallocate memory for child_sequences
+    free(child_sequences);
 
 	}
   

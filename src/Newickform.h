@@ -47,12 +47,31 @@ typedef struct newick_node
 } newick_node;
 
 // Define the structure to hold thread arguments
-typedef struct {
-    int thread_id;
-    int num_threads;
-    int num_nodes;
-    newick_node** jobNodeArray;
-} ThreadArgs;
+struct ThreadData {
+    newick_node** nodes; // Nodes to be processed by all threads
+    int start_node;             // Index of starting node for this thread
+    int num_nodes_to_process;    // Number of nodes to process by this thread
+    char** node_sequences;      // Pointer to the array of node sequences
+    char** node_names;          // Pointer to the array of node names
+    FILE* vcf_file_pointer;     // Pointer to the VCF file
+    int* snp_locations;         // Pointer to the array of SNP locations
+    int number_of_snps;         // Number of SNPs
+    char** column_names;        // Pointer to the array of column names
+    int number_of_columns;      // Number of columns
+    int length_of_original_genome;  // Length of the original genome
+    int num_stored_nodes;       // Number of stored nodes
+    FILE* block_file_pointer;   // Pointer to the block file
+    FILE* gff_file_pointer;     // Pointer to the GFF file
+    int min_snps;               // Minimum number of SNPs
+    FILE* branch_snps_file_pointer; // Pointer to the branch SNPs file
+    int window_min;             // Minimum window size
+    int window_max;             // Maximum window size
+    float uncorrected_p_value;  // Uncorrected p-value
+    float trimming_ratio;       // Trimming ratio
+    int extensive_search_flag;  // Extensive search flag
+    int thread_index;           // Thread index
+};
+
 
 #define MAX_FILENAME_SIZE 1024
 
@@ -64,6 +83,7 @@ char* strip_quotes(char *taxon);
 #else
 extern newick_node* parseTree(char *str);
 extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
+void* threadFunction(void* arg);
 extern void print_tree(newick_node *root, FILE * outputfile);
 void fill_nodeArray(newick_node *root, newick_node** nodeArray);
 int count_tree_nodes(newick_node* root);

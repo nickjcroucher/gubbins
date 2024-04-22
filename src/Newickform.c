@@ -30,24 +30,38 @@
 
 #define STR_OUT	"out"
 
-// Function to be executed by each thread
-void* print_nodes(void* arg) {
-    ThreadArgs* args = (ThreadArgs*)arg;
-
-    int start = (args->thread_id) * (args->num_nodes / args->num_threads);
-    int end = (args->thread_id + 1) * (args->num_nodes / args->num_threads);
-
-    // Adjust the end index for the last thread to cover all remaining nodes
-    if (args->thread_id == args->num_threads - 1) {
-        end = args->num_nodes;
+// Define thread function
+void* threadFunction(void* arg) {
+  
+    // Extract thread data
+    struct ThreadData* data = (struct ThreadData*)arg;
+    
+    if (data->num_nodes_to_process > -1)
+    {
+      for (int node_index = data->start_node; node_index < data->start_node+data->num_nodes_to_process; ++node_index)
+      {
+        // Generate branch sequences and identify recombinations
+        generate_branch_sequences(data->nodes[node_index],
+                                   data->vcf_file_pointer,
+                                   data->snp_locations,
+                                   data->number_of_snps,
+                                   data->column_names,
+                                   data->number_of_columns,
+                                   data->length_of_original_genome,
+                                   data->block_file_pointer,
+                                   data->gff_file_pointer,
+                                   data->min_snps,
+                                   data->branch_snps_file_pointer,
+                                   data->window_min,
+                                   data->window_max,
+                                   data->uncorrected_p_value,
+                                   data->trimming_ratio,
+                                   data->extensive_search_flag,
+                                   node_index);
+      }
     }
 
-    // Print the contents of the jobNodeArray for this thread's portion
-    for (int i = start; i < end; ++i) {
-        newick_node* node = args->jobNodeArray[i];
-        printf("Thread %d: Node %d: %s\n", args->thread_id, i, node->taxon);
-    }
-
+    // Exit thread
     pthread_exit(NULL);
 }
 
@@ -237,22 +251,11 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   // Initiate multithreading
   int num_threads = 4; // Adjust as needed
   pthread_t threads[num_threads];
-  ThreadArgs thread_args[num_threads];
+  struct ThreadData threadData[num_threads];
   
   // First carry gaps up tree
   carry_unambiguous_gaps_up_tree(root);
-  
-  // Allocate memory to store all sequences
-  // N.B. this can be reduced once memory management improves
-  int num_stored_nodes = num_nodes;
-  char ** node_sequences = calloc((number_of_snps + 1) * num_stored_nodes, sizeof(char*));
-  char ** node_names = calloc(MAX_SAMPLE_NAME_SIZE*num_stored_nodes,sizeof(char));
 
-  for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-  {
-    node_names[seq_store_index] = " ";
-  }
-  
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)
   {
@@ -262,55 +265,54 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
     get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
 
+    // Divide jobNodeArray among threads
+    int numJobsPerThread = num_jobs / num_threads;
+    int remainder = num_jobs % num_threads;
+    
     // Create and execute threads
     for (int i = 0; i < num_threads; ++i) {
-        thread_args[i].thread_id = i;
-        thread_args[i].num_threads = num_threads;
-        thread_args[i].num_nodes = num_jobs;
-        thread_args[i].jobNodeArray = jobNodeArray;
 
-        int rc = pthread_create(&threads[i], NULL, print_nodes, (void*)&thread_args[i]);
-        if (rc) {
-            printf("Error: Unable to create thread %d\n", i);
-            exit(-1);
+        // Calculate start and end indices for current thread
+        int startIndex = i * numJobsPerThread + (i < remainder ? i : remainder);
+        int endIndex = startIndex + numJobsPerThread + (i < remainder ? 1 : 0) - 1;
+      
+        // Set thread data
+        threadData[i].nodes = jobNodeArray;
+        threadData[i].start_node = startIndex;
+        threadData[i].num_nodes_to_process = endIndex - startIndex + 1; // Number of nodes for this thread
+        threadData[i].vcf_file_pointer = vcf_file_pointer;
+        threadData[i].snp_locations = snp_locations;
+        threadData[i].number_of_snps = number_of_snps;
+        threadData[i].column_names = column_names;
+        threadData[i].number_of_columns = number_of_columns;
+        threadData[i].length_of_original_genome = length_of_original_genome;
+        threadData[i].block_file_pointer = block_file_pointer;
+        threadData[i].gff_file_pointer = gff_file_pointer;
+        threadData[i].min_snps = min_snps;
+        threadData[i].branch_snps_file_pointer = branch_snps_file_pointer;
+        threadData[i].window_min = window_min;
+        threadData[i].window_max = window_max;
+        threadData[i].uncorrected_p_value = uncorrected_p_value;
+        threadData[i].trimming_ratio = trimming_ratio;
+        threadData[i].extensive_search_flag = extensive_search_flag;
+        threadData[i].thread_index = i;
+
+        // Create thread
+        if (pthread_create(&threads[i], NULL, threadFunction, (void*)&threadData[i]) != 0) {
+            perror("pthread_create");
+            exit(EXIT_FAILURE);
         }
-    }
-
-    // Join threads
-    for (int i = 0; i < num_threads; ++i) {
-        pthread_join(threads[i], NULL);
-    }
-    
-    for (int node_index = 0; node_index < num_jobs; ++node_index)
-    {
-      // Generate branch sequences and identify recombinations
-      generate_branch_sequences(jobNodeArray[node_index],
-                                node_sequences,
-                                node_names,
-                                vcf_file_pointer,
-                                snp_locations,
-                                number_of_snps,
-                                column_names,
-                                number_of_columns,
-                                length_of_original_genome,
-                                num_stored_nodes,
-                                block_file_pointer,
-                                gff_file_pointer,
-                                min_snps,
-                                branch_snps_file_pointer,
-                                window_min,
-                                window_max,
-                                uncorrected_p_value,
-                                trimming_ratio,
-                                extensive_search_flag);
+      
+        // Join threads
+        for (int i = 0; i < num_threads; ++i) {
+            pthread_join(threads[i], NULL);
+        }
     }
 
   }
   
   free(nodeArray);
   free(node_depths);
-  free(node_sequences);
-  free(node_names);
   
   int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);

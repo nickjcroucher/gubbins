@@ -302,7 +302,7 @@ void carry_unambiguous_gaps_up_tree(newick_node *root)
 	}
 }
 
-void generate_branch_sequences(newick_node *node, char ** node_sequences, char ** node_names, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, int num_stored_nodes, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
+void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int thread_index)
 {
 	newick_child *child;
 	int child_counter = 0;
@@ -315,7 +315,7 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
 	if (node->childNum == 0)
 	{
     
-		get_sequence_for_sample_name(node_sequence, node->taxon);
+		get_sequence_for_sample_name(node_sequence, node->taxon); // Get rid?
 		
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(node->taxon_names, node->taxon, size_of_string(node->taxon)+1);
@@ -328,7 +328,12 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
 	else
 	{
 		child = node->child;
-		char * child_sequences[node->childNum];
+		char ** child_sequences = calloc((number_of_snps + 1) * node->childNum, sizeof(char*));
+    // Allocate memory for each string in child_sequences
+    for (int i = 0; i < node->childNum; i++) {
+        child_sequences[i] = malloc((number_of_snps + 1) * sizeof(char)); // Assuming MAX_STRING_LENGTH is the maximum length of the string
+    }
+
 		newick_node * child_nodes[node->childNum];
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE*number_of_columns,sizeof(char));
 
@@ -337,13 +342,7 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
 		while (child != NULL)
 		{
 			// Retrieve child sequences from store
-      for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-      {
-        if (node_names[seq_store_index] == child->node->taxon) {
-          child_sequences[child_counter] = node_sequences[seq_store_index];
-          break;
-        }
-      }
+      get_sequence_for_sample_name(child_sequences[child_counter], child->node->taxon);
 			child_nodes[child_counter] = child->node;
 			
       // Remove from store as cannot be children of any other nodes
@@ -408,14 +407,7 @@ void generate_branch_sequences(newick_node *node, char ** node_sequences, char *
 	}
   
   // Store node sequence
-  for (int seq_store_index = 0; seq_store_index  < num_stored_nodes; ++seq_store_index)
-  {
-    if (strcmp(node_names[seq_store_index]," ") == 0) {
-      node_names[seq_store_index]  = node->taxon;
-      node_sequences[seq_store_index] = node_sequence;
-      break;
-    }
-  }
+  free(node_sequence);
   
 }
 

@@ -77,7 +77,6 @@ void create_csv_of_snp_sites(char filename[], int number_of_snps, char ** bases_
     // Indices run consecutively, rather than using SNP locations in whole genome alignment
     // This is because pyjar reconstructs only the polymorphic sites, not the whole sequences
     indexed_pattern* base_pattern_indices = malloc(number_of_snps * sizeof(indexed_pattern));
-    i = 0;
     for (i = 0; i < number_of_snps; i++)
     {
         base_pattern_indices[i].pattern = bases_for_snps[i];

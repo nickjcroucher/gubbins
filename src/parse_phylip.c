@@ -387,7 +387,6 @@ void load_sequences_from_multifasta_file(char filename[])
     get_sample_names_for_header(filename, phylip_sample_names, num_samples);
 
     int l;
-    i = 0;
     int sequence_number = 0;
 
     gzFile fp;

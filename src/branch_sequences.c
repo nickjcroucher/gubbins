@@ -86,7 +86,7 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 		
     //make sure that the index begins at start of block
 		int beginning_j = current_index;
-    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
+    for(int beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
     {
     }
     
@@ -310,7 +310,9 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 	int branch_genome_size = 0;
 	int number_of_branch_snps = 0;
 	
+  // Get SNP alleles for node from reconstruction phylip
   char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+  get_sequence_for_sample_name(node_sequence, node->taxon);
   
 	if (node->childNum == 0)
 	{
@@ -344,9 +346,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			// Retrieve child sequences from store
       get_sequence_for_sample_name(child_sequences[child_counter], child->node->taxon);
 			child_nodes[child_counter] = child->node;
-			
-      // Remove from store as cannot be children of any other nodes
-      // TO DO
       
 			char delimiter_string[3] = {" "};
 			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
@@ -357,8 +356,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 		}
 		
     // Get sequence reconstructed at internal node
-		node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-		get_sequence_for_sample_name(node_sequence, node->taxon);
 		branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
 		set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
 		
@@ -401,6 +398,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(branches_snp_sites);
+      free(child_sequences);
 			
 		}
 
@@ -1255,5 +1253,8 @@ int calculate_genome_length_excluding_blocks_and_gaps(char * sequence, int lengt
         }
     }
 
+    free(filtered_start_coords);
+    free(filtered_end_coords);
+  
     return genome_length;
 }

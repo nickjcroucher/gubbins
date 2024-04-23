@@ -1,6 +1,6 @@
 FT   misc_feature    339..978
 FT                   /node="Node_1->sequence_two"
-FT                   /neg_log_likelihood="77.515346"
+FT                   /neg_log_likelihood="77.517338"
 FT                   /colour="4"
 FT                   /taxa="sequence_two"
 FT                   /SNP_count="32"

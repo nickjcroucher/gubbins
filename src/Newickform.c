@@ -162,7 +162,7 @@ int max_distance_to_tips(newick_node *root) {
     return max_distance;
 }
 
-newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag)
+newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads)
 {
 	int iLen, iMaxLen;
 	char *pcTreeStr;
@@ -170,7 +170,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
 	char *pcOutputFile;
 	char acStrArray[256];
 	newick_node *root;
-    char *returnchar;
+  char *returnchar;
 	
 	FILE *f;
 	
@@ -249,7 +249,6 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   }
   
   // Initiate multithreading
-  int num_threads = 1; // Adjust as needed
   pthread_t threads[num_threads];
   struct ThreadData threadData[num_threads];
 

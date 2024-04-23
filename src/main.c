@@ -86,6 +86,7 @@ int main (int argc, char ** argv)
     float uncorrected_p_value = 0.05;
     float trimming_ratio = 1.0;
     int extensive_search_flag = 0;
+    int num_threads = 1;
     program_name = argv[0];
   
     while (1)
@@ -103,6 +104,7 @@ int main (int argc, char ** argv)
             {"p_value",             required_argument, 0, 'p'},
             {"trimming_ratio",      required_argument, 0, 'i'},
             {"extended_search",     required_argument, 0, 'x'},
+            {"ncpu",                required_argument, 0, 'n'},
 
             {0, 0, 0, 0}
         };
@@ -157,6 +159,9 @@ int main (int argc, char ** argv)
             case 't':
                 memcpy(tree_filename, optarg, size_of_string(optarg) +1);
                 break;
+            case 'n':
+                num_threads = atoi(optarg);
+                break;
             case '?':
                 /* getopt_long already printed an error message. */
                 break;
@@ -188,7 +193,8 @@ int main (int argc, char ** argv)
                     window_max,
                     uncorrected_p_value,
                     trimming_ratio,
-                    extensive_search_flag);
+                    extensive_search_flag,
+                    num_threads);
     }
     else
     {

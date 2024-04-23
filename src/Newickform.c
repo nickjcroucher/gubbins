@@ -31,10 +31,10 @@
 #define STR_OUT	"out"
 
 // Define thread function
-void* threadFunction(void* arg) {
+void* rec_threadFunction(void* arg) {
   
     // Extract thread data
-    struct ThreadData* data = (struct ThreadData*)arg;
+    struct rec_ThreadData* data = (struct rec_ThreadData*)arg;
     
     if (data->num_nodes_to_process > -1)
     {
@@ -250,7 +250,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   // Initiate multithreading
   pthread_t threads[num_threads];
-  struct ThreadData threadData[num_threads];
+  struct rec_ThreadData rec_ThreadData[num_threads];
 
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)
@@ -277,28 +277,28 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
         int endIndex = startIndex + numJobsPerThread + (i < remainder ? 1 : 0) - 1;
       
         // Set thread data
-        threadData[i].nodes = jobNodeArray;
-        threadData[i].start_node = startIndex;
-        threadData[i].num_nodes_to_process = endIndex - startIndex + 1; // Number of nodes for this thread
-        threadData[i].vcf_file_pointer = vcf_file_pointer;
-        threadData[i].snp_locations = snp_locations;
-        threadData[i].number_of_snps = number_of_snps;
-        threadData[i].column_names = column_names;
-        threadData[i].number_of_columns = number_of_columns;
-        threadData[i].length_of_original_genome = length_of_original_genome;
-        threadData[i].block_file_pointer = block_file_pointer;
-        threadData[i].gff_file_pointer = gff_file_pointer;
-        threadData[i].min_snps = min_snps;
-        threadData[i].branch_snps_file_pointer = branch_snps_file_pointer;
-        threadData[i].window_min = window_min;
-        threadData[i].window_max = window_max;
-        threadData[i].uncorrected_p_value = uncorrected_p_value;
-        threadData[i].trimming_ratio = trimming_ratio;
-        threadData[i].extensive_search_flag = extensive_search_flag;
-        threadData[i].thread_index = i;
+        rec_ThreadData[i].nodes = jobNodeArray;
+        rec_ThreadData[i].start_node = startIndex;
+        rec_ThreadData[i].num_nodes_to_process = endIndex - startIndex + 1; // Number of nodes for this thread
+        rec_ThreadData[i].vcf_file_pointer = vcf_file_pointer;
+        rec_ThreadData[i].snp_locations = snp_locations;
+        rec_ThreadData[i].number_of_snps = number_of_snps;
+        rec_ThreadData[i].column_names = column_names;
+        rec_ThreadData[i].number_of_columns = number_of_columns;
+        rec_ThreadData[i].length_of_original_genome = length_of_original_genome;
+        rec_ThreadData[i].block_file_pointer = block_file_pointer;
+        rec_ThreadData[i].gff_file_pointer = gff_file_pointer;
+        rec_ThreadData[i].min_snps = min_snps;
+        rec_ThreadData[i].branch_snps_file_pointer = branch_snps_file_pointer;
+        rec_ThreadData[i].window_min = window_min;
+        rec_ThreadData[i].window_max = window_max;
+        rec_ThreadData[i].uncorrected_p_value = uncorrected_p_value;
+        rec_ThreadData[i].trimming_ratio = trimming_ratio;
+        rec_ThreadData[i].extensive_search_flag = extensive_search_flag;
+        rec_ThreadData[i].thread_index = i;
 
         // Create thread
-        if (pthread_create(&threads[i], NULL, threadFunction, (void*)&threadData[i]) != 0) {
+        if (pthread_create(&threads[i], NULL, rec_threadFunction, (void*)&rec_ThreadData[i]) != 0) {
             perror("pthread_create");
             exit(EXIT_FAILURE);
         }
@@ -316,7 +316,15 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   }
   
   int * parent_recombinations = NULL;
-	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);
+	fill_in_recombinations_with_gaps(root,
+                                   parent_recombinations,
+                                   0,
+                                   0,
+                                   0,
+                                   root->block_coordinates,
+                                   length_of_original_genome,
+                                   snp_locations,
+                                   number_of_snps);
 
   // Free arrays
   free(nodeArray);

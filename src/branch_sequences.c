@@ -311,8 +311,10 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 	int number_of_branch_snps = 0;
 	
   // Get SNP alleles for node from reconstruction phylip
+  int parent_sequence_index = find_sequence_index_from_sample_name(node->taxon);
   char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-  get_sequence_for_sample_name(node_sequence, node->taxon);
+  get_sequence_for_sample_index(node_sequence, parent_sequence_index);
+//  get_sequence_for_sample_name(node_sequence, node->taxon);
   
   // Get sequence reconstructed at internal node
   branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
@@ -330,6 +332,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 	else
 	{
 		child = node->child;
+    int child_sequence_indices[node->childNum];
 		char ** child_sequences = calloc((number_of_snps + 1) * node->childNum, sizeof(char*));
     // Allocate memory for each string in child_sequences
     for (int i = 0; i < node->childNum; i++) {
@@ -345,13 +348,26 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 		{
 			
       // Retrieve child sequences from alignment
-      get_sequence_for_sample_name(child_sequences[child_counter], child->node->taxon);
+      child_sequence_indices[child_counter] = find_sequence_index_from_sample_name(child->node->taxon);
+      get_sequence_for_sample_index(child_sequences[child_counter], child_sequence_indices[child_counter]);
 			child_nodes[child_counter] = child->node;
       
+      // Merge list of descendant taxa
 			char delimiter_string[3] = {" "};
 			concat_strings_created_with_malloc(node->taxon_names, delimiter_string);
 			concat_strings_created_with_malloc(node->taxon_names, child_nodes[child_counter]->taxon_names);
-
+      
+      // Move on to next child
+      child = child->next;
+    }
+    
+    // Fill in gaps from children
+    child_counter = 0;
+    fill_in_unambiguous_gaps_in_parent_from_children(parent_sequence_index, child_sequence_indices,child_counter);
+    
+    for (child_counter = 0; child_counter < node->childNum; ++child_counter)
+    {
+    
       // Identify recombinations on descendant branches
 			int * branches_snp_sites;
 			branches_snp_sites = (int *) calloc((number_of_snps +1),sizeof(int));
@@ -390,7 +406,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			free(branches_snp_sites);
 			
       child_counter++;
-      child = child->next;
       
 		}
     

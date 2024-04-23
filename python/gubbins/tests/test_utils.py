@@ -20,7 +20,7 @@ data_dir = os.path.join(modules_dir, 'tests', 'data')
 class TestUtilities(unittest.TestCase):
 
     def test_gubbins_command(self):
-        assert common.create_gubbins_command('AAA', 'BBB', 'CCC', 'DDD', 'EEE', 5, 10, 200, 0.05, 1.0, 0) \
+        assert common.create_gubbins_command('AAA', 'BBB', 'CCC', 'DDD', 'EEE', 5, 10, 200, 0.05, 1.0, 0, 1) \
                == 'AAA -r -v CCC -a 10 -b 200 -f EEE -t DDD -m 5 -p 0.05 -i 1.0 BBB -n 1'
 
     def test_translation_of_filenames_to_final_filenames(self):

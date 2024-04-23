@@ -380,9 +380,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 			free(branch_snp_sequence);
 			free(branch_snp_ancestor_sequence);
 			free(branches_snp_sites);
-			
-      child_counter++;
-      
+
 		}
     
     // Deallocate memory for each string in child_sequences

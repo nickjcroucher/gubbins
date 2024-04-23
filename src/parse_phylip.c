@@ -62,16 +62,20 @@ int get_internal_node(int sequence_index)
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name)
 {
     int sequence_index;
-    sequence_index = find_sequence_index_from_sample_name( sample_name);
+    sequence_index = find_sequence_index_from_sample_name(sample_name);
     if(sequence_index < 0)
     {
-        printf("Couldnt find sequence name %s with index %d\n", sample_name,sequence_index);
+        printf("Could not find sequence name %s with index %d\n", sample_name,sequence_index);
         exit(1);
     }
-
-    memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
+    get_sequence_for_sample_index(sequence_bases, sequence_index);
+    
 }
 
+void get_sequence_for_sample_index(char * sequence_bases, int sequence_index)
+{
+    memcpy(sequence_bases, sequences[sequence_index], size_of_string(sequences[sequence_index]) +1);
+}
 
 void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index, int * child_sequence_indices, int num_children)
 {

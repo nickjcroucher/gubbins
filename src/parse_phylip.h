@@ -33,6 +33,7 @@
  } sample_statistics;
 
 void get_sequence_for_sample_name(char * sequence_bases, char * sample_name);
+void get_sequence_for_sample_index(char * sequence_bases, int sequence_index);
 int find_sequence_index_from_sample_name( char * sample_name);
 int update_sequence_base(char new_sequence_base, int sequence_index, int base_index);
 int does_column_contain_snps(int snp_column, char reference_base);

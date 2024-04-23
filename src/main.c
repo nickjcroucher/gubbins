@@ -32,7 +32,7 @@ const char* program_name;
 
 // Assumptions:
 // The sequences in the multi fasta alignment file are the same length
-// Your only interested in SNPs, INDELS are ignored
+// You are only interested in SNPs, INDELS are ignored
 // The first sequence is chosen as the reference sequence
 // If there is an indel in the reference sequence, the first normal base found in another strain is used.
 
@@ -46,9 +46,10 @@ void print_usage(FILE* stream, int exit_code)
            "  -t    Newick tree file\n"
            "  -v    VCF file\n"
            "  -f    Original Multifasta file\n"
+           "  -n    Number of threads to use for recombination detection\n"
            "  -m    Min SNPs for identifying a recombination block\n"
-		   "  -a    Min window size\n"
-		   "  -b    Max window size\n"
+           "  -a    Min window size\n"
+           "  -b    Max window size\n"
            "  -p    p value for detecting recombinations\n"
            "  -i    p value ratio for trimming recombinations\n"
            "  -h    Display this usage information.\n\n"
@@ -110,7 +111,7 @@ int main (int argc, char ** argv)
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:",
+        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:n:",
                            long_options, &option_index);
         /* Detect the end of the options. */
         if (c == -1)

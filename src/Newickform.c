@@ -252,9 +252,6 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   int num_threads = 1; // Adjust as needed
   pthread_t threads[num_threads];
   struct ThreadData threadData[num_threads];
-  
-  // First carry gaps up tree
-  carry_unambiguous_gaps_up_tree(root);
 
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)

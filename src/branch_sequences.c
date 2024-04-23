@@ -279,30 +279,6 @@ int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordi
 	return total_bases;
 }
 
-void carry_unambiguous_gaps_up_tree(newick_node *root)
-{
-	if(root->childNum > 0)
-	{
-		newick_child *child;
-		int parent_sequence_index =  find_sequence_index_from_sample_name(root->taxon);
-		
-		child = root->child;
-		int child_sequence_indices[root->childNum];
-		int child_counter = 0;
-		while (child != NULL)
-		{
-			child_sequence_indices[child_counter] = find_sequence_index_from_sample_name(child->node->taxon);
-			carry_unambiguous_gaps_up_tree(child->node);
-			child = child->next;
-			child_counter++;
-		}
-		
-		// compare the parent sequence to the each child sequence and update the gaps
-		fill_in_unambiguous_gaps_in_parent_from_children(parent_sequence_index, child_sequence_indices,child_counter);
-		//fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(parent_sequence_index, child_sequence_indices,child_counter);
-	}
-}
-
 void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps,FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int thread_index)
 {
 	newick_child *child;

@@ -285,28 +285,27 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 	int child_counter = 0;
 	int branch_genome_size = 0;
 	int number_of_branch_snps = 0;
-	
-  // Get SNP alleles for node from reconstruction phylip
-  int parent_sequence_index = find_sequence_index_from_sample_name(node->taxon);
-  char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
-  get_sequence_for_sample_index(node_sequence, parent_sequence_index);
-//  get_sequence_for_sample_name(node_sequence, node->taxon);
-  
-  // Get sequence reconstructed at internal node
-  branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-  set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
   
 	if (node->childNum == 0)
 	{
-    
-		get_sequence_for_sample_name(node_sequence, node->taxon); // Get rid?
-		
+    		
     node->taxon_names = (char *) calloc(MAX_SAMPLE_NAME_SIZE,sizeof(char));
 		memcpy(node->taxon_names, node->taxon, size_of_string(node->taxon)+1);
 		
 	}
 	else
 	{
+    
+    // Get internal node sequence
+    int parent_sequence_index = find_sequence_index_from_sample_name(node->taxon);
+    char * node_sequence = (char *) calloc((number_of_snps +1),sizeof(char));
+    get_sequence_for_sample_index(node_sequence, parent_sequence_index);
+    
+    // Get sequence reconstructed at internal node
+    branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
+    set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
+    
+    // Get child sequences
 		child = node->child;
     int child_sequence_indices[node->childNum];
 		char ** child_sequences = calloc((number_of_snps + 1) * node->childNum, sizeof(char*));
@@ -383,6 +382,9 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 
 		}
     
+    // Store node sequence
+    free(node_sequence);
+    
     // Deallocate memory for each string in child_sequences
     for (int i = 0; i < node->childNum; i++) {
         free(child_sequences[i]);
@@ -392,9 +394,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
     free(child_sequences);
     
 	}
-  
-  // Store node sequence
-  free(node_sequence);
   
 }
 

@@ -335,6 +335,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
       
       // Move on to next child
       child = child->next;
+      ++child_counter;
     }
     
     // Fill in gaps from children
@@ -392,7 +393,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
 
     // Deallocate memory for child_sequences
     free(child_sequences);
-
+    
 	}
   
   // Store node sequence

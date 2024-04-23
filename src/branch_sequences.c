@@ -339,7 +339,6 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
     }
     
     // Fill in gaps from children
-    child_counter = 0;
     fill_in_unambiguous_gaps_in_parent_from_children(parent_sequence_index, child_sequence_indices,child_counter);
     
     for (child_counter = 0; child_counter < node->childNum; ++child_counter)

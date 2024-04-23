@@ -10,7 +10,7 @@ START_TEST (check_gubbins_no_recombinations)
 {
 	remove("../tests/data/no_recombinations.tre");
 	cp("../tests/data/no_recombinations.tre", "../tests/data/no_recombinations.original.tre");
-	run_gubbins("../tests/data/no_recombinations.aln.vcf", "../tests/data/no_recombinations.tre","../tests/data/no_recombinations.aln.snp_sites.aln",3,"../tests/data/no_recombinations.aln.snp_sites.aln",100,10000,0.05,1,0);
+	run_gubbins("../tests/data/no_recombinations.aln.vcf", "../tests/data/no_recombinations.tre","../tests/data/no_recombinations.aln.snp_sites.aln",3,"../tests/data/no_recombinations.aln.snp_sites.aln",100,10000,0.05,1,0,1);
 	ck_assert(file_exists("../tests/data/no_recombinations.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/no_recombinations.tre.vcf") == 1);
 	ck_assert(file_exists("../tests/data/no_recombinations.tre.phylip") == 1);
@@ -37,7 +37,7 @@ START_TEST (check_gubbins_one_recombination)
 {
 	remove("../tests/data/one_recombination.tre");
 	cp("../tests/data/one_recombination.tre", "../tests/data/one_recombination.original.tre");
-	run_gubbins("../tests/data/one_recombination.aln.vcf", "../tests/data/one_recombination.tre","../tests/data/one_recombination.aln.snp_sites.aln",3,"../tests/data/one_recombination.aln.snp_sites.aln",100,10000,0.05,1,0);
+	run_gubbins("../tests/data/one_recombination.aln.vcf", "../tests/data/one_recombination.tre","../tests/data/one_recombination.aln.snp_sites.aln",3,"../tests/data/one_recombination.aln.snp_sites.aln",100,10000,0.05,1,0,1);
 	ck_assert(file_exists("../tests/data/one_recombination.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/one_recombination.tre.vcf") == 1);
 	ck_assert(file_exists("../tests/data/one_recombination.tre.phylip") == 1);
@@ -73,7 +73,7 @@ START_TEST (check_gubbins_multiple_recombinations)
                 "../tests/data/multiple_recombinations.jar.aln",
                 3,
                 "../tests/data/multiple_recombinations.aln",
-                30,100,0.05,1,0);
+                30,100,0.05,1,0,1);
 
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
@@ -83,8 +83,8 @@ START_TEST (check_gubbins_multiple_recombinations)
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.snp_sites.aln") == 1);
 
 	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 4);
-    ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
-    ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
+  ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
+  ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
 
 	remove("../tests/data/multiple_recombinations.tre");
 	remove("../tests/data/multiple_recombinations.tre.tab");
@@ -94,6 +94,40 @@ START_TEST (check_gubbins_multiple_recombinations)
 	remove("../tests/data/multiple_recombinations.tre.gff");
 	remove("../tests/data/multiple_recombinations.tre.snp_sites.aln");
 	remove("../tests/data/multiple_recombinations.tre.branch_snps.tab");
+}
+END_TEST
+
+START_TEST (check_gubbins_multithreaded)
+{
+  remove("../tests/data/multiple_recombinations.tre");
+  cp("../tests/data/multiple_recombinations.tre", "../tests/data/multiple_recombinations.original.tre");
+
+  run_gubbins("../tests/data/multiple_recombinations.aln.vcf",
+                "../tests/data/multiple_recombinations.tre",
+                "../tests/data/multiple_recombinations.jar.aln",
+                3,
+                "../tests/data/multiple_recombinations.aln",
+                30,100,0.05,1,0,2);
+
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.phylip") == 1);
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.stats") == 1);
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.gff") == 1);
+  ck_assert(file_exists("../tests/data/multiple_recombinations.tre.snp_sites.aln") == 1);
+
+  ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 4);
+  ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
+  ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
+
+  remove("../tests/data/multiple_recombinations.tre");
+  remove("../tests/data/multiple_recombinations.tre.tab");
+  remove("../tests/data/multiple_recombinations.tre.vcf");
+  remove("../tests/data/multiple_recombinations.tre.phylip");
+  remove("../tests/data/multiple_recombinations.tre.stats");
+  remove("../tests/data/multiple_recombinations.tre.gff");
+  remove("../tests/data/multiple_recombinations.tre.snp_sites.aln");
+  remove("../tests/data/multiple_recombinations.tre.branch_snps.tab");
 }
 END_TEST
 
@@ -108,7 +142,7 @@ START_TEST (check_recombination_at_root)
                 "../tests/data/recombination_at_root/recombination_at_root.aln.gaps.snp_sites.aln",
                 3,
                 "../tests/data/recombination_at_root/recombination_at_root.aln",
-                100,10000,0.05,1,0);
+                100,10000,0.05,1,0,1);
 
     ck_assert(compare_files("../tests/data/recombination_at_root/RAxML_result.recombination_at_root.iteration_1.tab","../tests/data/recombination_at_root/expected_RAxML_result.recombination_at_root.iteration_1.tab") == 1);
 

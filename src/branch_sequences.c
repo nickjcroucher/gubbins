@@ -185,24 +185,24 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 
 	if (root->childNum > 0)
 	{
-		child = root->child;
+//		child = root->child;
 		set_internal_node(1,sequence_index);
 
-		while (child != NULL)
-		{
-			fill_in_recombinations_with_gaps(child->node,
-                                             current_recombinations,
-                                             num_current_recombinations,
-                                             (current_total_snps + root->number_of_snps),
-                                             (num_blocks + root->number_of_blocks),
-                                             merged_block_coordinates,
-                                             length_of_original_genome,
-                                             snp_locations,
-                                             number_of_snps
-                                             );
-			child = child->next;
-
-		}
+//		while (child != NULL)
+//		{
+//			fill_in_recombinations_with_gaps(child->node,
+//                                             current_recombinations,
+//                                             num_current_recombinations,
+//                                             (current_total_snps + root->number_of_snps),
+//                                             (num_blocks + root->number_of_blocks),
+//                                             merged_block_coordinates,
+//                                             length_of_original_genome,
+//                                             snp_locations,
+//                                             number_of_snps
+//                                             );
+//			child = child->next;
+//
+//		}
 	}
 	else
 	{

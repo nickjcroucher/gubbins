@@ -79,6 +79,20 @@ void get_job_nodes(newick_node** jobNodeArray, newick_node** nodeArray, int* nod
   }
 }
 
+// Function to identify nodes relevant for each depth
+void get_job_node_indices(int* jobNodeIndexArray, newick_node** nodeArray, int* node_depths, int depth, int num_nodes)
+{
+  int j = 0;
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    if (node_depths[i] == depth)
+    {
+      jobNodeIndexArray[j] = i;
+      ++j;
+    }
+  }
+}
+
 // Function to count number of jobs to run at a particular depth
 int get_job_counts(int *node_depths, int depth, int num_nodes)
 {
@@ -315,17 +329,45 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     
   }
   
-  int * parent_recombinations = NULL;
-	fill_in_recombinations_with_gaps(root,
-                                   parent_recombinations,
-                                   0,
-                                   0,
-                                   0,
-                                   root->block_coordinates,
-                                   length_of_original_genome,
-                                   snp_locations,
-                                   number_of_snps);
-
+  // Define data structures needed to record statistics and mask recombined sequence
+  int ** parent_recombinations_array = calloc(num_nodes,sizeof(int*));
+  for (int i = 0; i < num_nodes; ++i) {
+    parent_recombinations_array[i] = NULL;
+  }
+  int * parent_num_recombinations_array = calloc(num_nodes,sizeof(int));
+  int * current_total_snps_array = calloc(num_nodes,sizeof(int));
+  int * num_blocks_array = calloc(num_nodes,sizeof(int));
+  for (int i = 0; i < num_nodes; ++i)
+  {
+    parent_num_recombinations_array[i] = 0;
+    current_total_snps_array[i] = 0;
+    num_blocks_array[i] = 0;
+  }
+//  int * parent_recombinations = NULL;
+  
+  // Iterate from root to tips to record statistics and mask recombined sequence
+  for (int depth = max_depth; depth >= 0; --depth) {
+      
+      // Identify number of nodes at the current depth
+      int num_jobs = get_job_counts(node_depths,depth,num_nodes);
+      int * jobNodeIndexArray = malloc(num_jobs * sizeof(int));
+      get_job_node_indices(jobNodeIndexArray,nodeArray,node_depths,depth,num_nodes);
+      
+      for (int node_num_index = 0; node_num_index < num_jobs; ++node_num_index)
+      {
+        int node_index = jobNodeIndexArray[node_num_index];
+        fill_in_recombinations_with_gaps(nodeArray[node_index],
+                                         parent_recombinations_array[node_index],
+                                         parent_num_recombinations_array[node_index],
+                                         current_total_snps_array[node_index],
+                                         num_blocks_array[node_index],
+                                         nodeArray[node_index]->block_coordinates,
+                                         length_of_original_genome,
+                                         snp_locations,
+                                         number_of_snps);
+      }
+  }
+  
   // Free arrays
   free(nodeArray);
   free(node_depths);

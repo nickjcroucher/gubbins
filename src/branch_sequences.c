@@ -86,7 +86,7 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 		
     //make sure that the index begins at start of block
 		int beginning_j = current_index;
-    for(int beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
+    for(beginning_j = current_index; snp_locations[beginning_j] < current_block_coordinates[0][i];beginning_j++)
     {
     }
     
@@ -176,6 +176,7 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
                                                                                                      snp_locations,
                                                                                                      number_of_snps,
                                                                                                      snps_in_recombinations);
+
  	for(i = 0; i < num_snps_in_recombinations; i++)
  	{
  		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);

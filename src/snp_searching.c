@@ -55,22 +55,22 @@ int advance_window_start_to_next_snp(int window_start_coordinate, int * snp_loca
 int find_starting_index(int window_start_coordinate, int * snp_locations, int start_index, int end_index)
 {
 	int current_index = 0;
-
 	if(start_index == end_index  || start_index + 1 == end_index)
 	{
-		return start_index;
+    return start_index;
 	}
 	else if(end_index < start_index)
 	{
-		return end_index;
+    return end_index;
 	}
 
 	if( snp_locations[start_index]>= window_start_coordinate)
 	{
-		return start_index;
+    return start_index;
 	}
 	
 	current_index = (int)((end_index-start_index)/2) + start_index;
+  
 	if(current_index >= end_index)
 	{
 		current_index = end_index-1;
@@ -79,7 +79,7 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 	{
 		current_index = start_index+1;
 	}
-	
+  
 	if( snp_locations[current_index] < window_start_coordinate)
 	{
 		start_index = current_index;
@@ -92,7 +92,6 @@ int find_starting_index(int window_start_coordinate, int * snp_locations, int st
 	{
 		return current_index;
 	}
-	
 	return find_starting_index(window_start_coordinate, snp_locations, start_index, end_index);
 }
 

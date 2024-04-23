@@ -73,7 +73,7 @@ void get_job_nodes(newick_node** jobNodeArray, newick_node** nodeArray, int* nod
   {
     if (node_depths[i] == depth)
     {
-      jobNodeArray[j] = nodeArray[i];
+      jobNodeArray[j] = nodeArray[i]; // TO DO convert to pointer
       ++j;
     }
   }
@@ -263,6 +263,10 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     // Identify number of nodes at the current depth
     int num_jobs = get_job_counts(node_depths,depth,num_nodes);
     newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
+    // Allocate memory for each element of jobNodeArray
+    for (int i = 0; i < num_jobs; i++) {
+        jobNodeArray[i] = (newick_node*)seqMalloc(sizeof(newick_node));
+    }
     get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
 
     // Divide jobNodeArray among threads
@@ -302,21 +306,26 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
             perror("pthread_create");
             exit(EXIT_FAILURE);
         }
-      
-        // Join threads
-        for (int i = 0; i < num_threads; ++i) {
-            pthread_join(threads[i], NULL);
-        }
+
     }
 
+    // Join threads
+    for (int i = 0; i < num_threads; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+    
+    // Free jobNodeArray
+    free(jobNodeArray);
+    
   }
-  
-  free(nodeArray);
-  free(node_depths);
   
   int * parent_recombinations = NULL;
 	fill_in_recombinations_with_gaps(root, parent_recombinations, 0, 0,0,root->block_coordinates,length_of_original_genome,snp_locations,number_of_snps);
 
+  // Free arrays
+  free(nodeArray);
+  free(node_depths);
+  
 	fclose(block_file_pointer);
 	fclose(gff_file_pointer);
 	fclose(branch_snps_file_pointer);

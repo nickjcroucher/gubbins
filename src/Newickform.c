@@ -30,7 +30,38 @@
 
 #define STR_OUT	"out"
 
-// Define thread function
+// Define thread function for inserting gaps into sequences
+void* gaps_threadFunction(void* arg) {
+  
+    // Extract thread data
+    struct gaps_ThreadData* data = (struct gaps_ThreadData*)arg;
+    
+    if (data->num_nodes_to_process > -1)
+    {
+        
+      for (int node_num_index = data->start_node; node_num_index < data->start_node+data->num_nodes_to_process; ++node_num_index)
+      {
+        int node_index = data->node_indices[node_num_index];
+        int parent_node_index = data->parents[node_index];
+        fill_in_recombinations_with_gaps(data->nodeArray,
+                                         node_index,
+                                         parent_node_index,
+                                         data->recombinations_array,
+                                         data->num_recombinations_array,
+                                         data->current_total_snps_array,
+                                         data->num_blocks_array,
+                                         data->length_of_original_genome,
+                                         data->snp_locations,
+                                         data->number_of_snps);
+      }
+        
+    }
+
+    // Exit thread
+    pthread_exit(NULL);
+}
+
+// Define thread function for identifying recombinations
 void* rec_threadFunction(void* arg) {
   
     // Extract thread data
@@ -325,6 +356,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   // Initiate multithreading
   pthread_t threads[num_threads];
   struct rec_ThreadData rec_ThreadData[num_threads];
+  struct gaps_ThreadData gaps_ThreadData[num_threads];
 
   // iterate through depths and identify batches of analyses to be run
   for (int depth = 0; depth <= max_depth; ++depth)
@@ -407,25 +439,51 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   // Iterate from root to tips to record statistics and mask recombined sequence
   for (int depth = max_depth; depth >= 0; --depth) {
+      
       // Identify number of nodes at the current depth
       int num_jobs = get_job_counts(node_depths,depth,num_nodes);
       int * jobNodeIndexArray = malloc(num_jobs * sizeof(int));
       get_job_node_indices(jobNodeIndexArray,nodeArray,node_depths,depth,num_nodes);
-      for (int node_num_index = 0; node_num_index < num_jobs; ++node_num_index)
-      {
-        int node_index = jobNodeIndexArray[node_num_index];
-        int parent_node_index = parents[node_index];
-        fill_in_recombinations_with_gaps(nodeArray,
-                                         node_index,
-                                         parent_node_index,
-                                         recombinations_array,
-                                         num_recombinations_array,
-                                         current_total_snps_array,
-                                         num_blocks_array,
-                                         length_of_original_genome,
-                                         snp_locations,
-                                         number_of_snps);
+    
+      // Divide jobNodeArray among threads
+      int numJobsPerThread = num_jobs / num_threads;
+      int remainder = num_jobs % num_threads;
+      
+      // Create and execute threads
+      for (int i = 0; i < num_threads; ++i) {
+
+          // Calculate start and end indices for current thread
+          int startIndex = i * numJobsPerThread + (i < remainder ? i : remainder);
+          int endIndex = startIndex + numJobsPerThread + (i < remainder ? 1 : 0) - 1;
+        
+          // Set thread data
+          gaps_ThreadData[i].node_indices = jobNodeIndexArray;
+          gaps_ThreadData[i].start_node = startIndex;
+          gaps_ThreadData[i].num_nodes_to_process = endIndex - startIndex + 1; // Number of nodes for this thread
+          gaps_ThreadData[i].nodeArray = nodeArray;
+          gaps_ThreadData[i].parents = parents;
+          gaps_ThreadData[i].recombinations_array = recombinations_array;
+          gaps_ThreadData[i].num_recombinations_array = num_recombinations_array;
+          gaps_ThreadData[i].current_total_snps_array = current_total_snps_array;
+          gaps_ThreadData[i].num_blocks_array = num_blocks_array;
+          gaps_ThreadData[i].length_of_original_genome = length_of_original_genome;
+          gaps_ThreadData[i].snp_locations = snp_locations;
+          gaps_ThreadData[i].number_of_snps = number_of_snps;
+          gaps_ThreadData[i].thread_index = i;
+
+          // Create thread
+          if (pthread_create(&threads[i], NULL, gaps_threadFunction, (void*)&gaps_ThreadData[i]) != 0) {
+              perror("pthread_create");
+              exit(EXIT_FAILURE);
+          }
+
       }
+
+      // Join threads
+      for (int i = 0; i < num_threads; ++i) {
+          pthread_join(threads[i], NULL);
+      }
+
   }
   
   // Free gaps arrays

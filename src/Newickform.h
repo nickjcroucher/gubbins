@@ -72,6 +72,22 @@ struct rec_ThreadData {
     int thread_index;           // Thread index
 };
 
+// Define the structure to hold thread arguments
+struct gaps_ThreadData {
+    int * node_indices;           // Nodes to be processed by this thread
+    int start_node;               // Index of starting node for this thread
+    int num_nodes_to_process;     // Number of nodes to process by this thread
+    newick_node ** nodeArray;     // Pointer to the array of node sequences
+    int * parents;                // Indices of the parents of the nodes
+    int ** recombinations_array;  // Pointer to the list of recombination coordinates
+    int * num_recombinations_array;  // Pointer to counts of recombinations
+    int * current_total_snps_array;  // Number of SNPs on each branch
+    int * num_blocks_array;          // Number of recombination on each branch
+    int length_of_original_genome;   // Length of the original genome
+    int * snp_locations;           // List of SNP locations
+    int number_of_snps;          // Number of SNP sites in the alignment
+    int thread_index;              // Thread index
+};
 
 #define MAX_FILENAME_SIZE 1024
 
@@ -92,6 +108,7 @@ void get_job_node_indices(int* jobNodeIndexArray, newick_node** nodeArray, int* 
 void get_job_counts(int *node_depths, int depth, int num_nodes);
 int * get_parents(newick_node *root, newick_node** nodeArray, int num_nodes);
 void populate_parents(newick_node *node, newick_node** nodeArray, int * parents, int num_nodes);
+void* gaps_threadFunction(void* arg);
 extern char* strip_quotes(char *taxon);
 #endif
 

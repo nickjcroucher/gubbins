@@ -85,6 +85,7 @@ START_TEST (check_gubbins_multiple_recombinations)
 	ck_assert(number_of_recombinations_in_file("../tests/data/multiple_recombinations.tre.tab") == 4);
   ck_assert(compare_files("../tests/data/multiple_recombinations.tre","../tests/data/multiple_recombinations.expected.tre") == 1);
   ck_assert(compare_files("../tests/data/multiple_recombinations.tre.branch_snps.tab","../tests/data/multiple_recombinations.tre.branch_snps.expected.tab") == 1);
+  ck_assert(compare_files("../tests/data/multiple_recombinations.tre.stats","../tests/data/multiple_recombinations.tre.expected.stats") == 1);
 
 	remove("../tests/data/multiple_recombinations.tre");
 	remove("../tests/data/multiple_recombinations.tre.tab");

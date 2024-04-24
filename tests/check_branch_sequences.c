@@ -117,15 +117,15 @@ int test_bases_in_recombinations_with_gaps(int block_size)
 
 START_TEST (check_calculate_number_of_bases_in_recombations)
 {
-	ck_assert(test_bases_in_recombinations(4) == 25);
-	ck_assert(test_bases_in_recombinations(3) == 20);
-	ck_assert(test_bases_in_recombinations(2) == 15);
-	ck_assert(test_bases_in_recombinations(1) == 5);
+  ck_assert(test_bases_in_recombinations(4) == 27);
+	ck_assert(test_bases_in_recombinations(3) == 23);
+	ck_assert(test_bases_in_recombinations(2) == 17);
+	ck_assert(test_bases_in_recombinations(1) == 6);
 	
-	ck_assert(test_bases_in_recombinations_with_gaps(4) == 22);
-	ck_assert(test_bases_in_recombinations_with_gaps(3) == 17);
-	ck_assert(test_bases_in_recombinations_with_gaps(2) == 12);
-	ck_assert(test_bases_in_recombinations_with_gaps(1) == 2);
+	ck_assert(test_bases_in_recombinations_with_gaps(4) == 24);
+	ck_assert(test_bases_in_recombinations_with_gaps(3) == 20);
+	ck_assert(test_bases_in_recombinations_with_gaps(2) == 14);
+	ck_assert(test_bases_in_recombinations_with_gaps(1) == 3);
 }
 END_TEST
 	

@@ -69,10 +69,11 @@ void* rec_threadFunction(void* arg) {
     
     if (data->num_nodes_to_process > -1)
     {
-      for (int node_index = data->start_node; node_index < data->start_node+data->num_nodes_to_process; ++node_index)
+      for (int node_num_index = data->start_node; node_num_index < data->start_node+data->num_nodes_to_process; ++node_num_index)
       {
+        int node_index = data->node_indices[node_num_index];
         // Generate branch sequences and identify recombinations
-        generate_branch_sequences(data->nodes[node_index],
+        generate_branch_sequences(data->nodeArray[node_index],
                                    data->vcf_file_pointer,
                                    data->snp_locations,
                                    data->number_of_snps,
@@ -364,12 +365,8 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     
     // Identify number of nodes at the current depth
     int num_jobs = get_job_counts(node_depths,depth,num_nodes);
-    newick_node** jobNodeArray = malloc(num_jobs * sizeof(newick_node*));
-    // Allocate memory for each element of jobNodeArray
-    for (int i = 0; i < num_jobs; i++) {
-        jobNodeArray[i] = (newick_node*)seqMalloc(sizeof(newick_node));
-    }
-    get_job_nodes(jobNodeArray,nodeArray,node_depths,depth,num_nodes);
+    int * jobNodeIndexArray = malloc(num_jobs * sizeof(int));
+    get_job_node_indices(jobNodeIndexArray,nodeArray,node_depths,depth,num_nodes);
 
     // Divide jobNodeArray among threads
     int numJobsPerThread = num_jobs / num_threads;
@@ -383,7 +380,8 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
         int endIndex = startIndex + numJobsPerThread + (i < remainder ? 1 : 0) - 1;
       
         // Set thread data
-        rec_ThreadData[i].nodes = jobNodeArray;
+        rec_ThreadData[i].node_indices = jobNodeIndexArray;
+        rec_ThreadData[i].nodeArray = nodeArray;
         rec_ThreadData[i].start_node = startIndex;
         rec_ThreadData[i].num_nodes_to_process = endIndex - startIndex + 1; // Number of nodes for this thread
         rec_ThreadData[i].vcf_file_pointer = vcf_file_pointer;
@@ -417,7 +415,7 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     }
     
     // Free jobNodeArray
-    free(jobNodeArray);
+    free(jobNodeIndexArray);
     
   }
   

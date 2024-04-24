@@ -48,7 +48,8 @@ typedef struct newick_node
 
 // Define the structure to hold thread arguments
 struct rec_ThreadData {
-    newick_node** nodes; // Nodes to be processed by all threads
+    int * node_indices; // Indices of nodes to be processed by all threads
+    newick_node ** nodeArray;     // Pointer to the array of node sequences
     int start_node;             // Index of starting node for this thread
     int num_nodes_to_process;    // Number of nodes to process by this thread
     char** node_sequences;      // Pointer to the array of node sequences

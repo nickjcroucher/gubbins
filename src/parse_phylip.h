@@ -40,9 +40,9 @@ int does_column_contain_snps(int snp_column, char reference_base);
 int number_of_samples_from_parse_phylip(void);
 void get_sample_names_from_parse_phylip(char ** sample_names);
 char convert_reference_to_real_base_in_column(int snp_column, char reference_base);
-void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps);
-void set_number_of_snps_for_sample(char * sample_name, int number_of_snps);
-void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations);
+void set_genome_length_without_gaps_for_sample(int sample_index, int genome_length_without_gaps);
+void set_number_of_snps_for_sample(int sample_index, int number_of_snps);
+void set_number_of_recombinations_for_sample(int sample_index, int number_of_recombinations);
 void set_number_of_blocks_for_sample(char * sample_name,int num_blocks);
 sample_statistics ** get_sample_statistics(void);
 int number_of_snps_in_phylip(void);
@@ -54,10 +54,10 @@ int get_internal_node(int sequence_index);
 void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(int parent_sequence_index, int * child_sequence_indices, int num_children);
 void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index, int * child_sequence_indices, int num_children);
 void freeup_memory(void);
-void set_number_of_branch_bases_in_recombinations(char * sample_name, int bases_in_recombinations);
-void set_number_of_bases_in_recombinations(char * sample_name, int bases_in_recombinations);
+void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations);
+void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations);
 void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_bases_for_snps, int number_of_filtered_snps);
-void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, int genome_length_excluding_blocks_and_gaps);
+void set_genome_length_excluding_blocks_and_gaps_for_sample(int sample_index, int genome_length_excluding_blocks_and_gaps);
 
 #define MAX_READ_BUFFER 65536
 #define MAX_SAMPLE_NAME_SIZE 1024

@@ -117,16 +117,16 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
  	sequence_index = find_sequence_index_from_sample_name(node->taxon);
  	
   // Set sample statistics for printing using information from node
- 	set_number_of_recombinations_for_sample(node->taxon,node->num_recombinations);
- 	set_number_of_snps_for_sample(node->taxon,node->number_of_snps);
+ 	set_number_of_recombinations_for_sample(sequence_index,node->num_recombinations);
+ 	set_number_of_snps_for_sample(sequence_index,node->number_of_snps);
 	
   // Set root-specific values
   if (parent_node_index == -1)
   {
-      set_number_of_bases_in_recombinations(node->taxon,0);
-      set_number_of_branch_bases_in_recombinations(node->taxon,0);
+      set_number_of_bases_in_recombinations(sequence_index,0);
+      set_number_of_branch_bases_in_recombinations(sequence_index,0);
       set_internal_node(1,sequence_index);
-      set_genome_length_excluding_blocks_and_gaps_for_sample(node->taxon,
+      set_genome_length_excluding_blocks_and_gaps_for_sample(sequence_index,
                                                              length_of_original_genome);
   }
   else
@@ -135,7 +135,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
       // Get parental sequence
       newick_node * parent = nodeArray[parent_node_index];
       char * node_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
-      get_sequence_for_sample_name(node_sequence, node->taxon);
+      get_sequence_for_sample_index(node_sequence, sequence_index);
     
       // Calculate clonal frame remaining at the parental node
       int ** current_block_coordinates = parent->block_coordinates;
@@ -144,7 +144,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
                                                                                                       current_block_coordinates,
                                                                                                       num_blocks[parent_node_index]);
       
-      set_genome_length_excluding_blocks_and_gaps_for_sample(node->taxon,
+      set_genome_length_excluding_blocks_and_gaps_for_sample(sequence_index,
                                                                genome_length_excluding_blocks_and_gaps);
       
       // Identify the recombinations leading to this node from the root
@@ -172,7 +172,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
       
       // Set number of branch bases in recombination by iterating through
       // the first part of merged blocks (i.e. only blocks on the branch to this node)
-      set_number_of_branch_bases_in_recombinations(node->taxon,
+      set_number_of_branch_bases_in_recombinations(sequence_index,
                                                      calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
                                                                                                                 node->number_of_blocks,
                                                                                                                 node_sequence,
@@ -182,7 +182,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
 
       // Set number of total bases in recombination by iterating through
       // all merged blocks leading to this node
-      set_number_of_bases_in_recombinations(node->taxon,
+      set_number_of_bases_in_recombinations(sequence_index,
                                               calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
                                                                                                          (num_blocks[parent_node_index] + node->number_of_blocks),
                                                                                                          node_sequence,
@@ -212,15 +212,15 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
 
       if (node->childNum > 0)
       {
-        set_internal_node(1,sequence_index);
-        // Update number of SNPs
-        current_total_snps[node_index] = current_total_snps[parent_node_index] + node->num_recombinations + node->number_of_snps;
-        num_blocks[node_index] = num_blocks[parent_node_index] + node->number_of_blocks;
-        nodeArray[node_index]->block_coordinates = merged_block_coordinates;
+          set_internal_node(1,sequence_index);
+          // Update number of SNPs
+          current_total_snps[node_index] = current_total_snps[parent_node_index] + node->num_recombinations + node->number_of_snps;
+          num_blocks[node_index] = num_blocks[parent_node_index] + node->number_of_blocks;
+          nodeArray[node_index]->block_coordinates = merged_block_coordinates;
       }
       else
       {
-            set_internal_node(0,sequence_index);
+          set_internal_node(0,sequence_index);
       }
   }
 
@@ -305,7 +305,7 @@ void generate_branch_sequences(newick_node *node, FILE *vcf_file_pointer,int * s
   
   // Get sequence reconstructed at node
   branch_genome_size = calculate_size_of_genome_without_gaps(node_sequence, 0,number_of_snps, length_of_original_genome);
-  set_genome_length_without_gaps_for_sample(node->taxon,branch_genome_size);
+  set_genome_length_without_gaps_for_sample(node_sequence_index,branch_genome_size);
   
 	if (node->childNum == 0)
 	{

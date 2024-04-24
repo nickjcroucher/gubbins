@@ -241,10 +241,8 @@ void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_b
 }
 
 
-void set_number_of_recombinations_for_sample(char * sample_name, int number_of_recombinations)
+void set_number_of_recombinations_for_sample(int sample_index, int number_of_recombinations)
 {
-    int sample_index ;
-    sample_index = find_sequence_index_from_sample_name( sample_name);
     if( sample_index == -1)
     {
         return;
@@ -253,15 +251,12 @@ void set_number_of_recombinations_for_sample(char * sample_name, int number_of_r
 }
 
 
-void set_number_of_snps_for_sample(char * sample_name, int number_of_snps)
+void set_number_of_snps_for_sample(int sample_index, int number_of_snps)
 {
-    int sample_index ;
-    sample_index = find_sequence_index_from_sample_name( sample_name);
     if( sample_index == -1)
     {
         return;
     }
-
     ((sample_statistics *) statistics_for_samples[sample_index])->number_of_snps = number_of_snps;
 }
 
@@ -279,10 +274,8 @@ void set_number_of_blocks_for_sample(char * sample_name,int num_blocks)
 
 
 
-void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_length_without_gaps)
+void set_genome_length_without_gaps_for_sample(int sample_index, int genome_length_without_gaps)
 {
-    int sample_index ;
-    sample_index = find_sequence_index_from_sample_name( sample_name);
     if( sample_index == -1)
     {
         return;
@@ -291,11 +284,10 @@ void set_genome_length_without_gaps_for_sample(char * sample_name, int genome_le
     ((sample_statistics *) statistics_for_samples[sample_index])->genome_length_without_gaps = genome_length_without_gaps;
 }
 
-void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, int genome_length_excluding_blocks_and_gaps)
+void set_genome_length_excluding_blocks_and_gaps_for_sample(int sample_index, int genome_length_excluding_blocks_and_gaps)
 {
-	int sample_index ;
-	sample_index = find_sequence_index_from_sample_name( sample_name);
-    if( sample_index == -1)
+
+  if( sample_index == -1)
     {
 		return;
 	}
@@ -303,10 +295,9 @@ void set_genome_length_excluding_blocks_and_gaps_for_sample(char * sample_name, 
 	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_excluding_blocks_and_gaps = genome_length_excluding_blocks_and_gaps;
 }
 
-void set_number_of_branch_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
+void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations)
 {
-    int sample_index ;
-    sample_index = find_sequence_index_from_sample_name( sample_name);
+
     if( sample_index == -1)
     {
         return;
@@ -314,10 +305,8 @@ void set_number_of_branch_bases_in_recombinations(char * sample_name, int bases_
     ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations = bases_in_recombinations;
 }
 
-void set_number_of_bases_in_recombinations(char * sample_name, int bases_in_recombinations)
+void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations)
 {
-    int sample_index ;
-    sample_index = find_sequence_index_from_sample_name( sample_name);
     if( sample_index == -1)
     {
         return;

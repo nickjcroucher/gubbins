@@ -90,6 +90,8 @@ int count_tree_nodes(newick_node* root);
 void get_job_nodes(newick_node** jobNodeArray,newick_node** nodeArray,int* node_depths,int depth,int num_nodes);
 void get_job_node_indices(int* jobNodeIndexArray, newick_node** nodeArray, int* node_depths, int depth, int num_nodes);
 void get_job_counts(int *node_depths, int depth, int num_nodes);
+int * get_parents(newick_node *root, newick_node** nodeArray, int num_nodes);
+void populate_parents(newick_node *node, newick_node** nodeArray, int * parents, int num_nodes);
 extern char* strip_quotes(char *taxon);
 #endif
 

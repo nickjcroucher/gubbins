@@ -217,7 +217,7 @@ void populate_parents(newick_node *node, newick_node** nodeArray, int * parents,
 }
 
 // Function to initialize the parents list and call the recursive function
-int **get_parents(newick_node *root, newick_node** nodeArray, int num_nodes) {
+int * get_parents(newick_node *root, newick_node** nodeArray, int num_nodes) {
 
     // Initialise parent node array
     int * parents = calloc(num_nodes,sizeof(int));
@@ -229,15 +229,6 @@ int **get_parents(newick_node *root, newick_node** nodeArray, int num_nodes) {
 
     // Populate the parents list recursively
     populate_parents(root, nodeArray, parents, num_nodes);
-
-    // Set root parent to NULL
-    for (int i = 0; i < num_nodes; i++) {
-        if (parents[i] == -1)
-        {
-            parents[i] = NULL;
-            break;
-        }
-    }
   
     return parents;
 }
@@ -426,17 +417,20 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
       {
         int node_index = jobNodeIndexArray[node_num_index];
         int parent_node_index = parents[node_index];
-        fill_in_recombinations_with_gaps(nodeArray,
-                                         node_index,
-                                         parent_node_index,
-                                         parent_recombinations_array,
-                                         parent_num_recombinations_array,
-                                         current_total_snps_array,
-                                         num_blocks_array,
-                                         nodeArray[node_index]->block_coordinates,
-                                         length_of_original_genome,
-                                         snp_locations,
-                                         number_of_snps);
+        if (parent_node_index > -1)
+        {
+          fill_in_recombinations_with_gaps(nodeArray,
+                                           node_index,
+                                           parent_node_index,
+                                           parent_recombinations_array,
+                                           parent_num_recombinations_array,
+                                           current_total_snps_array,
+                                           num_blocks_array,
+                                           nodeArray[node_index]->block_coordinates,
+                                           length_of_original_genome,
+                                           snp_locations,
+                                           number_of_snps);
+        }
       }
   }
   

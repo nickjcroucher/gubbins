@@ -92,7 +92,7 @@ int test_bases_in_recombinations(int block_size)
 	block_coords[1][3] = 15;
 	char * child_sequence      = "AAAAAAAAATAA";
 	int snp_locations[12] = {1,2,3,5,7,10,11,15,20,30,100,110};
-	return calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,12);
+	return calculate_number_of_bases_in_recombinations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,12);
 }
 
 int test_bases_in_recombinations_with_gaps(int block_size)
@@ -111,7 +111,7 @@ int test_bases_in_recombinations_with_gaps(int block_size)
 	block_coords[1][3] = 15;
 	char * child_sequence      =  "--A---AAAAAAAAAAAAAT";
 	int snp_locations[16] = {1,4,5,6,7,8,9,10,11,15,20,30,40,50,100,110};
-	return calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,16);
+	return calculate_number_of_bases_in_recombinations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,16);
 }
 
 

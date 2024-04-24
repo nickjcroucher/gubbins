@@ -176,6 +176,72 @@ int max_distance_to_tips(newick_node *root) {
     return max_distance;
 }
 
+// Recursive function to traverse the tree and populate the parents list
+void populate_parents(newick_node *node, newick_node** nodeArray, int * parents, int num_nodes) {
+    
+    // Get index of parent
+    int parent_index;
+    for (int i = 0; i < num_nodes; ++i)
+    {
+      if (nodeArray[i]->taxon == node->taxon)
+      {
+        parent_index = i;
+        break;
+      }
+    }
+
+    // Get indices of children
+    if (node->child != NULL) {
+        newick_child *child = node->child;
+        while (child != NULL) {
+            for (int j = 0; j < num_nodes; ++j)
+            {
+              if (nodeArray[j]->taxon == child->node->taxon)
+              {
+                parents[j] = parent_index;
+                break;
+              }
+            }
+            child = child->next;
+        }
+    }
+
+    // Recursively traverse child nodes
+    if (node->child != NULL) {
+        newick_child *child = node->child;
+        while (child != NULL) {
+            populate_parents(child->node, nodeArray, parents, num_nodes);
+            child = child->next;
+        }
+    }
+}
+
+// Function to initialize the parents list and call the recursive function
+int **get_parents(newick_node *root, newick_node** nodeArray, int num_nodes) {
+
+    // Initialise parent node array
+    int * parents = calloc(num_nodes,sizeof(int));
+  
+    // Initialize all elements to NULL
+    for (int i = 0; i < num_nodes; i++) {
+        parents[i] = -1;
+    }
+
+    // Populate the parents list recursively
+    populate_parents(root, nodeArray, parents, num_nodes);
+
+    // Set root parent to NULL
+    for (int i = 0; i < num_nodes; i++) {
+        if (parents[i] == -1)
+        {
+            parents[i] = NULL;
+            break;
+        }
+    }
+  
+    return parents;
+}
+
 newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads)
 {
 	int iLen, iMaxLen;
@@ -253,6 +319,9 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
     nodeArray[i] = (newick_node*)seqMalloc(sizeof(newick_node));
   }
   fill_nodeArray(current_node,nodeArray,num_nodes);
+  
+  // get parent of each node
+  int * parents = get_parents(root, nodeArray, num_nodes);
   
   // get depths of each node from tips
   int max_depth = max_distance_to_tips(root);
@@ -356,11 +425,14 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
       for (int node_num_index = 0; node_num_index < num_jobs; ++node_num_index)
       {
         int node_index = jobNodeIndexArray[node_num_index];
-        fill_in_recombinations_with_gaps(nodeArray[node_index],
-                                         parent_recombinations_array[node_index],
-                                         parent_num_recombinations_array[node_index],
-                                         current_total_snps_array[node_index],
-                                         num_blocks_array[node_index],
+        int parent_node_index = parents[node_index];
+        fill_in_recombinations_with_gaps(nodeArray,
+                                         node_index,
+                                         parent_node_index,
+                                         parent_recombinations_array,
+                                         parent_num_recombinations_array,
+                                         current_total_snps_array,
+                                         num_blocks_array,
                                          nodeArray[node_index]->block_coordinates,
                                          length_of_original_genome,
                                          snp_locations,
@@ -368,9 +440,19 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
       }
   }
   
-  // Free arrays
+  // Free gaps arrays
+  free(parent_num_recombinations_array);
+  free(current_total_snps_array);
+  free(num_blocks_array);
+  for (int i = 0; i < num_nodes; ++i) {
+    free(parent_recombinations_array[i]);
+  }
+  free(parent_recombinations_array);
+  
+  // Free general arrays
   free(nodeArray);
   free(node_depths);
+  free(parents);
   
 	fclose(block_file_pointer);
 	fclose(gff_file_pointer);

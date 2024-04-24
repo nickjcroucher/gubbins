@@ -105,19 +105,17 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinations, int parent_num_recombinations, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations, int number_of_snps )
+void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, int parent_node_index, int ** parent_recombinations, int * parent_num_recombinations, int * current_total_snps, int * num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations, int number_of_snps)
 {
-	newick_child *child;
-	int * current_recombinations;
-	int num_current_recombinations = 0 ;
+	newick_node * root = nodeArray[node_index];
 	char * child_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
 	
-	current_recombinations = (int *) calloc((root->num_recombinations+1+parent_num_recombinations),sizeof(int));
-	num_current_recombinations = copy_and_concat_integer_arrays(root->recombinations,
+  parent_recombinations[node_index] = (int *) calloc((root->num_recombinations+1+parent_num_recombinations[parent_node_index]),sizeof(int));
+  parent_num_recombinations[node_index] = copy_and_concat_integer_arrays(root->recombinations,
                                                                 root->num_recombinations,
-                                                                parent_recombinations,
-                                                                parent_num_recombinations,
-                                                                current_recombinations);
+                                                                parent_recombinations[parent_node_index],
+                                                                parent_num_recombinations[parent_node_index],
+                                                                parent_recombinations[node_index]);
 	
  	// overwrite the bases of snps with N's
  	int i;
@@ -129,50 +127,60 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	
 	get_sequence_for_sample_name(child_sequence, root->taxon);
 	int genome_length_excluding_blocks_and_gaps = calculate_genome_length_excluding_blocks_and_gaps(child_sequence,
-                                                                                                    length_of_original_genome,
-                                                                                                    current_block_coordinates,
-                                                                                                    num_blocks);
+                                                                                                  length_of_original_genome,
+                                                                                                  current_block_coordinates,
+                                                                                                  num_blocks[parent_node_index]);
 	
 	set_genome_length_excluding_blocks_and_gaps_for_sample(root->taxon,
                                                            genome_length_excluding_blocks_and_gaps);
 	
+  // Merge block coordinates putting most recent blocks first
 	int ** merged_block_coordinates;
 	merged_block_coordinates = (int **) calloc(3,sizeof(int *));
-	merged_block_coordinates[0] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
-	merged_block_coordinates[1] = (int*) calloc((num_blocks + root->number_of_blocks+1),sizeof(int ));
+	merged_block_coordinates[0] = (int*) calloc((num_blocks[parent_node_index] + root->number_of_blocks+1),sizeof(int ));
+	merged_block_coordinates[1] = (int*) calloc((num_blocks[parent_node_index] + root->number_of_blocks+1),sizeof(int ));
 	copy_and_concat_2d_integer_arrays(current_block_coordinates,
-                                      num_blocks,
+                                      num_blocks[parent_node_index],
                                       root->block_coordinates,
                                       root->number_of_blocks,
                                       merged_block_coordinates
                                       );
 	
+  // Set the number of recombination blocks for the sample
 	set_number_of_blocks_for_sample(root->taxon, root->number_of_blocks);
-    set_number_of_branch_bases_in_recombinations(root->taxon,
+  
+  // Set number of branch bases in recombination by iterating through
+  // the first part of merged blocks (i.e. only blocks on the branch to this node)
+  set_number_of_branch_bases_in_recombinations(root->taxon,
                                                  calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates,
                                                                                                           root->number_of_blocks,
                                                                                                           child_sequence,
                                                                                                           snp_locations,
-                                                                                                          current_total_snps)
+                                                                                                          current_total_snps[parent_node_index])
+//                                                                                                          root->number_of_snps)
                                                  );
+//  current_total_snps[node_index] = current_total_snps[parent_node_index] + root->number_of_snps; // restore?
+  // Set number of total bases in recombination by iterating through
+  // all merged blocks leading to this node
  	set_number_of_bases_in_recombinations(root->taxon,
                                           calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates,
-                                                                                                   (num_blocks + root->number_of_blocks),
+                                                                                                   (num_blocks[parent_node_index] + root->number_of_blocks),
                                                                                                    child_sequence,
                                                                                                    snp_locations,
-                                                                                                   current_total_snps)
+                                                                                                   current_total_snps[parent_node_index])
+//                                                                                                   current_total_snps[node_index])
                                           );
 	free(child_sequence); 	
 
- 	for(i = 0; i < num_current_recombinations; i++)
+ 	for(i = 0; i < parent_num_recombinations[node_index]; i++)
  	{
- 		update_sequence_base('N', sequence_index, current_recombinations[i]);
+ 		update_sequence_base('N', sequence_index, parent_recombinations[node_index][i]);
  	}
 
     // TODO: The stats for the number of snps in recombinations will need to be updated.
 	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
 	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates,
-                                                                                                     (num_blocks + root->number_of_blocks),
+                                                                                                     (num_blocks[parent_node_index] + root->number_of_blocks),
                                                                                                      snp_locations,
                                                                                                      number_of_snps,
                                                                                                      snps_in_recombinations);
@@ -187,6 +195,9 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	{
 //		child = root->child;
 		set_internal_node(1,sequence_index);
+    // Update number of SNPs
+    current_total_snps[node_index] = current_total_snps[parent_node_index] + root->number_of_snps;
+    num_blocks[node_index] = num_blocks[parent_node_index] + root->number_of_blocks;
 
 //		while (child != NULL)
 //		{
@@ -208,7 +219,6 @@ void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinat
 	{
         set_internal_node(0,sequence_index);
 	}
-	free(current_recombinations);
 	free(merged_block_coordinates[0]);
 	free(merged_block_coordinates[1]);
 	free(merged_block_coordinates);

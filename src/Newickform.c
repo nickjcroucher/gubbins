@@ -407,12 +407,11 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   
   // Iterate from root to tips to record statistics and mask recombined sequence
   for (int depth = max_depth; depth >= 0; --depth) {
-      
       // Identify number of nodes at the current depth
       int num_jobs = get_job_counts(node_depths,depth,num_nodes);
       int * jobNodeIndexArray = malloc(num_jobs * sizeof(int));
       get_job_node_indices(jobNodeIndexArray,nodeArray,node_depths,depth,num_nodes);
-      
+      printf("Depth is %d, num jobs is %d\n",depth,num_jobs);
       for (int node_num_index = 0; node_num_index < num_jobs; ++node_num_index)
       {
         int node_index = jobNodeIndexArray[node_num_index];

@@ -105,21 +105,12 @@ int get_list_of_snp_indices_which_fall_in_downstream_recombinations(int ** curre
 
 
 // Go through the tree and build up the recombinations list from root to branch. Print out each sample name and a list of recombinations
-void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, int parent_node_index, int ** current_recombinations, int * num_recombinations, int * current_total_snps, int * num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations, int number_of_snps)
+void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, int parent_node_index, int ** current_recombinations, int * num_recombinations, int * current_total_snps, int * num_blocks, int length_of_original_genome,int * snp_locations, int number_of_snps)
 {
 	
   // Define the relevant tree nodes
   newick_node * node = nodeArray[node_index];
-  newick_node * parent = nodeArray[parent_node_index];
-	
-  // Identify the recombinations leading to this node from the root
-  current_recombinations[node_index] = (int *) calloc((node->num_recombinations+1+num_recombinations[parent_node_index]),sizeof(int));
-  num_recombinations[node_index] = copy_and_concat_integer_arrays(node->recombinations,
-                                                                  node->num_recombinations,
-                                                                  current_recombinations[parent_node_index],
-                                                                  num_recombinations[parent_node_index],
-                                                                  current_recombinations[node_index]);
-	
+  
  	// overwrite the bases of snps with N's
  	int i;
  	int sequence_index;
@@ -129,108 +120,113 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
  	set_number_of_recombinations_for_sample(node->taxon,node->num_recombinations);
  	set_number_of_snps_for_sample(node->taxon,node->number_of_snps);
 	
-  // Get parental sequence
-  char * node_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
-	get_sequence_for_sample_name(node_sequence, node->taxon);
-	int genome_length_excluding_blocks_and_gaps = calculate_genome_length_excluding_blocks_and_gaps(node_sequence,
-                                                                                                  length_of_original_genome,
-                                                                                                  current_block_coordinates,
-                                                                                                  num_blocks[parent_node_index]);
-	
-	set_genome_length_excluding_blocks_and_gaps_for_sample(node->taxon,
-                                                           genome_length_excluding_blocks_and_gaps);
-	
-  // Merge block coordinates putting most recent blocks first
-	int ** merged_block_coordinates;
-	merged_block_coordinates = (int **) calloc(3,sizeof(int *));
-	merged_block_coordinates[0] = (int*) calloc((num_blocks[parent_node_index] + node->number_of_blocks+1),sizeof(int ));
-	merged_block_coordinates[1] = (int*) calloc((num_blocks[parent_node_index] + node->number_of_blocks+1),sizeof(int ));
-	copy_and_concat_2d_integer_arrays(current_block_coordinates,
-                                      num_blocks[parent_node_index],
-                                      node->block_coordinates,
-                                      node->number_of_blocks,
-                                      merged_block_coordinates
-                                      );
-	
-  // Set the number of recombination blocks for the sample
-	set_number_of_blocks_for_sample(node->taxon, node->number_of_blocks);
-  
-  // Set number of branch bases in recombination by iterating through
-  // the first part of merged blocks (i.e. only blocks on the branch to this node)
-  set_number_of_branch_bases_in_recombinations(node->taxon,
-                                                 calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates,
-                                                                                                          node->number_of_blocks,
-                                                                                                          node_sequence,
-                                                                                                          snp_locations,
-                                                                                                          current_total_snps[parent_node_index])
-//                                                                                                          root->number_of_snps)
-                                                 );
-//  current_total_snps[node_index] = current_total_snps[parent_node_index] + root->number_of_snps; // restore?
-  // Set number of total bases in recombination by iterating through
-  // all merged blocks leading to this node
- 	set_number_of_bases_in_recombinations(node->taxon,
-                                          calculate_number_of_bases_in_recombations_excluding_gaps(merged_block_coordinates,
-                                                                                                   (num_blocks[parent_node_index] + node->number_of_blocks),
-                                                                                                   node_sequence,
-                                                                                                   snp_locations,
-                                                                                                   current_total_snps[parent_node_index])
-//                                                                                                   current_total_snps[node_index])
+  // Set root-specific values
+  if (parent_node_index == -1)
+  {
+      set_number_of_bases_in_recombinations(node->taxon,0);
+      set_number_of_branch_bases_in_recombinations(node->taxon,0);
+      set_internal_node(1,sequence_index);
+      set_genome_length_excluding_blocks_and_gaps_for_sample(node->taxon,
+                                                             length_of_original_genome);
+  }
+  else
+  {
+      
+      // Get parental sequence
+      newick_node * parent = nodeArray[parent_node_index];
+      char * node_sequence = (char *) calloc((length_of_original_genome +1),sizeof(char));
+      get_sequence_for_sample_name(node_sequence, node->taxon);
+    
+      // Calculate clonal frame remaining at the parental node
+      int ** current_block_coordinates = parent->block_coordinates;
+      int genome_length_excluding_blocks_and_gaps = calculate_genome_length_excluding_blocks_and_gaps(node_sequence,
+                                                                                                      length_of_original_genome,
+                                                                                                      current_block_coordinates,
+                                                                                                      num_blocks[parent_node_index]);
+      
+      set_genome_length_excluding_blocks_and_gaps_for_sample(node->taxon,
+                                                               genome_length_excluding_blocks_and_gaps);
+      
+      // Identify the recombinations leading to this node from the root
+      current_recombinations[node_index] = (int *) calloc((node->num_recombinations+1+num_recombinations[parent_node_index]),sizeof(int));
+      num_recombinations[node_index] = copy_and_concat_integer_arrays(node->recombinations,
+                                                                      node->num_recombinations,
+                                                                      current_recombinations[parent_node_index],
+                                                                      num_recombinations[parent_node_index],
+                                                                      current_recombinations[node_index]);
+      
+      // Merge block coordinates putting most recent blocks first
+      int ** merged_block_coordinates;
+      merged_block_coordinates = (int **) calloc(3,sizeof(int *));
+      merged_block_coordinates[0] = (int*) calloc((num_blocks[parent_node_index] + node->number_of_blocks+1),sizeof(int ));
+      merged_block_coordinates[1] = (int*) calloc((num_blocks[parent_node_index] + node->number_of_blocks+1),sizeof(int ));
+      copy_and_concat_2d_integer_arrays(node->block_coordinates,
+                                        node->number_of_blocks,
+                                        current_block_coordinates,
+                                          num_blocks[parent_node_index],
+                                          merged_block_coordinates
                                           );
-	free(node_sequence);
+      
+      // Set the number of recombination blocks for the sample
+      set_number_of_blocks_for_sample(node->taxon, node->number_of_blocks);
+      
+      // Set number of branch bases in recombination by iterating through
+      // the first part of merged blocks (i.e. only blocks on the branch to this node)
+      set_number_of_branch_bases_in_recombinations(node->taxon,
+                                                     calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
+                                                                                                                node->number_of_blocks,
+                                                                                                                node_sequence,
+                                                                                                                snp_locations,
+                                                                                                                node->num_recombinations + node->number_of_snps)
+                                                     );
 
- 	for(i = 0; i < num_recombinations[node_index]; i++)
- 	{
- 		update_sequence_base('N', sequence_index, current_recombinations[node_index][i]);
- 	}
+      // Set number of total bases in recombination by iterating through
+      // all merged blocks leading to this node
+      set_number_of_bases_in_recombinations(node->taxon,
+                                              calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
+                                                                                                         (num_blocks[parent_node_index] + node->number_of_blocks),
+                                                                                                         node_sequence,
+                                                                                                         snp_locations,
+                                                                                                         current_total_snps[parent_node_index] + node->num_recombinations + node->number_of_snps)
+                                              );
+      free(node_sequence);
 
-    // TODO: The stats for the number of snps in recombinations will need to be updated.
-	int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
-	int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates,
-                                                                                                     (num_blocks[parent_node_index] + node->number_of_blocks),
-                                                                                                     snp_locations,
-                                                                                                     number_of_snps,
-                                                                                                     snps_in_recombinations);
+      for(i = 0; i < num_recombinations[node_index]; i++)
+      {
+        update_sequence_base('N', sequence_index, current_recombinations[node_index][i]);
+      }
 
- 	for(i = 0; i < num_snps_in_recombinations; i++)
- 	{
- 		update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
- 	}
-	free(snps_in_recombinations); 	
+        // TODO: The stats for the number of snps in recombinations will need to be updated.
+      int * snps_in_recombinations = (int *) calloc((number_of_snps +1),sizeof(int));
+      int num_snps_in_recombinations = get_list_of_snp_indices_which_fall_in_downstream_recombinations(merged_block_coordinates,
+                                                                                                         (num_blocks[parent_node_index] + node->number_of_blocks),
+                                                                                                         snp_locations,
+                                                                                                         number_of_snps,
+                                                                                                         snps_in_recombinations);
 
-	if (node->childNum > 0)
-	{
-//		child = root->child;
-		set_internal_node(1,sequence_index);
-    // Update number of SNPs
-    current_total_snps[node_index] = current_total_snps[parent_node_index] + node->number_of_snps;
-    num_blocks[node_index] = num_blocks[parent_node_index] + node->number_of_blocks;
+      for(i = 0; i < num_snps_in_recombinations; i++)
+      {
+        update_sequence_base('N', sequence_index, snps_in_recombinations[i]);
+      }
+      free(snps_in_recombinations);
 
-//		while (child != NULL)
-//		{
-//			fill_in_recombinations_with_gaps(child->node,
-//                                             current_recombinations,
-//                                             num_current_recombinations,
-//                                             (current_total_snps + root->number_of_snps),
-//                                             (num_blocks + root->number_of_blocks),
-//                                             merged_block_coordinates,
-//                                             length_of_original_genome,
-//                                             snp_locations,
-//                                             number_of_snps
-//                                             );
-//			child = child->next;
-//
-//		}
-	}
-	else
-	{
-        set_internal_node(0,sequence_index);
-	}
-	free(merged_block_coordinates[0]);
-	free(merged_block_coordinates[1]);
-	free(merged_block_coordinates);
+      if (node->childNum > 0)
+      {
+        set_internal_node(1,sequence_index);
+        // Update number of SNPs
+        current_total_snps[node_index] = current_total_snps[parent_node_index] + node->num_recombinations + node->number_of_snps;
+        num_blocks[node_index] = num_blocks[parent_node_index] + node->number_of_blocks;
+        nodeArray[node_index]->block_coordinates = merged_block_coordinates;
+      }
+      else
+      {
+            set_internal_node(0,sequence_index);
+      }
+  }
+
 }
 
-int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int current_total_snps)
+int calculate_number_of_bases_in_recombinations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int current_total_snps)
 {
 	int total_bases = 0;
 	int current_block = 1;
@@ -279,17 +275,15 @@ int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordi
 	}
 	for(start_block = 0; start_block < num_blocks; start_block++)
 	{
-		if(block_coordinates[0][start_block] == -1 || block_coordinates[1][start_block] == -1)
+		if(block_coordinates[0][start_block] != -1 && block_coordinates[1][start_block] != -1)
 		{
-			continue;
-		}
-		
-		
-	  total_bases += calculate_block_size_without_gaps(child_sequence,
+      total_bases += calculate_block_size_without_gaps(child_sequence,
                                                        snp_locations,
                                                        block_coordinates[0][start_block],
                                                        block_coordinates[1][start_block],
                                                        current_total_snps);
+		}
+    
   }
 	
 	return total_bases;

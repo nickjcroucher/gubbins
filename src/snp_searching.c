@@ -211,7 +211,7 @@ int calculate_block_size_without_gaps(char * child_sequence, int * snp_locations
 int calculate_block_size_without_gaps_with_start_end_index(char * child_sequence, int * snp_locations, int starting_coordinate, int ending_coordinate, int current_snp_count, int start_index,int end_index)
 {
 	int i;
-	int block_size = ending_coordinate - starting_coordinate;
+	int block_size = ending_coordinate - starting_coordinate + 1; // start and end coordinate are inclusive as they mark the bounding SNPs
 	start_index = find_starting_index( starting_coordinate, snp_locations,start_index, end_index);
 	
 	for(i = start_index; i < current_snp_count ; i++)

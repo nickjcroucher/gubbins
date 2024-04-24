@@ -390,16 +390,16 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
   }
   
   // Define data structures needed to record statistics and mask recombined sequence
-  int ** parent_recombinations_array = calloc(num_nodes,sizeof(int*));
+  int ** recombinations_array = calloc(num_nodes,sizeof(int*));
   for (int i = 0; i < num_nodes; ++i) {
-    parent_recombinations_array[i] = NULL;
+    recombinations_array[i] = NULL;
   }
-  int * parent_num_recombinations_array = calloc(num_nodes,sizeof(int));
+  int * num_recombinations_array = calloc(num_nodes,sizeof(int));
   int * current_total_snps_array = calloc(num_nodes,sizeof(int));
   int * num_blocks_array = calloc(num_nodes,sizeof(int));
   for (int i = 0; i < num_nodes; ++i)
   {
-    parent_num_recombinations_array[i] = 0;
+    num_recombinations_array[i] = 0;
     current_total_snps_array[i] = 0;
     num_blocks_array[i] = 0;
   }
@@ -411,36 +411,28 @@ newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp
       int num_jobs = get_job_counts(node_depths,depth,num_nodes);
       int * jobNodeIndexArray = malloc(num_jobs * sizeof(int));
       get_job_node_indices(jobNodeIndexArray,nodeArray,node_depths,depth,num_nodes);
-      printf("Depth is %d, num jobs is %d\n",depth,num_jobs);
       for (int node_num_index = 0; node_num_index < num_jobs; ++node_num_index)
       {
         int node_index = jobNodeIndexArray[node_num_index];
         int parent_node_index = parents[node_index];
-        if (parent_node_index > -1)
-        {
-          fill_in_recombinations_with_gaps(nodeArray,
-                                           node_index,
-                                           parent_node_index,
-                                           parent_recombinations_array,
-                                           parent_num_recombinations_array,
-                                           current_total_snps_array,
-                                           num_blocks_array,
-                                           nodeArray[node_index]->block_coordinates,
-                                           length_of_original_genome,
-                                           snp_locations,
-                                           number_of_snps);
-        }
+        fill_in_recombinations_with_gaps(nodeArray,
+                                         node_index,
+                                         parent_node_index,
+                                         recombinations_array,
+                                         num_recombinations_array,
+                                         current_total_snps_array,
+                                         num_blocks_array,
+                                         length_of_original_genome,
+                                         snp_locations,
+                                         number_of_snps);
       }
   }
   
   // Free gaps arrays
-  free(parent_num_recombinations_array);
+  free(num_recombinations_array);
   free(current_total_snps_array);
   free(num_blocks_array);
-  for (int i = 0; i < num_nodes; ++i) {
-    free(parent_recombinations_array[i]);
-  }
-  free(parent_recombinations_array);
+  free(recombinations_array);
   
   // Free general arrays
   free(nodeArray);

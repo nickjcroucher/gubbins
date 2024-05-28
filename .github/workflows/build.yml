@@ -16,9 +16,9 @@ jobs:
           python-version: 3.9
       - name: Set up miniconda
         uses: conda-incubator/setup-miniconda@v3
-          with:
-            auto-update-conda: true
-            python-version: 3.9
+        with:
+          auto-update-conda: true
+          python-version: 3.9
       - name: Install dependencies with conda
         run: |
             sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml

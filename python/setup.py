@@ -22,6 +22,7 @@ setuptools.setup(
         'scripts/gubbins_alignment_checker.py',
         'scripts/generate_files_for_clade_analysis.py',
         'scripts/count_recombinations_per_gene.py',
+        'scripts/extract_recombinant_sequences.py',
         '../R/scripts/plot_gubbins.R'
     ],
     tests_require=[

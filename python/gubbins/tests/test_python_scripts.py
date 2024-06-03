@@ -7,6 +7,7 @@ Testing the python scripts work
 
 import unittest
 import os
+import shutil
 import subprocess
 import hashlib
 import glob
@@ -143,6 +144,17 @@ class TestPythonScripts(unittest.TestCase):
         subprocess.check_call(rec_count_cmd, shell=True)
         assert self.md5_check(out_tab, check_tab)
         os.remove(out_tab)
+
+    # Test clade file extraction script
+    def test_extract_recombination_sequences(self):
+        multiple_aln = os.path.join(data_dir, "multiple_recombinations.aln")
+        multiple_gff = os.path.join(data_dir, "multiple_recombinations_gubbins.recombination_predictions.gff")
+        out_dir = os.path.join(data_dir, "test_loci")
+        rec_count_cmd = "extract_recombinant_sequences.py --aln " + multiple_aln + " --gff " + multiple_gff + " --out-dir " + out_dir
+        subprocess.check_call(rec_count_cmd, shell=True)
+        file_count = int(subprocess.run('ls -1 ' + out_dir + ' | wc -l', shell = True, stdout=subprocess.PIPE).stdout.decode('utf-8').rstrip())
+        assert file_count > 1
+        shutil.rmtree(out_dir)
 
     # Test plotting script (an R exception)
     def test_recombination_counting_per_gene(self):

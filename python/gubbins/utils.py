@@ -121,7 +121,8 @@ def choose_executable_based_on_processor(list_of_executables: list):
     for executable in list_of_executables:
         if cpu_info and 'AVX2' in executable and 'avx2' in flags and which(executable):
             break
-        elif cpu_info and 'AVX' in executable and 'avx' in flags and which(executable):
+        elif cpu_info and ('AVX' in executable and 'AVX2' not in executable)\
+              and ('avx' in flags and 'avx2' not in flags) and which(executable):
             break
         elif cpu_info and 'SSE3' in executable and 'sse3' in flags and which(executable):
             break

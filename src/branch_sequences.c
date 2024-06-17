@@ -123,8 +123,10 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
   // Set root-specific values
   if (parent_node_index == -1)
   {
-      set_number_of_bases_in_recombinations(sequence_index,0);
-      set_number_of_branch_bases_in_recombinations(sequence_index,0);
+      for (int include_gaps = 0; include_gaps <= 1; ++include_gaps) {
+        set_number_of_bases_in_recombinations(sequence_index,0,include_gaps);
+        set_number_of_branch_bases_in_recombinations(sequence_index,0,include_gaps);
+      }
       set_internal_node(1,sequence_index);
       set_genome_length_excluding_blocks_and_gaps_for_sample(sequence_index,
                                                              length_of_original_genome);
@@ -172,25 +174,31 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
       
       // Set number of branch bases in recombination by iterating through
       // the first part of merged blocks (i.e. only blocks on the branch to this node)
-      set_number_of_branch_bases_in_recombinations(sequence_index,
-                                                     calculate_number_of_bases_in_recombinations(merged_block_coordinates,
-                                                                                                  node->number_of_blocks,
-                                                                                                  node_sequence,
-                                                                                                  snp_locations,
-                                                                                                  number_of_snps,
-                                                                                                  0)
-                                                     );
+      for (int include_gaps = 0; include_gaps <= 1; ++include_gaps) {
+        set_number_of_branch_bases_in_recombinations(sequence_index,
+                                                       calculate_number_of_bases_in_recombinations(merged_block_coordinates,
+                                                                                                    node->number_of_blocks,
+                                                                                                    node_sequence,
+                                                                                                    snp_locations,
+                                                                                                    number_of_snps,
+                                                                                                   include_gaps),
+                                                       include_gaps
+                                                    );
+      }
 
       // Set number of total bases in recombination by iterating through
       // all merged blocks leading to this node
-      set_number_of_bases_in_recombinations(sequence_index,
-                                              calculate_number_of_bases_in_recombinations(merged_block_coordinates,
-                                                                                           (num_blocks[parent_node_index] + node->number_of_blocks),
-                                                                                           node_sequence,
-                                                                                           snp_locations,
-                                                                                           number_of_snps,
-                                                                                           0)
+      for (int include_gaps = 0; include_gaps <= 1; ++include_gaps) {
+        set_number_of_bases_in_recombinations(sequence_index,
+                                                calculate_number_of_bases_in_recombinations(merged_block_coordinates,
+                                                                                             (num_blocks[parent_node_index] + node->number_of_blocks),
+                                                                                             node_sequence,
+                                                                                             snp_locations,
+                                                                                             number_of_snps,
+                                                                                             include_gaps),
+                                                include_gaps
                                               );
+      }
       free(node_sequence);
 
       for(i = 0; i < num_recombinations[node_index]; i++)

@@ -35,25 +35,27 @@ void create_tree_statistics_file(char filename[], sample_statistics ** statistic
 	char extension[7] = {".stats"};
 	concat_strings_created_with_malloc(base_filename,extension);
 	file_pointer = fopen(base_filename, "w");
-	fprintf( file_pointer, "Node\tTotal SNPs\tNumber of SNPs Inside Recombinations\tNumber of SNPs Outside Recombinations\tNumber of Recombination Blocks\tBases in Recombinations\tCumulative Bases in Recombinations\tr/m\trho/theta\tGenome Length\tBases in Clonal Frame\n");
+	fprintf( file_pointer, "Node\tTotal SNPs\tNumber of SNPs Inside Recombinations\tNumber of SNPs Outside Recombinations\tNumber of Recombination Blocks\tBases in Recombinations Including Gaps\tCumulative Bases in Recombinations Including Gaps\tBases in Recombinations Excluding Gaps\tCumulative Bases in Recombinations Excluding Gaps\tr/m\trho/theta\tGenome Length\tBases in Clonal Frame\n");
 
 	for(sample_counter=0; sample_counter< number_of_samples; sample_counter++)
 	{
 		sample_statistics * sample_details = ((sample_statistics *) statistics_for_samples[sample_counter]);
 		fprintf( file_pointer, "%s\t", sample_details->sample_name);
-    	fprintf( file_pointer, "%i\t", (sample_details->number_of_recombinations + sample_details->number_of_snps));    
-   	 	fprintf( file_pointer, "%i\t", sample_details->number_of_recombinations);
-    	fprintf( file_pointer, "%i\t", (sample_details->number_of_snps));
-    	fprintf( file_pointer, "%i\t", sample_details->number_of_blocks);
-        fprintf( file_pointer, "%i\t", sample_details->branch_bases_in_recombinations);
-    	fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations);
-    	fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
+    fprintf( file_pointer, "%i\t", (sample_details->number_of_recombinations + sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", sample_details->number_of_recombinations);
+    fprintf( file_pointer, "%i\t", (sample_details->number_of_snps));
+    fprintf( file_pointer, "%i\t", sample_details->number_of_blocks);
+    fprintf( file_pointer, "%i\t", sample_details->branch_bases_in_recombinations_including_gaps);
+    fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations_including_gaps);
+    fprintf( file_pointer, "%i\t", sample_details->branch_bases_in_recombinations);
+    fprintf( file_pointer, "%i\t", sample_details->bases_in_recombinations);
+    fprintf( file_pointer, "%f\t", recombination_to_mutation_ratio(sample_details->number_of_recombinations, (sample_details->number_of_snps)));
 		fprintf( file_pointer, "%f\t", rho_theta(sample_details->number_of_blocks,sample_details->number_of_snps));
-    	fprintf( file_pointer, "%i\t", sample_details->genome_length_without_gaps);
+    fprintf( file_pointer, "%i\t", sample_details->genome_length_without_gaps);
 		fprintf( file_pointer, "%i", sample_details->genome_length_excluding_blocks_and_gaps);
 		fprintf( file_pointer, "\n");
 
-    	free(sample_details->sample_name);
+    free(sample_details->sample_name);
 		free(sample_details);
 	}
 	

@@ -27,6 +27,8 @@
    int number_of_snps;
    int genome_length_without_gaps;
    int number_of_blocks;
+   int bases_in_recombinations_including_gaps;
+   int branch_bases_in_recombinations_including_gaps;
    int bases_in_recombinations;
    int branch_bases_in_recombinations;
    int genome_length_excluding_blocks_and_gaps;
@@ -54,8 +56,8 @@ int get_internal_node(int sequence_index);
 void fill_in_unambiguous_bases_in_parent_from_children_where_parent_has_a_gap(int parent_sequence_index, int * child_sequence_indices, int num_children);
 void fill_in_unambiguous_gaps_in_parent_from_children(int parent_sequence_index, int * child_sequence_indices, int num_children);
 void freeup_memory(void);
-void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations);
-void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations);
+void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations, int include_gaps);
+void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations, int include_gaps);
 void filter_sequence_bases_and_rotate(char * reference_bases, char ** filtered_bases_for_snps, int number_of_filtered_snps);
 void set_genome_length_excluding_blocks_and_gaps_for_sample(int sample_index, int genome_length_excluding_blocks_and_gaps);
 

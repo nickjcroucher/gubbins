@@ -295,23 +295,34 @@ void set_genome_length_excluding_blocks_and_gaps_for_sample(int sample_index, in
 	((sample_statistics *) statistics_for_samples[sample_index])->genome_length_excluding_blocks_and_gaps = genome_length_excluding_blocks_and_gaps;
 }
 
-void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations)
+void set_number_of_branch_bases_in_recombinations(int sample_index, int bases_in_recombinations, int include_gaps)
 {
 
     if( sample_index == -1)
     {
         return;
     }
-    ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations = bases_in_recombinations;
+    
+    if (include_gaps > 0) {
+      ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations_including_gaps = bases_in_recombinations;
+    } else {
+      ((sample_statistics *) statistics_for_samples[sample_index])->branch_bases_in_recombinations = bases_in_recombinations;
+    }
 }
 
-void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations)
+void set_number_of_bases_in_recombinations(int sample_index, int bases_in_recombinations, int include_gaps)
 {
-    if( sample_index == -1)
-    {
-        return;
-    }
+  if( sample_index == -1)
+  {
+      return;
+  }
+  
+  if (include_gaps > 0) {
+    ((sample_statistics *) statistics_for_samples[sample_index])->bases_in_recombinations_including_gaps = bases_in_recombinations;
+  } else {
     ((sample_statistics *) statistics_for_samples[sample_index])->bases_in_recombinations = bases_in_recombinations;
+  }
+  
 }
 
 

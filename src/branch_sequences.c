@@ -173,21 +173,23 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
       // Set number of branch bases in recombination by iterating through
       // the first part of merged blocks (i.e. only blocks on the branch to this node)
       set_number_of_branch_bases_in_recombinations(sequence_index,
-                                                     calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
-                                                                                                                node->number_of_blocks,
-                                                                                                                node_sequence,
-                                                                                                                snp_locations,
-                                                                                                                number_of_snps)
+                                                     calculate_number_of_bases_in_recombinations(merged_block_coordinates,
+                                                                                                  node->number_of_blocks,
+                                                                                                  node_sequence,
+                                                                                                  snp_locations,
+                                                                                                  number_of_snps,
+                                                                                                  0)
                                                      );
 
       // Set number of total bases in recombination by iterating through
       // all merged blocks leading to this node
       set_number_of_bases_in_recombinations(sequence_index,
-                                              calculate_number_of_bases_in_recombinations_excluding_gaps(merged_block_coordinates,
-                                                                                                         (num_blocks[parent_node_index] + node->number_of_blocks),
-                                                                                                         node_sequence,
-                                                                                                         snp_locations,
-                                                                                                         number_of_snps)
+                                              calculate_number_of_bases_in_recombinations(merged_block_coordinates,
+                                                                                           (num_blocks[parent_node_index] + node->number_of_blocks),
+                                                                                           node_sequence,
+                                                                                           snp_locations,
+                                                                                           number_of_snps,
+                                                                                           0)
                                               );
       free(node_sequence);
 
@@ -226,7 +228,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
 
 }
 
-int calculate_number_of_bases_in_recombinations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int current_total_snps)
+int calculate_number_of_bases_in_recombinations(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations, int current_total_snps, int count_gaps)
 {
 	int total_bases = 0;
 	int current_block = 1;
@@ -277,11 +279,15 @@ int calculate_number_of_bases_in_recombinations_excluding_gaps(int ** block_coor
 	{
 		if(block_coordinates[0][start_block] != -1 && block_coordinates[1][start_block] != -1)
 		{
-      total_bases += calculate_block_size_without_gaps(child_sequence,
-                                                       snp_locations,
-                                                       block_coordinates[0][start_block],
-                                                       block_coordinates[1][start_block],
-                                                       current_total_snps);
+      if (count_gaps > 0) {
+        total_bases += (1 + block_coordinates[1][start_block] - block_coordinates[0][start_block]);
+      } else {
+        total_bases += calculate_block_size_without_gaps(child_sequence,
+                                                         snp_locations,
+                                                         block_coordinates[0][start_block],
+                                                         block_coordinates[1][start_block],
+                                                         current_total_snps);
+      }
 		}
     
   }

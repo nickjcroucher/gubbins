@@ -97,7 +97,7 @@ int test_bases_in_recombinations(int block_size)
 
 //int test_bases_in_recombinations_with_gaps(int block_size)
 //{
-//	int ** block_coords;  
+//	int ** block_coords;
 //	block_coords  = (int **) malloc(2*sizeof(int*));
 //	block_coords[0] = (int*) malloc((4)*sizeof(int ));
 //	block_coords[1] = (int*) malloc((4)*sizeof(int ));
@@ -139,15 +139,15 @@ int test_bases_in_recombinations(int block_size)
 //	ck_assert(test_bases_in_recombinations(3) == 23);
 //	ck_assert(test_bases_in_recombinations(2) == 17);
 //	ck_assert(test_bases_in_recombinations(1) == 6);
-//	
+//
 //	ck_assert(test_bases_in_recombinations_with_gaps(4) == 24);
 //	ck_assert(test_bases_in_recombinations_with_gaps(3) == 20);
 //	ck_assert(test_bases_in_recombinations_with_gaps(2) == 14);
 //	ck_assert(test_bases_in_recombinations_with_gaps(1) == 3);
-//  
+//
 //  ck_assert(test_bases_in_recombinations_with_gaps(4) < test_bases_in_recombinations_including_gaps(4));
 //  ck_assert(test_bases_in_recombinations(4) == test_bases_in_recombinations_including_gaps(4));
-//  
+//
 //}
 //END_TEST
 	
@@ -282,7 +282,7 @@ Suite * check_branch_sequences_suite (void)
   TCase *tc_branch_sequences = tcase_create ("excluding_recombinations");
 	tcase_add_test (tc_branch_sequences, check_exclude_snp_sites_in_block);
 	tcase_add_test (tc_branch_sequences, check_copy_and_concat_2d_integer_arrays);
-	tcase_add_test (tc_branch_sequences, check_calculate_number_of_bases_in_recombations);
+//	tcase_add_test (tc_branch_sequences, check_calculate_number_of_bases_in_recombations);
 	tcase_add_test (tc_branch_sequences, check_get_list_of_snp_indices_which_fall_in_downstream_recombinations);
 	tcase_add_test (tc_branch_sequences, check_get_list_of_snp_indices_which_fall_in_downstream_recombinations_single_block);
 	tcase_add_test (tc_branch_sequences, check_calculate_genome_length_clonal_frame_single_recomb);

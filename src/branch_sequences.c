@@ -177,7 +177,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
                                                                                                                 node->number_of_blocks,
                                                                                                                 node_sequence,
                                                                                                                 snp_locations,
-                                                                                                                node->num_recombinations + node->number_of_snps)
+                                                                                                                number_of_snps)
                                                      );
 
       // Set number of total bases in recombination by iterating through
@@ -187,7 +187,7 @@ void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, 
                                                                                                          (num_blocks[parent_node_index] + node->number_of_blocks),
                                                                                                          node_sequence,
                                                                                                          snp_locations,
-                                                                                                         current_total_snps[parent_node_index] + node->num_recombinations + node->number_of_snps)
+                                                                                                         number_of_snps)
                                               );
       free(node_sequence);
 

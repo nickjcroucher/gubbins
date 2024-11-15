@@ -289,7 +289,7 @@ class IQTree:
         self.citation = "https://doi.org/10.1093/molbev/msaa015"
 
         # Set parallelisation
-        command.extend(["-nt", str(self.threads)])
+        command.extend(["-T", str(self.threads)])
 
         # Add flags
         command.extend(["-safe","-redo"])

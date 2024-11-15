@@ -1,0 +1,20 @@
+Node	Total SNPs	Number of SNPs Inside Recombinations	Number of SNPs Outside Recombinations	Number of Recombination Blocks	Bases in Recombinations Including Gaps	Cumulative Bases in Recombinations Including Gaps	Bases in Recombinations Excluding Gaps	Cumulative Bases in Recombinations Excluding Gaps	r/m	rho/theta	Genome Length	Bases in Clonal Frame
+sequence_1	0	0	0	0	0	132	0	132	0.000000	0.000000	242	110
+sequence_2	1	0	1	0	0	166	0	166	0.000000	0.000000	242	76
+sequence_3	0	0	0	0	0	166	0	166	0.000000	0.000000	242	76
+sequence_4	1	0	1	0	0	166	0	166	0.000000	0.000000	242	76
+sequence_5	30	30	0	1	34	166	34	166	0.000000	0.000000	242	110
+sequence_6	0	0	0	0	0	132	0	132	0.000000	0.000000	242	110
+sequence_7	0	0	0	0	0	153	0	153	0.000000	0.000000	242	89
+sequence_8	0	0	0	0	0	153	0	153	0.000000	0.000000	242	89
+sequence_9	1	0	1	0	0	153	0	153	0.000000	0.000000	227	74
+sequence_10	0	0	0	0	0	0	0	0	0.000000	0.000000	227	227
+Node_1	0	0	0	0	0	153	0	153	0.000000	0.000000	242	89
+Node_2	22	21	1	1	21	153	21	153	21.000000	1.000000	242	110
+Node_3	1	0	1	0	0	132	0	132	0.000000	0.000000	242	110
+Node_4	0	0	0	0	0	132	0	132	0.000000	0.000000	242	110
+Node_5	0	0	0	0	0	166	0	166	0.000000	0.000000	242	76
+Node_6	32	30	2	1	34	166	34	166	15.000000	0.500000	242	110
+Node_7	1	0	1	0	0	132	0	132	0.000000	0.000000	242	110
+Node_8	180	132	48	1	132	132	132	132	2.750000	0.020833	242	242
+Node_9	0	0	0	0	0	0	0	0	0.000000	0.000000	242	242

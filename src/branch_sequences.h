@@ -21,7 +21,7 @@
 #define _BRANCH_SEQUENCES_H_
 #include "seqUtil.h"
 #include "Newickform.h"
-char *generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, char * leaf_sequence, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
+void generate_branch_sequences(newick_node *root, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome, FILE * block_file_pointer, FILE * gff_file_pointer,int min_snps, FILE * branch_snps_file_pointer, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int thread_index);
 void identify_recombinations(int number_of_branch_snps, int * branches_snp_sites,int length_of_original_genome);
 double calculate_snp_density(int * branches_snp_sites, int number_of_branch_snps, int index);
 void get_likelihood_for_windows(char * child_sequence, int current_num_snps, int * snp_site_coords, int branch_genome_size, int number_of_branch_snps, int * snp_locations, newick_node * current_node, FILE * block_file_pointer, newick_node *root, char * branch_snp_sequence, FILE * gff_file_pointer,int min_snps, int length_of_original_genome, char * original_sequence,int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
@@ -30,7 +30,7 @@ int calculate_window_size(int branch_genome_size, int number_of_branch_snps,int 
 double calculate_threshold(int branch_genome_size, int window_size, float uncorrected_p_value);
 int p_value_test(int branch_genome_size, int window_size, int num_branch_snps, int block_snp_count, int min_snps, float uncorrected_p_value);
 double reduce_factorial(int l, int i);
-void fill_in_recombinations_with_gaps(newick_node *root, int * parent_recombinations, int parent_num_recombinations, int current_total_snps,int num_blocks, int ** current_block_coordinates,int length_of_original_genome,int * snp_locations, int number_of_snps);
+void fill_in_recombinations_with_gaps(newick_node ** nodeArray, int node_index, int parent_node_index, int ** current_recombinations, int * num_recombinations, int * current_total_snps,int * num_blocks, int length_of_original_genome,int * snp_locations, int number_of_snps);
 int copy_and_concat_integer_arrays(int * array_1, int array_1_size, int * array_2, int array_2_size, int * output_array);
 int copy_and_concat_2d_integer_arrays(int ** array_1, int array_1_size, int ** array_2, int array_2_size, int ** output_array);
 double snp_density(int length_of_sequence, int number_of_snps);
@@ -38,7 +38,7 @@ int calculate_cutoff(int branch_genome_size, int window_size, int num_branch_snp
 int get_smallest_log_likelihood(double * candidate_blocks, int number_of_candidate_blocks);
 int exclude_snp_sites_in_block(int window_start_coordinate, int window_end_coordinate, int * snp_site_coords, int number_of_branch_snps);
 int flag_smallest_log_likelihood_recombinations(int ** candidate_blocks, int number_of_candidate_blocks, int number_of_branch_snps, int * snp_site_coords, int * recombinations, int number_of_recombinations,newick_node * current_node, FILE * block_file_pointer, newick_node *root,int * snp_locations, int total_num_snps, FILE * gff_file_pointer, double * block_likelihooods);
-int calculate_number_of_bases_in_recombations_excluding_gaps(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int current_total_snps);
+int calculate_number_of_bases_in_recombinations(int ** block_coordinates, int num_blocks,char * child_sequence, int * snp_locations,int current_total_snps, int count_gaps);
 void carry_unambiguous_gaps_up_tree(newick_node *root);
 void move_blocks_inwards_while_likelihood_improves(int number_of_blocks,int ** block_coordinates, int min_snps, int * snp_site_coords,  int number_of_branch_snps,char * branch_snp_sequence, int * snp_locations, int branch_genome_size,char * child_sequence, int length_of_sequence, double * block_likelihoods, int cutoff_value, float trimming_ratio);
 int get_blocks(int ** block_coordinates, int branch_genome_size,int * snp_site_coords,int number_of_branch_snps, int window_size, int cutoff, char * original_sequence, int * snp_locations, int number_of_snps);

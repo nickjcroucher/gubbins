@@ -533,7 +533,7 @@ plot_gubbins_recombination <- function(gubbins_rec,gubbins_tree, start_pos = NA,
     tidyr::unnest_longer(gene,
                          values_to = "Taxa") %>%
     dplyr::mutate(Taxa = factor(Taxa,
-                                levels = rev(get_taxa_name(gubbins_tree)))) %>%
+                                levels = rev(ggtree::get_taxa_name(gubbins_tree)))) %>%
     dplyr::mutate(length = end - start + 1) %>%
     dplyr::arrange(rev(length)) %>%
     dplyr::select(-length)
@@ -543,6 +543,16 @@ plot_gubbins_recombination <- function(gubbins_rec,gubbins_tree, start_pos = NA,
     trim_start(start_pos) %>%
     trim_end(end_pos)
   
+  # Get the number of taxa for selecting the line width
+  n_taxa <- length(ggtree::get_taxa_name(gubbins_tree))
+  rec_linewidth <-
+      dplyr::case_when(
+        n_taxa < 10 ~ 5,
+        n_taxa < 50 ~ 2,
+        n_taxa < 100 ~ 1.5,
+        TRUE ~ 1
+      )
+  
   # Plot recombination
   rec_plot <-
     ggplot(gubbins_rec,
@@ -551,7 +561,8 @@ plot_gubbins_recombination <- function(gubbins_rec,gubbins_tree, start_pos = NA,
                y = Taxa,
                yend = Taxa,
                colour = Colour)) +
-    geom_segment(alpha = 0.25) +
+    geom_segment(alpha = 0.5,
+                 linewidth = rec_linewidth) +
     scale_colour_manual(values = c("red" = "red",
                                    "blue" = "blue")) +
     scale_y_discrete(drop = FALSE) +

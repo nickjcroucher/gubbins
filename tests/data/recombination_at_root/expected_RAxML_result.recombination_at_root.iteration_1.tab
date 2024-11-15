@@ -1,18 +1,18 @@
 FT   misc_feature    339..978
 FT                   /node="Node_1->sequence_two"
-FT                   /neg_log_likelihood="77.515346"
+FT                   /neg_log_likelihood="77.539411"
 FT                   /colour="4"
 FT                   /taxa="sequence_two"
 FT                   /SNP_count="32"
 FT   misc_feature    11421..12388
 FT                   /node="Node_3->Node_2"
-FT                   /neg_log_likelihood="266.061457"
+FT                   /neg_log_likelihood="266.166621"
 FT                   /colour="2"
 FT                   /taxa=" sequence_four sequence_one"
 FT                   /SNP_count="209"
 FT   misc_feature    25..429
 FT                   /node="Node_3->Node_2"
-FT                   /neg_log_likelihood="35.854004"
+FT                   /neg_log_likelihood="35.864561"
 FT                   /colour="2"
 FT                   /taxa=" sequence_four sequence_one"
 FT                   /SNP_count="10"

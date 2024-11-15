@@ -92,12 +92,12 @@ int test_bases_in_recombinations(int block_size)
 	block_coords[1][3] = 15;
 	char * child_sequence      = "AAAAAAAAATAA";
 	int snp_locations[12] = {1,2,3,5,7,10,11,15,20,30,100,110};
-	return calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,12);
+	return calculate_number_of_bases_in_recombinations(block_coords, block_size, child_sequence, snp_locations,12,0);
 }
 
 int test_bases_in_recombinations_with_gaps(int block_size)
 {
-	int ** block_coords;  
+	int ** block_coords;
 	block_coords  = (int **) malloc(2*sizeof(int*));
 	block_coords[0] = (int*) malloc((4)*sizeof(int ));
 	block_coords[1] = (int*) malloc((4)*sizeof(int ));
@@ -111,21 +111,43 @@ int test_bases_in_recombinations_with_gaps(int block_size)
 	block_coords[1][3] = 15;
 	char * child_sequence      =  "--A---AAAAAAAAAAAAAT";
 	int snp_locations[16] = {1,4,5,6,7,8,9,10,11,15,20,30,40,50,100,110};
-	return calculate_number_of_bases_in_recombations_excluding_gaps(block_coords, block_size, child_sequence, snp_locations,16);
+	return calculate_number_of_bases_in_recombinations(block_coords, block_size, child_sequence, snp_locations,16,0);
 }
 
+int test_bases_in_recombinations_including_gaps(int block_size)
+{
+  int ** block_coords;
+  block_coords  = (int **) malloc(2*sizeof(int*));
+  block_coords[0] = (int*) malloc((4)*sizeof(int ));
+  block_coords[1] = (int*) malloc((4)*sizeof(int ));
+  block_coords[0][0] = 5;
+  block_coords[1][0] = 10;
+  block_coords[0][1] = 100;
+  block_coords[1][1] = 110;
+  block_coords[0][2] = 15;
+  block_coords[1][2] = 20;
+  block_coords[0][3] = 7;
+  block_coords[1][3] = 15;
+  char * child_sequence      =  "--A---AAAAAAAAAAAAAT";
+  int snp_locations[16] = {1,4,5,6,7,8,9,10,11,15,20,30,40,50,100,110};
+  return calculate_number_of_bases_in_recombinations(block_coords, block_size, child_sequence, snp_locations,16,1);
+}
 
 START_TEST (check_calculate_number_of_bases_in_recombations)
 {
-	ck_assert(test_bases_in_recombinations(4) == 25);
-	ck_assert(test_bases_in_recombinations(3) == 20);
-	ck_assert(test_bases_in_recombinations(2) == 15);
-	ck_assert(test_bases_in_recombinations(1) == 5);
-	
-	ck_assert(test_bases_in_recombinations_with_gaps(4) == 22);
-	ck_assert(test_bases_in_recombinations_with_gaps(3) == 17);
-	ck_assert(test_bases_in_recombinations_with_gaps(2) == 12);
-	ck_assert(test_bases_in_recombinations_with_gaps(1) == 2);
+  ck_assert(test_bases_in_recombinations(4) == 27);
+	ck_assert(test_bases_in_recombinations(3) == 23);
+	ck_assert(test_bases_in_recombinations(2) == 17);
+	ck_assert(test_bases_in_recombinations(1) == 6);
+
+	ck_assert(test_bases_in_recombinations_with_gaps(4) == 24);
+	ck_assert(test_bases_in_recombinations_with_gaps(3) == 20);
+	ck_assert(test_bases_in_recombinations_with_gaps(2) == 14);
+	ck_assert(test_bases_in_recombinations_with_gaps(1) == 3);
+
+  ck_assert(test_bases_in_recombinations_with_gaps(4) < test_bases_in_recombinations_including_gaps(4));
+  ck_assert(test_bases_in_recombinations(4) == test_bases_in_recombinations_including_gaps(4));
+
 }
 END_TEST
 	

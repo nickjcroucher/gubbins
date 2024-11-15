@@ -32,7 +32,7 @@ const char* program_name;
 
 // Assumptions:
 // The sequences in the multi fasta alignment file are the same length
-// Your only interested in SNPs, INDELS are ignored
+// You are only interested in SNPs, INDELS are ignored
 // The first sequence is chosen as the reference sequence
 // If there is an indel in the reference sequence, the first normal base found in another strain is used.
 
@@ -46,9 +46,10 @@ void print_usage(FILE* stream, int exit_code)
            "  -t    Newick tree file\n"
            "  -v    VCF file\n"
            "  -f    Original Multifasta file\n"
+           "  -n    Number of threads to use for recombination detection\n"
            "  -m    Min SNPs for identifying a recombination block\n"
-		   "  -a    Min window size\n"
-		   "  -b    Max window size\n"
+           "  -a    Min window size\n"
+           "  -b    Max window size\n"
            "  -p    p value for detecting recombinations\n"
            "  -i    p value ratio for trimming recombinations\n"
            "  -h    Display this usage information.\n\n"
@@ -86,6 +87,7 @@ int main (int argc, char ** argv)
     float uncorrected_p_value = 0.05;
     float trimming_ratio = 1.0;
     int extensive_search_flag = 0;
+    int num_threads = 1;
     program_name = argv[0];
   
     while (1)
@@ -103,12 +105,13 @@ int main (int argc, char ** argv)
             {"p_value",             required_argument, 0, 'p'},
             {"trimming_ratio",      required_argument, 0, 'i'},
             {"extended_search",     required_argument, 0, 'x'},
+            {"ncpu",                required_argument, 0, 'n'},
 
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:",
+        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:n:",
                            long_options, &option_index);
         /* Detect the end of the options. */
         if (c == -1)
@@ -157,6 +160,9 @@ int main (int argc, char ** argv)
             case 't':
                 memcpy(tree_filename, optarg, size_of_string(optarg) +1);
                 break;
+            case 'n':
+                num_threads = atoi(optarg);
+                break;
             case '?':
                 /* getopt_long already printed an error message. */
                 break;
@@ -188,7 +194,8 @@ int main (int argc, char ** argv)
                     window_max,
                     uncorrected_p_value,
                     trimming_ratio,
-                    extensive_search_flag);
+                    extensive_search_flag,
+                    num_threads);
     }
     else
     {

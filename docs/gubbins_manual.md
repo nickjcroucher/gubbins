@@ -279,6 +279,14 @@ To get summary statistics (e.g. ***r***/***m***) and subtrees for distinct clade
 extract_gubbins_clade_statistics.py --clades [file designating isolates to clades] --gff out.recombination_predictions.gff --snps out.branch_base_reconstruction.embl --tree out.final_tree.tre --out tree_anaysis
 ```
 
+To extract the recombinant sequences identified by Gubbins from the alignment:
+
+```
+extract_recombinant_sequences.py [-h] --aln [input alignment file] --gff out.recombination_predictions.gff --out-dir OUT_DIR [--start START] [--end END] [--terminal-only]
+```
+
+Note that currently this only identifies the unique alleles at the recombinant loci from the sequences in the alignment - it is not using the reconstructed sequences used to infer the recombinations on internal branches. This script will hopefully be updated to offer greater functionality in the future. 
+
 ## Examples
 
 Two example alignments can be downloaded from http://nickjcroucher.github.io/gubbins/:

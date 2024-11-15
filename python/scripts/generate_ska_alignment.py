@@ -118,7 +118,7 @@ if __name__ == "__main__":
                              ' --out ' + args.out + '.csv',
                             shell = True)
     
-    sys.stderr.write("Completed generating alignment with ska2 (https://github.com/bacpop/ska.rust)\n")
+    sys.stderr.write("Completed generating alignment with ska2 (https://github.com/bacpop/ska.rust)\nPlease cite https://doi.org/10.1101/2024.03.25.586631\n")
 
     # Clean up
     if not args.no_cleanup:

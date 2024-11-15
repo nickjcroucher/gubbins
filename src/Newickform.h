@@ -20,7 +20,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 typedef struct newick_child
 {
 	struct newick_node *node;
@@ -47,17 +46,70 @@ typedef struct newick_node
 	struct newick_node *parent;
 } newick_node;
 
+// Define the structure to hold thread arguments
+struct rec_ThreadData {
+    int * node_indices; // Indices of nodes to be processed by all threads
+    newick_node ** nodeArray;     // Pointer to the array of node sequences
+    int start_node;             // Index of starting node for this thread
+    int num_nodes_to_process;    // Number of nodes to process by this thread
+    char** node_sequences;      // Pointer to the array of node sequences
+    char** node_names;          // Pointer to the array of node names
+    FILE* vcf_file_pointer;     // Pointer to the VCF file
+    int* snp_locations;         // Pointer to the array of SNP locations
+    int number_of_snps;         // Number of SNPs
+    char** column_names;        // Pointer to the array of column names
+    int number_of_columns;      // Number of columns
+    int length_of_original_genome;  // Length of the original genome
+    int num_stored_nodes;       // Number of stored nodes
+    FILE* block_file_pointer;   // Pointer to the block file
+    FILE* gff_file_pointer;     // Pointer to the GFF file
+    int min_snps;               // Minimum number of SNPs
+    FILE* branch_snps_file_pointer; // Pointer to the branch SNPs file
+    int window_min;             // Minimum window size
+    int window_max;             // Maximum window size
+    float uncorrected_p_value;  // Uncorrected p-value
+    float trimming_ratio;       // Trimming ratio
+    int extensive_search_flag;  // Extensive search flag
+    int thread_index;           // Thread index
+};
+
+// Define the structure to hold thread arguments
+struct gaps_ThreadData {
+    int * node_indices;           // Nodes to be processed by this thread
+    int start_node;               // Index of starting node for this thread
+    int num_nodes_to_process;     // Number of nodes to process by this thread
+    newick_node ** nodeArray;     // Pointer to the array of node sequences
+    int * parents;                // Indices of the parents of the nodes
+    int ** recombinations_array;  // Pointer to the list of recombination coordinates
+    int * num_recombinations_array;  // Pointer to counts of recombinations
+    int * current_total_snps_array;  // Number of SNPs on each branch
+    int * num_blocks_array;          // Number of recombination on each branch
+    int length_of_original_genome;   // Length of the original genome
+    int * snp_locations;           // List of SNP locations
+    int number_of_snps;          // Number of SNP sites in the alignment
+    int thread_index;              // Thread index
+};
+
 #define MAX_FILENAME_SIZE 1024
 
 #ifdef __NEWICKFORM_C__
 newick_node* parseTree(char *str);
-newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,  int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
+newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns,  int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads);
 void print_tree(newick_node *root, FILE * outputfile);
 char* strip_quotes(char *taxon);
 #else
 extern newick_node* parseTree(char *str);
-extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag);
+extern newick_node* build_newick_tree(char * filename, FILE *vcf_file_pointer,int * snp_locations, int number_of_snps, char** column_names, int number_of_columns, int length_of_original_genome,int min_snps, int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads);
+void* rec_threadFunction(void* arg);
 extern void print_tree(newick_node *root, FILE * outputfile);
+void fill_nodeArray(newick_node *root, newick_node** nodeArray);
+int count_tree_nodes(newick_node* root);
+void get_job_nodes(newick_node** jobNodeArray,newick_node** nodeArray,int* node_depths,int depth,int num_nodes);
+void get_job_node_indices(int* jobNodeIndexArray, newick_node** nodeArray, int* node_depths, int depth, int num_nodes);
+void get_job_counts(int *node_depths, int depth, int num_nodes);
+int * get_parents(newick_node *root, newick_node** nodeArray, int num_nodes);
+void populate_parents(newick_node *node, newick_node** nodeArray, int * parents, int num_nodes);
+void* gaps_threadFunction(void* arg);
 extern char* strip_quotes(char *taxon);
 #endif
 

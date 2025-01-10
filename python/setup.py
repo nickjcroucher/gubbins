@@ -23,6 +23,7 @@ setuptools.setup(
         'scripts/generate_files_for_clade_analysis.py',
         'scripts/count_recombinations_per_gene.py',
         'scripts/extract_recombinant_sequences.py',
+        'scripts/extract_gubbins_clade_statistics.py',
         '../R/scripts/plot_gubbins.R'
     ],
     tests_require=[

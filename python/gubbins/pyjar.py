@@ -66,7 +66,7 @@ def read_tree(treefile):
 #Calculate Pij from Q matrix and branch length
 def calculate_pij(branch_length,rate_matrix):
     if branch_length==0:
-        pij = numpy.full((4,4), numpy.NINF, dtype = numpy.float32)
+        pij = numpy.full((4,4), -numpy.inf, dtype = numpy.float32)
         numpy.fill_diagonal(pij, 0.0)
     else:
         pij = numpy.array(numpy.log(linalg.expm(numpy.multiply(branch_length,rate_matrix))), dtype = numpy.float32) # modified
@@ -393,7 +393,7 @@ def iterate_over_base_patterns(column,
     Cmat_null = numpy.array([0,1,2,3], dtype = numpy.uint8)
         
     # Reset matrices
-    Lmat.fill(numpy.NINF)
+    Lmat.fill(-numpy.inf)
     Cmat[:] = Cmat_null
 
     # Count unknown bases
@@ -605,7 +605,7 @@ def reconstruct_alignment_column(column_index,
     
     # Generate data structures for reconstructions
     num_nodes = len(tree.nodes())
-    Lmat = numpy.full((num_nodes,4), numpy.NINF, dtype = numpy.float32)
+    Lmat = numpy.full((num_nodes,4), -numpy.inf, dtype = numpy.float32)
     Cmat = numpy.full((num_nodes,4), [0,1,2,3], dtype = numpy.uint8)
     reconstructed_base_indices = numpy.full(num_nodes, 8, dtype = numpy.uint8)
 
@@ -711,7 +711,7 @@ def jar(sequence_names = None,
     child_nodes_array = numpy.empty(num_nodes, dtype=object)
     leaf_node_list = []
     node_labels = numpy.empty(num_nodes, dtype=object)
-    node_pij = numpy.full((num_nodes,16), numpy.NINF, dtype=numpy.float32)
+    node_pij = numpy.full((num_nodes,16), -numpy.inf, dtype=numpy.float32)
     postordered_nodes = numpy.arange(num_nodes, dtype=numpy.int32)
     seed_node = None
     seed_node_edge_truncation = True

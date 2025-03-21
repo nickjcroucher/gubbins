@@ -28,6 +28,7 @@ dependencies:
   - multiprocess
   - numpy<=1.23.0
   - numba
+  - numba-dpex
 # phylogenetics
   - raxml=8.2.12
   - iqtree>=2.2

@@ -40,12 +40,12 @@ from Bio.Seq import Seq
 # Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.treebuilders import FastTree, VeryFastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
 from gubbins.pyjar import jar, get_base_patterns, Pyjar
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.treebuilders import FastTree, VeryFastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
 # Phylogenetic models valid for each algorithm
 tree_models = {

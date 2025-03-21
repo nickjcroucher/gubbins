@@ -40,6 +40,10 @@ class TestTreeMethods(unittest.TestCase):
         algorithm = treebuilders.RAxMLNG()
         assert algorithm.name == 'RAxMLNG'
 
+    def initialise_VeryFastTree(self):
+        algorithm = treebuilders.VeryFastTree()
+        assert algorithm.name == 'VeryFastTree'
+
     def test_robinson_foulds_distance(self):
         # two tree with different distances
         assert common.robinson_foulds_distance(os.path.join(data_dir, 'robinson_foulds_distance_tree1.tre'),

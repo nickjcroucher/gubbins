@@ -91,17 +91,40 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
-    # Test resuming a default analysis
-    def test_fasttree_resume(self):
+    def test_veryfasttree(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_veryfasttree_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--seed","42",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test resuming a default analysis
+    def test_veryfasttree_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
                                                     "--verbose", "--iterations", "3",
                                                     "--threads", "1",
                                                     "--no-cleanup",
                                                     "--prefix", "original",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
                                             "--verbose", "--iterations", "3",
                                             "--resume", "multiple_recombinations.iteration_1.tre",
                                             "--threads", "1",

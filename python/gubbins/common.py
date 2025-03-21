@@ -54,7 +54,8 @@ tree_models = {
     'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-    'rapidnj': ['JC','K2P']
+    'rapidnj': ['JC','K2P'],
+    'veryfasttree': ['JC','GTRCAT','GTRGAMMA']
 }
 
 def parse_and_run(input_args, program_description=""):
@@ -747,6 +748,8 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
         initialised_algorithm = FastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+    elif algorithm_choice == "veryfasttree":
+        initialised_algorithm = VeryFastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
     elif algorithm_choice == "raxmlng":

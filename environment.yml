@@ -2,6 +2,7 @@ name: gubbins_env
 channels:
   - conda-forge
   - bioconda
+  - dppy
   - defaults
   - r
 dependencies:

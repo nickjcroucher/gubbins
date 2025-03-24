@@ -858,8 +858,9 @@ class VeryFastTree:
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the VeryFastTree executable"""
         command = self.base_command.copy()
-        if input_tree:
-            command.extend(["-intree", input_tree])
+        # N.B. version 4.0.4 - intree appears to cause a problem so is not used in command construction
+#        if input_tree:
+#            command.extend(["-intree", input_tree])
         output_tree = basename + self.tree_suffix
         command.extend(["-nosupport"])
         command.extend(["-out", output_tree])

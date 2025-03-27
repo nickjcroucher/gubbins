@@ -475,15 +475,13 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}","--JC69"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--JC69"])
         elif self.model == 'K2P':
-            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}","--K80"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--K80"])
         elif self.model == 'HKY':
-            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}","--HKY85"])
-        elif self.model == 'GTRCAT':
-            command.extend(["-m","GTRCAT+ASC_FELS{" + str(invariant_sites) + "}", "-V"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--HKY85"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTRGAMMA+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["-m","ASC_GTRGAMMA{" + str(invariant_sites) + "}"])
         else:
             command.extend(["-m", self.model + "+ASC_FELS{" + str(invariant_sites) + "}"])
         command.extend(["-p",self.seed])

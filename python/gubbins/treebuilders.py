@@ -307,7 +307,7 @@ class IQTree:
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTR+G4+I{" + str(invariant_proportion) + "}"])
         else:
-            command.extend(["-m",self.model+I{" + str(invariant_proportion) + "}])
+            command.extend(["-m",self.model + "+I{" + str(invariant_proportion) + "}"])
         command.extend(["-seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:

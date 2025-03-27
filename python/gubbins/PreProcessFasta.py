@@ -114,5 +114,5 @@ class PreProcessFasta(object):
         return sequence_names
     
     def get_alignment_length(self):
-        alignment = AlignIO.read(input_handle, "fasta")
+        alignment = AlignIO.read(self.input_filename, "fasta")
         return alignment.get_alignment_length()

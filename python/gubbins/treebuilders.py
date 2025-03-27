@@ -307,7 +307,7 @@ class IQTree:
         elif self.model == 'GTRGAMMA':
             command.extend(["-m","GTR+G4+I{" + str(invariant_proportion) + "}"])
         else:
-            command.extend(["-m",self.model + "+I{" + str(invariant_proportion) + "}"])
+            command.extend(["-m",self.model])
         command.extend(["-seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:
@@ -475,15 +475,15 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--JC69"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--JC69"])
         elif self.model == 'K2P':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--K80"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--K80"])
         elif self.model == 'HKY':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--HKY85"])
+            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--HKY85"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","ASC_GTRGAMMA{" + str(invariant_sites) + "}"])
+            command.extend(["-m","ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein"])
         else:
-            command.extend(["-m", self.model + "+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["-m", self.model])
         command.extend(["-p",self.seed])
         # Additional arguments
         if self.additional_args is not None:

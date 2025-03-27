@@ -156,6 +156,7 @@ class FastTree:
         # Function for returning base command
         command = [self.executable]
         command.extend(["-nt"])
+        command.extend(["-rawdist"]) # https://morgannprice.github.io/fasttree/
         if self.model == 'JC':
             command.extend(["-nocat"])
         elif self.model == 'GTR':
@@ -259,7 +260,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -296,17 +297,17 @@ class IQTree:
         if self.use_best:
             pass
         elif self.model == 'JC':
-            command.extend(["-m", "JC"])
+            command.extend(["-m", "JC+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'K2P':
-            command.extend(["-m", "K2P"])
+            command.extend(["-m", "K2P+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'HKY':
-            command.extend(["-m", "HKY"])
+            command.extend(["-m", "HKY+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'GTR':
-            command.extend(["-m","GTR"])
+            command.extend(["-m","GTR+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTR+G4"])
+            command.extend(["-m","GTR+G4+I{" + str(invariant_proportion) + "}"])
         else:
-            command.extend(["-m",self.model])
+            command.extend(["-m",self.model+I{" + str(invariant_proportion) + "}])
         command.extend(["-seed",self.seed])
         # Additional arguments
         if self.additional_args is not None:
@@ -437,7 +438,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', invariant_sites = 0, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -474,17 +475,17 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            command.extend(["-m", "GTRCAT","--JC69"])
+            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}","--JC69"])
         elif self.model == 'K2P':
-            command.extend(["-m", "GTRCAT","--K80"])
+            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}"","--K80"])
         elif self.model == 'HKY':
-            command.extend(["-m", "GTRCAT","--HKY85"])
+            command.extend(["-m", "GTRCAT+ASC_FELS{" + str(invariant_sites) + "}"","--HKY85"])
         elif self.model == 'GTRCAT':
-            command.extend(["-m","GTRCAT", "-V"])
+            command.extend(["-m","GTRCAT+ASC_FELS{" + str(invariant_sites) + "}"", "-V"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTRGAMMA"])
+            command.extend(["-m","GTRGAMMA+ASC_FELS{" + str(invariant_sites) + "}""])
         else:
-            command.extend(["-m", self.model])
+            command.extend(["-m", self.model + "+ASC_FELS{" + str(invariant_sites) + "}"])
         command.extend(["-p",self.seed])
         # Additional arguments
         if self.additional_args is not None:
@@ -610,7 +611,7 @@ class RAxML:
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
+    def __init__(self, threads: 1, model: str, invariant_sites = 0, bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -645,15 +646,15 @@ class RAxMLNG:
         # Add model
         command.extend(["--model"])
         if self.model == 'JC':
-            command.extend(["JC"])
+            command.extend(["JC+ASC_FELS{" + str(invariant_sites) + "}"])
         elif self.model == 'K2P':
-            command.extend(["K80"])
+            command.extend(["K80+ASC_FELS{" + str(invariant_sites) + "}"])
         elif self.model == 'HKY':
-            command.extend(["HKY"])
+            command.extend(["HKY+ASC_FELS{" + str(invariant_sites) + "}"])
         elif self.model == 'GTR':
-            command.extend(["GTR"])
+            command.extend(["GTR+ASC_FELS{" + str(invariant_sites) + "}"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["GTR+G"])
+            command.extend(["GTR+G+ASC_FELS{" + str(invariant_sites) + "}"])
         else:
             command.extend([self.model])
         command.extend(["--seed",self.seed])
@@ -825,6 +826,7 @@ class VeryFastTree:
         # Function for returning base command
         command = [self.executable]
         command.extend(["-nt"])
+        command.extend(["-rawdist"]) # https://morgannprice.github.io/fasttree/
         if self.model == 'JC':
             command.extend(["-nocat"])
         elif self.model == 'GTR':

@@ -240,6 +240,7 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # Define file names
+        alignment_suffix = current_tree_builder.alignment_suffix
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
@@ -268,7 +269,7 @@ def parse_and_run(input_args, program_description=""):
                 printer.print("Phylogeny will be constructed with a " + current_model + " model")
             # Initialise tree builder
             tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-            alignment_suffix = tree_builder.alignment_suffix
+#            alignment_suffix = tree_builder.alignment_suffix
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
             # Update date model (should not make a difference)
             if input_args.date is not None:

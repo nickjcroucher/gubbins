@@ -50,7 +50,7 @@ from gubbins.treebuilders import FastTree, VeryFastTree, IQTree, RAxML, RAxMLNG,
 # Phylogenetic models valid for each algorithm
 tree_models = {
     'star': ['JC','GTRCAT','GTRGAMMA'],
-    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+    'raxml': ['JC','K2P','HKY','GTRGAMMA'],
     'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'fasttree': ['JC','GTRCAT','GTRGAMMA'],
@@ -96,10 +96,6 @@ def parse_and_run(input_args, program_description=""):
     # Select the algorithms used for the first iteration
     current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,1)
     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
-    # Initialise tree builder
-    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-    alignment_suffix = tree_builder.alignment_suffix
-    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
     # Initialise model fitter
     model_fitter = return_algorithm(current_model_fitter, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
     methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
@@ -173,6 +169,8 @@ def parse_and_run(input_args, program_description=""):
                                         input_args.filter_percentage)
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
+    overall_alignment_length = pre_process_fasta.get_alignment_length()
+    snp_alignment_length = overall_alignment_length
 
     # Check on number of sequences remaining in alignment after validation and processing
     if input_args.pairwise:
@@ -248,6 +246,10 @@ def parse_and_run(input_args, program_description=""):
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
+        pre_process_snp_fasta = PreProcessFasta(snp_alignment_filename,
+                                            input_args.verbose,
+                                            input_args.filter_percentage)
+        snp_alignment_length = pre_process_fasta.get_alignment_length()
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
         if i == 2 or input_args.resume is not None:
@@ -271,6 +273,11 @@ def parse_and_run(input_args, program_description=""):
             # Update date model (should not make a difference)
             if input_args.date is not None:
                 tree_dater.model = current_model
+        else:
+            # Initialise tree builder
+            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            alignment_suffix = tree_builder.alignment_suffix
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"

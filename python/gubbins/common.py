@@ -126,6 +126,8 @@ def parse_and_run(input_args, program_description=""):
     gaps_alignment_filename = base_filename + ".gaps.snp_sites.aln"
     gaps_vcf_filename = base_filename + ".gaps.vcf"
     joint_sequences_filename = base_filename + ".seq.joint.aln"
+    sequence_names_fn = base_filename + ".gaps.sequence_names.csv"
+    base_patterns_fn = base_filename + ".gaps.base_patterns.csv"
 
     # If restarting from a previous run
     starting_iteration = 1
@@ -173,7 +175,8 @@ def parse_and_run(input_args, program_description=""):
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
     overall_alignment_length = pre_process_fasta.get_alignment_length()
-    snp_alignment_length = overall_alignment_length
+    current_alignment_length = overall_alignment_length
+    all_snp_alignment_length = overall_alignment_length
 
     # Check on number of sequences remaining in alignment after validation and processing
     if input_args.pairwise:
@@ -247,19 +250,27 @@ def parse_and_run(input_args, program_description=""):
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
+            pre_process_snp_fasta = PreProcessFasta(snp_alignment_filename,
+                                                    input_args.verbose,
+                                                    0.0)
+            all_snp_alignment_length = pre_process_snp_fasta.get_alignment_length()
+            current_alignment_length = all_snp_alignment_length
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
-        pre_process_snp_fasta = PreProcessFasta(snp_alignment_filename,
-                                            input_args.verbose,
-                                            input_args.filter_percentage)
-        snp_alignment_length = pre_process_fasta.get_alignment_length()
+            pre_process_snp_fasta = PreProcessFasta(alignment_filename,
+                                                    input_args.verbose,
+                                                    0.0)
+            if alignment_suffix.endswith('phylip'):
+                current_alignment_length = pre_process_snp_fasta.get_alignment_length('phylip-relaxed')
+            else:
+                current_alignment_length = pre_process_snp_fasta.get_alignment_length()
 
         # Initialise model fitter
         model_fitter = return_algorithm(current_model_fitter,
                                         current_recon_model,
                                         input_args,
-                                        snp_alignment_length,
+                                        all_snp_alignment_length,
                                         overall_alignment_length,
                                         node_labels = internal_node_label_prefix,
                                         extra = extra_model_arguments)
@@ -269,7 +280,7 @@ def parse_and_run(input_args, program_description=""):
             sequence_reconstructor = return_algorithm(input_args.seq_recon,
                                                       current_recon_model,
                                                       input_args,
-                                                      snp_alignment_length,
+                                                      current_alignment_length,
                                                       overall_alignment_length,
                                                       node_labels = internal_node_label_prefix,
                                                       extra = input_args.seq_recon_args)
@@ -294,7 +305,7 @@ def parse_and_run(input_args, program_description=""):
             tree_builder = return_algorithm(current_tree_builder,
                                             current_model,
                                             input_args,
-                                            snp_alignment_length,
+                                            current_alignment_length,
                                             overall_alignment_length,
                                             node_labels = internal_node_label_prefix,
                                             extra = extra_tree_arguments)
@@ -308,7 +319,7 @@ def parse_and_run(input_args, program_description=""):
             tree_builder = return_algorithm(current_tree_builder,
                                             current_model,
                                             input_args,
-                                            snp_alignment_length,
+                                            current_alignment_length,
                                             overall_alignment_length,
                                             node_labels = internal_node_label_prefix,
                                             extra = extra_tree_arguments)
@@ -317,31 +328,44 @@ def parse_and_run(input_args, program_description=""):
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
-        if previous_tree_name and input_args.first_tree_builder != "star":
-            tree_building_command = tree_builder.tree_building_command(
-                os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
-        else:
-            tree_building_command = tree_builder.tree_building_command(
-                os.path.abspath(alignment_filename), "", current_basename)
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
+        if i == starting_iteration:
+            for fn in [gaps_alignment_filename, gaps_vcf_filename, joint_sequences_filename, alignment_filename]:
+                os.symlink(os.path.abspath(fn),
+                        os.path.join(base_directory,temp_working_dir,os.path.basename(fn)))
+        else:
+            for fn in [previous_tree_name, alignment_filename]:
+                os.symlink(os.path.abspath(fn),
+                        os.path.join(base_directory,temp_working_dir,os.path.basename(fn)))
 
         # 1.2. Construct the phylogenetic tree
         if input_args.starting_tree is not None and i == 1:
             printer.print("\nCopying the starting tree...")
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
-
-            printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
-                           tree_building_command])
             if current_tree_builder == "star":
+                tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), "", current_basename)
                 # Move star tree into temp dir
                 shutil.move(tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix,
                             built_tree)
             else:
                 try:
+                    # Prepare tmp directory for tree building and sequence reconstruction
                     os.chdir(temp_working_dir)
+                    printer.print("Entering working directory " + temp_working_dir)
+                    if previous_tree_name:
+                        tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
+                    else:
+                        tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), "", current_basename)
+                    printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
+                           tree_building_command])
                     subprocess.check_call(tree_building_command, shell=True)
-                except subprocess.SubprocessError:
+                except subprocess.SubprocessError as e:
+                    if e.output is not None:
+                        sys.stderr.write('Error: ' + e.output + '\n')
                     sys.exit("Failed while building the tree.")
                 os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
@@ -373,14 +397,17 @@ def parse_and_run(input_args, program_description=""):
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
+                for fn in [sequence_names_fn, base_patterns_fn]:
+                        os.symlink(os.path.join(base_directory,fn),
+                                os.path.join(base_directory,temp_working_dir,os.path.basename(fn)))
                 # 3.3b. Record in methods log (just once)
                 pyjar_method = Pyjar(current_model)
                 methods_log = update_methods_log(methods_log, method = pyjar_method, step = 'Sequence reconstructor')
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
-                                                                os.path.abspath(temp_rooted_tree),
-                                                                temp_working_dir + '/' + current_basename)
+                                                                        os.path.abspath(temp_rooted_tree),
+                                                                        temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
             try:
                 subprocess.check_call(model_fitting_command, shell = True)
@@ -552,7 +579,7 @@ def parse_and_run(input_args, program_description=""):
                 bootstrap_utility = return_algorithm("raxmlng",
                                                       current_model,
                                                       input_args,
-                                                      snp_alignment_length,
+                                                      current_alignment_length,
                                                       overall_alignment_length,
                                                       node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used

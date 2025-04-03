@@ -516,16 +516,25 @@ class RAxML:
                 break
         return version
 
+    def generate_partition_files(self, command: list, basename: str) -> list:
+        """Generate the partition files enumerating invariant site counts"""
+        if self.invariant_sites > 0:
+            partitions_fn = os.path.basename(basename) + '.partitions'
+            partition_fn = os.path.basename(basename) + '.partition'
+            with open(partitions_fn,'w') as partitions_file:
+                partitions_file.write('[asc~' + partition_fn + '], ASC_DNA, p1=1-' + str(self.partition_length) + '\n')
+                partitions_file.flush()
+            with open(partition_fn,'w') as partition_file:
+                partition_file.write(str(self.invariant_sites) + '\n')
+                partition_file.flush()
+            command.extend(["-q", partitions_fn])
+        return command
+        
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
         command = self.base_command.copy()
         # Write partition input files - https://cme.h-its.org/exelixis/resource/download/NewManual.pdf
-        if self.invariant_sites > 0:
-            with open(self.tree_prefix + 'partitions','w') as partitions_file:
-                partitions_file.write('[asc~' + self.tree_prefix + 'partition_1.txt' + '], ASC_DNA, p1=1' + str(self.partition_length) + '\n')
-            with open(self.tree_prefix + 'partition_1.txt','w') as partition_file:
-                partition_file.write(str(self.invariant_sites))
-            command.extend(["-q", self.tree_prefix + 'partitions'])
+        command = self.generate_partition_files(command,basename)
         # Complete command string
         command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
@@ -593,6 +602,7 @@ class RAxML:
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
         command.extend(["-f e"])
         command.extend(["-w",os.path.dirname(basename)])

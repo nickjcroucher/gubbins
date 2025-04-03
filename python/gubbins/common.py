@@ -58,6 +58,16 @@ tree_models = {
     'veryfasttree': ['JC','GTRCAT','GTRGAMMA']
 }
 
+suffix_dict = {
+    'star': '.snp_sites.aln',
+    'raxml': '.snp_sites.aln',
+    'raxmlng': '.phylip',
+    'iqtree': '.phylip',
+    'fasttree': '.snp_sites.aln',
+    'rapidnj': '.snp_sites.aln',
+    'veryfasttree': '.snp_sites.aln'
+}
+
 def parse_and_run(input_args, program_description=""):
     """Main function of the Gubbins program"""
     start_time = time.time()
@@ -96,13 +106,6 @@ def parse_and_run(input_args, program_description=""):
     # Select the algorithms used for the first iteration
     current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,1)
     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
-    # Initialise model fitter
-    model_fitter = return_algorithm(current_model_fitter, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
-    # Initialise sequence reconstruction if MAR
-    if input_args.mar:
-        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
-        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
     # Initialise IQtree
     tree_dater = IQTree(threads = input_args.threads,
@@ -240,7 +243,7 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # Define file names
-        alignment_suffix = current_tree_builder.alignment_suffix
+        alignment_suffix = get_alignment_suffix(current_tree_builder)
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
@@ -251,6 +254,26 @@ def parse_and_run(input_args, program_description=""):
                                             input_args.verbose,
                                             input_args.filter_percentage)
         snp_alignment_length = pre_process_fasta.get_alignment_length()
+
+        # Initialise model fitter
+        model_fitter = return_algorithm(current_model_fitter,
+                                        current_recon_model,
+                                        input_args,
+                                        snp_alignment_length,
+                                        overall_alignment_length,
+                                        node_labels = internal_node_label_prefix,
+                                        extra = extra_model_arguments)
+        methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
+        # Initialise sequence reconstruction if MAR
+        if input_args.mar:
+            sequence_reconstructor = return_algorithm(input_args.seq_recon,
+                                                      current_recon_model,
+                                                      input_args,
+                                                      snp_alignment_length,
+                                                      overall_alignment_length,
+                                                      node_labels = internal_node_label_prefix,
+                                                      extra = input_args.seq_recon_args)
+            methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
         if i == 2 or input_args.resume is not None:
@@ -268,7 +291,13 @@ def parse_and_run(input_args, program_description=""):
                     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
                 printer.print("Phylogeny will be constructed with a " + current_model + " model")
             # Initialise tree builder
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            tree_builder = return_algorithm(current_tree_builder,
+                                            current_model,
+                                            input_args,
+                                            snp_alignment_length,
+                                            overall_alignment_length,
+                                            node_labels = internal_node_label_prefix,
+                                            extra = extra_tree_arguments)
 #            alignment_suffix = tree_builder.alignment_suffix
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
             # Update date model (should not make a difference)
@@ -276,7 +305,13 @@ def parse_and_run(input_args, program_description=""):
                 tree_dater.model = current_model
         else:
             # Initialise tree builder
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
+            tree_builder = return_algorithm(current_tree_builder,
+                                            current_model,
+                                            input_args,
+                                            snp_alignment_length,
+                                            overall_alignment_length,
+                                            node_labels = internal_node_label_prefix,
+                                            extra = extra_tree_arguments)
             alignment_suffix = tree_builder.alignment_suffix
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
 
@@ -514,7 +549,12 @@ def parse_and_run(input_args, program_description=""):
             if current_tree_builder == "raxmlng":
                 bootstrap_utility = tree_builder
             else:
-                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
+                bootstrap_utility = return_algorithm("raxmlng",
+                                                      current_model,
+                                                      input_args,
+                                                      snp_alignment_length,
+                                                      overall_alignment_length,
+                                                      node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
                 bootstrap_aln = generate_bootstrap_alignments(bootstrap_aln,
@@ -752,20 +792,57 @@ def return_algorithm_choices(args,i):
     # Return choices
     return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments, custom_model, current_recon_model
 
-def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
+def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, complete_aln_length, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = FastTree(threads = input_args.threads,
+                                          model = model,
+                                          seed = input_args.seed,
+                                          bootstrap = input_args.bootstrap,
+                                          verbose = input_args.verbose,
+                                          additional_args = extra)
     elif algorithm_choice == "veryfasttree":
-        initialised_algorithm = VeryFastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = VeryFastTree(threads = input_args.threads,
+                                              model = model,
+                                              seed = input_args.seed,
+                                              bootstrap = input_args.bootstrap,
+                                              verbose = input_args.verbose,
+                                              additional_args = extra)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxML(threads = input_args.threads,
+                                      model = model,
+                                      invariant_sites = complete_aln_length - snp_aln_length,
+                                      partition_length = snp_aln_length,
+                                      seed = input_args.seed,
+                                      bootstrap = input_args.bootstrap,
+                                      internal_node_prefix = node_labels,
+                                      verbose = input_args.verbose,
+                                      additional_args = extra)
     elif algorithm_choice == "raxmlng":
-        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxMLNG(threads = input_args.threads,
+                                        model = model,
+                                        seed = input_args.seed,
+                                        invariant_sites = complete_aln_length - snp_aln_length,
+                                        bootstrap = input_args.bootstrap,
+                                        internal_node_prefix = node_labels,
+                                        verbose = input_args.verbose,
+                                        additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads,
+                                        model = model,
+                                        seed = input_args.seed,
+                                        invariant_proportion = (complete_aln_length - snp_aln_length)/complete_aln_length,
+                                        bootstrap = input_args.bootstrap,
+                                        internal_node_prefix = node_labels,
+                                        verbose = input_args.verbose,
+                                        use_best = (model is None and input_args.best_model),
+                                        additional_args = extra)
     elif algorithm_choice == "rapidnj":
-        initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RapidNJ(threads = input_args.threads,
+                                        model = model,
+                                        bootstrap = input_args.bootstrap,
+                                        verbose = input_args.verbose,
+                                        additional_args = extra)
     elif algorithm_choice == "star":
         initialised_algorithm = Star()
     else:
@@ -1406,3 +1483,12 @@ def translation_of_dating_filenames_to_final_filenames(temp_working_dir,
         os.path.join(temp_working_dir,basename + '.timetree.nwk'): prefix + '.final_tree.timetree.tre'
     }
     return dating_files
+
+def get_alignment_suffix(treebuilder_name):
+    suffix = None
+    if (treebuilder_name in suffix_dict):
+        suffix = suffix_dict[treebuilder_name]
+    else:
+        sys.stderr.write('Unknown treebuilding method\n')
+        sys.exit(1)
+    return suffix

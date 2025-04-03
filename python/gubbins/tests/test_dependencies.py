@@ -869,11 +869,11 @@ class TestExternalDependencies(unittest.TestCase):
         for file in glob.glob(regex_to_remove):
             os.remove(file)
         tmp_to_remove = "./tmp*/*"
-        for file in glob.glob(tmp_to_remove):
-            os.remove(file)
         for dir in glob.glob("./tmp*"):
             if os.path.isdir(dir):
-                os.rmdir(dir)
+                shutil.rmtree(dir)
+        for file in glob.glob(tmp_to_remove):
+            os.remove(file)
 
 if __name__ == "__main__":
     unittest.main(buffer=True)

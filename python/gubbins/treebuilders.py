@@ -438,7 +438,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', invariant_sites = 0, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', invariant_sites = 0, partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -453,6 +453,8 @@ class RAxML:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
+        self.invariant_sites = invariant_sites
+        self.partition_length = partition_length
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
@@ -475,13 +477,25 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--JC69"])
+            if self.invariant_sites == 0:
+                command.extend(["-m", "GTRGAMMA","--JC69"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--JC69"])
         elif self.model == 'K2P':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--K80"])
+            if self.invariant_sites == 0:
+                command.extend(["-m", "GTRGAMMA","--K80"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--K80"])
         elif self.model == 'HKY':
-            command.extend(["-m", "ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein","--HKY85"])
+            if self.invariant_sites == 0:
+                command.extend(["-m", "GTRGAMMA","--HKY85"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--HKY85"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","ASC_GTRGAMMA{" + str(invariant_sites) + "}","--asc-corr=felsenstein"])
+            if self.invariant_sites == 0:
+                command.extend(["-m","GTRGAMMA"])
+            else:
+                command.extend(["-m","ASC_GTRGAMMA","--asc-corr=felsenstein"])
         else:
             command.extend(["-m", self.model])
         command.extend(["-p",self.seed])
@@ -505,6 +519,14 @@ class RAxML:
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
         command = self.base_command.copy()
+        # Write partition input files - https://cme.h-its.org/exelixis/resource/download/NewManual.pdf
+        if self.invariant_sites > 0:
+            with open(self.tree_prefix + 'partitions','w') as partitions_file:
+                partitions_file.write('[asc~' + self.tree_prefix + 'partition_1.txt' + '], ASC_DNA, p1=1' + str(self.partition_length) + '\n')
+            with open(self.tree_prefix + 'partition_1.txt','w') as partition_file:
+                partition_file.write(str(self.invariant_sites))
+            command.extend(["-q", self.tree_prefix + 'partitions'])
+        # Complete command string
         command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         if input_tree:
@@ -624,6 +646,7 @@ class RAxMLNG:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
+        self.invariant_sites = invariant_sites
         self.additional_args = additional_args
 
         self.single_threaded_executables = ['raxml-ng']

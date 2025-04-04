@@ -110,6 +110,8 @@ def parse_and_run(input_args, program_description=""):
     # Initialise IQtree
     tree_dater = IQTree(threads = input_args.threads,
                             model = current_model,
+                            invariant_proportion = 0,
+                            constant_base_counts = [0.0,0.0,0.0,0.0],
                             verbose = input_args.verbose
                         )
 
@@ -276,6 +278,7 @@ def parse_and_run(input_args, program_description=""):
                                         input_args,
                                         all_snp_alignment_length,
                                         overall_alignment_length,
+                                        base_frequencies,
                                         node_labels = internal_node_label_prefix,
                                         extra = extra_model_arguments)
         methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
@@ -286,6 +289,7 @@ def parse_and_run(input_args, program_description=""):
                                                       input_args,
                                                       all_snp_alignment_length,
                                                       overall_alignment_length,
+                                                      [0.0,0.0,0.0,0.0],
                                                       node_labels = internal_node_label_prefix,
                                                       extra = input_args.seq_recon_args)
             methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
@@ -307,6 +311,9 @@ def parse_and_run(input_args, program_description=""):
                 current_model = select_best_models(alignment_filename,
                                                     basename,
                                                     current_tree_builder,
+                                                    all_snp_alignment_length,
+                                                    overall_alignment_length,
+                                                    base_frequencies,
                                                     input_args)
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
@@ -318,6 +325,7 @@ def parse_and_run(input_args, program_description=""):
                                             input_args,
                                             current_alignment_length,
                                             overall_alignment_length,
+                                            base_frequencies,
                                             node_labels = internal_node_label_prefix,
                                             extra = extra_tree_arguments)
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
@@ -331,6 +339,7 @@ def parse_and_run(input_args, program_description=""):
                                             input_args,
                                             current_alignment_length,
                                             overall_alignment_length,
+                                            base_frequencies,
                                             node_labels = internal_node_label_prefix,
                                             extra = extra_tree_arguments)
             alignment_suffix = tree_builder.alignment_suffix
@@ -341,8 +350,9 @@ def parse_and_run(input_args, program_description=""):
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
         if i == starting_iteration:
             for fn in [gaps_alignment_filename, gaps_vcf_filename, joint_sequences_filename, alignment_filename]:
-                os.symlink(os.path.abspath(fn),
-                        os.path.join(base_directory,temp_working_dir,os.path.basename(fn)))
+                target_file = os.path.join(base_directory,temp_working_dir,os.path.basename(fn))
+                if not os.path.isfile(target_file):
+                    os.symlink(os.path.abspath(fn), target_file)
         else:
             for fn in [previous_tree_name, alignment_filename]:
                 target_path = os.path.join(base_directory,temp_working_dir,os.path.basename(fn))
@@ -448,10 +458,10 @@ def parse_and_run(input_args, program_description=""):
                     # If this fails, continue to generate rest of output
                     sys.stderr.write("Unable to use time calibrated tree for sequence reconstruction in "
                     " iteration " + str(i))
-            else:
-                # Set root of reconstruction tree to match that of the current tree
-                # Cannot just midpoint root both, because the branch lengths differ between them
-                harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
+
+            # Set root of reconstruction tree to match that of the current tree
+            # Cannot just midpoint root both, because the branch lengths differ between them
+            harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
@@ -603,6 +613,7 @@ def parse_and_run(input_args, program_description=""):
                                                       input_args,
                                                       current_alignment_length,
                                                       overall_alignment_length,
+                                                      base_frequencies,
                                                       node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
@@ -849,7 +860,7 @@ def return_algorithm_choices(args,i):
     # Return choices
     return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments, custom_model, current_recon_model
 
-def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, complete_aln_length, node_labels = None, extra = None):
+def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, complete_aln_length, base_frequencies, node_labels = None, extra = None):
     initialised_algorithm = None
     if algorithm_choice == "fasttree":
         initialised_algorithm = FastTree(threads = input_args.threads,
@@ -885,10 +896,13 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
                                         verbose = input_args.verbose,
                                         additional_args = extra)
     elif algorithm_choice == "iqtree":
+        constant_sites = (complete_aln_length - snp_aln_length)
+        constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
         initialised_algorithm = IQTree(threads = input_args.threads,
                                         model = model,
                                         seed = input_args.seed,
-                                        invariant_proportion = (complete_aln_length - snp_aln_length)/complete_aln_length,
+                                        invariant_proportion = constant_sites/complete_aln_length,
+                                        constant_base_counts = constant_base_counts,
                                         bootstrap = input_args.bootstrap,
                                         internal_node_prefix = node_labels,
                                         verbose = input_args.verbose,
@@ -907,9 +921,13 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
         sys.exit()
     return initialised_algorithm
 
-def select_best_models(snp_alignment_filename,basename,current_tree_builder,input_args):
+def select_best_models(snp_alignment_filename,basename,current_tree_builder,all_snp_alignment_length,complete_aln_length,base_frequencies,input_args):
+    constant_sites = (complete_aln_length - all_snp_alignment_length)
+    constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
     model_tester = IQTree(threads = input_args.threads,
                             model = 'GTR',
+                            invariant_proportion = constant_sites/complete_aln_length,
+                            constant_base_counts = constant_base_counts,
                             verbose = input_args.verbose
                     )
     model_test_command = model_tester.run_model_comparison(snp_alignment_filename,basename)
@@ -1228,6 +1246,7 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
                                                                                     destination_tree,
                                                                                     is_bipartitions_updated=False)
     if len(missing_bipartitions) > 0:
+        sys.stderr.write('Problem comparing the tree files ' + source_tree_filename + ' and ' + destination_tree_filename + '\n')
         sys.stderr.write('Bipartitions missing when transferring node labels: ' + str([str(x) for x in missing_bipartitions]))
         sys.exit(1)
     

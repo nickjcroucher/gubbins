@@ -128,4 +128,6 @@ class PreProcessFasta(object):
             for index,base in enumerate(['A','C','G','T']):
                 base_frequencies[index] += (record.seq.count(base) + record.seq.count(base.lower()))
         
+        base_frequencies = [b/(alignment_length*len(sequence_names)) for b in base_frequencies]
+        
         return alignment_length, sequence_names, base_frequencies

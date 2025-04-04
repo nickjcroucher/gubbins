@@ -50,8 +50,8 @@ class Star:
 
         # Write tree
         star_tree_string = "("
-        star_tree_string = star_tree_string + ':0.9,'.join(taxon_names)
-        star_tree_string = star_tree_string + ':1);' # mid point rooting fails with equidistant taxa
+        star_tree_string = star_tree_string + ':0.09,'.join(taxon_names)
+        star_tree_string = star_tree_string + ':0.1);' # mid point rooting fails with equidistant taxa
 
         # Print to file
         output_tree = basename + self.tree_suffix
@@ -260,7 +260,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [], seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -292,7 +292,7 @@ class IQTree:
         # Set parallelisation
         command.extend(["-T", str(self.threads)])
 
-        # Add flags
+        # Define model
         command.extend(["-safe","-redo"])
         if self.use_best:
             pass
@@ -309,6 +309,11 @@ class IQTree:
         else:
             command.extend(["-m",self.model])
         command.extend(["-seed",self.seed])
+        
+        # Account for invariant sites
+        print('Inside base counts: ' + str(constant_base_counts))
+        command.extend(["-fconst",','.join([str(x) for x in constant_base_counts])])
+        
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])

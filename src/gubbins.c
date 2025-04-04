@@ -39,16 +39,16 @@
 // given a sample name extract the sequences from the vcf
 // compare two sequences to get pseudo sequnece and fill in with difference from reference sequence
 
-void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads)
+void run_gubbins(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int scaling_flag, int num_threads)
 {
 	load_sequences_from_multifasta_file(multi_fasta_filename);
-	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value, trimming_ratio, extensive_search_flag, num_threads);
+	extract_sequences(vcf_filename, tree_filename, multi_fasta_filename,min_snps,original_multi_fasta_filename,window_min, window_max, uncorrected_p_value, trimming_ratio, extensive_search_flag, scaling_flag, num_threads);
 	create_tree_statistics_file(tree_filename,get_sample_statistics(),number_of_samples_from_parse_phylip());
 	freeup_memory();
 }
 
 
-void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[],int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads)
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[],int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int scaling_flag, int num_threads)
 {
 	FILE *vcf_file_pointer;
 	vcf_file_pointer=fopen(vcf_filename, "r");
@@ -105,7 +105,12 @@ void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fast
 	create_fasta_of_snp_sites(tree_filename, number_of_filtered_snps, filtered_bases_for_snps, sample_names, number_of_samples,internal_nodes);
 	
 	// Create an new tree with updated distances
-	scale_branch_distances(root_node, number_of_filtered_snps);
+  if (scaling_flag == 1) {
+    scale_branch_distances(root_node, number_of_filtered_snps);
+  } else {
+    scale_branch_distances(root_node, length_of_original_genome);
+  }
+	
 
 	FILE *output_tree_pointer;
 	output_tree_pointer=fopen(tree_filename, "w");

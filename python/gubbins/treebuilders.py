@@ -497,7 +497,11 @@ class RAxML:
             else:
                 command.extend(["-m","ASC_GTRGAMMA","--asc-corr=felsenstein"])
         else:
-            command.extend(["-m", self.model])
+            if self.model.startswith("ASC_"):
+                command.extend(["-m", self.model])
+            else:
+                self.invariant_sites = 0
+                command.extend(["-m", self.model])
         command.extend(["-p",self.seed])
         # Additional arguments
         if self.additional_args is not None:
@@ -519,8 +523,8 @@ class RAxML:
     def generate_partition_files(self, command: list, basename: str) -> list:
         """Generate the partition files enumerating invariant site counts"""
         if self.invariant_sites > 0:
-            partitions_fn = os.path.basename(basename) + '.partitions'
-            partition_fn = os.path.basename(basename) + '.partition'
+            partitions_fn = 'invariant_sites.' + os.path.basename(basename) + '.partitions'
+            partition_fn = 'invariant_sites.' + os.path.basename(basename) + '.partition'
             with open(partitions_fn,'w') as partitions_file:
                 partitions_file.write('[asc~' + partition_fn + '], ASC_DNA, p1=1-' + str(self.partition_length) + '\n')
                 partitions_file.flush()
@@ -547,6 +551,7 @@ class RAxML:
     def internal_sequence_reconstruction_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for ancestral sequence reconstruction"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-f", "A", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         command.extend(["-t", input_tree])
@@ -612,6 +617,7 @@ class RAxML:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         # Run bootstraps
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-s", alignment_filename, "-n", basename + ".bootstrapped_trees"])
         command.extend(["-w",tmp])
         command.extend(["-x",self.seed])
@@ -625,6 +631,7 @@ class RAxML:
     def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a single branch support test"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-f", "J"])
         command.extend(["-s", alignment_filename, "-n", input_tree + ".sh_support"])
         command.extend(["-t", input_tree])

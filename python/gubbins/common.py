@@ -554,7 +554,7 @@ def parse_and_run(input_args, program_description=""):
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size,
-            input_args.p_value, input_args.trimming_ratio, input_args.extensive_search, input_args.threads)
+            input_args.p_value, input_args.trimming_ratio, input_args.extensive_search, tree_builder.invariant_site_correction, input_args.threads)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         try:
             subprocess.check_call(gubbins_command, shell=True)
@@ -961,12 +961,14 @@ def select_best_models(snp_alignment_filename,basename,current_tree_builder,all_
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size,
-                           p_value, trimming_ratio, extensive_search, num_threads):
+                           p_value, trimming_ratio, extensive_search, invariant_site_correction, num_threads):
     command = [gubbins_exec, "-r", "-v", vcf_filename, "-a", str(min_window_size),
                "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
                "-m", str(min_snps), "-p", str(p_value), "-i", str(trimming_ratio), "-n", str(num_threads)]
     if extensive_search:
-            command.append("-x")
+        command.append("-x")
+    if not invariant_site_correction:
+        command.append("-s")
     command.append(alignment_filename)
     return " ".join(command)
 

@@ -40,6 +40,7 @@ class Star:
         self.model = "-"
         self.version = "unspecified"
         self.citation = "no citation"
+        self.invariant_site_correction = False
     
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         # Extract taxon names from alignment
@@ -72,6 +73,7 @@ class RapidNJ:
         self.model = model
         self.additional_args = additional_args
         self.bootstrap = bootstrap
+        self.invariant_site_correction = False
 
         # Construct command
         self.executable = "rapidnj"
@@ -141,6 +143,7 @@ class FastTree:
         self.bootstrap = bootstrap
         self.additional_args = additional_args
         self.seed = utils.set_seed(seed)
+        self.invariant_site_correction = False
 
         # Identify executable
         self.potential_executables = ["FastTreeMP","fasttreeMP","FastTree", "fasttree"]
@@ -277,6 +280,7 @@ class IQTree:
         self.use_best = use_best
         self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
     
         # Construct base command
         self.executable = "iqtree"
@@ -311,7 +315,6 @@ class IQTree:
         command.extend(["-seed",self.seed])
         
         # Account for invariant sites
-        print('Inside base counts: ' + str(constant_base_counts))
         command.extend(["-fconst",','.join([str(x) for x in constant_base_counts])])
         
         # Additional arguments
@@ -461,6 +464,7 @@ class RAxML:
         self.invariant_sites = invariant_sites
         self.partition_length = partition_length
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if invariant_sites > 0 else False)
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
         self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2', 'raxmlHPC-PTHREADS-AVX',
@@ -670,6 +674,7 @@ class RAxMLNG:
         self.seed = utils.set_seed(seed)
         self.invariant_sites = invariant_sites
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if invariant_sites > 0 else False)
 
         self.single_threaded_executables = ['raxml-ng']
         self.multi_threaded_executables = ['raxml-ng']
@@ -854,6 +859,7 @@ class VeryFastTree:
         self.bootstrap = bootstrap
         self.additional_args = additional_args
         self.seed = utils.set_seed(seed)
+        self.invariant_site_correction = False
 
         # Identify executable
         self.potential_executables = ["VeryFastTree", "veryfasttree"]

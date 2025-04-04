@@ -162,41 +162,43 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nChecking input alignment file...")
     if not os.path.exists(input_args.alignment_filename):
         sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist")
-    temp_alignment_filename = os.path.join(temp_working_dir,base_filename)
-    os.symlink(os.path.abspath(input_args.alignment_filename), temp_alignment_filename)
-    input_args.alignment_filename = temp_alignment_filename
-    if not ValidateFastaAlignment(temp_alignment_filename).is_input_fasta_file_valid():
+    if not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
         sys.exit("The input alignment file " + input_args.alignment_filename + " is invalid")
+
     # Filter the input alignment and save as temporary alignment file
     printer.print("\nFiltering input alignment...")
-    pre_process_fasta = PreProcessFasta(temp_alignment_filename,
+    temp_alignment_filename = os.path.join(temp_working_dir,base_filename)
+    pre_process_fasta = PreProcessFasta(input_args.alignment_filename,
                                         input_args.verbose,
                                         input_args.filter_percentage)
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
-    overall_alignment_length = pre_process_fasta.get_alignment_length()
+
+    # Get filtered alignment information
+    filtered_alignment = PreProcessFasta(temp_alignment_filename,
+                                        input_args.verbose,
+                                        0.0)
+    overall_alignment_length, sequence_names_in_alignment, base_frequencies = filtered_alignment.get_alignment_information()
+    number_of_sequences_in_alignment = len(sequence_names_in_alignment)
     current_alignment_length = overall_alignment_length
     all_snp_alignment_length = overall_alignment_length
 
     # Check on number of sequences remaining in alignment after validation and processing
     if input_args.pairwise:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+        if number_of_sequences_in_alignment != 2:
             sys.exit("Pairwise mode should only be used for two sequences.")
-    else:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+    elif number_of_sequences_in_alignment < 3:
             sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
     # If outgroup is specified, check it is still in the alignment
     if input_args.outgroup is not None:
-        if input_args.outgroup in taxa_removed:
-            sys.stderr.write('Outgroup removed due to proportion of missing bases\n')
+        if input_args.outgroup not in sequence_names_in_alignment:
+            sys.stderr.write('Outgroup not in filtered alignment - may have been removed due to proportion of missing bases\n')
             sys.exit(1)
 
     # Initialise tree dating algorithm if dates supplied
     if input_args.date is not None:
         if os.path.isfile(input_args.date):
-            # Get sequence names from alignment
-            sequence_names_in_alignment = pre_process_fasta.get_sequence_names()
             # Edit taxon names as in tree
             new_date_file = os.path.join(temp_working_dir,basename + '.dates')
             with open(input_args.date,'r') as in_dates, open(new_date_file,'w') as out_dates:
@@ -949,18 +951,6 @@ def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, curre
             command.append("-x")
     command.append(alignment_filename)
     return " ".join(command)
-
-def number_of_sequences_in_alignment(filename):
-    return len(get_sequence_names_from_alignment(filename))
-
-
-def get_sequence_names_from_alignment(filename):
-    sequence_names = []
-    with open(filename, "r") as handle:
-        for record in SeqIO.parse(handle, "fasta"):
-            sequence_names.append(record.id)
-    return sequence_names
-
 
 def is_starting_tree_valid(starting_tree):
     try:

@@ -25,7 +25,7 @@ class TestAlignmentMethods(unittest.TestCase):
     def test_sequence_composition(self):
         preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'small_alignment.aln'))
         overall_alignment_length, sequence_names_in_alignment, base_frequencies = preprocessfasta.get_alignment_information()
-        assert base_frequencies == [8,4,4,4]
+        assert base_frequencies == [0.4,0.2,0.2,0.2]
 
     def test_get_sequence_names_from_alignment(self):
         preprocessfasta = PreProcessFasta(os.path.join(data_dir, 'small_alignment.aln'))

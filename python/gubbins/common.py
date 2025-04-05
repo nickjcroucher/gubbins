@@ -131,6 +131,10 @@ def parse_and_run(input_args, program_description=""):
     sequence_names_fn = base_filename + ".gaps.sequence_names.csv"
     base_patterns_fn = base_filename + ".gaps.base_patterns.csv"
 
+    # Filter the input alignment and save as temporary alignment file
+    # Create temporary directory for storing working copies of input files
+    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
+
     # If restarting from a previous run
     starting_iteration = 1
     if input_args.resume is not None:
@@ -147,6 +151,7 @@ def parse_and_run(input_args, program_description=""):
                 sys.stderr.write('Resuming Gubbins analysis at iteration ' + str(starting_iteration) + '\n')
             input_args.starting_tree = input_args.resume
             current_tree_name = input_args.starting_tree
+        os.symlink(os.path.join(current_directory,snp_alignment_filename),os.path.join(temp_working_dir,snp_alignment_filename))
 
     # Check if intermediate files from a previous run exist
     intermediate_files = [basename + ".iteration_"]
@@ -155,10 +160,6 @@ def parse_and_run(input_args, program_description=""):
     if utils.do_files_exist(".", intermediate_files, "", input_args.verbose) and input_args.resume is None:
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
-
-    # Filter the input alignment and save as temporary alignment file
-    # Create temporary directory for storing working copies of input files
-    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
 
     # Check if the input files exist and have the right format
     printer.print("\nChecking input alignment file...")
@@ -261,6 +262,7 @@ def parse_and_run(input_args, program_description=""):
                                                     0.0)
             all_snp_alignment_length = pre_process_snp_fasta.get_alignment_length()
             current_alignment_length = all_snp_alignment_length
+            os.symlink(os.path.join(current_directory,snp_alignment_filename),os.path.join(temp_working_dir,snp_alignment_filename))
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
@@ -284,12 +286,15 @@ def parse_and_run(input_args, program_description=""):
         methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
         # Initialise sequence reconstruction if MAR
         if input_args.mar:
+            mar_base_frequencies = base_frequencies
+            if input_args.seq_recon == "iqtree":
+                mar_base_frequencies = [0.0,0.0,0.0,0.0]
             sequence_reconstructor = return_algorithm(input_args.seq_recon,
                                                       current_recon_model,
                                                       input_args,
                                                       all_snp_alignment_length,
                                                       overall_alignment_length,
-                                                      [0.0,0.0,0.0,0.0],
+                                                      mar_base_frequencies,
                                                       node_labels = internal_node_label_prefix,
                                                       extra = input_args.seq_recon_args)
             methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
@@ -349,7 +354,7 @@ def parse_and_run(input_args, program_description=""):
         current_tree_name = current_basename + ".tre"
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
         if i == starting_iteration:
-            for fn in [gaps_alignment_filename, gaps_vcf_filename, joint_sequences_filename, alignment_filename]:
+            for fn in [gaps_alignment_filename, gaps_vcf_filename, joint_sequences_filename, alignment_filename, base_filename + ".start"]:
                 target_file = os.path.join(base_directory,temp_working_dir,os.path.basename(fn))
                 if not os.path.isfile(target_file):
                     os.symlink(os.path.abspath(fn), target_file)
@@ -404,7 +409,7 @@ def parse_and_run(input_args, program_description=""):
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
-        current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+        current_tree_name_with_internal_nodes = os.path.join(temp_working_dir, current_tree_name + ".internal")
 
         if not input_args.mar:
         
@@ -428,6 +433,7 @@ def parse_and_run(input_args, program_description=""):
                 methods_log = update_methods_log(methods_log, method = pyjar_method, step = 'Sequence reconstructor')
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
+            os.chdir(temp_working_dir)
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
                                                                         os.path.abspath(temp_rooted_tree),
                                                                         temp_working_dir + '/' + current_basename)
@@ -483,6 +489,7 @@ def parse_and_run(input_args, program_description=""):
                                                   temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes,
                                                   "pyjar")
+            os.chdir(current_directory)
             printer.print(["\nDone transfer"])
             
         else:
@@ -516,7 +523,7 @@ def parse_and_run(input_args, program_description=""):
                 sys.exit("Failed while reconstructing the ancestral sequences: " + e.output)
             os.chdir(current_directory)
             # 3.4b. Join ancestral sequences with given sequences
-            current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+            current_tree_name_with_internal_nodes = os.path.join(temp_working_dir,current_tree_name + ".internal")
             sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
@@ -683,6 +690,7 @@ def parse_and_run(input_args, program_description=""):
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
+    shutil.copyfile(os.path.join(temp_working_dir, current_tree_name + ".internal"), current_tree_name + ".internal")
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
@@ -862,6 +870,8 @@ def return_algorithm_choices(args,i):
 
 def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, complete_aln_length, base_frequencies, node_labels = None, extra = None):
     initialised_algorithm = None
+    constant_sites = (complete_aln_length - snp_aln_length)
+    constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
     if algorithm_choice == "fasttree":
         initialised_algorithm = FastTree(threads = input_args.threads,
                                           model = model,
@@ -879,7 +889,7 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
     elif algorithm_choice == "raxml":
         initialised_algorithm = RAxML(threads = input_args.threads,
                                       model = model,
-                                      invariant_sites = complete_aln_length - snp_aln_length,
+                                      constant_base_counts = constant_base_counts,
                                       partition_length = snp_aln_length,
                                       seed = input_args.seed,
                                       bootstrap = input_args.bootstrap,
@@ -890,14 +900,12 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
         initialised_algorithm = RAxMLNG(threads = input_args.threads,
                                         model = model,
                                         seed = input_args.seed,
-                                        invariant_sites = complete_aln_length - snp_aln_length,
+                                        constant_base_counts = constant_base_counts,
                                         bootstrap = input_args.bootstrap,
                                         internal_node_prefix = node_labels,
                                         verbose = input_args.verbose,
                                         additional_args = extra)
     elif algorithm_choice == "iqtree":
-        constant_sites = (complete_aln_length - snp_aln_length)
-        constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
         initialised_algorithm = IQTree(threads = input_args.threads,
                                         model = model,
                                         seed = input_args.seed,

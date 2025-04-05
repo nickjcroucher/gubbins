@@ -263,7 +263,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [], seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [0.0,0.0,0.0,0.0], seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -446,7 +446,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', invariant_sites = 0, partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', constant_base_counts = [0,0,0,0], partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -461,10 +461,10 @@ class RAxML:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
-        self.invariant_sites = invariant_sites
+        self.constant_base_counts = constant_base_counts
         self.partition_length = partition_length
         self.additional_args = additional_args
-        self.invariant_site_correction = (True if invariant_sites > 0 else False)
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
         self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2', 'raxmlHPC-PTHREADS-AVX',
@@ -486,30 +486,30 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            if self.invariant_sites == 0:
+            if not self.invariant_site_correction:
                 command.extend(["-m", "GTRGAMMA","--JC69"])
             else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--JC69"])
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--JC69"])
         elif self.model == 'K2P':
-            if self.invariant_sites == 0:
+            if not self.invariant_site_correction:
                 command.extend(["-m", "GTRGAMMA","--K80"])
             else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--K80"])
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--K80"])
         elif self.model == 'HKY':
-            if self.invariant_sites == 0:
+            if not self.invariant_site_correction:
                 command.extend(["-m", "GTRGAMMA","--HKY85"])
             else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=felsenstein","--HKY85"])
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--HKY85"])
         elif self.model == 'GTRGAMMA':
-            if self.invariant_sites == 0:
+            if not self.invariant_site_correction:
                 command.extend(["-m","GTRGAMMA"])
             else:
-                command.extend(["-m","ASC_GTRGAMMA","--asc-corr=felsenstein"])
+                command.extend(["-m","ASC_GTRGAMMA","--asc-corr=stamatakis"])
         else:
             if self.model.startswith("ASC_"):
                 command.extend(["-m", self.model])
             else:
-                self.invariant_sites = 0
+                self.invariant_site_correction = False
                 command.extend(["-m", self.model])
         command.extend(["-p",self.seed])
         # Additional arguments
@@ -531,14 +531,15 @@ class RAxML:
 
     def generate_partition_files(self, command: list, basename: str) -> list:
         """Generate the partition files enumerating invariant site counts"""
-        if self.invariant_sites > 0:
+        current_wd = os.getcwd()
+        if self.invariant_site_correction:
             partitions_fn = 'invariant_sites.' + os.path.basename(basename) + '.partitions'
             partition_fn = 'invariant_sites.' + os.path.basename(basename) + '.partition'
             with open(partitions_fn,'w') as partitions_file:
                 partitions_file.write('[asc~' + partition_fn + '], ASC_DNA, p1=1-' + str(self.partition_length) + '\n')
                 partitions_file.flush()
             with open(partition_fn,'w') as partition_file:
-                partition_file.write(str(self.invariant_sites) + '\n')
+                partition_file.write(' '.join([str(x) for x in self.constant_base_counts]) + '\n')
                 partition_file.flush()
             command.extend(["-q", partitions_fn])
         return command
@@ -657,7 +658,7 @@ class RAxML:
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model: str, invariant_sites = 0, bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
+    def __init__(self, threads: 1, model: str, constant_base_counts = [0,0,0,0], bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -672,9 +673,9 @@ class RAxMLNG:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
-        self.invariant_sites = invariant_sites
+        self.constant_base_counts = constant_base_counts
         self.additional_args = additional_args
-        self.invariant_site_correction = (True if invariant_sites > 0 else False)
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxml-ng']
         self.multi_threaded_executables = ['raxml-ng']
@@ -694,15 +695,15 @@ class RAxMLNG:
         # Add model
         command.extend(["--model"])
         if self.model == 'JC':
-            command.extend(["JC+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["JC+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'K2P':
-            command.extend(["K80+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["K80+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'HKY':
-            command.extend(["HKY+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["HKY+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'GTR':
-            command.extend(["GTR+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["GTR+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["GTR+G+ASC_FELS{" + str(invariant_sites) + "}"])
+            command.extend(["GTR+G+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         else:
             command.extend([self.model])
         command.extend(["--seed",self.seed])

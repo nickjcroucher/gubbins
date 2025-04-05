@@ -658,6 +658,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--bootstrap","10",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -670,6 +671,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--bootstrap","1000",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -772,6 +774,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--threads", "1",
                                                     "--sh-test",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -784,6 +787,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--threads", "1",
                                                     "--sh-test",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))

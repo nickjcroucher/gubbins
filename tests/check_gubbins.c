@@ -73,7 +73,7 @@ START_TEST (check_gubbins_multiple_recombinations)
                 "../tests/data/multiple_recombinations.jar.aln",
                 3,
                 "../tests/data/multiple_recombinations.aln",
-                30,100,0.05,1,0,0,1);
+                30,100,0.05,1,0,1,1);
 
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.tab") == 1);
 	ck_assert(file_exists("../tests/data/multiple_recombinations.tre.vcf") == 1);

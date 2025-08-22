@@ -99,7 +99,7 @@ class PreProcessFasta(object):
             if number_of_included_alignments <= 1:
                 sys.exit("Not enough sequences are left after removing duplicates.Please check you input data.")
 
-        with open(output_filename, "w+") as output_handle:
+        with open(output_filename, "w") as output_handle:
             AlignIO.write(MultipleSeqAlignment(output_alignments), output_handle, "fasta")
 
         return taxa_to_remove
@@ -112,3 +112,22 @@ class PreProcessFasta(object):
                 for record in alignment:
                     sequence_names.append(record.id)
         return sequence_names
+    
+    def get_alignment_length(self, format = "fasta"):
+        alignment = AlignIO.read(self.input_filename, format)
+        return alignment.get_alignment_length()
+
+    def get_alignment_information(self, format = "fasta"):
+        sequence_names = []
+        base_frequencies = [0,0,0,0]
+        alignment = AlignIO.read(self.input_filename, format)
+        alignment_length = alignment.get_alignment_length()
+        
+        for record in alignment:
+            sequence_names.append(record.id)
+            for index,base in enumerate(['A','C','G','T']):
+                base_frequencies[index] += (record.seq.count(base) + record.seq.count(base.lower()))
+        
+        base_frequencies = [b/(alignment_length*len(sequence_names)) for b in base_frequencies]
+        
+        return alignment_length, sequence_names, base_frequencies

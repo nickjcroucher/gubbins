@@ -91,17 +91,40 @@ class TestExternalDependencies(unittest.TestCase):
         self.cleanup('multiple_recombinations')
         assert exit_code == 0
 
-    # Test resuming a default analysis
-    def test_fasttree_resume(self):
+    def test_veryfasttree(self):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
-        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    def test_veryfasttree_seed(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
+                                                    "--verbose", "--iterations", "3",
+                                                    "--seed","42",
+                                                    "--threads", "1",
+                                                    os.path.join(data_dir, 'multiple_recombinations.aln')]))
+        exit_code = self.check_for_output_files('multiple_recombinations')
+        self.cleanup('multiple_recombinations')
+        assert exit_code == 0
+
+    # Test resuming a default analysis
+    def test_veryfasttree_resume(self):
+        exit_code = 1
+        parser = run_gubbins.parse_input_args()
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
                                                     "--verbose", "--iterations", "3",
                                                     "--threads", "1",
                                                     "--no-cleanup",
                                                     "--prefix", "original",
                                                     os.path.join(data_dir, 'multiple_recombinations.aln')]))
-        common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+        common.parse_and_run(parser.parse_args(["--tree-builder", "veryfasttree",
                                             "--verbose", "--iterations", "3",
                                             "--resume", "multiple_recombinations.iteration_1.tre",
                                             "--threads", "1",
@@ -635,6 +658,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--bootstrap","10",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -647,6 +671,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--bootstrap","1000",
                                                     "--threads", "1",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -749,6 +774,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--threads", "1",
                                                     "--sh-test",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -761,6 +787,7 @@ class TestExternalDependencies(unittest.TestCase):
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
                                                     "--verbose", "--iterations", "3",
+                                                    "--model","HKY",
                                                     "--threads", "1",
                                                     "--sh-test",
                                                     os.path.join(data_dir, 'bootstrapping_test.aln')]))
@@ -845,12 +872,9 @@ class TestExternalDependencies(unittest.TestCase):
         regex_to_remove = prefix + ".*"
         for file in glob.glob(regex_to_remove):
             os.remove(file)
-        tmp_to_remove = "./tmp*/*"
-        for file in glob.glob(tmp_to_remove):
-            os.remove(file)
         for dir in glob.glob("./tmp*"):
             if os.path.isdir(dir):
-                os.rmdir(dir)
+                shutil.rmtree(dir)
 
 if __name__ == "__main__":
     unittest.main(buffer=True)

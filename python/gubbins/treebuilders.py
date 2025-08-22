@@ -40,6 +40,7 @@ class Star:
         self.model = "-"
         self.version = "unspecified"
         self.citation = "no citation"
+        self.invariant_site_correction = False
     
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         # Extract taxon names from alignment
@@ -50,8 +51,8 @@ class Star:
 
         # Write tree
         star_tree_string = "("
-        star_tree_string = star_tree_string + ':0.9,'.join(taxon_names)
-        star_tree_string = star_tree_string + ':1);' # mid point rooting fails with equidistant taxa
+        star_tree_string = star_tree_string + ':0.09,'.join(taxon_names)
+        star_tree_string = star_tree_string + ':0.1);' # mid point rooting fails with equidistant taxa
 
         # Print to file
         output_tree = basename + self.tree_suffix
@@ -72,6 +73,7 @@ class RapidNJ:
         self.model = model
         self.additional_args = additional_args
         self.bootstrap = bootstrap
+        self.invariant_site_correction = False
 
         # Construct command
         self.executable = "rapidnj"
@@ -141,6 +143,7 @@ class FastTree:
         self.bootstrap = bootstrap
         self.additional_args = additional_args
         self.seed = utils.set_seed(seed)
+        self.invariant_site_correction = False
 
         # Identify executable
         self.potential_executables = ["FastTreeMP","fasttreeMP","FastTree", "fasttree"]
@@ -156,6 +159,7 @@ class FastTree:
         # Function for returning base command
         command = [self.executable]
         command.extend(["-nt"])
+        command.extend(["-rawdist"]) # https://morgannprice.github.io/fasttree/
         if self.model == 'JC':
             command.extend(["-nocat"])
         elif self.model == 'GTR':
@@ -259,7 +263,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [0.0,0.0,0.0,0.0], seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -276,6 +280,7 @@ class IQTree:
         self.use_best = use_best
         self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
     
         # Construct base command
         self.executable = "iqtree"
@@ -291,23 +296,27 @@ class IQTree:
         # Set parallelisation
         command.extend(["-T", str(self.threads)])
 
-        # Add flags
+        # Define model
         command.extend(["-safe","-redo"])
         if self.use_best:
             pass
         elif self.model == 'JC':
-            command.extend(["-m", "JC"])
+            command.extend(["-m", "JC+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'K2P':
-            command.extend(["-m", "K2P"])
+            command.extend(["-m", "K2P+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'HKY':
-            command.extend(["-m", "HKY"])
+            command.extend(["-m", "HKY+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'GTR':
-            command.extend(["-m","GTR"])
+            command.extend(["-m","GTR+I{" + str(invariant_proportion) + "}"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTR+G4"])
+            command.extend(["-m","GTR+G4+I{" + str(invariant_proportion) + "}"])
         else:
             command.extend(["-m",self.model])
         command.extend(["-seed",self.seed])
+        
+        # Account for invariant sites
+        command.extend(["-fconst",','.join([str(x) for x in constant_base_counts])])
+        
         # Additional arguments
         if self.additional_args is not None:
             command.extend([self.additional_args])
@@ -437,7 +446,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', constant_base_counts = [0,0,0,0], partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -452,7 +461,10 @@ class RAxML:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
+        self.constant_base_counts = constant_base_counts
+        self.partition_length = partition_length
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
         self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2', 'raxmlHPC-PTHREADS-AVX',
@@ -474,17 +486,31 @@ class RAxML:
         # Add flags
         command.extend(["-safe"])
         if self.model == 'JC':
-            command.extend(["-m", "GTRCAT","--JC69"])
+            if not self.invariant_site_correction:
+                command.extend(["-m", "GTRGAMMA","--JC69"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--JC69"])
         elif self.model == 'K2P':
-            command.extend(["-m", "GTRCAT","--K80"])
+            if not self.invariant_site_correction:
+                command.extend(["-m", "GTRGAMMA","--K80"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--K80"])
         elif self.model == 'HKY':
-            command.extend(["-m", "GTRCAT","--HKY85"])
-        elif self.model == 'GTRCAT':
-            command.extend(["-m","GTRCAT", "-V"])
+            if not self.invariant_site_correction:
+                command.extend(["-m", "GTRGAMMA","--HKY85"])
+            else:
+                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--HKY85"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTRGAMMA"])
+            if not self.invariant_site_correction:
+                command.extend(["-m","GTRGAMMA"])
+            else:
+                command.extend(["-m","ASC_GTRGAMMA","--asc-corr=stamatakis"])
         else:
-            command.extend(["-m", self.model])
+            if self.model.startswith("ASC_"):
+                command.extend(["-m", self.model])
+            else:
+                self.invariant_site_correction = False
+                command.extend(["-m", self.model])
         command.extend(["-p",self.seed])
         # Additional arguments
         if self.additional_args is not None:
@@ -503,9 +529,27 @@ class RAxML:
                 break
         return version
 
+    def generate_partition_files(self, command: list, basename: str) -> list:
+        """Generate the partition files enumerating invariant site counts"""
+        current_wd = os.getcwd()
+        if self.invariant_site_correction:
+            partitions_fn = 'invariant_sites.' + os.path.basename(basename) + '.partitions'
+            partition_fn = 'invariant_sites.' + os.path.basename(basename) + '.partition'
+            with open(partitions_fn,'w') as partitions_file:
+                partitions_file.write('[asc~' + partition_fn + '], ASC_DNA, p1=1-' + str(self.partition_length) + '\n')
+                partitions_file.flush()
+            with open(partition_fn,'w') as partition_file:
+                partition_file.write(' '.join([str(x) for x in self.constant_base_counts]) + '\n')
+                partition_file.flush()
+            command.extend(["-q", partitions_fn])
+        return command
+        
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
         command = self.base_command.copy()
+        # Write partition input files - https://cme.h-its.org/exelixis/resource/download/NewManual.pdf
+        command = self.generate_partition_files(command,basename)
+        # Complete command string
         command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         if input_tree:
@@ -517,6 +561,7 @@ class RAxML:
     def internal_sequence_reconstruction_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for ancestral sequence reconstruction"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-f", "A", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         command.extend(["-t", input_tree])
@@ -572,6 +617,7 @@ class RAxML:
     def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Fits a nucleotide substitution model to a tree and an alignment"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-s", alignment_filename, "-n", os.path.basename(basename) + '_reconstruction', "-t", input_tree])
         command.extend(["-f e"])
         command.extend(["-w",os.path.dirname(basename)])
@@ -581,6 +627,7 @@ class RAxML:
         """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
         # Run bootstraps
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-s", alignment_filename, "-n", basename + ".bootstrapped_trees"])
         command.extend(["-w",tmp])
         command.extend(["-x",self.seed])
@@ -594,6 +641,7 @@ class RAxML:
     def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
         """Runs a single branch support test"""
         command = self.base_command.copy()
+        command = self.generate_partition_files(command,basename)
         command.extend(["-f", "J"])
         command.extend(["-s", alignment_filename, "-n", input_tree + ".sh_support"])
         command.extend(["-t", input_tree])
@@ -610,7 +658,7 @@ class RAxML:
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
+    def __init__(self, threads: 1, model: str, constant_base_counts = [0,0,0,0], bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -625,7 +673,9 @@ class RAxMLNG:
         self.internal_node_prefix = internal_node_prefix
         self.bootstrap = bootstrap
         self.seed = utils.set_seed(seed)
+        self.constant_base_counts = constant_base_counts
         self.additional_args = additional_args
+        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxml-ng']
         self.multi_threaded_executables = ['raxml-ng']
@@ -645,15 +695,15 @@ class RAxMLNG:
         # Add model
         command.extend(["--model"])
         if self.model == 'JC':
-            command.extend(["JC"])
+            command.extend(["JC+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'K2P':
-            command.extend(["K80"])
+            command.extend(["K80+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'HKY':
-            command.extend(["HKY"])
+            command.extend(["HKY+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'GTR':
-            command.extend(["GTR"])
+            command.extend(["GTR+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         elif self.model == 'GTRGAMMA':
-            command.extend(["GTR+G"])
+            command.extend(["GTR+G+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
         else:
             command.extend([self.model])
         command.extend(["--seed",self.seed])
@@ -794,4 +844,131 @@ class RAxMLNG:
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
         """Return bootstrapped tree files name"""
         file_name = tmp + "/" + basename + ".raxml.bootstraps"
+        return file_name
+
+class VeryFastTree:
+    """Class for operations with the VeryFastTree executable"""
+
+    def __init__(self, threads: int, bootstrap = 0, model='GTRCAT', seed = None, verbose = False, additional_args = None):
+        """Initialises the object"""
+        self.verbose = verbose
+        self.threads = threads
+        self.model = model
+        self.tree_prefix = ""
+        self.tree_suffix = ".tre"
+        self.alignment_suffix = ".snp_sites.aln"
+        self.bootstrap = bootstrap
+        self.additional_args = additional_args
+        self.seed = utils.set_seed(seed)
+        self.invariant_site_correction = False
+
+        # Identify executable
+        self.potential_executables = ["VeryFastTree", "veryfasttree"]
+        self.executable = utils.choose_executable(self.potential_executables)
+        if self.executable is None:
+            sys.exit("No usable version of VeryFastTree could be found.")
+
+        # Reproducibility
+        self.name = 'VeryFastTree'
+        self.version = self.get_version(self.executable)
+        self.citation = "https://doi.org/10.1093/gigascience/giae055"
+
+        # Function for returning base command
+        command = [self.executable]
+        command.extend(["-nt"])
+        command.extend(["-rawdist"]) # https://morgannprice.github.io/fasttree/
+        if self.model == 'JC':
+            command.extend(["-nocat"])
+        elif self.model == 'GTR':
+            command.extend(["-gtr","-nocat"])
+        elif self.model == 'GTRGAMMA':
+            command.extend(["-gtr","-gamma"])
+        elif self.model == 'GTRCAT':
+            command.extend(["-gtr"])
+        else:
+            command.extend([self.model])
+        command.extend(["-seed",self.seed])
+        # Set number threads
+        command.extend(["-threads",str(self.threads)])
+        # Additional arguments
+        if self.additional_args is not None:
+            command.extend([self.additional_args])
+        # Define final command
+        self.base_command = command
+
+    def get_version(self,exe) -> str:
+        """Gets the version of the tree building algorithm being used"""
+        version = "Not determined"
+        version_message = subprocess.run([exe], capture_output=True)
+        for line in version_message.stderr.decode().splitlines():
+            if line.startswith('VeryFastTree'):
+                info = line.split()
+                version = info[1]
+                break
+        return version
+
+    def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Constructs the command to call the VeryFastTree executable"""
+        command = self.base_command.copy()
+        # N.B. version 4.0.4 - intree appears to cause a problem so is not used in command construction
+#        if input_tree:
+#            command.extend(["-intree", input_tree])
+        output_tree = basename + self.tree_suffix
+        command.extend(["-nosupport"])
+        command.extend(["-out", output_tree])
+        command.extend(["-log", basename + '.log'])
+        command.append(alignment_filename)
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
+    
+    def get_info_filename(self, tmp: str, basename: str) -> str:
+        """Returns the name of the file containing the fitted model parameters"""
+        fn = tmp + '/' + basename + '.log'
+        return fn
+    
+    def get_recontree_filename(self, tmp: str, basename: str) -> str:
+        """Returns the name of the tree generated by model fitting"""
+        fn = tmp + '/' + basename + '.treefile'
+        return fn
+
+    def model_fitting_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
+        """Fits a nucleotide substitution model to a tree and an alignment"""
+        command = self.base_command.copy()
+        command.extend(["-mllen","-nome"])
+        command.extend(["-nosupport"])
+        command.extend(["-intree",input_tree])
+        command.extend(["-log", basename + ".log"])
+        command.extend(["-out", basename + ".treefile"])
+        command.extend([alignment_filename])
+        return " ".join(command)
+        
+    def bootstrapping_command(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a bootstrapping analysis and annotates the nodes of a summary tree"""
+        command = self.base_command.copy()
+        output_tree = basename + self.tree_suffix
+        command.extend(["-nosupport"])
+        command.extend(["-intree1",input_tree]) # http://www.microbesonline.org/fasttree/
+        command.extend(["-out", tmp + "/" + basename + ".bootstrapped_trees"])
+        command.extend(["-log", basename + ".log"])
+        command.extend(["-n", str(self.bootstrap)])
+        command.append(alignment_filename + ".bootstrapping.aln")
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
+    
+    def sh_test(self, alignment_filename: str, input_tree: str, basename: str, tmp: str) -> str:
+        """Runs a single branch support test"""
+        command = self.base_command.copy()
+        command.extend(["-mllen","-nome"])
+        command.extend(["-intree",input_tree])
+        command.extend(["-out",tmp + "/" + input_tree + ".sh_support"])
+        command.extend([alignment_filename])
+        if not self.verbose:
+            command.extend([">", "/dev/null", "2>&1"])
+        return " ".join(command)
+
+    def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:
+        """Return bootstrapped tree files name"""
+        file_name = tmp + "/" + basename + ".bootstrapped_trees"
         return file_name

@@ -52,6 +52,7 @@ void print_usage(FILE* stream, int exit_code)
            "  -b    Max window size\n"
            "  -p    p value for detecting recombinations\n"
            "  -i    p value ratio for trimming recombinations\n"
+           "  -s    scale branch lengths without correcting for invariant sites\n"
            "  -h    Display this usage information.\n\n"
 );
   exit (exit_code);
@@ -87,6 +88,7 @@ int main (int argc, char ** argv)
     float uncorrected_p_value = 0.05;
     float trimming_ratio = 1.0;
     int extensive_search_flag = 0;
+    int scaling_flag = 0;
     int num_threads = 1;
     program_name = argv[0];
   
@@ -106,12 +108,13 @@ int main (int argc, char ** argv)
             {"trimming_ratio",      required_argument, 0, 'i'},
             {"extended_search",     required_argument, 0, 'x'},
             {"ncpu",                required_argument, 0, 'n'},
+            {"scaling",             required_argument, 0, 's'},
 
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long (argc, argv, "hrxv:f:t:m:a:b:p:i:n:",
+        c = getopt_long (argc, argv, "hrxsv:f:t:m:a:b:p:i:n:",
                            long_options, &option_index);
         /* Detect the end of the options. */
         if (c == -1)
@@ -135,6 +138,9 @@ int main (int argc, char ** argv)
                 break;
             case 'x':
                 extensive_search_flag = 1;
+                break;
+            case 's':
+                scaling_flag = 1;
                 break;
             case 'f':
                 memcpy(original_multi_fasta_filename, optarg, size_of_string(optarg) +1);
@@ -195,6 +201,7 @@ int main (int argc, char ** argv)
                     uncorrected_p_value,
                     trimming_ratio,
                     extensive_search_flag,
+                    scaling_flag,
                     num_threads);
     }
     else

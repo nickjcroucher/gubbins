@@ -23,8 +23,8 @@
 #include "seqUtil.h"
 #include "Newickform.h"
 
-void run_gubbins(char vcf_filename[], char tree_filename[], char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int num_threads);
-void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int n_threads);
+void run_gubbins(char vcf_filename[], char tree_filename[], char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int scaling_flag, int num_threads);
+void extract_sequences(char vcf_filename[], char tree_filename[],char multi_fasta_filename[], int min_snps, char original_multi_fasta_filename[], int window_min, int window_max, float uncorrected_p_value, float trimming_ratio, int extensive_search_flag, int scaling_flag, int n_threads);
 char find_first_real_base(int base_position,  int number_of_child_sequences, char ** child_sequences);
 
 

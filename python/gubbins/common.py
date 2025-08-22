@@ -40,21 +40,32 @@ from Bio.Seq import Seq
 # Gubbins imports
 from gubbins.PreProcessFasta import PreProcessFasta
 from gubbins.ValidateFastaAlignment import ValidateFastaAlignment
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.treebuilders import FastTree, VeryFastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 from gubbins.pyjar import jar, get_base_patterns
 from gubbins import utils
 from gubbins.__init__ import version
 from gubbins.pyjar import jar, get_base_patterns, Pyjar
-from gubbins.treebuilders import FastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
+from gubbins.treebuilders import FastTree, VeryFastTree, IQTree, RAxML, RAxMLNG, RapidNJ, Star
 
 # Phylogenetic models valid for each algorithm
 tree_models = {
     'star': ['JC','GTRCAT','GTRGAMMA'],
-    'raxml': ['JC','K2P','HKY','GTRCAT','GTRGAMMA'],
+    'raxml': ['JC','K2P','HKY','GTRGAMMA'],
     'raxmlng': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'iqtree': ['JC','K2P','HKY','GTR','GTRGAMMA'],
     'fasttree': ['JC','GTRCAT','GTRGAMMA'],
-    'rapidnj': ['JC','K2P']
+    'rapidnj': ['JC','K2P'],
+    'veryfasttree': ['JC','GTRCAT','GTRGAMMA']
+}
+
+suffix_dict = {
+    'star': '.snp_sites.aln',
+    'raxml': '.snp_sites.aln',
+    'raxmlng': '.phylip',
+    'iqtree': '.phylip',
+    'fasttree': '.snp_sites.aln',
+    'rapidnj': '.snp_sites.aln',
+    'veryfasttree': '.snp_sites.aln'
 }
 
 def parse_and_run(input_args, program_description=""):
@@ -95,21 +106,12 @@ def parse_and_run(input_args, program_description=""):
     # Select the algorithms used for the first iteration
     current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_model_arguments, custom_model, custom_recon_model = return_algorithm_choices(input_args,1)
     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
-    # Initialise tree builder
-    tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-    alignment_suffix = tree_builder.alignment_suffix
-    methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
-    # Initialise model fitter
-    model_fitter = return_algorithm(current_model_fitter, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = extra_model_arguments)
-    methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
-    # Initialise sequence reconstruction if MAR
-    if input_args.mar:
-        sequence_reconstructor = return_algorithm(input_args.seq_recon, current_recon_model, input_args, node_labels = internal_node_label_prefix, extra = input_args.seq_recon_args)
-        methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
 
     # Initialise IQtree
     tree_dater = IQTree(threads = input_args.threads,
                             model = current_model,
+                            invariant_proportion = 0,
+                            constant_base_counts = [0.0,0.0,0.0,0.0],
                             verbose = input_args.verbose
                         )
 
@@ -126,6 +128,12 @@ def parse_and_run(input_args, program_description=""):
     gaps_alignment_filename = base_filename + ".gaps.snp_sites.aln"
     gaps_vcf_filename = base_filename + ".gaps.vcf"
     joint_sequences_filename = base_filename + ".seq.joint.aln"
+    sequence_names_fn = base_filename + ".gaps.sequence_names.csv"
+    base_patterns_fn = base_filename + ".gaps.base_patterns.csv"
+
+    # Filter the input alignment and save as temporary alignment file
+    # Create temporary directory for storing working copies of input files
+    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
 
     # If restarting from a previous run
     starting_iteration = 1
@@ -143,6 +151,7 @@ def parse_and_run(input_args, program_description=""):
                 sys.stderr.write('Resuming Gubbins analysis at iteration ' + str(starting_iteration) + '\n')
             input_args.starting_tree = input_args.resume
             current_tree_name = input_args.starting_tree
+        os.symlink(os.path.join(current_directory,snp_alignment_filename),os.path.join(temp_working_dir,snp_alignment_filename))
 
     # Check if intermediate files from a previous run exist
     intermediate_files = [basename + ".iteration_"]
@@ -152,46 +161,47 @@ def parse_and_run(input_args, program_description=""):
         sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
                  "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
 
-    # Filter the input alignment and save as temporary alignment file
-    # Create temporary directory for storing working copies of input files
-    temp_working_dir = tempfile.mkdtemp(dir=os.getcwd())
-
     # Check if the input files exist and have the right format
     printer.print("\nChecking input alignment file...")
     if not os.path.exists(input_args.alignment_filename):
         sys.exit("The input alignment file " + input_args.alignment_filename + " does not exist")
-    temp_alignment_filename = temp_working_dir + "/" + base_filename
-    shutil.copyfile(input_args.alignment_filename, temp_alignment_filename)
-    input_args.alignment_filename = temp_alignment_filename
-    if not ValidateFastaAlignment(temp_alignment_filename).is_input_fasta_file_valid():
+    if not ValidateFastaAlignment(input_args.alignment_filename).is_input_fasta_file_valid():
         sys.exit("The input alignment file " + input_args.alignment_filename + " is invalid")
+
     # Filter the input alignment and save as temporary alignment file
     printer.print("\nFiltering input alignment...")
-    pre_process_fasta = PreProcessFasta(temp_alignment_filename,
+    temp_alignment_filename = os.path.join(temp_working_dir,base_filename)
+    pre_process_fasta = PreProcessFasta(input_args.alignment_filename,
                                         input_args.verbose,
                                         input_args.filter_percentage)
     taxa_removed = pre_process_fasta.remove_duplicate_sequences_and_sequences_missing_too_much_data(
         temp_alignment_filename, input_args.remove_identical_sequences)
 
+    # Get filtered alignment information
+    filtered_alignment = PreProcessFasta(temp_alignment_filename,
+                                        input_args.verbose,
+                                        0.0)
+    overall_alignment_length, sequence_names_in_alignment, base_frequencies = filtered_alignment.get_alignment_information()
+    number_of_sequences_in_alignment = len(sequence_names_in_alignment)
+    current_alignment_length = overall_alignment_length
+    all_snp_alignment_length = overall_alignment_length
+
     # Check on number of sequences remaining in alignment after validation and processing
     if input_args.pairwise:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) != 2:
+        if number_of_sequences_in_alignment != 2:
             sys.exit("Pairwise mode should only be used for two sequences.")
-    else:
-        if number_of_sequences_in_alignment(input_args.alignment_filename) < 3:
+    elif number_of_sequences_in_alignment < 3:
             sys.exit("Three or more sequences are required for a meaningful phylogenetic analysis.")
 
     # If outgroup is specified, check it is still in the alignment
     if input_args.outgroup is not None:
-        if input_args.outgroup in taxa_removed:
-            sys.stderr.write('Outgroup removed due to proportion of missing bases\n')
+        if input_args.outgroup not in sequence_names_in_alignment:
+            sys.stderr.write('Outgroup not in filtered alignment - may have been removed due to proportion of missing bases\n')
             sys.exit(1)
 
     # Initialise tree dating algorithm if dates supplied
     if input_args.date is not None:
         if os.path.isfile(input_args.date):
-            # Get sequence names from alignment
-            sequence_names_in_alignment = pre_process_fasta.get_sequence_names()
             # Edit taxon names as in tree
             new_date_file = os.path.join(temp_working_dir,basename + '.dates')
             with open(input_args.date,'r') as in_dates, open(new_date_file,'w') as out_dates:
@@ -230,7 +240,9 @@ def parse_and_run(input_args, program_description=""):
     printer.print(["\nRunning Gubbins to detect SNPs...", gubbins_command])
     try:
         subprocess.check_call(gubbins_command, shell=True)
-    except subprocess.SubprocessError:
+    except subprocess.SubprocessError as e:
+        if e.output is not None:
+            print("Gubbins error: " + e.output)
         sys.exit("Gubbins crashed, please ensure you have enough free memory")
     printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
     reconvert_fasta_file(snp_alignment_filename, snp_alignment_filename)
@@ -241,12 +253,58 @@ def parse_and_run(input_args, program_description=""):
         printer.print("\n*** Iteration " + str(i) + " ***")
 
         # Define file names
+        alignment_suffix = get_alignment_suffix(current_tree_builder)
         if i == 1:
             previous_tree_name = input_args.starting_tree
             alignment_filename = base_filename + alignment_suffix
+            pre_process_snp_fasta = PreProcessFasta(snp_alignment_filename,
+                                                    input_args.verbose,
+                                                    0.0)
+            all_snp_alignment_length = pre_process_snp_fasta.get_alignment_length()
+            current_alignment_length = all_snp_alignment_length
+            os.symlink(os.path.join(current_directory,snp_alignment_filename),os.path.join(temp_working_dir,snp_alignment_filename))
         else:
             previous_tree_name = current_tree_name
             alignment_filename = previous_tree_name + alignment_suffix
+            pre_process_snp_fasta = PreProcessFasta(alignment_filename,
+                                                    input_args.verbose,
+                                                    0.0)
+            if alignment_suffix.endswith('phylip'):
+                current_alignment_length = pre_process_snp_fasta.get_alignment_length('phylip-relaxed')
+            else:
+                current_alignment_length = pre_process_snp_fasta.get_alignment_length()
+
+        # Initialise model fitter
+        model_fitter = return_algorithm(current_model_fitter,
+                                        current_recon_model,
+                                        input_args,
+                                        all_snp_alignment_length,
+                                        overall_alignment_length,
+                                        base_frequencies,
+                                        node_labels = internal_node_label_prefix,
+                                        extra = extra_model_arguments)
+        methods_log = update_methods_log(methods_log, method = model_fitter, step = 'Model fitter (1st iteration)')
+        # Initialise sequence reconstruction if MAR
+        if input_args.mar:
+            mar_base_frequencies = base_frequencies
+            if input_args.seq_recon == "iqtree":
+                mar_base_frequencies = [0.0,0.0,0.0,0.0]
+            sequence_reconstructor = return_algorithm(input_args.seq_recon,
+                                                      current_recon_model,
+                                                      input_args,
+                                                      all_snp_alignment_length,
+                                                      overall_alignment_length,
+                                                      mar_base_frequencies,
+                                                      node_labels = internal_node_label_prefix,
+                                                      extra = input_args.seq_recon_args)
+            methods_log = update_methods_log(methods_log, method = sequence_reconstructor, step = 'Sequence reconstructor (1st iteration)')
+            # Copy in phylip file used for RAxML MAR
+            if sequence_reconstructor.alignment_suffix.endswith('.phylip'):
+                recon_alignment_file = os.path.join(base_directory,temp_working_dir,os.path.basename(temp_alignment_filename) + '.phylip')
+                if not os.path.isfile(recon_alignment_file):
+                    os.symlink(os.path.abspath(base_filename) + '.phylip',
+                                        recon_alignment_file)
+
 
         # 1.1. Construct the tree-building command depending on the iteration and employed options
         if i == 2 or input_args.resume is not None:
@@ -258,46 +316,84 @@ def parse_and_run(input_args, program_description=""):
                 current_model = select_best_models(alignment_filename,
                                                     basename,
                                                     current_tree_builder,
+                                                    all_snp_alignment_length,
+                                                    overall_alignment_length,
+                                                    base_frequencies,
                                                     input_args)
                 input_args.model = current_model
                 if current_tree_builder != 'iqtree':
                     check_model_validity(current_model,current_tree_builder,input_args.mar,current_recon_model,current_model_fitter,custom_model, custom_recon_model)
                 printer.print("Phylogeny will be constructed with a " + current_model + " model")
             # Initialise tree builder
-            tree_builder = return_algorithm(current_tree_builder, current_model, input_args, node_labels = internal_node_label_prefix, extra = extra_tree_arguments)
-            alignment_suffix = tree_builder.alignment_suffix
+            tree_builder = return_algorithm(current_tree_builder,
+                                            current_model,
+                                            input_args,
+                                            current_alignment_length,
+                                            overall_alignment_length,
+                                            base_frequencies,
+                                            node_labels = internal_node_label_prefix,
+                                            extra = extra_tree_arguments)
             methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (later iterations)')
             # Update date model (should not make a difference)
             if input_args.date is not None:
                 tree_dater.model = current_model
+        else:
+            # Initialise tree builder
+            tree_builder = return_algorithm(current_tree_builder,
+                                            current_model,
+                                            input_args,
+                                            current_alignment_length,
+                                            overall_alignment_length,
+                                            base_frequencies,
+                                            node_labels = internal_node_label_prefix,
+                                            extra = extra_tree_arguments)
+            alignment_suffix = tree_builder.alignment_suffix
+            methods_log = update_methods_log(methods_log, method = tree_builder, step = 'Tree constructor (1st iteration)')
 
         current_basename = basename + ".iteration_" + str(i)
         current_tree_name = current_basename + ".tre"
-        if previous_tree_name and input_args.first_tree_builder != "star":
-            tree_building_command = tree_builder.tree_building_command(
-                os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
-        else:
-            tree_building_command = tree_builder.tree_building_command(
-                os.path.abspath(alignment_filename), "", current_basename)
         built_tree = temp_working_dir + "/" + tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix
+        if i == starting_iteration:
+            for fn in [gaps_alignment_filename, gaps_vcf_filename, joint_sequences_filename, alignment_filename, base_filename + ".start"]:
+                target_file = os.path.join(base_directory,temp_working_dir,os.path.basename(fn))
+                if not os.path.isfile(target_file):
+                    os.symlink(os.path.abspath(fn), target_file)
+        else:
+            for fn in [previous_tree_name, alignment_filename]:
+                target_path = os.path.join(base_directory,temp_working_dir,os.path.basename(fn))
+                if os.path.isfile(target_path):
+                    os.remove(target_path)
+                os.symlink(os.path.abspath(fn),
+                                        target_path)
 
         # 1.2. Construct the phylogenetic tree
         if input_args.starting_tree is not None and i == 1:
             printer.print("\nCopying the starting tree...")
             shutil.copyfile(input_args.starting_tree, current_tree_name)
         else:
-
-            printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
-                           tree_building_command])
             if current_tree_builder == "star":
+                tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), "", current_basename)
                 # Move star tree into temp dir
                 shutil.move(tree_builder.tree_prefix + current_basename + tree_builder.tree_suffix,
                             built_tree)
             else:
                 try:
+                    # Prepare tmp directory for tree building and sequence reconstruction
                     os.chdir(temp_working_dir)
+                    printer.print("Entering working directory " + temp_working_dir)
+                    if previous_tree_name:
+                        tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), os.path.abspath(previous_tree_name), current_basename)
+                    else:
+                        tree_building_command = tree_builder.tree_building_command(
+                            os.path.abspath(alignment_filename), "", current_basename)
+                    printer.print(["\nConstructing the phylogenetic tree with " + tree_builder.executable + "...",
+                           tree_building_command])
                     subprocess.check_call(tree_building_command, shell=True)
-                except subprocess.SubprocessError:
+                except subprocess.SubprocessError as e:
+                    if e.output is not None:
+                        sys.stderr.write('Error: ' + e.output + '\n')
                     sys.exit("Failed while building the tree.")
                 os.chdir(current_directory)
             shutil.copyfile(built_tree, current_tree_name)
@@ -313,7 +409,7 @@ def parse_and_run(input_args, program_description=""):
 
         # 3.1. Construct the command for ancestral state reconstruction depending on the iteration and employed options
         ancestral_sequence_basename = current_basename + ".internal"
-        current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+        current_tree_name_with_internal_nodes = os.path.join(temp_working_dir, current_tree_name + ".internal")
 
         if not input_args.mar:
         
@@ -329,14 +425,18 @@ def parse_and_run(input_args, program_description=""):
                                                             get_base_patterns(base_filename,
                                                                                 input_args.verbose,
                                                                                 threads = input_args.threads)
+                for fn in [sequence_names_fn, base_patterns_fn]:
+                        os.symlink(os.path.join(base_directory,fn),
+                                os.path.join(base_directory,temp_working_dir,os.path.basename(fn)))
                 # 3.3b. Record in methods log (just once)
                 pyjar_method = Pyjar(current_model)
                 methods_log = update_methods_log(methods_log, method = pyjar_method, step = 'Sequence reconstructor')
 
             # 3.4a. Re-fit full polymorphism alignment to new tree
+            os.chdir(temp_working_dir)
             model_fitting_command = model_fitter.model_fitting_command(snp_alignment_filename,
-                                                                os.path.abspath(temp_rooted_tree),
-                                                                temp_working_dir + '/' + current_basename)
+                                                                        os.path.abspath(temp_rooted_tree),
+                                                                        temp_working_dir + '/' + current_basename)
             printer.print(["\nFitting substitution model to tree...", model_fitting_command])
             try:
                 subprocess.check_call(model_fitting_command, shell = True)
@@ -364,10 +464,10 @@ def parse_and_run(input_args, program_description=""):
                     # If this fails, continue to generate rest of output
                     sys.stderr.write("Unable to use time calibrated tree for sequence reconstruction in "
                     " iteration " + str(i))
-            else:
-                # Set root of reconstruction tree to match that of the current tree
-                # Cannot just midpoint root both, because the branch lengths differ between them
-                harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
+
+            # Set root of reconstruction tree to match that of the current tree
+            # Cannot just midpoint root both, because the branch lengths differ between them
+            harmonise_roots(recontree_filename, temp_rooted_tree, algorithm = model_fitter.name)
             
             printer.print(["\nRunning joint ancestral reconstruction with pyjar"])
             jar(sequence_names = ordered_sequence_names, # complete polymorphism alignment
@@ -389,33 +489,41 @@ def parse_and_run(input_args, program_description=""):
                                                   temp_rooted_tree,
                                                   current_tree_name_with_internal_nodes,
                                                   "pyjar")
+            os.chdir(current_directory)
             printer.print(["\nDone transfer"])
             
         else:
 
             # 3.2b. Marginal ancestral reconstruction with RAxML, RAxML-NG or IQTree
-            sequence_reconstruction_command = sequence_reconstructor.internal_sequence_reconstruction_command(
-                os.path.abspath(base_filename + alignment_suffix), os.path.abspath(temp_rooted_tree),
-                ancestral_sequence_basename)
-            raw_internal_sequence_filename \
-                = temp_working_dir + "/" + sequence_reconstructor.asr_prefix \
-                + ancestral_sequence_basename + sequence_reconstructor.asr_suffix
-            processed_internal_sequence_filename = temp_working_dir + "/" + ancestral_sequence_basename + ".aln"
-            raw_internal_rooted_tree_filename \
-                = temp_working_dir + "/" + sequence_reconstructor.asr_tree_prefix \
-                + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix
+            os.chdir(temp_working_dir)
+            sequence_reconstruction_command = \
+                  sequence_reconstructor.internal_sequence_reconstruction_command(
+                                              os.path.abspath(base_filename + alignment_suffix),
+                                              os.path.abspath(temp_rooted_tree),
+                                              ancestral_sequence_basename)
+            raw_internal_sequence_filename = os.path.join(base_directory,
+                                              temp_working_dir,
+                                              os.path.basename(sequence_reconstructor.asr_prefix + ancestral_sequence_basename + sequence_reconstructor.asr_suffix))
+            processed_internal_sequence_filename = os.path.join(base_directory,
+                                              temp_working_dir,
+                                              os.path.basename(ancestral_sequence_basename + ".aln"))
+                                              
+            raw_internal_rooted_tree_filename  = os.path.join(base_directory,
+                                              temp_working_dir,
+                                              os.path.basename(sequence_reconstructor.asr_tree_prefix + ancestral_sequence_basename + sequence_reconstructor.asr_tree_suffix))
 
             # 3.3b. Reconstruct the ancestral sequence
             printer.print(["\nReconstructing ancestral sequences with " + sequence_reconstructor.executable + "...",
                            sequence_reconstruction_command])
-            os.chdir(temp_working_dir)
             try:
                 subprocess.check_call(sequence_reconstruction_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while reconstructing the ancestral sequences.")
+            except subprocess.SubprocessError as e:
+                if e.output is None:
+                    e.output = 'Unspecified error'
+                sys.exit("Failed while reconstructing the ancestral sequences: " + e.output)
             os.chdir(current_directory)
             # 3.4b. Join ancestral sequences with given sequences
-            current_tree_name_with_internal_nodes = current_tree_name + ".internal"
+            current_tree_name_with_internal_nodes = os.path.join(temp_working_dir,current_tree_name + ".internal")
             sequence_reconstructor.convert_raw_ancestral_states_to_fasta(raw_internal_sequence_filename,
                                                                          processed_internal_sequence_filename)
             concatenate_fasta_files([snp_alignment_filename, processed_internal_sequence_filename],
@@ -453,11 +561,13 @@ def parse_and_run(input_args, program_description=""):
         gubbins_command = create_gubbins_command(
             gubbins_exec, gaps_alignment_filename, gaps_vcf_filename, current_tree_name,
             input_args.alignment_filename, input_args.min_snps, input_args.min_window_size, input_args.max_window_size,
-            input_args.p_value, input_args.trimming_ratio, input_args.extensive_search, input_args.threads)
+            input_args.p_value, input_args.trimming_ratio, input_args.extensive_search, tree_builder.invariant_site_correction, input_args.threads)
         printer.print(["\nRunning Gubbins to detect recombinations...", gubbins_command])
         try:
             subprocess.check_call(gubbins_command, shell=True)
-        except subprocess.SubprocessError:
+        except subprocess.SubprocessError as e:
+            if e.output is None:
+                print("Gubbins failed: " + e.output)
             sys.exit("Failed while running Gubbins. Please ensure you have enough free memory")
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
         shutil.copyfile(current_tree_name, current_tree_name_with_internal_nodes)
@@ -492,8 +602,8 @@ def parse_and_run(input_args, program_description=""):
             bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(final_aln), os.path.abspath(current_tree_name), temp_working_dir + "/" + current_basename)
             try:
                 subprocess.check_call(bootstrap_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while running bootstrap analysis.")
+            except subprocess.SubprocessError as e:
+                sys.exit("Failed while running bootstrap analysis: " + e.output)
             transfer_bootstraps_to_tree(temp_working_dir + "/" + current_basename + ".tre.bootstrapped",
                                                     os.path.abspath(current_tree_name),
                                                     current_basename + ".tre.bootstrapped",
@@ -505,7 +615,13 @@ def parse_and_run(input_args, program_description=""):
             if current_tree_builder == "raxmlng":
                 bootstrap_utility = tree_builder
             else:
-                bootstrap_utility = return_algorithm("raxmlng", current_model, input_args, node_labels = "")
+                bootstrap_utility = return_algorithm("raxmlng",
+                                                      current_model,
+                                                      input_args,
+                                                      current_alignment_length,
+                                                      overall_alignment_length,
+                                                      base_frequencies,
+                                                      node_labels = "")
             # Generate alignments for bootstrapping if FastTree being used
             if current_tree_builder == "fasttree":
                 bootstrap_aln = generate_bootstrap_alignments(bootstrap_aln,
@@ -515,8 +631,10 @@ def parse_and_run(input_args, program_description=""):
             bootstrap_command = tree_builder.bootstrapping_command(os.path.abspath(bootstrap_aln), os.path.abspath(current_tree_name), current_basename, os.path.abspath(temp_working_dir))
             try:
                 subprocess.check_call(bootstrap_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while running bootstrap analysis.")
+            except subprocess.SubprocessError as e:
+                if e.output is None:
+                    e.output = 'Unspecified error'
+                sys.exit("Failed while running bootstrap analysis: " + e.output)
             # Annotate the final tree using the bootstraps
             bootstrapped_trees_file = tree_builder.get_bootstrapped_trees_file(temp_working_dir,current_basename)
             annotation_command = bootstrap_utility.annotate_tree_using_bootstraps_command(os.path.abspath(final_aln),
@@ -527,8 +645,10 @@ def parse_and_run(input_args, program_description=""):
                                                                                             transfer = input_args.transfer_bootstrap)
             try:
                 subprocess.check_call(annotation_command, shell=True)
-            except subprocess.SubprocessError:
-                sys.exit("Failed while annotating final tree with bootstrapping results.")
+            except subprocess.SubprocessError as e:
+                if e.output is None:
+                    e.output = 'Unspecified error'
+                sys.exit("Failed while annotating final tree with bootstrapping results: " + e.output)
         printer.print("...done. Run time: {:.2f} s".format(time.time() - start_time))
 
     # 7. Run node branch support analysis if requested
@@ -539,8 +659,10 @@ def parse_and_run(input_args, program_description=""):
                                                 os.path.abspath(temp_working_dir))
         try:
             subprocess.check_call(sh_test_command, shell=True)
-        except subprocess.SubprocessError:
-            sys.exit("Failed while running SH test.")
+        except subprocess.SubprocessError as e:
+            if e.output is None:
+                e.output = 'Unspecified error'
+            sys.exit("Failed while running SH test: " + e.output)
         reformat_sh_support(current_tree_name,
                             os.path.abspath(temp_working_dir),
                             current_tree_name,
@@ -557,15 +679,18 @@ def parse_and_run(input_args, program_description=""):
                                                     outgroup = input_args.outgroup)
         try:
             subprocess.check_call(dating_command, shell=True)
-        except subprocess.SubprocessError:
+        except subprocess.SubprocessError as e:
             # If this fails, continue to generate rest of output
-            sys.stderr.write("Failed running tree time calibration with LSD.")
+            if e.output is None:
+                e.output = 'Unspecified error'
+            sys.stderr.write("Failed running tree time calibration with LSD: " + e.output)
             input_args.date = None
 
     # Create the final output
     printer.print("\nCreating the final output...")
     if input_args.prefix is None:
         input_args.prefix = basename
+    shutil.copyfile(os.path.join(temp_working_dir, current_tree_name + ".internal"), current_tree_name + ".internal")
     output_filenames_to_final_filenames = translation_of_filenames_to_final_filenames(
         current_tree_name, input_args.prefix)
     utils.rename_files(output_filenames_to_final_filenames)
@@ -743,18 +868,60 @@ def return_algorithm_choices(args,i):
     # Return choices
     return current_tree_builder, current_model_fitter, current_model, current_recon_model, extra_tree_arguments, extra_recon_arguments, custom_model, current_recon_model
 
-def return_algorithm(algorithm_choice, model, input_args, node_labels = None, extra = None):
+def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, complete_aln_length, base_frequencies, node_labels = None, extra = None):
     initialised_algorithm = None
+    constant_sites = (complete_aln_length - snp_aln_length)
+    constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
     if algorithm_choice == "fasttree":
-        initialised_algorithm = FastTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = FastTree(threads = input_args.threads,
+                                          model = model,
+                                          seed = input_args.seed,
+                                          bootstrap = input_args.bootstrap,
+                                          verbose = input_args.verbose,
+                                          additional_args = extra)
+    elif algorithm_choice == "veryfasttree":
+        initialised_algorithm = VeryFastTree(threads = input_args.threads,
+                                              model = model,
+                                              seed = input_args.seed,
+                                              bootstrap = input_args.bootstrap,
+                                              verbose = input_args.verbose,
+                                              additional_args = extra)
     elif algorithm_choice == "raxml":
-        initialised_algorithm = RAxML(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxML(threads = input_args.threads,
+                                      model = model,
+                                      constant_base_counts = constant_base_counts,
+                                      partition_length = snp_aln_length,
+                                      seed = input_args.seed,
+                                      bootstrap = input_args.bootstrap,
+                                      internal_node_prefix = node_labels,
+                                      verbose = input_args.verbose,
+                                      additional_args = extra)
     elif algorithm_choice == "raxmlng":
-        initialised_algorithm = RAxMLNG(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RAxMLNG(threads = input_args.threads,
+                                        model = model,
+                                        seed = input_args.seed,
+                                        constant_base_counts = constant_base_counts,
+                                        bootstrap = input_args.bootstrap,
+                                        internal_node_prefix = node_labels,
+                                        verbose = input_args.verbose,
+                                        additional_args = extra)
     elif algorithm_choice == "iqtree":
-        initialised_algorithm = IQTree(threads = input_args.threads, model = model, seed = input_args.seed, bootstrap = input_args.bootstrap, internal_node_prefix = node_labels, verbose = input_args.verbose, use_best = (model is None and input_args.best_model), additional_args = extra)
+        initialised_algorithm = IQTree(threads = input_args.threads,
+                                        model = model,
+                                        seed = input_args.seed,
+                                        invariant_proportion = constant_sites/complete_aln_length,
+                                        constant_base_counts = constant_base_counts,
+                                        bootstrap = input_args.bootstrap,
+                                        internal_node_prefix = node_labels,
+                                        verbose = input_args.verbose,
+                                        use_best = (model is None and input_args.best_model),
+                                        additional_args = extra)
     elif algorithm_choice == "rapidnj":
-        initialised_algorithm = RapidNJ(threads = input_args.threads, model = model, bootstrap = input_args.bootstrap, verbose = input_args.verbose, additional_args = extra)
+        initialised_algorithm = RapidNJ(threads = input_args.threads,
+                                        model = model,
+                                        bootstrap = input_args.bootstrap,
+                                        verbose = input_args.verbose,
+                                        additional_args = extra)
     elif algorithm_choice == "star":
         initialised_algorithm = Star()
     else:
@@ -762,9 +929,13 @@ def return_algorithm(algorithm_choice, model, input_args, node_labels = None, ex
         sys.exit()
     return initialised_algorithm
 
-def select_best_models(snp_alignment_filename,basename,current_tree_builder,input_args):
+def select_best_models(snp_alignment_filename,basename,current_tree_builder,all_snp_alignment_length,complete_aln_length,base_frequencies,input_args):
+    constant_sites = (complete_aln_length - all_snp_alignment_length)
+    constant_base_counts = [int(b*constant_sites) for b in base_frequencies]
     model_tester = IQTree(threads = input_args.threads,
                             model = 'GTR',
+                            invariant_proportion = constant_sites/complete_aln_length,
+                            constant_base_counts = constant_base_counts,
                             verbose = input_args.verbose
                     )
     model_test_command = model_tester.run_model_comparison(snp_alignment_filename,basename)
@@ -798,26 +969,16 @@ def select_best_models(snp_alignment_filename,basename,current_tree_builder,inpu
 
 def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, current_tree_name,
                            original_alignment_filename, min_snps, min_window_size, max_window_size,
-                           p_value, trimming_ratio, extensive_search, num_threads):
+                           p_value, trimming_ratio, extensive_search, invariant_site_correction, num_threads):
     command = [gubbins_exec, "-r", "-v", vcf_filename, "-a", str(min_window_size),
                "-b", str(max_window_size), "-f", original_alignment_filename, "-t", current_tree_name,
                "-m", str(min_snps), "-p", str(p_value), "-i", str(trimming_ratio), "-n", str(num_threads)]
     if extensive_search:
-            command.append("-x")
+        command.append("-x")
+    if not invariant_site_correction:
+        command.append("-s")
     command.append(alignment_filename)
     return " ".join(command)
-
-def number_of_sequences_in_alignment(filename):
-    return len(get_sequence_names_from_alignment(filename))
-
-
-def get_sequence_names_from_alignment(filename):
-    sequence_names = []
-    with open(filename, "r") as handle:
-        for record in SeqIO.parse(handle, "fasta"):
-            sequence_names.append(record.id)
-    return sequence_names
-
 
 def is_starting_tree_valid(starting_tree):
     try:
@@ -919,7 +1080,6 @@ def reroot_tree_with_outgroup(tree_name, outgroups):
     clade_outgroups = get_monophyletic_outgroup(tree_name, outgroups)
     tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
     outgroup_mrca = tree.mrca(taxon_labels=clade_outgroups)
-    print('Edge length is: ' + str(outgroup_mrca.edge.length))
     tree.reroot_at_edge(outgroup_mrca.edge,
                         length1 = outgroup_mrca.edge.length/2,
                         length2 = outgroup_mrca.edge.length/2,
@@ -1096,6 +1256,7 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
                                                                                     destination_tree,
                                                                                     is_bipartitions_updated=False)
     if len(missing_bipartitions) > 0:
+        sys.stderr.write('Problem comparing the tree files ' + source_tree_filename + ' and ' + destination_tree_filename + '\n')
         sys.stderr.write('Bipartitions missing when transferring node labels: ' + str([str(x) for x in missing_bipartitions]))
         sys.exit(1)
     
@@ -1395,3 +1556,12 @@ def translation_of_dating_filenames_to_final_filenames(temp_working_dir,
         os.path.join(temp_working_dir,basename + '.timetree.nwk'): prefix + '.final_tree.timetree.tre'
     }
     return dating_files
+
+def get_alignment_suffix(treebuilder_name):
+    suffix = None
+    if (treebuilder_name in suffix_dict):
+        suffix = suffix_dict[treebuilder_name]
+    else:
+        sys.stderr.write('Unknown treebuilding method\n')
+        sys.exit(1)
+    return suffix

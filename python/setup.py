@@ -34,7 +34,8 @@ setuptools.setup(
         "multiprocess >= 0.70",
         "scipy >= 1.5.3",
         "numpy >= 1.19",
-        "ska >= 1.0"
+        "ska >= 1.0",
+        "numba > 0.0"
     ],
     long_description="""\
       Gubbins is a tool that generates a reconstruction of
@@ -54,7 +55,8 @@ setuptools.setup(
         "dendropy  >= 4.0.2",
         "multiprocess >= 0.70",
         "scipy >= 1.5.3",
-        "numpy >= 1.19"
+        "numpy >= 1.19",
+        "numba > 0.0"
     ],
     license="GPL"
 )

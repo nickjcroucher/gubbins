@@ -158,8 +158,8 @@ def parse_and_run(input_args, program_description=""):
     if not input_args.no_cleanup and input_args.resume is None:
         utils.delete_files(".", intermediate_files, "", input_args.verbose)
     if utils.do_files_exist(".", intermediate_files, "", input_args.verbose) and input_args.resume is None:
-        sys.exit("Intermediate files from a previous run exist. Please rerun without the --no_cleanup option "
-                 "to automatically delete them or with the --use_time_stamp to add a unique prefix.")
+        sys.exit("Intermediate files from a previous run exist. Please rerun without the --no-cleanup option "
+                 "to automatically delete them or with the --use-time-stamp to add a unique prefix.")
 
     # Check if the input files exist and have the right format
     printer.print("\nChecking input alignment file...")

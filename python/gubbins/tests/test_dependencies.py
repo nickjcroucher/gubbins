@@ -696,6 +696,7 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--model","HKY",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","100",
                                                     "--threads", "1",
@@ -720,6 +721,7 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "fasttree",
+                                                    "--model","JC",
                                                     "--model-fitter", "raxml",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","10",
@@ -733,6 +735,7 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxmlng",
+                                                    "--model","HKY",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","100",
                                                     "--threads", "1",
@@ -746,6 +749,7 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "raxml",
+                                                    "--model","HKY",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","10",
                                                     "--threads", "1",
@@ -759,6 +763,7 @@ class TestExternalDependencies(unittest.TestCase):
         exit_code = 1
         parser = run_gubbins.parse_input_args()
         common.parse_and_run(parser.parse_args(["--tree-builder", "iqtree",
+                                                    "--model","HKY",
                                                     "--verbose", "--iterations", "3",
                                                     "--bootstrap","1000",
                                                     "--threads", "1",

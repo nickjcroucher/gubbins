@@ -78,6 +78,9 @@ def parse_input_args():
                                                       action = 'store_true')
     treeGroup.add_argument('--seed',                  help='Set seed for reproducibility of analysis',
                                                       default = None, type = int)
+    treeGroup.add_argument('--invariant-site-correction',
+                                                      help='Correct for invariant sites',
+                                                      default = False, action = 'store_true')
                                                           
     modelGroup = parser.add_argument_group('Nucleotide substitution model options')
     modelGroup.add_argument('--model',          '-M', help='Nucleotide substitution model (not all available for all '

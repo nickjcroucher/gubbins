@@ -895,6 +895,7 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
                                       bootstrap = input_args.bootstrap,
                                       internal_node_prefix = node_labels,
                                       verbose = input_args.verbose,
+                                      invariant_site_correction = input_args.invariant_site_correction,
                                       additional_args = extra)
     elif algorithm_choice == "raxmlng":
         initialised_algorithm = RAxMLNG(threads = input_args.threads,
@@ -904,6 +905,7 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
                                         bootstrap = input_args.bootstrap,
                                         internal_node_prefix = node_labels,
                                         verbose = input_args.verbose,
+                                        invariant_site_correction = input_args.invariant_site_correction,
                                         additional_args = extra)
     elif algorithm_choice == "iqtree":
         initialised_algorithm = IQTree(threads = input_args.threads,
@@ -915,6 +917,7 @@ def return_algorithm(algorithm_choice, model, input_args, snp_aln_length, comple
                                         internal_node_prefix = node_labels,
                                         verbose = input_args.verbose,
                                         use_best = (model is None and input_args.best_model),
+                                        invariant_site_correction = input_args.invariant_site_correction,
                                         additional_args = extra)
     elif algorithm_choice == "rapidnj":
         initialised_algorithm = RapidNJ(threads = input_args.threads,

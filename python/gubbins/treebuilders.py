@@ -263,7 +263,7 @@ class FastTree:
 class IQTree:
     """Class for operations with the IQTree executable"""
 
-    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [0.0,0.0,0.0,0.0], seed = None, internal_node_prefix="", verbose=False, use_best=False, additional_args = None):
+    def __init__(self, threads: 1, model: str, bootstrap = 0, invariant_proportion = 0, constant_base_counts = [0.0,0.0,0.0,0.0], seed = None, internal_node_prefix="", verbose=False, use_best=False, invariant_site_correction = True, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -280,7 +280,7 @@ class IQTree:
         self.use_best = use_best
         self.seed = utils.set_seed(seed)
         self.additional_args = additional_args
-        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
+        self.invariant_site_correction = (invariant_site_correction if max(constant_base_counts) > 0 else False)
     
         # Construct base command
         self.executable = "iqtree"
@@ -300,22 +300,27 @@ class IQTree:
         command.extend(["-safe","-redo"])
         if self.use_best:
             pass
-        elif self.model == 'JC':
-            command.extend(["-m", "JC+I{" + str(invariant_proportion) + "}"])
-        elif self.model == 'K2P':
-            command.extend(["-m", "K2P+I{" + str(invariant_proportion) + "}"])
-        elif self.model == 'HKY':
-            command.extend(["-m", "HKY+I{" + str(invariant_proportion) + "}"])
-        elif self.model == 'GTR':
-            command.extend(["-m","GTR+I{" + str(invariant_proportion) + "}"])
-        elif self.model == 'GTRGAMMA':
-            command.extend(["-m","GTR+G4+I{" + str(invariant_proportion) + "}"])
         else:
-            command.extend(["-m",self.model])
+            invariant_site_string = ""
+            if invariant_site_correction:
+                invariant_site_string = "+I{" + str(invariant_proportion) + "}"
+            elif self.model == 'JC':
+                command.extend(["-m", "JC"+invariant_site_string])
+            elif self.model == 'K2P':
+                command.extend(["-m", "K2P"+invariant_site_string])
+            elif self.model == 'HKY':
+                command.extend(["-m", "HKY"+invariant_site_string])
+            elif self.model == 'GTR':
+                command.extend(["-m","GTR"+invariant_site_string])
+            elif self.model == 'GTRGAMMA':
+                command.extend(["-m","GTR+G4"+invariant_site_string])
+            else:
+                command.extend(["-m",self.model])
         command.extend(["-seed",self.seed])
         
         # Account for invariant sites
-        command.extend(["-fconst",','.join([str(x) for x in constant_base_counts])])
+        if invariant_site_correction:
+            command.extend(["-fconst",','.join([str(x) for x in constant_base_counts])])
         
         # Additional arguments
         if self.additional_args is not None:
@@ -446,7 +451,7 @@ class IQTree:
 class RAxML:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model='GTRCAT', constant_base_counts = [0,0,0,0], partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, additional_args = None):
+    def __init__(self, threads: 1, model='GTRCAT', constant_base_counts = [0,0,0,0], partition_length = 1, bootstrap = 0, seed = None, internal_node_prefix="", verbose=False, invariant_site_correction = True, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -464,7 +469,7 @@ class RAxML:
         self.constant_base_counts = constant_base_counts
         self.partition_length = partition_length
         self.additional_args = additional_args
-        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
+        self.invariant_site_correction = (invariant_site_correction if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxmlHPC-AVX2', 'raxmlHPC-AVX', 'raxmlHPC-SSE3', 'raxmlHPC']
         self.multi_threaded_executables = ['raxmlHPC-PTHREADS-AVX2', 'raxmlHPC-PTHREADS-AVX',
@@ -507,7 +512,7 @@ class RAxML:
                 command.extend(["-m","ASC_GTRGAMMA","--asc-corr=stamatakis"])
         else:
             if self.model.startswith("ASC_"):
-                command.extend(["-m", self.model])
+                command.extend(["-m", self.model,"--asc-corr=stamatakis"])
             else:
                 self.invariant_site_correction = False
                 command.extend(["-m", self.model])
@@ -547,10 +552,11 @@ class RAxML:
     def tree_building_command(self, alignment_filename: str, input_tree: str, basename: str) -> str:
         """Constructs the command to call the RAxML executable for tree building"""
         command = self.base_command.copy()
-        # Write partition input files - https://cme.h-its.org/exelixis/resource/download/NewManual.pdf
-        command = self.generate_partition_files(command,basename)
-        # Complete command string
-        command.extend(["-f", "d", "-p", str(1)])
+        if self.invariant_site_correction:
+            # Write partition input files - https://cme.h-its.org/exelixis/resource/download/NewManual.pdf
+            command = self.generate_partition_files(command,basename)
+            # Complete command string
+            command.extend(["-f", "d", "-p", str(1)])
         command.extend(["-s", alignment_filename, "-n", basename])
         if input_tree:
             command.extend(["-t", input_tree])
@@ -658,7 +664,7 @@ class RAxML:
 class RAxMLNG:
     """Class for operations with the RAxML executable"""
 
-    def __init__(self, threads: 1, model: str, constant_base_counts = [0,0,0,0], bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, additional_args = None):
+    def __init__(self, threads: 1, model: str, constant_base_counts = [0,0,0,0], bootstrap = 0, seed = None, internal_node_prefix = "", verbose = False, invariant_site_correction = True, additional_args = None):
         """Initialises the object"""
         self.verbose = verbose
         self.threads = threads
@@ -675,7 +681,7 @@ class RAxMLNG:
         self.seed = utils.set_seed(seed)
         self.constant_base_counts = constant_base_counts
         self.additional_args = additional_args
-        self.invariant_site_correction = (True if max(constant_base_counts) > 0 else False)
+        self.invariant_site_correction = (invariant_site_correction if max(constant_base_counts) > 0 else False)
 
         self.single_threaded_executables = ['raxml-ng']
         self.multi_threaded_executables = ['raxml-ng']
@@ -694,16 +700,19 @@ class RAxMLNG:
 
         # Add model
         command.extend(["--model"])
+        invariant_site_string = ""
+        if invariant_site_correction:
+            invariant_site_string = "+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"
         if self.model == 'JC':
-            command.extend(["JC+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
+            command.extend(["JC"+invariant_site_string])
         elif self.model == 'K2P':
-            command.extend(["K80+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
+            command.extend(["K80"+invariant_site_string])
         elif self.model == 'HKY':
-            command.extend(["HKY+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
+            command.extend(["HKY"+invariant_site_string])
         elif self.model == 'GTR':
-            command.extend(["GTR+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
+            command.extend(["GTR"+invariant_site_string])
         elif self.model == 'GTRGAMMA':
-            command.extend(["GTR+G+ASC_STAM{" + '/'.join([str(x) for x in constant_base_counts]) + "}"])
+            command.extend(["GTR+G"+invariant_site_string])
         else:
             command.extend([self.model])
         command.extend(["--seed",self.seed])

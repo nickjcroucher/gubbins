@@ -303,8 +303,9 @@ class IQTree:
         else:
             invariant_site_string = ""
             if invariant_site_correction:
-                invariant_site_string = "+I{" + str(invariant_proportion) + "}"
-            elif self.model == 'JC':
+                #invariant_site_string = "+I{" + str(invariant_proportion) + "}"
+                invariant_site_string = "+I"
+            if self.model == 'JC':
                 command.extend(["-m", "JC"+invariant_site_string])
             elif self.model == 'K2P':
                 command.extend(["-m", "K2P"+invariant_site_string])
@@ -385,7 +386,7 @@ class IQTree:
 
     def get_info_filename(self, tmp: str, basename: str) -> str:
         """Returns the name of the file containing the fitted model parameters"""
-        fn = tmp + '/' + basename + '.log'
+        fn = tmp + '/' + basename + '.iqtree'
         return fn
     
     def get_recontree_filename(self, tmp: str, basename: str) -> str:
@@ -490,26 +491,19 @@ class RAxML:
 
         # Add flags
         command.extend(["-safe"])
+        invariant_site_string = ""
+        model_string = "GTRGAMMA"
+        if self.invariant_site_correction:
+            model_string = "ASC_GTRGAMMA"
+            invariant_site_string = "--asc-corr=stamatakis"
         if self.model == 'JC':
-            if not self.invariant_site_correction:
-                command.extend(["-m", "GTRGAMMA","--JC69"])
-            else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--JC69"])
+            command.extend(["-m", model_string,"--JC69",invariant_site_string])
         elif self.model == 'K2P':
-            if not self.invariant_site_correction:
-                command.extend(["-m", "GTRGAMMA","--K80"])
-            else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--K80"])
+            command.extend(["-m", model_string,"--K80",invariant_site_string])
         elif self.model == 'HKY':
-            if not self.invariant_site_correction:
-                command.extend(["-m", "GTRGAMMA","--HKY85"])
-            else:
-                command.extend(["-m", "ASC_GTRGAMMA","--asc-corr=stamatakis","--HKY85"])
+            command.extend(["-m", model_string,"--HKY85",invariant_site_string])
         elif self.model == 'GTRGAMMA':
-            if not self.invariant_site_correction:
-                command.extend(["-m","GTRGAMMA"])
-            else:
-                command.extend(["-m","ASC_GTRGAMMA","--asc-corr=stamatakis"])
+            command.extend(["-m", model_string,invariant_site_string])
         else:
             if self.model.startswith("ASC_"):
                 command.extend(["-m", self.model,"--asc-corr=stamatakis"])

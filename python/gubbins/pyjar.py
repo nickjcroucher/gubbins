@@ -152,6 +152,30 @@ def read_info(infofile, type = 'raxml'):
                     f = [0.25,0.25,0.25,0.25]
                     r = [1.0,1.0,1.0,1.0,1.0,1.0]
             elif type == 'iqtree':
+                # Base frequencies
+                words=line.split()
+                if "pi(A)" in line:
+                    f[0] = float(words[2])
+                elif "pi(C)" in line:
+                    f[1] = float(words[2])
+                elif "pi(G)" in line:
+                    f[2] = float(words[2])
+                elif "pi(T)" in line:
+                    f[3] = float(words[2])
+                # Rate estimates
+                if "A-C:" in line:
+                    r[0] = float(words[1])
+                elif "A-G:" in line:
+                    r[1] = float(words[1])
+                elif "A-T:" in line:
+                    r[2] = float(words[1])
+                elif "C-G:" in line:
+                    r[3] = float(words[1])
+                elif "C-T:" in line:
+                    r[4] = float(words[1])
+                elif "G-T:" in line:
+                    r[5] = float(words[1])
+            
                 if line.startswith('Base frequencies:'):
                     words=line.split()
                     f=[float(words[3]), float(words[5]), float(words[7]), float(words[9])]

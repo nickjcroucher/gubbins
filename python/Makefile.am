@@ -4,7 +4,7 @@ all-local:
 	pip install .
 
 install-exec-local:
-	pip install .
+	@PYTHON@ -m pip install .
 
 uninstall-local:
 	rm -rf $(pythondir)/*gubbins*

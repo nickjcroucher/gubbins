@@ -29,9 +29,9 @@ dependencies:
   - numba
 # phylogenetics
   - raxml=8.2.12
-  - iqtree>=2.2,<3
+  - iqtree>=3.0
   - rapidnj
-  - raxml-ng=1.0.1
+  - raxml-ng>=2
   - fasttree=2.1.10
   - veryfasttree
 # Scripts

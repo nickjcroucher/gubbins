@@ -297,7 +297,7 @@ class IQTree:
         command.extend(["-T", str(self.threads)])
 
         # Define model
-        command.extend(["-safe","-redo"])
+        command.extend(["-safe","-redo","-st DNA"])
         if self.use_best:
             pass
         else:

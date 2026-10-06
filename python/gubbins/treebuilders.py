@@ -837,11 +837,11 @@ class RAxMLNG:
         else:
             command.extend(["--bs-metric fbp"])
         # Output
-        if self.verbose:
+        if not self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
-        command.extend([";ls -lah;"])
+        command.extend([";"])
         # Rename final file
-        command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
+        command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:

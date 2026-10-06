@@ -837,7 +837,7 @@ class RAxMLNG:
         else:
             command.extend(["--bs-metric fbp"])
         # Output
-        if not self.verbose:
+        if self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
         command.extend([";"])
         # Rename final file

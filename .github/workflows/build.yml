@@ -50,13 +50,10 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh
             conda activate gubbins_env
             # Ensure matching gcov exists in env
-            conda install -y -c conda-forge gcc_linux-64 gxx_linux-64 binutils_impl_linux-64
             GCOV_TOOL="$(command -v x86_64-conda-linux-gnu-gcov || true)"
             if [ -z "$GCOV_TOOL" ]; then
               GCOV_TOOL="$(command -v gcov)"
             fi
-            echo "Using gcov: $GCOV_TOOL"
-            "$GCOV_TOOL" --version
             lcov --directory . \
                  --capture \
                  --output-file gubbins_coverage.info.tmp \

@@ -842,7 +842,7 @@ class RAxMLNG:
         command.extend(["; ls -lah; ls -lah ", tmp, ";"])
         # Rename final file
         if transfer:
-            command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])
+            command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.supportTBE", basename + ".tre.bootstrapped"])
         else:
             command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)

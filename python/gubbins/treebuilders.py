@@ -837,9 +837,9 @@ class RAxMLNG:
         else:
             command.extend(["--bs-metric fbp"])
         # Output
-        if not self.verbose:
+        if self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
-        command.extend([";"])
+        command.extend(["; ls -lah; "])
         # Rename final file
         if transfer:
             command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])

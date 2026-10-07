@@ -841,7 +841,10 @@ class RAxMLNG:
             command.extend([">", "/dev/null", "2>&1"])
         command.extend([";"])
         # Rename final file
-        command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])
+        if transfer:
+            command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])
+        Else:
+            command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:

@@ -9,9 +9,9 @@ jobs:
       runs-on: macos-13
 
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.9
       - name: Set up miniconda
@@ -30,9 +30,9 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.9
       - name: Install dependencies with conda
@@ -76,6 +76,6 @@ jobs:
           cd python
           pytest -q --cov=gubbins --cov-report=xml:coverage.xml
       - name: Upload code coverage analysis
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
             files: ./python/coverage.xml,gubbins_coverage.info

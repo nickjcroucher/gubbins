@@ -839,7 +839,7 @@ class RAxMLNG:
         # Output
         if self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
-        command.extend(["; ls -lah; "])
+        command.extend(["; ls -lah; ls -lah ", tmp, ";"])
         # Rename final file
         if transfer:
             command.extend(["cp",tmp + "/" + basename + ".raxml.support", basename + ".tre.bootstrapped"])

@@ -22,7 +22,7 @@ dependencies:
   - llvm
 # algorithm
   - scipy
-  - dendropy
+  - dendropy>=5.0
   - biopython
   - multiprocess
   - numpy

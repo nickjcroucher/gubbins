@@ -30,7 +30,7 @@ setuptools.setup(
         "pytest >= 4.6",
         "wheel >= 0.34",
         "biopython >= 1.59",
-        "dendropy  >= 4.0.2",
+        "dendropy  >= 5.0",
         "multiprocess >= 0.70",
         "scipy >= 1.5.3",
         "numpy >= 1.19",
@@ -52,7 +52,7 @@ setuptools.setup(
     ],
     install_requires=[
         "biopython >= 1.59",
-        "dendropy  >= 4.0.2",
+        "dendropy  >= 5.0",
         "multiprocess >= 0.70",
         "scipy >= 1.5.3",
         "numpy >= 1.19",

@@ -5,7 +5,7 @@ channels:
   - r
 dependencies:
 # python
-  - python>=3.8,<3.11
+  - python>=3.10,<3.13
 # installation
   - autoconf
   - automake
@@ -25,7 +25,7 @@ dependencies:
   - dendropy
   - biopython
   - multiprocess
-  - numpy<=1.23.0
+  - numpy
   - numba
 # phylogenetics
   - raxml=8.2.12

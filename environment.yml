@@ -5,7 +5,7 @@ channels:
   - r
 dependencies:
 # python
-  - python>=3.8,<3.11
+  - python>=3.10,<3.13
 # installation
   - autoconf
   - automake
@@ -22,16 +22,16 @@ dependencies:
   - llvm
 # algorithm
   - scipy
-  - dendropy
+  - dendropy>=5.0
   - biopython
   - multiprocess
-  - numpy<=1.23.0
+  - numpy
   - numba
 # phylogenetics
   - raxml=8.2.12
-  - iqtree>=2.2,<3
+  - iqtree>=3.0
   - rapidnj
-  - raxml-ng=1.0.1
+  - raxml-ng>=2
   - fasttree=2.1.10
   - veryfasttree
 # Scripts

@@ -9,7 +9,7 @@ for usage by client code.
 
 import sys
 import os
-import pkg_resources
+from importlib.metadata import PackageNotFoundError, version as dist_version
 
 ###############################################################################
 ## Populate the 'gubbins' namespace
@@ -55,9 +55,9 @@ def version():
     os.environ["PATH"] = os.environ["PATH"] + ":/usr/lib/gubbins/"
     program_version = ""
     try:
-        program_version = str(pkg_resources.get_distribution(__project__).version)
-    except pkg_resources.RequirementParseError:
-        pass
+        program_version = dist_version(__project__)
+    except PackageNotFoundError:
+        program_version = "Unknown"
     return "%s" % program_version
 
 __version__ = version()

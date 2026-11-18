@@ -6,45 +6,82 @@ on:
 jobs:
 
     test-osx:
-      runs-on: macos-13
+      runs-on: macos-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          python-version: ["3.10", "3.11", "3.12"]
 
       steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
+      - uses: actions/checkout@v5
       - name: Set up miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          python-version: 3.9
-      - name: Install dependencies with conda
-        run: |
-            sudo chown -R $UID $CONDA && source $CONDA/etc/profile.d/conda.sh && conda env update --file environment.yml
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
+          channels: conda-forge,bioconda
+          activate-environment: gubbins_env
+          environment-file: environment.yml
       - name: Run C and python tests
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && FILES=`ls -l1 $CONDA_PREFIX/lib/clang/*/lib/darwin/*`; for clang_dir in $(ls -d1 $CONDA_PREFIX/lib/clang/*); do if [[ ! -d "$clang_dir/lib/darwin" ]]; then mkdir -p $clang_dir/lib/darwin; for clang_file in $(echo $FILES); do ln -s $clang_file $clang_dir/lib/darwin/; done; fi;  done && export PATH=$PATH:/lib/python3.9/site-packages/ && autoreconf -i &&  ./configure  --prefix=$CONDA_PREFIX --exec_prefix $CONDA_PREFIX CFLAGS="-O0 -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-apple-darwin --build=x86_64-apple-darwin && make && make install && make check
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && FILES=`ls -l1 $CONDA_PREFIX/lib/clang/*/lib/darwin/*`; for clang_dir in $(ls -d1 $CONDA_PREFIX/lib/clang/*); do if [[ ! -d "$clang_dir/lib/darwin" ]]; then mkdir -p $clang_dir/lib/darwin; for clang_file in $(echo $FILES); do ln -s $clang_file $clang_dir/lib/darwin/; done; fi;  done && autoreconf -i &&  ./configure  --prefix=$CONDA_PREFIX --exec_prefix $CONDA_PREFIX CFLAGS="-O0 -I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" --host=x86_64-apple-darwin --build=x86_64-apple-darwin && make && make install && make check
 
     test-linux:
       runs-on: ubuntu-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          python-version: ["3.10", "3.11", "3.12"]
 
       steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - name: Set up miniconda
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: 3.9
-      - name: Install dependencies with conda
-        run: |
-            $CONDA/bin/conda env update --file environment.yml && conda init
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge,bioconda
+          activate-environment: gubbins_env
+          environment-file: environment.yml
       - name: Install subunit from source
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && conda install -c conda-forge testtools extras six testscenarios fixtures traceback2 python-mimeparse iso8601 && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && CXXFLAGS="${CXXFLAGS} -I${CONDA_PREFIX}/include/" LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX}/lib/ -lcppunit" ./configure --prefix=$CONDA_PREFIX && sudo make install && make check && cd ..
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && unset CC CXX && export CC=gcc && export CXX=g++ && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && export CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_CFLAGS="-I${CONDA_PREFIX}/include/" && export CPPUNIT_LIBS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/" && git clone https://github.com/testing-cabal/subunit.git && cd subunit && autoreconf -vi && CXXFLAGS="${CXXFLAGS} -I${CONDA_PREFIX}/include/" LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX}/lib/ -lcppunit" AR=/usr/bin/ar RANLIB=/usr/bin/ranlib NM=/usr/bin/nm LD=/usr/bin/ld STRIP=/usr/bin/strip CC=/usr/bin/gcc CXX=/usr/bin/g++ ./configure --prefix=$CONDA_PREFIX && sudo make install && cd ..
       - name: Run C and python tests
         run: |
-            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/ --coverage" && export CFLAGS="-I${CONDA_PREFIX}/include/ --coverage" && export PATH=$PATH:/lib/python3.9/site-packages/ && export NUMBA_DISABLE_JIT=1 && autoreconf -i && ./configure --prefix=$CONDA_PREFIX --exec_prefix $CONDA_PREFIX -enable-code-coverage CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --host=x86_64-linux-gnu --build=x86_64-linux-gnu && make && make install && export CODE_COVERAGE_OUTPUT_FILE="gubbins_coverage.info" && make check && make check-code-coverage
-      - name: Upload python code coverage analysis
-        uses: codecov/codecov-action@v4
+            source $CONDA/etc/profile.d/conda.sh && conda activate gubbins_env && export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,-rpath,${CONDA_PREFIX}/lib/ --coverage" && export CFLAGS="-I${CONDA_PREFIX}/include/ --coverage" && export NUMBA_DISABLE_JIT=1 && autoreconf -i && ./configure --prefix=$CONDA_PREFIX --exec_prefix $CONDA_PREFIX --enable-code-coverage CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --host=x86_64-linux-gnu --build=x86_64-linux-gnu && make && make install && export CODE_COVERAGE_OUTPUT_FILE="gubbins_coverage.info" && make check
+      - name: Calculate C code coverage
+        shell: bash -l {0}
+        run: |
+            source $CONDA/etc/profile.d/conda.sh
+            conda activate gubbins_env
+            # Ensure matching gcov exists in env
+            GCOV_TOOL="$(command -v x86_64-conda-linux-gnu-gcov || true)"
+            if [ -z "$GCOV_TOOL" ]; then
+              GCOV_TOOL="$(command -v gcov)"
+            fi
+            lcov --directory . \
+                 --capture \
+                 --output-file gubbins_coverage.info.tmp \
+                 --test-name gubbins_test \
+                 --no-checksum \
+                 --compat-libtool \
+                 --gcov-tool "${GCOV_TOOL}"
+            REPO_ROOT="$(realpath .)"
+            lcov --extract gubbins_coverage.info.tmp \
+                 "${REPO_ROOT}/src/*" \
+                 "${REPO_ROOT}/tests/*" \
+                 --output-file gubbins_coverage.info \
+                 --ignore-errors empty
+            test -s gubbins_coverage.info || echo "Warning: gubbins_coverage.info is empty"
+      - name: Calculate Python code coverage
+        shell: bash -l {0}
+        run: |
+          source $CONDA/etc/profile.d/conda.sh
+          conda activate gubbins_env
+          cd python
+          pytest -q --cov=gubbins --cov-report=xml:coverage.xml
+      - name: Upload code coverage analysis
+        uses: codecov/codecov-action@v5
         with:
             files: ./python/coverage.xml,gubbins_coverage.info

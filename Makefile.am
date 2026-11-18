@@ -23,3 +23,13 @@ osx-package:
 	cd ${HOME}/${PACKAGE}-${VERSION}-inst && rm -rf ${HOME}/${PACKAGE}-${VERSION}-inst/Users
 	cd ${HOME}/${PACKAGE}-${VERSION}-inst && find . -type f -print  > ${HOME}/files.lst
 	cd ${HOME}/${PACKAGE}-${VERSION}-inst && tar zcvf ${PACKAGE}_${VERSION}_osx_10.8.tar.gz -T ${HOME}/files.lst
+
+# Robust coverage post-processing hook (called by code-coverage-capture)
+code-coverage-capture-hook:
+  @REPO_ROOT=$$(realpath $(top_builddir)); \
+  $(LCOV) --extract "$(CODE_COVERAGE_OUTPUT_FILE).tmp" \
+    "$$REPO_ROOT/src/*" \
+    "$$REPO_ROOT/tests/*" \
+    --output-file "$(CODE_COVERAGE_OUTPUT_FILE)" \
+    $(CODE_COVERAGE_LCOV_SHOPTS) $(CODE_COVERAGE_LCOV_RMOPTS) \
+    --ignore-errors empty

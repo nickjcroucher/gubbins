@@ -291,13 +291,13 @@ class IQTree:
         # Reproducibility
         self.name = 'IQTree'
         self.version = self.get_version(self.executable)
-        self.citation = "https://doi.org/10.1093/molbev/msaa015"
+        self.citation = "https://doi.org/10.1093/molbev/msag117"
 
         # Set parallelisation
         command.extend(["-T", str(self.threads)])
 
         # Define model
-        command.extend(["-safe","-redo"])
+        command.extend(["-safe","-redo","-st DNA"])
         if self.use_best:
             pass
         else:
@@ -687,7 +687,7 @@ class RAxMLNG:
         # Reproducibility
         self.name = 'RAxMLNG'
         self.version = self.get_version(self.executable)
-        self.citation = "https://doi.org/10.1093/bioinformatics/btz305"
+        self.citation = "https://doi.org/10.64898/2026.09.09.750097"
         
         # Set parallelisation
         command.extend(["--threads", str(self.threads)])
@@ -837,11 +837,14 @@ class RAxMLNG:
         else:
             command.extend(["--bs-metric fbp"])
         # Output
-        if not self.verbose:
+        if self.verbose:
             command.extend([">", "/dev/null", "2>&1"])
-        command.extend([";"])
+        command.extend(["; ls -lah; ls -lah ", tmp, ";"])
         # Rename final file
-        command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
+        if transfer:
+            command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.supportTBE", basename + ".tre.bootstrapped"])
+        else:
+            command.extend(["cp",tmp + "/" + basename + ".bootstrapped.raxml.support", basename + ".tre.bootstrapped"])
         return " ".join(command)
 
     def get_bootstrapped_trees_file(self, tmp: str, basename: str) -> str:

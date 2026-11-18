@@ -7,10 +7,7 @@ Integration testing of external dependencies. Likely to be the most brittle test
 
 import unittest
 import os
-import sys
 import glob
-import argparse
-import pkg_resources
 import shutil
 from gubbins import common, run_gubbins
 

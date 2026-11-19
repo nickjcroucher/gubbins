@@ -146,7 +146,7 @@ make_palette <- function(i,df=meta.df) {
   
 }
 
-make_individual_heatmap <- function(i, df = meta.df, tree_plot = gubbins_tree, legend_direction = "horizontal", ncol = 1, label_size = NA) {
+make_individual_heatmap <- function(i, df = meta.df, tree_plot = gubbins_tree, legend_direction = "horizontal", ncol = 2, label_size = NA) {
   
   # Get legend
   individual_palette <- make_palette(i, df = df)

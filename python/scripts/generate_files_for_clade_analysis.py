@@ -24,7 +24,7 @@ import sys
 import argparse
 import re
 # Phylogenetic imports
-import dendropy
+import treeswift
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
@@ -94,13 +94,13 @@ if __name__ == "__main__":
         sys.exit(1)
     
     # Prune from the tree
+    from gubbins.common import _load_tree, _prune_taxa, _format_newick
     output_tree_name = args.out + '.tree'
-    tree = dendropy.Tree.get(path = args.tree,
-                             schema = 'newick',
-                             preserve_underscores = True)
-    tree.retain_taxa_with_labels(subset)
-    tree.write_to_path(output_tree_name,
-                        'newick')
+    tree = _load_tree(args.tree)
+    to_remove = [n.label for n in tree.traverse_leaves() if n.label not in subset]
+    _prune_taxa(tree, to_remove)
+    with open(output_tree_name, 'w') as tree_out:
+        tree_out.write(_format_newick(tree, suppress_internal=False, quote_names=True) + ';\n')
 
     # Identify relevant recombination blocks
     recombination_starts = []

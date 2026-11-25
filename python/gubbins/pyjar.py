@@ -9,7 +9,7 @@ from asyncio import subprocess
 import shutil
 from scipy import linalg
 import numpy
-import dendropy
+import treeswift
 import sys
 import os
 import time
@@ -57,11 +57,8 @@ def read_tree(treefile):
     if not os.path.isfile(treefile):
         print("Error: tree file does not exist")
         sys.exit(204)
-    t=dendropy.Tree.get(path=treefile,
-                        schema="newick",
-                        preserve_underscores=True,
-                        rooting="force-rooted")
-    return t
+    from gubbins.common import _load_tree
+    return _load_tree(treefile)
 
 #Calculate Pij from Q matrix and branch length
 def calculate_pij(branch_length,rate_matrix):
@@ -628,7 +625,7 @@ def reconstruct_alignment_column(column_index,
     out_aln = numpy.ndarray(new_aln.shape, dtype = numpy.int8, buffer = out_aln_shm.buf)
     
     # Generate data structures for reconstructions
-    num_nodes = len(tree.nodes())
+    num_nodes = tree.num_nodes()
     Lmat = numpy.full((num_nodes,4), -numpy.inf, dtype = numpy.float32)
     Cmat = numpy.full((num_nodes,4), [0,1,2,3], dtype = numpy.uint8)
     reconstructed_base_indices = numpy.full(num_nodes, 8, dtype = numpy.uint8)
@@ -729,8 +726,9 @@ def jar(sequence_names = None,
     rm = create_rate_matrix(f,r)
 
     # Label internal nodes in tree and add these to the new alignment and calculate pij per non-root branch
-    nodecounter=0
-    num_nodes = len(tree.nodes())
+    nodecounter = 0
+    all_nodes = list(tree.traverse_postorder())
+    num_nodes = len(all_nodes)
     node_indices = {}
     child_nodes_array = numpy.empty(num_nodes, dtype=object)
     leaf_node_list = []
@@ -742,62 +740,59 @@ def jar(sequence_names = None,
     node_index_to_aln_row = numpy.full(num_nodes, -1, dtype=numpy.int32)
     ancestral_node_indices = {}
 
-    for node_index,node in zip(postordered_nodes,tree.postorder_node_iter()):
-        if node.taxon == None:
-            nodecounter+=1
-            nodename="Node_"+str(nodecounter)
-            tree.taxon_namespace.add_taxon(dendropy.Taxon(nodename))
-            node.taxon=tree.taxon_namespace.get_taxon(nodename)
+    for node_index, node in zip(postordered_nodes, all_nodes):
+        if not node.label:
+            nodecounter += 1
+            nodename = "Node_" + str(nodecounter)
+            node.label = nodename
             if nodename in alignment_sequence_names:
                 print(nodename, "already in alignment. Quitting")
                 sys.exit(209)
             ancestral_node_indices[node_index] = nodename
         else:
-            node.taxon.label = node.taxon.label.strip("'")
-            if node.taxon.label in alignment_sequence_names:
-                node_index_to_aln_row[node_index] = alignment_sequence_names[node.taxon.label]
-            else:
-                sys.stderr.write('Unable to find ' + node.taxon.label + ' in alignment')
+            node.label = str(node.label).strip("'")
+            if node.label in alignment_sequence_names:
+                node_index_to_aln_row[node_index] = alignment_sequence_names[node.label]
+            elif node.is_leaf():
+                sys.stderr.write('Unable to find ' + node.label + ' in alignment')
                 sys.exit(1)
-        if node.parent_node == None:
-            seed_node = node_index
-        elif node.parent_node == tree.seed_node and seed_node_edge_truncation:
-            # Set the length of one root-to-child branch to ~zero
-            # as reconstruction should occur with rooting at a node
-            # midpoint rooting causes problems at the root, especially w/JC69
-            # With outgroup:
-            # Prefer to truncate the ingroup branch to force the recombinations
-            # onto the outgroup branch
-            if outgroup_name is None or \
-                            (outgroup_name is not None and node.taxon.label != outgroup_name):
-                seed_node_edge_truncation = False
-                node_pij[node_index,:]=calculate_pij(node.edge_length/1e6, rm)
             else:
-                node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
+                ancestral_node_indices[node_index] = node.label
+        edge_len = node.edge_length if node.edge_length is not None else 0.0
+        if node.is_root():
+            seed_node = node_index
+        elif node.parent is tree.root and seed_node_edge_truncation:
+            if outgroup_name is None or \
+                            (outgroup_name is not None and node.label != outgroup_name):
+                seed_node_edge_truncation = False
+                node_pij[node_index,:] = calculate_pij(edge_len/1e6, rm)
+            else:
+                node_pij[node_index,:] = calculate_pij(edge_len, rm)
         else:
-            node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
-        # Store information to avoid subsequent recalculation as
-        # look up of taxon labels with dendropy is slower than native data structures
-        node_label = node.taxon.label
+            node_pij[node_index,:] = calculate_pij(edge_len, rm)
+
+        node_label = node.label
         node_indices[node_label] = node_index
         node_labels[node_index] = node_label
         if node.is_leaf():
             leaf_node_list.append(node_index)
-            child_nodes_array[node_index] = numpy.full(1, -1, dtype=numpy.int32) # Cannot leave array empty
+            child_nodes_array[node_index] = numpy.full(1, -1, dtype=numpy.int32)
         else:
-            child_nodes_array[node_index] = numpy.array([node_indices[child.taxon.label] for child in node.child_node_iter()],
+            child_nodes_array[node_index] = numpy.array([node_indices[child.label] for child in node.children],
                                                     dtype=numpy.int32)
     leaf_nodes = numpy.array(leaf_node_list, dtype = numpy.int32)
     child_nodes = convert_to_square_numpy_array(child_nodes_array)
 
     # Store the preordered nodes and record parent node information
+    from gubbins.common import _preorder_ltr
     parent_nodes = numpy.full(num_nodes, -1, dtype = numpy.int32)
     preordered_nodes = numpy.full(num_nodes-1, -1, dtype=numpy.int32)
-    for node_count,node in enumerate(tree.preorder_node_iter()):
-        if node.parent_node != None:
-            node_index = node_indices[node.taxon.label]
-            preordered_nodes[node_count-1] = node_index # Do not add root node to preordered nodes
-            parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
+    preorder_list = list(_preorder_ltr(tree.root))
+    for node_count, node in enumerate(preorder_list):
+        if not node.is_root():
+            node_index = node_indices[node.label]
+            preordered_nodes[node_count-1] = node_index
+            parent_nodes[node_index] = node_indices[node.parent.label]
 
         
     ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
@@ -918,9 +913,9 @@ def jar(sequence_names = None,
             asr_output.write(''.join(aln_line) + "\n")
 
     # Combine results for each base across the alignment
-    for node in tree.preorder_node_iter():
+    for node in preorder_list:
         node.edge_length = 0.0 # reset lengths to convert to SNPs
-        node_index = node_indices[node.taxon.label]
+        node_index = node_indices[node.label]
         for x in range(len(reconstruction_results)):
             try:
                 node.edge_length += reconstruction_results[x][node_index];

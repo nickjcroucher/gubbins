@@ -24,7 +24,7 @@ import sys
 import argparse
 import re
 # Phylogenetic imports
-import dendropy
+import treeswift
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
@@ -94,29 +94,14 @@ if __name__ == "__main__":
         sys.exit(1)
     
     # Prune from the tree
+    from gubbins.common import _load_tree, _prune_taxa, tree_as_string
     output_tree_name = args.out + '.tree'
-    tree = dendropy.Tree.get(path = args.tree,
-                             schema = 'newick',
-                             preserve_underscores = True)
-    tree.retain_taxa_with_labels(subset)
+    tree = _load_tree(args.tree)
+    to_remove = [n.label for n in tree.traverse_leaves() if n.label not in subset]
+    _prune_taxa(tree, to_remove)
     
     # Output tree
-    clade_tree_string = tree.as_string(
-                        schema='newick',
-                        suppress_leaf_taxon_labels=False,
-                        suppress_leaf_node_labels=True,
-                        suppress_internal_taxon_labels=False,
-                        suppress_internal_node_labels=False,
-                        suppress_rooting=True,
-                        suppress_edge_lengths=False,
-                        unquoted_underscores=True,
-                        preserve_spaces=False,
-                        store_tree_weights=False,
-                        suppress_annotations=True,
-                        annotations_as_nhx=False,
-                        suppress_item_comments=True,
-                        node_label_element_separator=' '
-                    )
+    clade_tree_string = tree_as_string(tree, suppress_internal=False, suppress_rooting=True)
     with open(output_tree_name,'w') as tree_out:
         tree_out.write(clade_tree_string.replace('\'', '') + '\n')
 

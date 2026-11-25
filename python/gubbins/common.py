@@ -29,7 +29,48 @@ import tempfile
 import gzip
 import time
 # Phylogenetic imports
-import dendropy
+import treeswift
+
+
+def _load_tree(path):
+    with open(path, 'r') as fh:
+        text = fh.read().strip()
+    if not text or not text.endswith(';') or text.count('(') != text.count(')'):
+        raise ValueError("Invalid Newick tree")
+    t = treeswift.read_tree_newick(text)
+    if isinstance(t, list):
+        if len(t) != 1:
+            raise ValueError("Expected single tree")
+        t = t[0]
+    for n in t.traverse_postorder():
+        if n.label is not None:
+            n.label = str(n.label).strip("'")
+    return t
+
+
+def _preorder_ltr(node):
+    yield node
+    for c in node.children:
+        yield from _preorder_ltr(c)
+
+
+def _leaves_ltr(node):
+    for n in _preorder_ltr(node):
+        if n.is_leaf():
+            yield n
+
+
+def _compute_sub_leaves(tree):
+    sub_leaves = {}
+    for node in tree.traverse_postorder():
+        if node.is_leaf():
+            sub_leaves[node] = frozenset((node.label or '',))
+        else:
+            s = set()
+            for c in node.children:
+                s.update(sub_leaves[c])
+            sub_leaves[node] = frozenset(s)
+    return sub_leaves
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
@@ -986,7 +1027,10 @@ def create_gubbins_command(gubbins_exec, alignment_filename, vcf_filename, curre
 def is_starting_tree_valid(starting_tree):
     try:
         Phylo.read(starting_tree, 'newick')
-        dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+        t = _load_tree(starting_tree)
+        tip_names = [n.label for n in t.traverse_leaves()]
+        if len(tip_names) == 0 or None in tip_names or '' in tip_names or len(tip_names) != len(set(tip_names)):
+            return False
     except Exception:
         print("Error with the input starting tree: Is it a valid Newick file?")
         return False
@@ -1004,11 +1048,11 @@ def do_the_names_match_the_fasta_file(starting_tree, alignment_filename):
                 sequence_names.add(record.name)
 
     # Extract sequence names from tree
-    tree = dendropy.Tree.get_from_path(starting_tree, 'newick', preserve_underscores=True)
+    tree = _load_tree(starting_tree)
     leaf_names = set()
-    for lf in tree.leaf_nodes():
-        lf.taxon.label = utils.process_sequence_names(lf.taxon.label)
-        leaf_names.add(lf.taxon.label)
+    for lf in tree.traverse_leaves():
+        lf.label = utils.process_sequence_names(lf.label)
+        leaf_names.add(lf.label)
 
     # Write out modified tree
     output_tree_string = tree_as_string(tree, suppress_internal=False)
@@ -1063,10 +1107,185 @@ def intermediate_files_regex():
     return "($|\\.(gff|vcf|snp_sites|branch_snps|phylip|stats|tab|internal))"
 
 
+def _collapse_basal_bifurcation(tree):
+    root = tree.root
+    if len(root.children) != 2:
+        return
+    c0, c1 = root.children
+    if len(c1.children) >= 2:
+        to_keep, to_del = c0, c1
+    elif len(c0.children) >= 2:
+        to_del, to_keep = c0, c1
+    else:
+        return
+    if to_keep.edge_length is not None and to_del.edge_length is not None:
+        to_keep.edge_length = to_keep.edge_length + to_del.edge_length
+    idx = root.children.index(to_del)
+    for ch in to_del.children:
+        ch.parent = root
+    root.children[idx:idx+1] = to_del.children
+
+
+def _suppress_unifurcations(node):
+    for ch in list(node.children):
+        _suppress_unifurcations(ch)
+    if node.parent is not None and len(node.children) == 1:
+        ch = node.children[0]
+        if ch.edge_length is not None and node.edge_length is not None:
+            ch.edge_length = ch.edge_length + node.edge_length
+        elif node.edge_length is not None:
+            ch.edge_length = node.edge_length
+        parent = node.parent
+        idx = parent.children.index(node)
+        parent.children[idx] = ch
+        ch.parent = parent
+    elif node.parent is None and len(node.children) == 1:
+        ch = node.children[0]
+        if ch.edge_length is not None and node.edge_length is not None:
+            node.edge_length = node.edge_length + ch.edge_length
+        elif ch.edge_length is not None:
+            node.edge_length = ch.edge_length
+        node.label = ch.label
+        node.children = list(ch.children)
+        for c in node.children:
+            c.parent = node
+
+
+def _prune_taxa(tree, taxa_to_remove):
+    root = tree.root
+    remove_set = set(taxa_to_remove)
+    orig_leaves = set(tree.traverse_leaves())
+    for node in list(tree.traverse_postorder()):
+        if node is root:
+            continue
+        if node in orig_leaves:
+            if node.label in remove_set or not node.label:
+                node.parent.children.remove(node)
+                node.parent = None
+        else:
+            if len(node.children) == 0:
+                node.parent.children.remove(node)
+                node.parent = None
+    _suppress_unifurcations(root)
+
+
+def _reroot_at_edge(tree, target_node, length1, length2):
+    root = tree.root
+    if target_node is root:
+        return tree
+    old_parent = target_node.parent
+    old_parent.children.remove(target_node)
+    new_root = treeswift.Node(label=None, edge_length=root.edge_length)
+
+    path = []
+    curr = old_parent
+    while curr is not None:
+        path.append(curr)
+        curr = curr.parent
+
+    for i in range(len(path) - 1):
+        child_p = path[i]
+        parent_p = path[i + 1]
+        parent_p.children.remove(child_p)
+        parent_p.parent = child_p
+        child_p.children.append(parent_p)
+
+    for i in range(len(path) - 1, 0, -1):
+        path[i].edge_length = path[i - 1].edge_length
+
+    target_node.edge_length = length2
+    target_node.parent = new_root
+    old_parent.edge_length = length1
+    old_parent.parent = new_root
+    new_root.children = [target_node, old_parent]
+
+    _suppress_unifurcations(new_root)
+    tree.root = new_root
+    return tree
+
+
+def _patristic_dist(mrca, n1, n2):
+    d1 = 0.0
+    c = n1
+    while c is not mrca:
+        d1 += (c.edge_length if c.edge_length is not None else 0.0)
+        c = c.parent
+    d2 = 0.0
+    c = n2
+    while c is not mrca:
+        d2 += (c.edge_length if c.edge_length is not None else 0.0)
+        c = c.parent
+    return d1 + d2
+
+
+def _dist_from_root(root, node):
+    path = []
+    c = node
+    while c is not root and c is not None:
+        path.append(c)
+        c = c.parent
+    d = 0.0
+    for nd in reversed(path):
+        d += (nd.edge_length if nd.edge_length is not None else 0.0)
+    return d
+
+
+def _reroot_at_midpoint(tree):
+    root = tree.root
+    leaves = list(_leaves_ltr(root))
+    max_dist = -1.0
+    max_pair = (None, None)
+    max_mrca = None
+    for i, l1 in enumerate(leaves):
+        for l2 in leaves[i+1:]:
+            mrca = tree.mrca({l1.label, l2.label})
+            d = _patristic_dist(mrca, l1, l2)
+            if d > max_dist:
+                max_dist = d
+                max_pair = (l1, l2)
+                max_mrca = mrca
+    n1, n2 = max_pair
+    if _dist_from_root(root, n1) < _dist_from_root(root, n2):
+        n1, n2 = n2, n1
+    plen = float(max_dist) / 2.0
+    cur = n1
+    while cur is not max_mrca:
+        cur_len = cur.edge_length if cur.edge_length is not None else 0.0
+        if cur_len > plen:
+            head_len = plen
+            tail_len = cur_len - plen
+            return _reroot_at_edge(tree, cur, tail_len, head_len)
+        elif cur_len < plen:
+            plen -= cur_len
+            cur = cur.parent
+        else:
+            break
+    return tree
+
+
+def _format_newick(node, suppress_internal=True, quote_names=False):
+    if isinstance(node, treeswift.Tree):
+        node = node.root
+    if node.is_leaf():
+        name = str(node.label) if node.label else ''
+        if quote_names and name:
+            name = f"'{name}'"
+        label = name
+    else:
+        children_str = ','.join(_format_newick(c, suppress_internal, quote_names) for c in node.children)
+        name = '' if suppress_internal else (str(node.label) if node.label else '')
+        if quote_names and name:
+            name = f"'{name}'"
+        label = f'({children_str}){name}'
+    if node.edge_length is not None:
+        return f'{label}:{node.edge_length}'
+    return label
+
+
 def root_tree(input_filename, output_filename):
     # split bi nodes and root tree
-    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
-    split_all_non_bi_nodes(tree.seed_node)
+    tree = _load_tree(input_filename)
+    split_all_non_bi_nodes(tree.root)
     output_tree_string = tree_as_string(tree, suppress_internal=False, suppress_rooting=False)
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
@@ -1081,71 +1300,62 @@ def reroot_tree(tree_name, outgroups):
 
 def reroot_tree_with_outgroup(tree_name, outgroups):
     clade_outgroups = get_monophyletic_outgroup(tree_name, outgroups)
-    tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
-    outgroup_mrca = tree.mrca(taxon_labels=clade_outgroups)
-    tree.reroot_at_edge(outgroup_mrca.edge,
-                        length1 = outgroup_mrca.edge.length/2,
-                        length2 = outgroup_mrca.edge.length/2,
-                        update_bipartitions=False)
-    tree.update_bipartitions()
+    tree = _load_tree(tree_name)
+    outgroup_node = tree.mrca(set(clade_outgroups))
+    half_len = (outgroup_node.edge_length / 2.0) if outgroup_node.edge_length is not None else 0.0
+    tree = _reroot_at_edge(tree, outgroup_node, half_len, half_len)
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 def reroot_tree_at_midpoint(tree_name):
-    tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
-    split_all_non_bi_nodes(tree.seed_node)
-    tree.update_bipartitions()
-    tree.deroot()
-    tree.reroot_at_midpoint()
-    tree.update_bipartitions()
+    tree = _load_tree(tree_name)
+    split_all_non_bi_nodes(tree.root)
+    _collapse_basal_bifurcation(tree)
+    tree = _reroot_at_midpoint(tree)
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(tree_name, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 def unroot_tree(input_filename, output_filename):
-    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
-    tree.deroot()
+    tree = _load_tree(input_filename)
+    _collapse_basal_bifurcation(tree)
     output_tree_string = tree_as_string(tree, suppress_internal=False)
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 def harmonise_roots(new_tree_fn, tree_for_root_fn, algorithm = None):
-    # Read in tree and get nodes adjacent to root
-    taxa = dendropy.TaxonNamespace()
-    tree_for_root = dendropy.Tree.get_from_path(tree_for_root_fn,
-                                                'newick',
-                                                preserve_underscores=True,
-                                                taxon_namespace=taxa,
-                                                rooting="force-rooted")
-    tree_for_root.encode_bipartitions()
-    root = tree_for_root.seed_node
+    tree_for_root = _load_tree(tree_for_root_fn)
+    sub_root = _compute_sub_leaves(tree_for_root)
+    all_root_leaves = sub_root[tree_for_root.root]
+    ref_leaf = min(all_root_leaves)
     root_adjacent_bipartitions = []
-    for root_adjacent_node in root.child_nodes():
-        root_adjacent_bipartitions.append(root_adjacent_node.edge.bipartition)
-    # Now search the new tree for these nodes
-    new_tree = dendropy.Tree.get_from_path(new_tree_fn,
-                                            'newick',
-                                            preserve_underscores=True,
-                                            taxon_namespace=taxa,
-                                            rooting="force-rooted")
-    new_tree.encode_bipartitions()
-    for node in new_tree.preorder_node_iter():
-        if node.edge.bipartition in root_adjacent_bipartitions:
-            half_branch_length = node.edge_length/2
-            new_tree.reroot_at_edge(node.edge,
-                                    length1 = half_branch_length,
-                                    length2 = half_branch_length)
+    for child in tree_for_root.root.children:
+        leaves = sub_root[child]
+        bp = leaves if ref_leaf not in leaves else (all_root_leaves - leaves)
+        root_adjacent_bipartitions.append(bp)
+
+    new_tree = _load_tree(new_tree_fn)
+    sub_new = _compute_sub_leaves(new_tree)
+    all_new_leaves = sub_new[new_tree.root]
+    for node in _preorder_ltr(new_tree.root):
+        if node.is_root():
+            continue
+        leaves = sub_new[node]
+        bp = leaves if ref_leaf not in leaves else (all_new_leaves - leaves)
+        if bp in root_adjacent_bipartitions:
+            half_branch_length = (node.edge_length / 2.0) if node.edge_length is not None else 0.0
+            new_tree = _reroot_at_edge(new_tree, node, half_branch_length, half_branch_length)
             break
+
     new_tree_string = tree_as_string(new_tree,
-                                        suppress_internal=False,
-                                        suppress_rooting=False)
+                                      suppress_internal=False,
+                                      suppress_rooting=False)
 
     # Check both trees are topologically identical
-    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(tree_for_root,
-                                                                                    new_tree,
-                                                                                    is_bipartitions_updated=False)
-    
+    bp_root = set(_get_bipartitions_with_lengths(tree_for_root).keys())
+    bp_new = set(_get_bipartitions_with_lengths(new_tree).keys())
+    missing_bipartitions = bp_root - bp_new
     if len(missing_bipartitions) > 0:
         sys.stderr.write('Bipartitions missing when harmonising roots between trees ' + new_tree_fn + ' and ' + tree_for_root_fn + '\n')
         sys.stderr.write('The missing bipartitions are: ' + str([str(x) for x in missing_bipartitions]) + '\n')
@@ -1158,71 +1368,60 @@ def harmonise_roots(new_tree_fn, tree_for_root_fn, algorithm = None):
         output_file.write(new_tree_string.replace('\'', ''))
 
 def filter_out_removed_taxa_from_tree(input_filename, output_filename, taxa_removed):
-    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
-    tree.prune_taxa_with_labels(taxa_removed, update_bipartitions=True)
-    tree.prune_leaves_without_taxa(update_bipartitions=True)
-    tree.deroot()
+    tree = _load_tree(input_filename)
+    _prune_taxa(tree, taxa_removed)
+    _collapse_basal_bifurcation(tree)
     output_tree_string = tree_as_string(tree)
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
 
 
 def tree_as_string(tree, suppress_internal=True, suppress_rooting=True):
-
-    return tree.as_string(
-        schema='newick',
-        suppress_leaf_taxon_labels=False,
-        suppress_leaf_node_labels=True,
-        suppress_internal_taxon_labels=suppress_internal,
-        suppress_internal_node_labels=suppress_internal,
-        suppress_rooting=suppress_rooting,
-        suppress_edge_lengths=False,
-        unquoted_underscores=True,
-        preserve_spaces=False,
-        store_tree_weights=False,
-        suppress_annotations=True,
-        annotations_as_nhx=False,
-        suppress_item_comments=True,
-        node_label_element_separator=' '
-    )
+    return _format_newick(tree, suppress_internal=suppress_internal) + ';\n'
 
 
 def split_all_non_bi_nodes(node):
+    if isinstance(node, treeswift.Tree):
+        node = node.root
     if node.is_leaf():
         return None
-    elif len(node.child_nodes()) > 2:
+    elif len(node.children) > 2:
         split_child_nodes(node)
 
-    for child_node in node.child_nodes():
+    for child_node in list(node.children):
         split_all_non_bi_nodes(child_node)
 
     return None
 
 
 def split_child_nodes(node):
-    all_child_nodes = node.child_nodes()
-    # skip over the first node
+    all_child_nodes = list(node.children)
     first_child = all_child_nodes.pop()
-    # create a placeholder node to hang everything else off
-    new_child_node = node.new_child(edge_length=0)
-    # move the subtree into the placeholder
-    new_child_node.set_child_nodes(all_child_nodes)
-    # probably not really necessary
-    node.set_child_nodes((first_child, new_child_node))
+    new_child_node = treeswift.Node(label=None, edge_length=0)
+    new_child_node.children = all_child_nodes
+    for c in all_child_nodes:
+        c.parent = new_child_node
+    new_child_node.parent = node
+    first_child.parent = node
+    node.children = [first_child, new_child_node]
 
 
 def get_monophyletic_outgroup(tree_name, outgroups):
     if len(outgroups) == 1:
         return outgroups
 
-    tree = dendropy.Tree.get_from_path(tree_name, 'newick', preserve_underscores=True)
-    tree.deroot()
-    tree.update_bipartitions()
+    tree = _load_tree(tree_name)
+    _collapse_basal_bifurcation(tree)
 
-    for leaf_node in tree.mrca(taxon_labels=outgroups).leaf_nodes():
-        if leaf_node.taxon.label not in outgroups:
+    try:
+        mrca = tree.mrca(set(outgroups))
+    except Exception:
+        return [outgroups[0]]
+
+    for leaf_node in _leaves_ltr(mrca):
+        if leaf_node.label not in outgroups:
             print("Your outgroups do not form a clade.\n  Using the first taxon " + str(outgroups[0]) +
-                  " as the outgroup.\n  Taxon " + str(leaf_node.taxon.label) +
+                  " as the outgroup.\n  Taxon " + str(leaf_node.label) +
                   " is in the clade but not in your list of outgroups.")
             return [outgroups[0]]
 
@@ -1231,65 +1430,43 @@ def get_monophyletic_outgroup(tree_name, outgroups):
 
 def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename,
                                           sequence_reconstructor, use_root = True):
-    # read source tree and extract node labels, to match with the ancestral sequence reconstruction
-    taxa = dendropy.TaxonNamespace()
-    source_tree = dendropy.Tree.get_from_path(source_tree_filename,
-                                              'newick',
-                                              preserve_underscores=True,
-                                              taxon_namespace=taxa,
-                                              rooting='force-rooted')
-    source_tree.encode_bipartitions()
+    source_tree = _load_tree(source_tree_filename)
+    sub_src = _compute_sub_leaves(source_tree)
     source_internal_node_dict = {}
-    for source_internal_node in source_tree.internal_nodes():
-        node_bipartition = source_internal_node.edge.bipartition
-        if source_internal_node.label:
-            source_internal_node_dict[node_bipartition] = source_internal_node.label
-        else:
-            source_internal_node_dict[node_bipartition] = ''
-    # read original tree and add in the labels from the ancestral sequence reconstruction
-    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename,
-                                                    'newick',
-                                                    preserve_underscores=True,
-                                                    taxon_namespace=taxa,
-                                                    rooting='force-rooted')
-    destination_tree.encode_bipartitions()
-    
+    for node, clade in sub_src.items():
+        if not node.is_leaf():
+            source_internal_node_dict[clade] = node.label or ''
+
+    destination_tree = _load_tree(destination_tree_filename)
+
     # Check both trees are topologically identical
-    missing_bipartitions = dendropy.calculate.treecompare.find_missing_bipartitions(source_tree,
-                                                                                    destination_tree,
-                                                                                    is_bipartitions_updated=False)
+    bp_src = set(_get_bipartitions_with_lengths(source_tree).keys())
+    bp_dst = set(_get_bipartitions_with_lengths(destination_tree).keys())
+    missing_bipartitions = bp_src - bp_dst
     if len(missing_bipartitions) > 0:
         sys.stderr.write('Problem comparing the tree files ' + source_tree_filename + ' and ' + destination_tree_filename + '\n')
         sys.stderr.write('Bipartitions missing when transferring node labels: ' + str([str(x) for x in missing_bipartitions]))
         sys.exit(1)
-    
-    root_alternative = ''
-    for destination_internal_node in destination_tree.internal_nodes():
-        if destination_internal_node != destination_tree.seed_node or use_root:
-            node_bipartition = destination_internal_node.edge.bipartition
-            if sequence_reconstructor == 'pyjar':
-                try:
-                    new_label = source_internal_node_dict[node_bipartition]
-                except:
-                    sys.stderr.write('Unable to find bipartition ' + str(node_bipartition) + '\n')
-                    sys.exit(1)
-            else:
-                new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_dict[node_bipartition]))
-            destination_internal_node.label = None
-            destination_internal_node.taxon = dendropy.Taxon(new_label)
 
-    # output final tree
+    sub_dst = _compute_sub_leaves(destination_tree)
+    for node, clade in sub_dst.items():
+        if not node.is_leaf():
+            if not node.is_root() or use_root:
+                if sequence_reconstructor == 'pyjar':
+                    try:
+                        new_label = source_internal_node_dict[clade]
+                    except KeyError:
+                        sys.stderr.write('Unable to find bipartition ' + str(clade) + '\n')
+                        sys.exit(1)
+                else:
+                    new_label = sequence_reconstructor.replace_internal_node_label(str(source_internal_node_dict.get(clade, '')))
+                node.label = new_label
+
     if not use_root:
-        alt_root_name = ''
-        for root_child_node in destination_tree.seed_node.child_nodes():
-            alt_root_name = root_child_node.taxon.label
-            break
-        destination_tree.seed_node.label = None
-        destination_tree.seed_node.taxon = dendropy.Taxon(alt_root_name)
-    destination_tree_string = destination_tree.as_string(schema="newick",
-                                                            suppress_rooting=True,
-                                                            unquoted_underscores=True,
-                                                            suppress_internal_node_labels=True).replace("'","").replace('\'', '')
+        alt_root_name = destination_tree.root.children[0].label if destination_tree.root.children else ''
+        destination_tree.root.label = alt_root_name
+
+    destination_tree_string = (_format_newick(destination_tree, suppress_internal=False) + ';\n').replace("'","").replace('\'', '')
 
     with open(output_tree_filename, 'w+') as output_file:
         print(destination_tree_string,
@@ -1297,7 +1474,9 @@ def transfer_internal_node_labels_to_tree(source_tree_filename, destination_tree
                  end='')
 
 def remove_internal_node_labels_from_tree(input_filename, output_filename):
-    tree = dendropy.Tree.get_from_path(input_filename, 'newick', preserve_underscores=True)
+    tree = _load_tree(input_filename)
+    for node in tree.traverse_internal():
+        node.label = None
     output_tree_string = tree_as_string(tree)
     with open(output_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))
@@ -1438,22 +1617,34 @@ def has_tree_been_seen_before(tree_file_names, converge_method):
     return False
 
 
+def _get_bipartitions_with_lengths(tree):
+    sub_leaves = _compute_sub_leaves(tree)
+    all_leaves = sub_leaves[tree.root]
+    ref_leaf = min(all_leaves)
+    bipartitions = {}
+    for node, leaves in sub_leaves.items():
+        if node is tree.root:
+            continue
+        bp = leaves if ref_leaf not in leaves else (all_leaves - leaves)
+        bipartitions[bp] = node.edge_length if node.edge_length is not None else 0.0
+    return bipartitions
+
+
 def robinson_foulds_distance(input_tree_name, output_tree_name):
-    tns = dendropy.TaxonNamespace()
-    input_tree = dendropy.Tree.get_from_path(input_tree_name, 'newick', taxon_namespace=tns)
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick', taxon_namespace=tns)
-    input_tree.encode_bipartitions()
-    output_tree.encode_bipartitions()
-    return dendropy.calculate.treecompare.weighted_robinson_foulds_distance(input_tree, output_tree)
+    t1 = _load_tree(input_tree_name)
+    t2 = _load_tree(output_tree_name)
+    bp1 = _get_bipartitions_with_lengths(t1)
+    bp2 = _get_bipartitions_with_lengths(t2)
+    all_bps = set(bp1.keys()).union(bp2.keys())
+    return sum(abs(bp1.get(bp, 0.0) - bp2.get(bp, 0.0)) for bp in all_bps)
 
 
 def symmetric_difference(input_tree_name, output_tree_name):
-    tns = dendropy.TaxonNamespace()
-    input_tree = dendropy.Tree.get_from_path(input_tree_name, 'newick', taxon_namespace=tns)
-    output_tree = dendropy.Tree.get_from_path(output_tree_name, 'newick', taxon_namespace=tns)
-    input_tree.encode_bipartitions()
-    output_tree.encode_bipartitions()
-    return dendropy.calculate.treecompare.symmetric_difference(input_tree, output_tree)
+    t1 = _load_tree(input_tree_name)
+    t2 = _load_tree(output_tree_name)
+    bp1 = set(_get_bipartitions_with_lengths(t1).keys())
+    bp2 = set(_get_bipartitions_with_lengths(t2).keys())
+    return float(len(bp1.symmetric_difference(bp2)))
 
 def generate_bootstrap_alignments(bootstrap_aln, n, output_aln_prefix):
     snp_aln = list(AlignIO.parse(bootstrap_aln, "fasta"))[0]
@@ -1465,30 +1656,25 @@ def generate_bootstrap_alignments(bootstrap_aln, n, output_aln_prefix):
 def transfer_bootstraps_to_tree(source_tree_filename, destination_tree_filename, output_tree_filename, outgroups = None):
     # read source tree and extract bootstraps as node labels, match with bipartition
     reroot_tree(source_tree_filename, outgroups = outgroups)
-    source_tree = dendropy.Tree.get_from_path(source_tree_filename, 'newick', preserve_underscores=True)
+    source_tree = _load_tree(source_tree_filename)
+    sub_src = _compute_sub_leaves(source_tree)
     source_bootstraps = {}
-    for source_internal_node in source_tree.internal_nodes():
-        leaves = []
-        for leaf in source_internal_node.leaf_iter():
-            leaves.append(leaf.taxon.label.replace("'",""))
-        descendant_taxa = frozenset(leaves)
-        if source_internal_node.label:
-            source_bootstraps[descendant_taxa] = source_internal_node.label
-        else:
-            source_bootstraps[descendant_taxa] = ''
-    # read original tree and add in the bootstrap values
-    destination_tree = dendropy.Tree.get_from_path(destination_tree_filename, 'newick', preserve_underscores=True)
-    for destination_internal_node in destination_tree.internal_nodes():
-        leaves = []
-        for descendant in destination_internal_node.leaf_iter():
-            leaves.append(descendant.taxon.label.replace("'",""))
-        descendant_taxa = frozenset(leaves)
-        if descendant_taxa in source_bootstraps:
-            destination_internal_node.label = source_bootstraps[descendant_taxa]
-        else:
-            sys.stderr.write('Cannot find the internal node with descendants ' + str(descendant_taxa) + '\n')
-            destination_internal_node.label = "NA"
-    # output final tree
+    for node, leaves in sub_src.items():
+        if not node.is_leaf():
+            descendant_taxa = frozenset([l.replace("'", "") for l in leaves])
+            source_bootstraps[descendant_taxa] = node.label or ''
+
+    destination_tree = _load_tree(destination_tree_filename)
+    sub_dst = _compute_sub_leaves(destination_tree)
+    for node, leaves in sub_dst.items():
+        if not node.is_leaf():
+            descendant_taxa = frozenset([l.replace("'", "") for l in leaves])
+            if descendant_taxa in source_bootstraps:
+                node.label = source_bootstraps[descendant_taxa]
+            else:
+                sys.stderr.write('Cannot find the internal node with descendants ' + str(descendant_taxa) + '\n')
+                node.label = "NA"
+
     output_tree_string = tree_as_string(destination_tree, suppress_internal=False, suppress_rooting=False)
     with open(output_tree_filename, 'w+') as output_file:
         output_file.write(output_tree_string.replace('\'', ''))

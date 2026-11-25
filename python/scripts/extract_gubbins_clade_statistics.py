@@ -24,7 +24,7 @@ import sys
 import argparse
 import re
 # Phylogenetic imports
-import dendropy
+import treeswift
 # Biopython imports
 from Bio import AlignIO
 from Bio import Phylo
@@ -163,13 +163,11 @@ if __name__ == "__main__":
                 pm_snps[node] += 1
     
     # Parse tree
+    from gubbins.common import _load_tree, _prune_taxa, _preorder_ltr, tree_as_string
     info_labels = ['total_snps','rec_snps','mutation_snps','recombinations']
     tree_info_labels = ['n_taxa','n_branches','branch_length']
-    tree = dendropy.Tree.get(path = args.tree,
-                             schema = 'newick',
-                             preserve_underscores = True,
-                             rooting='force-rooted')
-    taxon_names = [taxon.label for taxon in tree.taxon_namespace]
+    tree = _load_tree(args.tree)
+    taxon_names = [n.label for n in tree.traverse_leaves()]
     
     # Calculate statistics per clade
     rec_length_string = ''
@@ -187,39 +185,23 @@ if __name__ == "__main__":
                     sys.stderr.write('Tree contains ' + ','.join(taxon_names) + '\n')
                     #exit(1)
             # Extract clade tree
-            clade_tree = tree.clone(depth = 1)
-            clade_tree.retain_taxa_with_labels(clade_members)
+            clade_tree = _load_tree(args.tree)
+            to_remove = [n.label for n in clade_tree.traverse_leaves() if n.label not in clade_members]
+            _prune_taxa(clade_tree, to_remove)
             # Print tree
             if args.print_trees:
-                clade_tree_string = clade_tree.as_string(
-                                        schema='newick',
-                                        suppress_leaf_taxon_labels=False,
-                                        suppress_leaf_node_labels=True,
-                                        suppress_internal_taxon_labels=True,
-                                        suppress_internal_node_labels=True,
-                                        suppress_rooting=True,
-                                        suppress_edge_lengths=False,
-                                        unquoted_underscores=True,
-                                        preserve_spaces=False,
-                                        store_tree_weights=False,
-                                        suppress_annotations=True,
-                                        annotations_as_nhx=False,
-                                        suppress_item_comments=True,
-                                        node_label_element_separator=' '
-                                    )
+                clade_tree_string = tree_as_string(clade_tree, suppress_internal=True, suppress_rooting=True)
                 with open(clade_name + '.tre','w') as tree_out:
                     tree_out.write(clade_tree_string.replace('\'', '') + '\n')
             # Print statistics
             clade_info = {label:0 for label in info_labels + tree_info_labels}
-            for node in clade_tree.preorder_node_iter():
-                if node != clade_tree.seed_node:
+            for node in _preorder_ltr(clade_tree.root):
+                if not node.is_root():
                     clade_info['n_branches'] += 1
-                    clade_info['branch_length'] += node.edge_length
+                    clade_info['branch_length'] += (node.edge_length if node.edge_length is not None else 0.0)
                     if node.is_leaf():
                         clade_info['n_taxa'] += 1
-                        node_label_string = node.taxon.label
-                    else:
-                        node_label_string = node.label
+                    node_label_string = node.label
                     if node_label_string in node_snps:
                         clade_info['total_snps'] += len(node_snps[node_label_string])
                         clade_info['rec_snps'] += rec_snps[node_label_string]

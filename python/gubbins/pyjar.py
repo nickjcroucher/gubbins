@@ -5,7 +5,6 @@
 # code modified from https://github.com/simonrharris/pyjar
 # pyjar is free software, licensed under GPLv3.
 
-from asyncio import subprocess
 import shutil
 from scipy import linalg
 import numpy
@@ -17,7 +16,7 @@ from Bio import AlignIO
 from math import log, exp
 from functools import partial
 import numba
-from numba import jit, njit, types, from_dtype
+from numba import jit, njit, prange, types, from_dtype
 from math import ceil
 import collections
 import datetime
@@ -45,6 +44,28 @@ class Pyjar:
         self.algorithm = "pyjar"
         self.executable = "pyjar"
         self.model = model
+
+
+class FlattenedBasePositions:
+    """Holds CSR-flattened base pattern positions while supporting sequence indexing/iteration."""
+    __slots__ = ('positions_flat', 'position_offsets')
+
+    def __init__(self, positions_flat, position_offsets):
+        self.positions_flat = positions_flat
+        self.position_offsets = position_offsets
+
+    def __len__(self):
+        return len(self.position_offsets) - 1
+
+    def __getitem__(self, idx):
+        return self.positions_flat[self.position_offsets[idx]:self.position_offsets[idx + 1]]
+
+    def __iter__(self):
+        offsets = self.position_offsets
+        flat = self.positions_flat
+        for i in range(len(offsets) - 1):
+            yield flat[offsets[i]:offsets[i + 1]]
+
 
 # Split a list into chunks for multiprocessing
 # from https://stackoverflow.com/questions/2130016/splitting-a-list-into-n-parts-of-approximately-equal-length/37414115#37414115
@@ -229,6 +250,97 @@ def get_unique_columns(data):
 # JIT-compiled functions #
 ##########################
 
+# Fast byte-buffer parsers for base_patterns.csv and base_positions.csv
+#######################################################################
+@njit(numba.uint8[:, :](numba.uint8[:], numba.int64, numba.int64), cache=True)
+def parse_patterns_bytes(buf, n_rows, n_cols):
+    out = numpy.empty((n_rows, n_cols), dtype=numpy.uint8)
+    lut = numpy.full(256, 5, dtype=numpy.uint8)
+    lut[65] = 0; lut[97] = 0   # A, a
+    lut[67] = 1; lut[99] = 1   # C, c
+    lut[71] = 2; lut[103] = 2  # G, g
+    lut[84] = 3; lut[116] = 3  # T, t
+    lut[45] = 4                # -
+    lut[78] = 5; lut[110] = 5  # N, n
+    row = 0
+    col = 0
+    for i in range(buf.size):
+        b = buf[i]
+        if b == 10:
+            if col > 0:
+                row += 1
+                col = 0
+        elif b != 13:
+            out[row, col] = lut[b]
+            col += 1
+    return out
+
+
+@njit(numba.types.Tuple((numba.int64, numba.int64))(numba.uint8[:]), cache=True)
+def count_positions_and_lines(buf):
+    n_lines = 0
+    n_nums = 0
+    in_num = False
+    for i in range(buf.size):
+        b = buf[i]
+        if 48 <= b <= 57:
+            if not in_num:
+                in_num = True
+                n_nums += 1
+        elif b == 10:
+            if in_num:
+                n_lines += 1
+                in_num = False
+        else:
+            in_num = False
+    if in_num:
+        n_lines += 1
+    return n_lines, n_nums
+
+
+@njit(numba.types.Tuple((numba.int32[:], numba.int32[:], numba.int64))(numba.uint8[:], numba.int64, numba.int64), cache=True)
+def parse_positions_bytes(buf, n_lines, n_nums):
+    positions_flat = numpy.empty(n_nums, dtype=numpy.int32)
+    offsets = numpy.empty(n_lines + 1, dtype=numpy.int32)
+    offsets[0] = 0
+    line_idx = 0
+    num_idx = 0
+    val = numpy.int32(0)
+    in_num = False
+    max_val = numpy.int32(0)
+    for i in range(buf.size):
+        b = buf[i]
+        if 48 <= b <= 57:
+            val = val * numpy.int32(10) + numpy.int32(b - 48)
+            in_num = True
+        elif b == 44:
+            if in_num:
+                positions_flat[num_idx] = val
+                if val > max_val:
+                    max_val = val
+                num_idx += 1
+                val = numpy.int32(0)
+                in_num = False
+        elif b == 10:
+            if in_num:
+                positions_flat[num_idx] = val
+                if val > max_val:
+                    max_val = val
+                num_idx += 1
+                val = numpy.int32(0)
+                in_num = False
+                line_idx += 1
+                offsets[line_idx] = num_idx
+    if in_num:
+        positions_flat[num_idx] = val
+        if val > max_val:
+            max_val = val
+        num_idx += 1
+        line_idx += 1
+        offsets[line_idx] = num_idx
+    return positions_flat, offsets, int(max_val) + 1
+
+
 # Convert bases to integers
 ###########################
 @njit(numba.void(numba.typeof(numpy.dtype('U1'))[:],
@@ -263,15 +375,22 @@ def seq_to_int(seq,out_seq):
 def find_most_likely_base_given_descendents(Lmat, Cmat, pij, node_index, child_nodes, column_base_indices):
     #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
     #2b. Cz(i) = the value of j attaining the above maximum.
-    child_node_indices = child_nodes[node_index,:]
-    child_node_indices = child_node_indices[child_node_indices > -1]
-    for end_index in column_base_indices:
-        c = Lmat[child_node_indices,end_index].sum()
-        for start_index in column_base_indices:
-            j = pij[start_index,end_index]+c
-            if j > Lmat[node_index,start_index]:
-                Lmat[node_index,start_index] = j
-                Cmat[node_index,start_index] = end_index
+    max_children = child_nodes.shape[1]
+    n_bases = column_base_indices.size
+    for b_end in range(n_bases):
+        end_index = column_base_indices[b_end]
+        c = numpy.float32(0.0)
+        for k in range(max_children):
+            ch = child_nodes[node_index, k]
+            if ch < 0:
+                break
+            c += Lmat[ch, end_index]
+        for b_start in range(n_bases):
+            start_index = column_base_indices[b_start]
+            j = pij[start_index, end_index] + c
+            if j > Lmat[node_index, start_index]:
+                Lmat[node_index, start_index] = j
+                Cmat[node_index, start_index] = end_index
 
 # Calculate the most likely base at the root node
 #################################################
@@ -283,13 +402,22 @@ def find_most_likely_base_given_descendents(Lmat, Cmat, pij, node_index, child_n
                 numba.uint8[:]),
                 cache=True)
 def calculate_root_likelihood(Lmat, Cmat, base_frequencies, node_index, child_node_indices, column_base_indices):
-    for end_index in column_base_indices:
-        c = Lmat[child_node_indices,end_index].sum()
-        for start_index in column_base_indices:
-            j = log(base_frequencies[end_index]) + c
-            if j > Lmat[node_index,start_index]:
-                Lmat[node_index,start_index] = j
-                Cmat[node_index,start_index] = end_index
+    n_children = child_node_indices.size
+    n_bases = column_base_indices.size
+    for b_end in range(n_bases):
+        end_index = column_base_indices[b_end]
+        c = numpy.float32(0.0)
+        for k in range(n_children):
+            ch = child_node_indices[k]
+            if ch < 0:
+                break
+            c += Lmat[ch, end_index]
+        j = log(base_frequencies[end_index]) + c
+        for b_start in range(n_bases):
+            start_index = column_base_indices[b_start]
+            if j > Lmat[node_index, start_index]:
+                Lmat[node_index, start_index] = j
+                Cmat[node_index, start_index] = end_index
 
 # Fill in matrices given known or unknown base in sequence
 ##########################################################
@@ -301,13 +429,15 @@ def calculate_root_likelihood(Lmat, Cmat, base_frequencies, node_index, child_no
                 cache=True)
 def process_leaf(Lmat, Cmat, pij, node_index, taxon_base_index):
     if taxon_base_index < 4:
-        #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j. This implies that no matter what is the amino acid in the father of y, j is assigned to node y.
-        Cmat[node_index,:] = taxon_base_index
+        #1a. Let j be the amino acid at y. Set, for each amino acid i: Cy(i)= j.
         #1b. Set for each amino acid i: Ly(i) = Pij(ty), where ty is the branch length between y and its father.
-        Lmat[node_index,:] = [pij[0][taxon_base_index],pij[1][taxon_base_index],pij[2][taxon_base_index],pij[3][taxon_base_index]]
+        for i in range(4):
+            Cmat[node_index, i] = taxon_base_index
+            Lmat[node_index, i] = pij[i, taxon_base_index]
     else:
         # Cmat stays as default when base is unknown
-        Lmat[node_index,:] = [pij[0][0],pij[1][1],pij[2][2],pij[3][3]]
+        for i in range(4):
+            Lmat[node_index, i] = pij[i, i]
 
 # Count the number of substitutions occurring on a branch
 #########################################################
@@ -320,11 +450,14 @@ def process_leaf(Lmat, Cmat, pij, node_index, taxon_base_index):
                 cache=True)
 def count_node_snps(node_snps,preordered_nodes,parent_nodes,seed_node,reconstructed_alleles,base_pattern_columns):
     # Note that preordered node list does not include the root
-    for node_index in preordered_nodes:
+    n_cols = base_pattern_columns.size
+    for i in range(preordered_nodes.size):
+        node_index = preordered_nodes[i]
         parent_node_index = parent_nodes[node_index]
-        if reconstructed_alleles[node_index] < 4 and reconstructed_alleles[parent_node_index] < 4 \
-          and reconstructed_alleles[node_index] != reconstructed_alleles[parent_node_index]:
-            node_snps[node_index] += len(base_pattern_columns)
+        a_node = reconstructed_alleles[node_index]
+        a_parent = reconstructed_alleles[parent_node_index]
+        if a_node < 4 and a_parent < 4 and a_node != a_parent:
+            node_snps[node_index] += n_cols
 
 # Reconstruct missing data at internal nodes
 ############################################
@@ -343,16 +476,21 @@ def reconstruct_alleles(reconstructed_alleles,
                         column,
                         child_nodes,
                         reconstructed_base_indices):
-    for node_index in postordered_nodes:
-        if node_index in leaf_nodes:
-            alignment_index = node_index_to_aln_row[node_index]
+    max_children = child_nodes.shape[1]
+    for i in range(postordered_nodes.size):
+        node_index = postordered_nodes[i]
+        alignment_index = node_index_to_aln_row[node_index]
+        if alignment_index >= 0:
             reconstructed_alleles[node_index] = column[alignment_index]
         else:
             has_child_base = False
-            for child_taxon_index in child_nodes[node_index,:]:
-                if child_taxon_index > -1:
-                    if reconstructed_alleles[child_taxon_index] < 4:
-                        has_child_base = True
+            for k in range(max_children):
+                child_taxon_index = child_nodes[node_index, k]
+                if child_taxon_index < 0:
+                    break
+                if reconstructed_alleles[child_taxon_index] < 4:
+                    has_child_base = True
+                    break
             if has_child_base:
                 reconstructed_alleles[node_index] = reconstructed_base_indices[node_index]
             else:
@@ -367,12 +505,14 @@ def reconstruct_alleles(reconstructed_alleles,
                 numba.int32[:]),
                 cache=True)
 def fill_out_aln(out_aln,reconstructed_alleles,ordered_bases,ancestral_node_order,base_pattern_columns):
-    for index in numpy.arange(ancestral_node_order.size, dtype=numpy.int32):
+    n_anc = ancestral_node_order.size
+    n_cols = base_pattern_columns.size
+    for index in range(n_anc):
         node_index = ancestral_node_order[index]
         base_index = reconstructed_alleles[node_index]
         base = ordered_bases[base_index]
-        for column in base_pattern_columns:
-            out_aln[column,index] = base
+        for c_i in range(n_cols):
+            out_aln[base_pattern_columns[c_i], index] = base
 
 # Reconstruct each base pattern
 ###############################
@@ -414,33 +554,53 @@ def iterate_over_base_patterns(column,
                                 reconstructed_base_indices,
                                 node_snps):
 
-    Cmat_null = numpy.array([0,1,2,3], dtype = numpy.uint8)
-        
-    # Reset matrices
-    Lmat.fill(-numpy.inf)
-    Cmat[:] = Cmat_null
+    num_nodes = postordered_nodes.size
+    for n in range(num_nodes):
+        for b in range(4):
+            Lmat[n, b] = -numpy.inf
+            Cmat[n, b] = b
 
-    # Count unknown bases
-    unknown_base_count = numpy.count_nonzero(column > 3)
-    column_base_indices = numpy.unique(column[numpy.where(column <= 3)])
+    # Count unknown bases and find unique observed bases in {0, 1, 2, 3}
+    unknown_base_count = 0
+    seen0 = False; seen1 = False; seen2 = False; seen3 = False
+    for i in range(column.size):
+        val = column[i]
+        if val > 3:
+            unknown_base_count += 1
+        elif val == 0:
+            seen0 = True
+        elif val == 1:
+            seen1 = True
+        elif val == 2:
+            seen2 = True
+        elif val == 3:
+            seen3 = True
+    n_bases = (1 if seen0 else 0) + (1 if seen1 else 0) + (1 if seen2 else 0) + (1 if seen3 else 0)
+    column_base_indices = numpy.empty(n_bases, dtype=numpy.uint8)
+    idx = 0
+    if seen0: column_base_indices[idx] = 0; idx += 1
+    if seen1: column_base_indices[idx] = 1; idx += 1
+    if seen2: column_base_indices[idx] = 2; idx += 1
+    if seen3: column_base_indices[idx] = 3; idx += 1
       
     # Heuristic for speed: if all taxa are monomorphic, with a gap in only one sequence, then the ancestral states
     # will all be the observed base, as no ancestral node will have two child nodes with unknown bases at this site
-    if unknown_base_count == 1 and column_base_indices.size == 1:
+    if unknown_base_count == 1 and n_bases == 1:
         # If site is monomorphic - replace entire column
-        tmp_out_aln[base_pattern_columns,:] = ordered_bases[column_base_indices[0]]
+        base_val = ordered_bases[column_base_indices[0]]
+        n_anc = tmp_out_aln.shape[1]
+        for c_i in range(base_pattern_columns.size):
+            col_pos = base_pattern_columns[c_i]
+            for a_i in range(n_anc):
+                tmp_out_aln[col_pos, a_i] = base_val
     else:
-        # Otherwise perform a full ML inference
-        #1 For each OTU y perform the following:
-        #Visit a nonroot internal node, z, which has not been visited yet, but both of whose sons, nodes x and y, have already been visited, i.e., Lx(j), Cx(j), Ly(j), and Cy(j) have already been defined for each j. Let tz be the length of the branch connecting node z and its father. For each amino acid i, compute Lz(i) and Cz(i) according to the following formulae:
-        #Denote the three sons of the root by x, y, and z. For each amino acid k, compute the expression Pk x Lx(k) x Ly(k) x Lz(k). Reconstruct r by choosing the amino acid k maximizing this expression. The maximum value found is the likelihood of the best reconstruction.
-        for node_index in postordered_nodes:
+        for i in range(num_nodes):
+            node_index = postordered_nodes[i]
             if node_index == seed_node:
                 continue
-            #calculate the transistion matrix for the branch
-            pij=numpy.reshape(node_pij[node_index,:].copy(),(4,4))
-            if node_index in leaf_nodes:
-                alignment_index = node_index_to_aln_row[node_index]
+            pij = numpy.reshape(numpy.ascontiguousarray(node_pij[node_index, :]), (4, 4))
+            alignment_index = node_index_to_aln_row[node_index]
+            if alignment_index >= 0:
                 taxon_base_index = column[alignment_index]
                 process_leaf(Lmat,
                                 Cmat,
@@ -448,8 +608,6 @@ def iterate_over_base_patterns(column,
                                 node_index,
                                 taxon_base_index)
             else:
-                #2a. Lz(i) = maxj Pij(tz) x Lx(j) x Ly(j)
-                #2b. Cz(i) = the value of j attaining the above maximum.
                 find_most_likely_base_given_descendents(Lmat,
                                                         Cmat,
                                                         pij,
@@ -458,24 +616,18 @@ def iterate_over_base_patterns(column,
                                                         column_base_indices)
 
         # Calculate likelihood of base at root node
-        child_node_indices = child_nodes[node_index,:]
-        child_node_indices = child_node_indices[child_node_indices > -1]
-        calculate_root_likelihood(Lmat, Cmat, base_frequencies, node_index, child_node_indices, column_base_indices)
-        max_root_base_index = Cmat[node_index,numpy.argmax(Lmat[node_index,:])]
-        reconstructed_base_indices[node_index] = max_root_base_index
+        root_index = postordered_nodes[num_nodes - 1]
+        child_node_indices = child_nodes[root_index, :]
+        calculate_root_likelihood(Lmat, Cmat, base_frequencies, root_index, child_node_indices, column_base_indices)
+        max_root_base_index = Cmat[root_index, numpy.argmax(Lmat[root_index, :])]
+        reconstructed_base_indices[root_index] = max_root_base_index
         
-        #Traverse the tree from the root in the direction of the OTUs, assigning to each node its most likely ancestral character as follows:
-        # Note that preordered node list does not include the root
-        for node_index in preordered_nodes:
-            #5a. Visit an unreconstructed internal node x whose father y has already been reconstructed. Denote by i the reconstructed amino acid at node y.
+        for i in range(preordered_nodes.size):
+            node_index = preordered_nodes[i]
             parent_node_index = parent_nodes[node_index]
-            i = reconstructed_base_indices[parent_node_index]
-            #5b. Reconstruct node x by choosing Cx(i).
-            reconstructed_base_indices[node_index] = Cmat[node_index,i]
+            reconstructed_base_indices[node_index] = Cmat[node_index, reconstructed_base_indices[parent_node_index]]
 
-        # Put gaps back in and check that any ancestor with only gaps downstream is made a gap
-        # store reconstructed alleles
-        reconstructed_alleles = numpy.full(postordered_nodes.size, 8, dtype = numpy.uint8)
+        reconstructed_alleles = numpy.full(num_nodes, 8, dtype = numpy.uint8)
         reconstruct_alleles(reconstructed_alleles,
                             postordered_nodes,
                             leaf_nodes,
@@ -485,7 +637,6 @@ def iterate_over_base_patterns(column,
                             reconstructed_base_indices
                             )
 
-        # If site is not monomorphic - replace specific entries
         fill_out_aln(tmp_out_aln,
                     reconstructed_alleles,
                     ordered_bases,
@@ -493,7 +644,6 @@ def iterate_over_base_patterns(column,
                     base_pattern_columns
                     )
 
-        # enumerate the number of base subtitutions reconstructed occurring on each branch
         count_node_snps(node_snps,
                         preordered_nodes,
                         parent_nodes,
@@ -501,6 +651,266 @@ def iterate_over_base_patterns(column,
                         reconstructed_alleles,
                         base_pattern_columns,
                         )
+
+
+# Allocation-free batch kernel operating directly on transposed ASCII buffer (n_ancestral, max_pos)
+###################################################################################################
+@njit(cache=True)
+def _reconstruct_single_pattern_T(column,
+                                  base_pattern_columns,
+                                  Lmat,
+                                  Cmat,
+                                  out_aln_T,
+                                  ordered_ascii_bases,
+                                  postordered_nodes,
+                                  preordered_nodes,
+                                  parent_nodes,
+                                  child_nodes,
+                                  seed_node,
+                                  ancestral_node_order,
+                                  node_pij_3d,
+                                  log_base_frequencies,
+                                  node_index_to_aln_row,
+                                  reconstructed_base_indices,
+                                  reconstructed_alleles,
+                                  column_base_indices_buf,
+                                  node_snps):
+    num_nodes = postordered_nodes.size
+    max_children = child_nodes.shape[1]
+    for n in range(num_nodes):
+        for b in range(4):
+            Lmat[n, b] = -numpy.inf
+            Cmat[n, b] = b
+
+    unknown_base_count = 0
+    seen0 = False; seen1 = False; seen2 = False; seen3 = False
+    for i in range(column.size):
+        val = column[i]
+        if val > 3:
+            unknown_base_count += 1
+        elif val == 0:
+            seen0 = True
+        elif val == 1:
+            seen1 = True
+        elif val == 2:
+            seen2 = True
+        elif val == 3:
+            seen3 = True
+    n_bases = 0
+    if seen0: column_base_indices_buf[n_bases] = 0; n_bases += 1
+    if seen1: column_base_indices_buf[n_bases] = 1; n_bases += 1
+    if seen2: column_base_indices_buf[n_bases] = 2; n_bases += 1
+    if seen3: column_base_indices_buf[n_bases] = 3; n_bases += 1
+
+    n_cols = base_pattern_columns.size
+    n_anc = ancestral_node_order.size
+
+    if unknown_base_count == 1 and n_bases == 1:
+        base_val = ordered_ascii_bases[column_base_indices_buf[0]]
+        for a_i in range(n_anc):
+            row = out_aln_T[a_i]
+            for c_i in range(n_cols):
+                row[base_pattern_columns[c_i]] = base_val
+    else:
+        for i in range(num_nodes):
+            node_index = postordered_nodes[i]
+            if node_index == seed_node:
+                continue
+            pij_node = node_pij_3d[node_index]
+            aln_row = node_index_to_aln_row[node_index]
+            if aln_row >= 0:
+                process_leaf(Lmat, Cmat, pij_node, node_index, column[aln_row])
+            else:
+                for b_end in range(n_bases):
+                    end_index = column_base_indices_buf[b_end]
+                    c = numpy.float32(0.0)
+                    for k in range(max_children):
+                        ch = child_nodes[node_index, k]
+                        if ch < 0:
+                            break
+                        c += Lmat[ch, end_index]
+                    for b_start in range(n_bases):
+                        start_index = column_base_indices_buf[b_start]
+                        j = pij_node[start_index, end_index] + c
+                        if j > Lmat[node_index, start_index]:
+                            Lmat[node_index, start_index] = j
+                            Cmat[node_index, start_index] = end_index
+
+        root_idx = postordered_nodes[num_nodes - 1]
+        for b_end in range(n_bases):
+            end_index = column_base_indices_buf[b_end]
+            c = numpy.float32(0.0)
+            for k in range(max_children):
+                ch = child_nodes[root_idx, k]
+                if ch < 0:
+                    break
+                c += Lmat[ch, end_index]
+            j = log_base_frequencies[end_index] + c
+            for b_start in range(n_bases):
+                start_index = column_base_indices_buf[b_start]
+                if j > Lmat[root_idx, start_index]:
+                    Lmat[root_idx, start_index] = j
+                    Cmat[root_idx, start_index] = end_index
+
+        best_b = 0
+        best_l = Lmat[root_idx, 0]
+        for b in range(1, 4):
+            if Lmat[root_idx, b] > best_l:
+                best_l = Lmat[root_idx, b]
+                best_b = b
+        reconstructed_base_indices[root_idx] = Cmat[root_idx, best_b]
+
+        for i in range(preordered_nodes.size):
+            node_index = preordered_nodes[i]
+            parent_node_index = parent_nodes[node_index]
+            reconstructed_base_indices[node_index] = Cmat[node_index, reconstructed_base_indices[parent_node_index]]
+
+        for i in range(num_nodes):
+            node_index = postordered_nodes[i]
+            aln_row = node_index_to_aln_row[node_index]
+            if aln_row >= 0:
+                reconstructed_alleles[node_index] = column[aln_row]
+            else:
+                has_child_base = False
+                for k in range(max_children):
+                    ch = child_nodes[node_index, k]
+                    if ch < 0:
+                        break
+                    if reconstructed_alleles[ch] < 4:
+                        has_child_base = True
+                        break
+                if has_child_base:
+                    reconstructed_alleles[node_index] = reconstructed_base_indices[node_index]
+                else:
+                    reconstructed_alleles[node_index] = numpy.uint8(4)
+
+        for index in range(n_anc):
+            node_index = ancestral_node_order[index]
+            base = ordered_ascii_bases[reconstructed_alleles[node_index]]
+            row = out_aln_T[index]
+            for c_i in range(n_cols):
+                row[base_pattern_columns[c_i]] = base
+
+        for i in range(preordered_nodes.size):
+            node_index = preordered_nodes[i]
+            parent_node_index = parent_nodes[node_index]
+            a_node = reconstructed_alleles[node_index]
+            a_parent = reconstructed_alleles[parent_node_index]
+            if a_node < 4 and a_parent < 4 and a_node != a_parent:
+                node_snps[node_index] += n_cols
+
+
+@njit(cache=True)
+def reconstruct_all_patterns_T(base_patterns,
+                               positions_flat,
+                               position_offsets,
+                               out_aln_T,
+                               ordered_ascii_bases,
+                               postordered_nodes,
+                               preordered_nodes,
+                               parent_nodes,
+                               child_nodes,
+                               seed_node,
+                               ancestral_node_order,
+                               node_pij_3d,
+                               log_base_frequencies,
+                               node_index_to_aln_row):
+    n_patterns = base_patterns.shape[0]
+    num_nodes = postordered_nodes.size
+    Lmat = numpy.full((num_nodes, 4), -numpy.inf, dtype=numpy.float32)
+    Cmat = numpy.zeros((num_nodes, 4), dtype=numpy.uint8)
+    reconstructed_base_indices = numpy.full(num_nodes, 8, dtype=numpy.uint8)
+    reconstructed_alleles = numpy.full(num_nodes, 8, dtype=numpy.uint8)
+    column_base_indices_buf = numpy.zeros(4, dtype=numpy.uint8)
+    node_snps = numpy.zeros(num_nodes, dtype=numpy.int32)
+    for b in range(n_patterns):
+        start = position_offsets[b]
+        end = position_offsets[b + 1]
+        _reconstruct_single_pattern_T(
+            base_patterns[b],
+            positions_flat[start:end],
+            Lmat,
+            Cmat,
+            out_aln_T,
+            ordered_ascii_bases,
+            postordered_nodes,
+            preordered_nodes,
+            parent_nodes,
+            child_nodes,
+            seed_node,
+            ancestral_node_order,
+            node_pij_3d,
+            log_base_frequencies,
+            node_index_to_aln_row,
+            reconstructed_base_indices,
+            reconstructed_alleles,
+            column_base_indices_buf,
+            node_snps
+        )
+    return node_snps
+
+
+@njit(parallel=True, cache=True)
+def reconstruct_all_patterns_T_parallel(base_patterns,
+                                        positions_flat,
+                                        position_offsets,
+                                        out_aln_T,
+                                        ordered_ascii_bases,
+                                        postordered_nodes,
+                                        preordered_nodes,
+                                        parent_nodes,
+                                        child_nodes,
+                                        seed_node,
+                                        ancestral_node_order,
+                                        node_pij_3d,
+                                        log_base_frequencies,
+                                        node_index_to_aln_row,
+                                        n_threads):
+    n_patterns = base_patterns.shape[0]
+    num_nodes = postordered_nodes.size
+    n_chunks = min(n_threads, n_patterns)
+    if n_chunks < 1:
+        n_chunks = 1
+    node_snps_chunks = numpy.zeros((n_chunks, num_nodes), dtype=numpy.int32)
+    for t in prange(n_chunks):
+        chunk_start = (t * n_patterns) // n_chunks
+        chunk_end = ((t + 1) * n_patterns) // n_chunks
+        Lmat = numpy.full((num_nodes, 4), -numpy.inf, dtype=numpy.float32)
+        Cmat = numpy.zeros((num_nodes, 4), dtype=numpy.uint8)
+        reconstructed_base_indices = numpy.full(num_nodes, 8, dtype=numpy.uint8)
+        reconstructed_alleles = numpy.full(num_nodes, 8, dtype=numpy.uint8)
+        column_base_indices_buf = numpy.zeros(4, dtype=numpy.uint8)
+        local_snps = node_snps_chunks[t]
+        for b in range(chunk_start, chunk_end):
+            start = position_offsets[b]
+            end = position_offsets[b + 1]
+            _reconstruct_single_pattern_T(
+                base_patterns[b],
+                positions_flat[start:end],
+                Lmat,
+                Cmat,
+                out_aln_T,
+                ordered_ascii_bases,
+                postordered_nodes,
+                preordered_nodes,
+                parent_nodes,
+                child_nodes,
+                seed_node,
+                ancestral_node_order,
+                node_pij_3d,
+                log_base_frequencies,
+                node_index_to_aln_row,
+                reconstructed_base_indices,
+                reconstructed_alleles,
+                column_base_indices_buf,
+                local_snps
+            )
+    node_snps = numpy.zeros(num_nodes, dtype=numpy.int32)
+    for t in range(n_chunks):
+        for n in range(num_nodes):
+            node_snps[n] += node_snps_chunks[t, n]
+    return node_snps
+
 
 # Convert integers to bases
 ###########################
@@ -540,12 +950,6 @@ def get_base_patterns(prefix, verbose, threads = 1):
     if verbose:
         print("Finding unique base patterns")
     t1=time.process_time()
-    
-    # Check njit function is compiled before multiprocessing
-    try:
-        seq_to_int()
-    except:
-        pass
 
     # Read in ordered sequence names
     sequence_names_fn = prefix + '.gaps.sequence_names.csv'
@@ -556,35 +960,23 @@ def get_base_patterns(prefix, verbose, threads = 1):
         for line in names_file:
             sequence_names.append(line.rstrip())
 
-    # Convert alignment to Numpy array
-    codec = 'utf-32-le' if sys.byteorder == 'little' else 'utf-32-be'
-    # Read in the unique base patterns
+    # Read in base patterns and base positions using compiled byte-buffer parsers
     base_patterns_fn = prefix + '.gaps.base_patterns.csv'
     if not os.path.isfile(base_patterns_fn):
         sys.exit("Unable to open base patterns file " + base_patterns_fn + "\n")
-    array_of_pattern_arrays = []
-    with open(base_patterns_fn,'r') as pattern_file:
-        for line in pattern_file:
-            unicode_seq = numpy.frombuffer(bytearray(line.rstrip(), codec), dtype = 'U1')
-            out_array = numpy.ndarray(unicode_seq.shape, dtype = numpy.uint8)
-            seq_to_int(unicode_seq,out_array)
-            array_of_pattern_arrays.append(out_array)
-    vstacked_patterns = numpy.vstack(array_of_pattern_arrays)
-    # Read in base positions
-    array_of_position_arrays = []
     base_positions_fn = prefix + '.gaps.base_positions.csv'
     if not os.path.isfile(base_positions_fn):
         sys.exit("Unable to open base positions file " + base_positions_fn + "\n")
-    array_max = 0
-    with open(base_positions_fn, 'r') as positions_file:
-        for line in positions_file:
-            subarray = numpy.asarray(list(map(int,line.rstrip().split(','))),
-                                    dtype = numpy.int32)
-            array_of_position_arrays.append(subarray)
-            subarray_max = numpy.amax(subarray)
-            if subarray_max > array_max:
-                array_max = subarray_max
-    array_max = array_max + 1
+
+    with open(base_positions_fn, 'rb') as positions_file:
+        pos_bytes = numpy.fromfile(positions_file, dtype=numpy.uint8)
+    n_lines, n_nums = count_positions_and_lines(pos_bytes)
+    positions_flat, position_offsets, array_max = parse_positions_bytes(pos_bytes, n_lines, n_nums)
+
+    with open(base_patterns_fn, 'rb') as pattern_file:
+        pat_bytes = numpy.fromfile(pattern_file, dtype=numpy.uint8)
+    vstacked_patterns = parse_patterns_bytes(pat_bytes, n_lines, len(sequence_names))
+    array_of_position_arrays = FlattenedBasePositions(positions_flat, position_offsets)
 
     # Record timing
     t2=time.process_time()
@@ -617,42 +1009,25 @@ def reconstruct_alignment_column(column_index,
                                 threads = 1,
                                 verbose = False):
     
-    ### TIMING
-    if verbose:
-        prep_time = 0.0
-        calc_time = 0.0
-        prep_time_start = time.process_time()
-
     # Load shared memory output alignment
     out_aln_shm = shared_memory.SharedMemory(name = new_aln.name)
     out_aln = numpy.ndarray(new_aln.shape, dtype = numpy.int8, buffer = out_aln_shm.buf)
     
     # Generate data structures for reconstructions
-    num_nodes = len(tree.nodes())
+    num_nodes = postordered_nodes.size if postordered_nodes is not None else len(tree.nodes())
     Lmat = numpy.full((num_nodes,4), -numpy.inf, dtype = numpy.float32)
     Cmat = numpy.full((num_nodes,4), [0,1,2,3], dtype = numpy.uint8)
     reconstructed_base_indices = numpy.full(num_nodes, 8, dtype = numpy.uint8)
 
-    # Record SNPs reconstructed as occurring on each branch
-    
     ordered_bases = numpy.array([0,1,2,3,4], dtype=numpy.int8)
     node_snps = numpy.zeros(num_nodes, dtype = numpy.int32)
 
     # Load base pattern information
     base_patterns_shm = shared_memory.SharedMemory(name = base_patterns.name)
     base_patterns = numpy.ndarray(base_patterns.shape, dtype = base_patterns.dtype, buffer = base_patterns_shm.buf)
-    # Load base pattern position information
     
-    # Extract information for iterations
     column = base_patterns[column_index]
 
-    ### TIMING
-    if verbose:
-        prep_time_end = time.process_time()
-        prep_time = prep_time_end - prep_time_start
-        calc_time_start = time.process_time()
-
-    # Iterate over columns
     iterate_over_base_patterns(column,
                                 base_pattern_positions,
                                 Lmat,
@@ -735,9 +1110,9 @@ def jar(sequence_names = None,
     child_nodes_array = numpy.empty(num_nodes, dtype=object)
     leaf_node_list = []
     node_labels = numpy.empty(num_nodes, dtype=object)
-    node_pij = numpy.full((num_nodes,16), -numpy.inf, dtype=numpy.float32)
+    node_pij_3d = numpy.full((num_nodes, 4, 4), -numpy.inf, dtype=numpy.float32)
     postordered_nodes = numpy.arange(num_nodes, dtype=numpy.int32)
-    seed_node = None
+    seed_node = -1
     seed_node_edge_truncation = True
     node_index_to_aln_row = numpy.full(num_nodes, -1, dtype=numpy.int32)
     ancestral_node_indices = {}
@@ -762,32 +1137,23 @@ def jar(sequence_names = None,
         if node.parent_node == None:
             seed_node = node_index
         elif node.parent_node == tree.seed_node and seed_node_edge_truncation:
-            # Set the length of one root-to-child branch to ~zero
-            # as reconstruction should occur with rooting at a node
-            # midpoint rooting causes problems at the root, especially w/JC69
-            # With outgroup:
-            # Prefer to truncate the ingroup branch to force the recombinations
-            # onto the outgroup branch
             if outgroup_name is None or \
                             (outgroup_name is not None and node.taxon.label != outgroup_name):
                 seed_node_edge_truncation = False
-                node_pij[node_index,:]=calculate_pij(node.edge_length/1e6, rm)
+                node_pij_3d[node_index] = calculate_pij(node.edge_length/1e6, rm).reshape((4, 4))
             else:
-                node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
+                node_pij_3d[node_index] = calculate_pij(node.edge_length, rm).reshape((4, 4))
         else:
-            node_pij[node_index,:]=calculate_pij(node.edge_length, rm)
-        # Store information to avoid subsequent recalculation as
-        # look up of taxon labels with dendropy is slower than native data structures
+            node_pij_3d[node_index] = calculate_pij(node.edge_length, rm).reshape((4, 4))
         node_label = node.taxon.label
         node_indices[node_label] = node_index
         node_labels[node_index] = node_label
         if node.is_leaf():
             leaf_node_list.append(node_index)
-            child_nodes_array[node_index] = numpy.full(1, -1, dtype=numpy.int32) # Cannot leave array empty
+            child_nodes_array[node_index] = numpy.full(1, -1, dtype=numpy.int32)
         else:
             child_nodes_array[node_index] = numpy.array([node_indices[child.taxon.label] for child in node.child_node_iter()],
                                                     dtype=numpy.int32)
-    leaf_nodes = numpy.array(leaf_node_list, dtype = numpy.int32)
     child_nodes = convert_to_square_numpy_array(child_nodes_array)
 
     # Store the preordered nodes and record parent node information
@@ -796,136 +1162,89 @@ def jar(sequence_names = None,
     for node_count,node in enumerate(tree.preorder_node_iter()):
         if node.parent_node != None:
             node_index = node_indices[node.taxon.label]
-            preordered_nodes[node_count-1] = node_index # Do not add root node to preordered nodes
+            preordered_nodes[node_count-1] = node_index
             parent_nodes[node_index] = node_indices[node.parent_node.taxon.label]
 
-        
-    ## Switch this to a numpy.int8 data type use the default as 5 the corresponding value to N
-    ## form the seq_to_int transformation o the sequence 
-    new_aln_array = numpy.full((max_pos,len(ancestral_node_indices)), 5, dtype = numpy.int8)
-    
-    # Index names for reconstruction
+    # Transposed contiguous ASCII alignment buffer (n_ancestral, max_pos), initialized to 78 (ASCII 'N')
+    out_aln_T = numpy.full((len(ancestral_node_indices), max_pos), 78, dtype=numpy.uint8)
     ancestral_node_order = numpy.fromiter(ancestral_node_indices.keys(), dtype=numpy.int32)
+    ordered_ascii_bases = numpy.array([65, 67, 71, 84, 45], dtype=numpy.uint8)
+    log_f = numpy.log(f).astype(numpy.float32)
 
-    # Compile functions prior to multiprocessing
-    for func in [find_most_likely_base_given_descendents,
-                process_leaf,
-                calculate_root_likelihood,
-                count_node_snps,
-                reconstruct_alleles,
-                fill_out_aln,
-                iterate_over_base_patterns,
-                int_to_seq]:
-        try:
-            func()
-        except:
-            pass
+    if isinstance(base_pattern_positions, FlattenedBasePositions):
+        positions_flat = base_pattern_positions.positions_flat
+        position_offsets = base_pattern_positions.position_offsets
+    else:
+        lengths = numpy.array([len(p) for p in base_pattern_positions], dtype=numpy.int32)
+        position_offsets = numpy.empty(len(lengths) + 1, dtype=numpy.int32)
+        position_offsets[0] = 0
+        numpy.cumsum(lengths, out=position_offsets[1:])
+        positions_flat = numpy.concatenate(base_pattern_positions).astype(numpy.int32, copy=False)
 
     # Reconstruct each base position
     if verbose:
         print("Reconstructing sites on tree")
+        prep_time_end = time.process_time()
+        prep_time = prep_time_end - prep_time_start
+        calc_time_start = time.process_time()
 
-    with SharedMemoryManager() as smm:
-    
-        # Convert alignment to shared memory numpy array
-        new_aln_shared_array = generate_shared_mem_array(new_aln_array, smm)
-        
-        # Convert base patterns to shared memory numpy array
-        base_patterns_shared_array = generate_shared_mem_array(base_patterns, smm)
-        
-        # Convert base pattern positions to shared memory numpy array
-        bp_list = list(range(len(base_patterns)))
-        npatterns = len(base_patterns)
+    if threads > 1:
+        try:
+            numba.set_num_threads(min(int(threads), numba.config.NUMBA_NUM_THREADS))
+        except Exception:
+            pass
+        total_node_snps = reconstruct_all_patterns_T_parallel(
+            base_patterns,
+            positions_flat,
+            position_offsets,
+            out_aln_T,
+            ordered_ascii_bases,
+            postordered_nodes,
+            preordered_nodes,
+            parent_nodes,
+            child_nodes,
+            numpy.int32(seed_node),
+            ancestral_node_order,
+            node_pij_3d,
+            log_f,
+            node_index_to_aln_row,
+            int(threads)
+        )
+    else:
+        total_node_snps = reconstruct_all_patterns_T(
+            base_patterns,
+            positions_flat,
+            position_offsets,
+            out_aln_T,
+            ordered_ascii_bases,
+            postordered_nodes,
+            preordered_nodes,
+            parent_nodes,
+            child_nodes,
+            numpy.int32(seed_node),
+            ancestral_node_order,
+            node_pij_3d,
+            log_f,
+            node_index_to_aln_row
+        )
 
-        if verbose:
-            prep_time_end = time.process_time()
-            prep_time = prep_time_end - prep_time_start
-            calc_time_start = time.process_time()
-
-
-        if threads > 1:
-
-            # Parallelise reconstructions across alignment columns using multiprocessing
-            with multiprocessing.get_context(method=mp_method).Pool(processes = threads) as pool:
-                reconstruction_results = pool.starmap(partial(
-                                            reconstruct_alignment_column,
-                                                tree = tree,
-                                                preordered_nodes = preordered_nodes,
-                                                postordered_nodes = postordered_nodes,
-                                                leaf_nodes = leaf_nodes,
-                                                parent_nodes = parent_nodes,
-                                                child_nodes = child_nodes,
-                                                seed_node = seed_node,
-                                                node_pij = node_pij,
-                                                node_index_to_aln_row = node_index_to_aln_row,
-                                                ancestral_node_order = ancestral_node_order,
-                                                base_patterns = base_patterns_shared_array,
-                                                base_frequencies = f,
-                                                new_aln = new_aln_shared_array,
-                                                threads = threads,
-                                                verbose = verbose),
-                                            zip(bp_list, base_pattern_positions)
-                                        )
-            
-            # Write out alignment while shared memory manager still active
-            out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
-            out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
-                     
-            # Release pool nodes
-            pool.join()
-        
-        else:
-        
-            # Run as a loop on a single core
-            reconstruction_results = \
-                [
-                            reconstruct_alignment_column(
-                                b,
-                                p,
-                                tree = tree,
-                                preordered_nodes = preordered_nodes,
-                                postordered_nodes = postordered_nodes,
-                                leaf_nodes = leaf_nodes,
-                                parent_nodes = parent_nodes,
-                                child_nodes = child_nodes,
-                                seed_node = seed_node,
-                                node_pij = node_pij,
-                                node_index_to_aln_row = node_index_to_aln_row,
-                                ancestral_node_order = ancestral_node_order,
-                                base_patterns = base_patterns_shared_array,
-                                base_frequencies = f,
-                                new_aln = new_aln_shared_array,
-                                threads = threads,
-                                verbose = verbose) for b,p in zip(bp_list, base_pattern_positions)
-                ]
-            
-            # Extract final result
-            out_aln_shm = shared_memory.SharedMemory(name = new_aln_shared_array.name)
-            out_aln = numpy.ndarray(new_aln_array.shape, dtype = 'i1', buffer = out_aln_shm.buf)
-
-    # Process outputs
-    aln_line = numpy.full(len(out_aln[:,0]),"?",dtype="U1")
+    # Process outputs: write contiguous ASCII rows directly
     if verbose:
         print("Printing alignment with internal node sequences: ", output_prefix+".joint.aln")
     source = alignment_filename
     destination = output_prefix+".joint.aln"
     dest = shutil.copy(source, destination)
-    with open(dest, "a") as asr_output:
-        for i,node_index in enumerate(ancestral_node_order):
+    with open(dest, "ab") as asr_output:
+        for i, node_index in enumerate(ancestral_node_order):
             taxon = ancestral_node_indices[node_index]
-            asr_output.write('>' + taxon + '\n')
-            int_to_seq(out_aln[:,i], aln_line)
-            asr_output.write(''.join(aln_line) + "\n")
+            asr_output.write(('>' + taxon + '\n').encode('ascii'))
+            asr_output.write(out_aln_T[i])
+            asr_output.write(b"\n")
 
-    # Combine results for each base across the alignment
+    # Set branch lengths to total reconstructed SNPs per branch
     for node in tree.preorder_node_iter():
-        node.edge_length = 0.0 # reset lengths to convert to SNPs
         node_index = node_indices[node.taxon.label]
-        for x in range(len(reconstruction_results)):
-            try:
-                node.edge_length += reconstruction_results[x][node_index];
-            except AttributeError:
-                continue
+        node.edge_length = float(total_node_snps[node_index])
 
     ### TIMING
     if verbose:
@@ -949,4 +1268,3 @@ def jar(sequence_names = None,
         print("Done")
         print('Time for JAR preparation:\t' + str(prep_time))
         print('Time for JAR calculation:\t' + str(calc_time))
-
